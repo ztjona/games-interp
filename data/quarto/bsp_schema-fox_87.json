@@ -1,0 +1,545 @@
+{
+  "bsp_set_name": "fox_87",
+  "animal": "fox",
+  "game": "quarto",
+  "num_bsps": 87,
+  "categories": {
+    "offered_piece": 4,
+    "cell_attribute": 64,
+    "game_phase": 3,
+    "cell_occupancy": 16
+  },
+  "filters": {
+    "include_categories": [
+      "cell_occupancy",
+      "cell_attribute",
+      "offered_piece",
+      "game_phase"
+    ],
+    "exclude_categories": null
+  },
+  "bsps": [
+    {
+      "id": "cell_0_0_occupied",
+      "description": "Is cell (0,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_1_occupied",
+      "description": "Is cell (0,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_2_occupied",
+      "description": "Is cell (0,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_3_occupied",
+      "description": "Is cell (0,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_0_occupied",
+      "description": "Is cell (1,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_1_occupied",
+      "description": "Is cell (1,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_2_occupied",
+      "description": "Is cell (1,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_3_occupied",
+      "description": "Is cell (1,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_0_occupied",
+      "description": "Is cell (2,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_1_occupied",
+      "description": "Is cell (2,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_2_occupied",
+      "description": "Is cell (2,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_3_occupied",
+      "description": "Is cell (2,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_0_occupied",
+      "description": "Is cell (3,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_1_occupied",
+      "description": "Is cell (3,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_2_occupied",
+      "description": "Is cell (3,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_3_occupied",
+      "description": "Is cell (3,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_0_size_tall",
+      "description": "Piece at (0,0) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_0_coloration_dark",
+      "description": "Piece at (0,0) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_0_shape_square",
+      "description": "Piece at (0,0) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_0_hole_hollow",
+      "description": "Piece at (0,0) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_size_tall",
+      "description": "Piece at (0,1) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_coloration_dark",
+      "description": "Piece at (0,1) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_shape_square",
+      "description": "Piece at (0,1) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_hole_hollow",
+      "description": "Piece at (0,1) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_size_tall",
+      "description": "Piece at (0,2) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_coloration_dark",
+      "description": "Piece at (0,2) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_shape_square",
+      "description": "Piece at (0,2) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_hole_hollow",
+      "description": "Piece at (0,2) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_size_tall",
+      "description": "Piece at (0,3) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_coloration_dark",
+      "description": "Piece at (0,3) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_shape_square",
+      "description": "Piece at (0,3) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_hole_hollow",
+      "description": "Piece at (0,3) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_size_tall",
+      "description": "Piece at (1,0) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_coloration_dark",
+      "description": "Piece at (1,0) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_shape_square",
+      "description": "Piece at (1,0) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_hole_hollow",
+      "description": "Piece at (1,0) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_size_tall",
+      "description": "Piece at (1,1) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_coloration_dark",
+      "description": "Piece at (1,1) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_shape_square",
+      "description": "Piece at (1,1) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_hole_hollow",
+      "description": "Piece at (1,1) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_size_tall",
+      "description": "Piece at (1,2) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_coloration_dark",
+      "description": "Piece at (1,2) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_shape_square",
+      "description": "Piece at (1,2) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_hole_hollow",
+      "description": "Piece at (1,2) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_size_tall",
+      "description": "Piece at (1,3) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_coloration_dark",
+      "description": "Piece at (1,3) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_shape_square",
+      "description": "Piece at (1,3) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_hole_hollow",
+      "description": "Piece at (1,3) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_size_tall",
+      "description": "Piece at (2,0) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_coloration_dark",
+      "description": "Piece at (2,0) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_shape_square",
+      "description": "Piece at (2,0) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_hole_hollow",
+      "description": "Piece at (2,0) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_size_tall",
+      "description": "Piece at (2,1) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_coloration_dark",
+      "description": "Piece at (2,1) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_shape_square",
+      "description": "Piece at (2,1) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_hole_hollow",
+      "description": "Piece at (2,1) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_size_tall",
+      "description": "Piece at (2,2) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_coloration_dark",
+      "description": "Piece at (2,2) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_shape_square",
+      "description": "Piece at (2,2) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_hole_hollow",
+      "description": "Piece at (2,2) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_size_tall",
+      "description": "Piece at (2,3) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_coloration_dark",
+      "description": "Piece at (2,3) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_shape_square",
+      "description": "Piece at (2,3) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_hole_hollow",
+      "description": "Piece at (2,3) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_size_tall",
+      "description": "Piece at (3,0) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_coloration_dark",
+      "description": "Piece at (3,0) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_shape_square",
+      "description": "Piece at (3,0) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_hole_hollow",
+      "description": "Piece at (3,0) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_size_tall",
+      "description": "Piece at (3,1) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_coloration_dark",
+      "description": "Piece at (3,1) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_shape_square",
+      "description": "Piece at (3,1) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_hole_hollow",
+      "description": "Piece at (3,1) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_size_tall",
+      "description": "Piece at (3,2) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_coloration_dark",
+      "description": "Piece at (3,2) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_shape_square",
+      "description": "Piece at (3,2) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_hole_hollow",
+      "description": "Piece at (3,2) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_size_tall",
+      "description": "Piece at (3,3) is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_coloration_dark",
+      "description": "Piece at (3,3) is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_shape_square",
+      "description": "Piece at (3,3) is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_hole_hollow",
+      "description": "Piece at (3,3) is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "offered_size_tall",
+      "description": "Offered piece is TALL (1) else SHORT (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "offered_coloration_dark",
+      "description": "Offered piece is DARK (1) else LIGHT (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "offered_shape_square",
+      "description": "Offered piece is SQUARE (1) else ROUND (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "offered_hole_hollow",
+      "description": "Offered piece is HOLLOW (1) else SOLID (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "game_phase_early",
+      "description": "Early game (0-5 pieces on board)",
+      "type": "binary",
+      "category": "game_phase"
+    },
+    {
+      "id": "game_phase_mid",
+      "description": "Mid game (6-11 pieces on board)",
+      "type": "binary",
+      "category": "game_phase"
+    },
+    {
+      "id": "game_phase_late",
+      "description": "Late game (12-16 pieces on board)",
+      "type": "binary",
+      "category": "game_phase"
+    }
+  ]
+}
