@@ -11,6 +11,7 @@ from .architectures import (
     VanillaSAE,
 )
 from .hooks import ActivationStore, list_hooks, load_game_model
+from .registry import register_training_run
 from .train import (
     compute_metrics,
     iter_batches,
@@ -41,4 +42,6 @@ __all__ = [
     "load_activation_data",
     "save_checkpoint",
     "load_checkpoint",
+    # Registry
+    "register_training_run",
 ]

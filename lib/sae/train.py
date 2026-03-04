@@ -2,12 +2,14 @@
 
 from __future__ import annotations
 
+import json
 import sys
 import time
 from pathlib import Path
 from typing import Any
 
 import torch
+from tqdm import tqdm
 
 from .architectures import BaseSAE, BatchTopKSAE, ARCHITECTURES
 
@@ -94,11 +96,15 @@ def train_sae(
     lr: float,
     log_every: int = 500,
     seed: int = 42,
+    metrics_file: Path | str | None = None,
 ) -> dict[str, Any]:
     """Train an SAE on pre-collected activation data.
 
     For BatchTopKSAE, automatically calibrates inference thresholds after
     the training loop using the same data.
+
+    Args:
+        metrics_file: Optional path to write metrics as JSONL for live monitoring
 
     Returns:
         dict with keys: num_steps, num_epochs, wall_time_seconds,
@@ -112,6 +118,13 @@ def train_sae(
     metrics_log: list[dict] = []
     step = 0
     epoch = 0
+
+    # Open metrics file for live logging
+    metrics_fh = None
+    if metrics_file:
+        metrics_file = Path(metrics_file)
+        metrics_file.parent.mkdir(parents=True, exist_ok=True)
+        metrics_fh = open(metrics_file, "w")
     t_start = time.time()
 
     _stderr(
@@ -119,6 +132,9 @@ def train_sae(
         f"d_input={sae.d_input}, d_dict={sae.d_dict} | "
         f"{num_batches} steps, batch_size={batch_size}, lr={lr}"
     )
+
+    # Progress bar
+    pbar = tqdm(total=num_batches, desc="Training", unit="step")
 
     while step < num_batches:
         epoch += 1
@@ -134,6 +150,7 @@ def train_sae(
             loss.backward()
             torch.nn.utils.clip_grad_norm_(sae.parameters(), 1.0)
             optimizer.step()
+            pbar.update(1)
             sae.normalize_decoder()
 
             step += 1
@@ -150,14 +167,29 @@ def train_sae(
                     },
                     **eval_metrics,
                 }
+
                 metrics_log.append(log_entry)
-                _stderr(
-                    f"  step {step}/{num_batches} | "
-                    f"loss={log_entry['loss']:.4f} | "
-                    f"L0={eval_metrics['l0']:.1f} | "
-                    f"FVU={eval_metrics['fvu']:.4f} | "
-                    f"dead={eval_metrics['dead_features_pct']:.1f}%"
+
+                # Write to JSONL file for live monitoring
+                if metrics_fh:
+                    metrics_fh.write(json.dumps(log_entry) + "\n")
+                    metrics_fh.flush()  # Ensure immediate write for live plotting
+
+                # Update progress bar with latest metrics
+                pbar.set_postfix(
+                    {
+                        "loss": f"{log_entry['loss']:.4f}",
+                        "L0": f"{eval_metrics['l0']:.1f}",
+                        "FVU": f"{eval_metrics['fvu']:.4f}",
+                        "dead": f"{eval_metrics['dead_features_pct']:.1f}%",
+                    }
                 )
+
+    pbar.close()
+
+    # Close metrics file
+    if metrics_fh:
+        metrics_fh.close()
 
     wall_time = time.time() - t_start
     _stderr(f"Training complete. {step} steps in {wall_time:.1f}s ({epoch} epochs)")
@@ -189,8 +221,9 @@ def train_sae(
 # ---------------------------------------------------------------------------
 
 
-def save_checkpoint(sae: BaseSAE, path: Path, metadata: dict[str, Any]):
+def save_checkpoint(sae: BaseSAE, path: Path | str, metadata: dict[str, Any]):
     """Save SAE weights and metadata to a .pt checkpoint file."""
+    path = Path(path)  # Convert to Path if string
     path.parent.mkdir(parents=True, exist_ok=True)
     checkpoint = {
         "state_dict": sae.state_dict(),

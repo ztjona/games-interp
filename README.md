@@ -12,12 +12,22 @@ games-interp/
 │   │   └── CNN_uncoupled.py #   Model class definition
 │   ├── othello/             #   GPT-style transformer (planned)
 │   └── tictactoe/           #   CNN models (planned)
+├── lib/                     # Core SAE training library
+│   └── sae/                 #   SAE architectures, training loop, registry
+│       ├── __init__.py      #   Public API exports
+│       ├── architectures.py #   6 SAE variants (vanilla, topk, etc.)
+│       ├── train.py         #   train_sae(), metrics, checkpoints
+│       ├── registry.py      #   Experiment tracking
+│       └── hooks.py         #   Model hook utilities
 ├── saes/                    # Trained SAE checkpoints (per game)
-│   ├── quarto/
+│   ├── quarto/              #   {experiment}-{arch}-{hook}-*.pt
+│   │   └── training_registry.json  # Experiment metadata
 │   ├── othello/
 │   └── tictactoe/
 ├── data/                    # Activation datasets & game states (.pt)
 │   ├── quarto/              #   {hook}_{opponents}_activations.pt + _meta.pt
+│   │   ├── bsp_labels-*.pt  #   BSP label tensors
+│   │   └── bsp_schema-*.json #   BSP definitions
 │   ├── othello/
 │   └── tictactoe/
 ├── bsps/                    # [DEPRECATED] Legacy BSP JSON schemas
@@ -28,9 +38,16 @@ games-interp/
 │   ├── deduplicate_positions.py  # CLI: combine and deduplicate position files
 │   ├── compute_bsp_labels.py     # CLI: compute BSP labels from metadata
 │   ├── generate_bsps.py          # [Can deprecate] BSP schema generator
+│   ├── plot_training.py          # Live training metrics visualization
 │   └── games/                     # Game-specific modules
 │       ├── __init__.py            #   Registry (get_game_module)
 │       └── quarto.py              #   Quarto: bots, positions, BSP computation
+├── configs/                 # YAML training configurations
+│   ├── pilot-vanilla.yaml   #   Example: vanilla SAE config
+│   └── pilot-topk.yaml      #   Example: topk SAE config
+├── train_vanilla.py         # [DELETE after pilot finishes] Direct training: vanilla SAE
+├── train_topk.py            # [DELETE after pilot finishes] Direct training: topk SAE
+├── sae_train.py             # Unified training CLI (YAML config support)
 ├── Quarto-specifications.md      # Game-specific documentation
 ├── SELF-IMPROVEMENT.md           # Agent/skill update recommendations
 └── .gitignore
@@ -39,8 +56,10 @@ games-interp/
 ## Setup
 
 ```bash
-pip install docopt pyyaml torch numpy tqdm quartopy
+pip install torch numpy tqdm quartopy pyyaml docopt plotly dash
 ```
+
+**Stack:** PyTorch, NumPy, tqdm, Plotly, Dash, docopt, YAML, quartopy
 
 ### Current Quarto Datasets (March 2026)
 
@@ -124,6 +143,83 @@ python scripts/deduplicate_positions.py file1.pt file2.pt file3.pt --output comb
 Output includes provenance metadata tracking all source files and deduplication statistics.
 
 ### SAE Training & Evaluation
+
+#### Unified Training with YAML Configs
+
+The project uses a unified CLI script (`sae_train.py`) with YAML configuration files for reproducible SAE training:
+
+```bash
+# Train from config file (recommended)
+python sae_train.py --config=configs/pilot-vanilla.yaml
+python sae_train.py --config=configs/pilot-topk.yaml
+
+# Or use command line arguments
+python sae_train.py pilot vanilla --expansion=8 --lr=3e-4
+python sae_train.py pilot topk --k=16 --expansion=8
+
+# Parallel experiments (in separate terminals)
+python sae_train.py sweep-lr-1 vanilla --lr=1e-4 &
+python sae_train.py sweep-lr-2 vanilla --lr=3e-4 &
+python sae_train.py sweep-lr-3 vanilla --lr=1e-3 &
+
+# Monitor training live in another terminal
+python scripts/plot_training.py saes/quarto/pilot-*_metrics.jsonl --live
+```
+
+**Outputs:**
+- Checkpoints: `saes/{game}/{experiment}-{arch}-{hook}-*.pt`
+- Metrics (JSONL): `saes/{game}/{experiment}-{arch}-{hook}-*_metrics.jsonl`
+- Registry: `saes/{game}/training_registry.json` (experiment tracking)
+
+**YAML Config Example** (`configs/pilot-vanilla.yaml`):
+```yaml
+experiment: pilot
+architecture: vanilla
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 1000    # Quick test
+lr: 3e-4
+seed: 42
+log_every: 50        # Frequent logs for monitoring
+l1_weight: 1e-3
+```
+
+#### Live Training Monitoring with Plotly Dash
+
+Monitor training progress in real-time or compare multiple runs:
+
+```bash
+# One-time static plot (opens in browser)
+python scripts/plot_training.py saes/quarto/pilot-vanilla-exp8-fc1_metrics.jsonl
+
+# Live monitoring server (updates every 10s automatically)
+python scripts/plot_training.py saes/quarto/pilot-*_metrics.jsonl --live
+# Then open http://localhost:8050 in your browser
+# Leave the tab open - plot refreshes automatically, no need to reload
+
+# Compare multiple architectures side-by-side (live)
+python scripts/plot_training.py saes/quarto/pilot-vanilla-exp8-fc1_metrics.jsonl \
+                                saes/quarto/pilot-topk-k16-exp8-fc1_metrics.jsonl --live
+```
+
+**Metrics plotted:**
+- **Loss**: Reconstruction loss (lower is better)
+- **L0**: Average active features per sample (sparsity measure)
+- **FVU**: Fraction of variance unexplained (closer to 0 is better)
+- **Dead Features %**: Percentage of features that never activate (track feature utilization)
+
+**Live mode** runs a local web server (Dash). Open the URL once in your browser and leave 
+the tab open. The plot refreshes automatically every 10 seconds - no need to reload or reopen tabs.
+Each training run appears as a separate colored trace on shared subplots for easy comparison.
+
+**JSONL format:** Metrics are logged as JSON Lines (one JSON object per line), enabling
+streaming writes during training and easy incremental parsing. Each line contains:
+`{"step": int, "loss": float, "l0": float, "fvu": float, "dead_features_pct": float}`
+
+#### Advanced Training via Skills (For Custom Architectures)
 
 Training and evaluation scripts live in the agent skill directories and are invoked
 from the project root:

@@ -1,0 +1,66 @@
+{
+  "test-vanilla-exp4-fc1": {
+    "experiment": "test",
+    "architecture": "vanilla",
+    "game": "quarto",
+    "hook": "fc1",
+    "timestamp": "2026-03-03T21:06:33.617619",
+    "checkpoint": "saes\\quarto\\test-vanilla-exp4-fc1.pt",
+    "expansion": 4,
+    "batch_size": 4096,
+    "num_batches": 100,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 20,
+    "l1_weight": 0.001,
+    "final_metrics": {
+      "l0": 265.73,
+      "fvu": 0.037599,
+      "mse": 11.066859,
+      "dead_features_pct": 0.0
+    }
+  },
+  "pilot-vanilla-exp8-fc1": {
+    "experiment": "pilot",
+    "architecture": "vanilla",
+    "game": "quarto",
+    "hook": "fc1",
+    "timestamp": "2026-03-04T13:07:44.977706",
+    "checkpoint": "saes\\quarto\\pilot-vanilla-exp8-fc1.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 50,
+    "l1_weight": 0.001,
+    "final_metrics": {
+      "l0": 574.26,
+      "fvu": 0.000183,
+      "mse": 0.053874,
+      "dead_features_pct": 28.52
+    }
+  },
+  "pilot-topk-k16-exp8-fc1": {
+    "experiment": "pilot",
+    "architecture": "topk",
+    "game": "quarto",
+    "hook": "fc1",
+    "timestamp": "2026-03-04T13:10:19.532742",
+    "checkpoint": "saes\\quarto\\pilot-topk-k16-exp8-fc1.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 50,
+    "k": 16,
+    "aux_loss_weight": 0.01,
+    "final_metrics": {
+      "l0": 16.0,
+      "fvu": 0.007813,
+      "mse": 2.299656,
+      "dead_features_pct": 88.67
+    }
+  }
+}
