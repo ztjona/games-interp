@@ -1,14 +1,18 @@
-"""Compute Board State Property (BSP) labels from activation metadata.
+"""Compute Board State Property (BSP) labels from position or activation metadata.
 
-Reads metadata from collect_activations.py output and computes binary BSP labels
-using game-specific computation functions. Supports filtering BSPs by category.
+Accepts either:
+  - A positions file (positions-*.pt from deduplicate_positions.py)
+  - An activation metadata file (*_meta.pt from collect_activations.py --opponents mode)
+
+Both file formats share the same structure: {boards, pieces, metadata, provenance}.
+The standard workflow uses positions files directly, avoiding redundant meta files.
 
 Usage:
-    compute_bsp_labels.py <meta_file> --game <name> [options]
+    compute_bsp_labels.py <data_file> --game <name> [options]
     compute_bsp_labels.py (-h | --help)
 
 Arguments:
-    <meta_file>    Path to *_meta.pt file from collect_activations.py
+    <data_file>    Path to positions-*.pt or *_meta.pt file
 
 Options:
     -h --help                      Show this help message
@@ -22,14 +26,15 @@ Options:
     --list-categories              List available BSP categories and exit
 
 Examples:
-    # Compute all BSPs
-    python compute_bsp_labels.py data/quarto/fc1_random_v_random_meta.pt --game quarto
+    # Compute all BSPs from a positions file (standard workflow)
+    python compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt --game quarto --name gorilla
 
-    # Only cell properties (no threats)
-    python compute_bsp_labels.py data/quarto/fc1_meta.pt --game quarto --categories cell_occupancy,cell_attribute
+    # Only cell properties
+    python compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt --game quarto --name fox \\
+        --categories cell_occupancy,cell_attribute,offered_piece,game_phase
 
-    # Exclude complex categories
-    python compute_bsp_labels.py data/quarto/fc1_meta.pt --game quarto --exclude-categories threat_square_2x2
+    # From legacy _meta.pt file
+    python compute_bsp_labels.py data/quarto/fc1_random_v_random_meta.pt --game quarto --name gorilla
 """
 
 from __future__ import annotations
@@ -81,7 +86,7 @@ def filter_bsp_definitions(
 def main():
     args = docopt(__doc__)
 
-    meta_path = Path(args["<meta_file>"])
+    meta_path = Path(args["<data_file>"])
     game = args["--game"]
 
     # Load game module
@@ -132,8 +137,8 @@ def main():
         file=sys.stderr,
     )
 
-    # Load metadata
-    print(f"Loading metadata from {meta_path}...", file=sys.stderr)
+    # Load metadata — same structure for positions-*.pt and *_meta.pt files
+    print(f"Loading data from {meta_path}...", file=sys.stderr)
     meta_data = torch.load(meta_path, map_location="cpu", weights_only=False)
     metadata_list = meta_data.get("metadata", [])
     n_samples = len(metadata_list)
@@ -196,29 +201,11 @@ def main():
     bsp_set_name = f"{animal_name}_{len(selected_bsps)}"
     print(f"\nUsing BSP set name: {bsp_set_name}", file=sys.stderr)
 
-    # Extract hook and opponents from meta filename
-    # Expected format: {hook}_{opponents}_meta.pt OR {hook}_{opponents}_flat_meta.pt
-    # E.g.: fc1_random_v_random_meta.pt, fc1_Aa_replay-LossBT_meta.pt
-    stem = meta_path.stem  # e.g., "fc1_random_v_random_meta"
-
-    # Remove _meta suffix
-    if stem.endswith("_meta"):
-        stem = stem[:-5]  # Remove "_meta"
-
-    # Remove _flat suffix if present
-    if stem.endswith("_flat"):
-        stem = stem[:-5]  # Remove "_flat"
-
-    # First part is hook, rest is opponents
-    parts = stem.split("_", 1)
-    hook = parts[0] if len(parts) > 0 else "unknown"
-    opponents = parts[1] if len(parts) > 1 else "unknown"
-
-    # Determine output paths
+    # Determine output paths — always bsp_labels-{bsp_set_name}.pt (no hook/opponents in name)
     data_dir = meta_path.parent
 
     if args["--output"] == "auto" or args["--output"] is None:
-        output_path = data_dir / f"bsp_labels-{hook}-{opponents}-{bsp_set_name}.pt"
+        output_path = data_dir / f"bsp_labels-{bsp_set_name}.pt"
     else:
         output_path = Path(args["--output"])
 
@@ -253,10 +240,8 @@ def main():
     # Summary to stdout
     summary = {
         "bsp_set_name": bsp_set_name,
-        "meta_file": str(meta_path),
+        "data_file": str(meta_path),
         "game": game,
-        "hook": hook,
-        "opponents": opponents,
         "n_samples": n_samples,
         "num_bsps": len(selected_bsps),
         "bsp_labels_shape": list(bsp_labels.shape),

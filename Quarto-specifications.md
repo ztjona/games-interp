@@ -101,14 +101,17 @@ python scripts/sae_train.py list-hooks models/quarto/{model}.pt --model-class mo
 - `get_all_bsp_definitions()` — Returns metadata for all 164 BSPs
 - `compute_bsp_vector(metadata, bsp_ids)` — Computes binary labels from game state
 
-**Usage:**
+**Usage:** Pass a positions file directly (standard workflow). The `*_meta.pt` files from `collect_activations.py` are only created when using `--opponents` mode (on-the-fly position generation) and are not needed in the standard pipeline.
+
 ```bash
-# Compute all BSPs (will prompt for set name)
-python scripts/compute_bsp_labels.py data/quarto/fc1_random_v_random_meta.pt --game quarto
+# Compute all BSPs from a positions file
+python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
+    --game quarto --name gorilla
 
 # Compute subset (cell properties only)
-python scripts/compute_bsp_labels.py data/quarto/fc1_meta.pt --game quarto \
-    --categories cell_occupancy,cell_attribute
+python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
+    --game quarto --name fox \
+    --categories cell_occupancy,cell_attribute,offered_piece,game_phase
 ```
 
 ## Common BSP Sets

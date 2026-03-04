@@ -203,7 +203,7 @@ def main():
     else:
         output_path = Path(args["--output"])
 
-    meta_path = output_path.with_name(output_path.stem + "_meta.pt")
+    meta_path = output_path.with_name(output_path.stem + "_meta.pt") if not positions_file else None
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"\nModel:      {model_path}", file=sys.stderr)
@@ -213,7 +213,10 @@ def main():
     print(f"Device:     {device}", file=sys.stderr)
     print(f"Flatten:    {flatten}", file=sys.stderr)
     print(f"Output:     {output_path}", file=sys.stderr)
-    print(f"Meta:       {meta_path}", file=sys.stderr)
+    if meta_path:
+        print(f"Meta:       {meta_path}", file=sys.stderr)
+    else:
+        print(f"Meta:       (none — positions file is the source of record)", file=sys.stderr)
     print(f"Samples:    {n_samples}", file=sys.stderr)
     print(f"Batch size: {batch_size}", file=sys.stderr)
 
@@ -263,20 +266,21 @@ def main():
     }
 
     torch.save(activations, output_path)
-    torch.save(
-        {
-            "boards": board_tensor,
-            "pieces": piece_tensor,
-            "metadata": metadata,
-            "provenance": provenance,
-        },
-        meta_path,
-    )
+    if meta_path:
+        torch.save(
+            {
+                "boards": board_tensor,
+                "pieces": piece_tensor,
+                "metadata": metadata,
+                "provenance": provenance,
+            },
+            meta_path,
+        )
 
     # Summary JSON to stdout
     summary = {
         "activations_path": str(output_path),
-        "meta_path": str(meta_path),
+        "meta_path": str(meta_path) if meta_path else None,
         **provenance,
         "activation_shape": list(activations.shape),
     }
