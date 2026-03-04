@@ -61,6 +61,8 @@
       "fvu": 0.007813,
       "mse": 2.299656,
       "dead_features_pct": 88.67
-    }
+    },
+    "invalid": true,
+    "invalid_reason": "TopK aux loss had zero-gradient bug (step function on dead count). Dead features could never revive. Fixed 2026-03-04 with residual reconstruction aux loss."
   }
 }

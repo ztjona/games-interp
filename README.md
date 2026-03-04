@@ -3,6 +3,38 @@
 PhD research project using Sparse Autoencoders (SAEs) to extract interpretable features
 from board game neural networks (Quarto, Othello, Tic-tac-toe).
 
+## Status (March 2026)
+
+**Phase:** Architecture sweep preparation — pilot runs complete, bugs fixed, ready for systematic experiments.
+
+| Milestone | Status |
+|-----------|--------|
+| Quarto CNN trained (Aa_replay) | Done |
+| Position collection (4 opponent modes) | Done — 240K unique positions |
+| BSP computation (164 properties) | Done — gorilla (164) + fox (87) |
+| SAE library (6 architectures) | Done — vanilla, topk, batchtopk, gated, jumprelu, p-annealing |
+| Pilot experiments | Done — vanilla + topk on fc1 (see analysis below) |
+| Bug fixes (aux loss, metrics, kwargs) | Done — 2026-03-04 |
+| Architecture sweep ("arnold") | **Next** — 10 runs, 5K steps each |
+| BSP coverage evaluation | Pending — after sweep |
+| Causal verification | Pending |
+
+### Pilot Results Summary
+
+| SAE | FVU | L0 | Dead % | Verdict |
+|-----|-----|----|--------|---------|
+| Vanilla (exp8, l1=0.001) | 0.018% | 574 | 28.5% | Near-identity collapse — L1 too weak |
+| TopK k=16 (exp8) | 0.78% | 16 | 88.7% | **INVALID** — aux loss had zero-gradient bug |
+
+Both pilot runs converged by ~5K of 25K steps. Key learning: 25K steps unnecessary for this model; 5K sufficient for sweep.
+
+### Recent Fixes (2026-03-04)
+
+- **TopK aux loss**: Replaced step-function dead count (zero gradient) with residual reconstruction through dead features (Gao et al. 2024)
+- **Metrics**: Added `l0_std` (sparsity variation across positions) and `median_feat_freq` (typical feature utilization)
+- **Constructor kwargs**: Fixed BatchTopK (was passing unsupported `aux_loss_weight`) and JumpReLU (was passing `threshold` instead of `theta_init`)
+- **Test suite**: 48 tests covering all 6 architectures, aux loss gradients, and metrics completeness
+
 ## Project Structure
 
 ```

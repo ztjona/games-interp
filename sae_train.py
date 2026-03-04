@@ -19,6 +19,8 @@ Options:
     --lr=<float>            Learning rate [default: 3e-4]
     --seed=<int>            Random seed [default: 42]
     --log-every=<n>         Log metrics every N steps [default: 500]
+    --patience=<int>        Early-stop after N eval windows with no FVU improvement. 0=off [default: 0]
+    --min-improvement=<f>   Min relative FVU improvement to reset patience [default: 0.01]
     --device=<dev>          Device (cuda|cpu|auto) [default: auto]
 
     # Architecture-specific hyperparameters
@@ -27,6 +29,7 @@ Options:
     --aux-loss-weight=<f>   TopK/BatchTopK: auxiliary loss weight [default: 1e-2]
     --gated-l1=<float>      Gated: L1 weight on gate [default: 1e-3]
     --jump-threshold=<f>    JumpReLU: threshold parameter [default: 0.001]
+    --l0-target=<float>     JumpReLU: target L0 sparsity [default: 50]
     --p-start=<float>       P-annealing: initial p [default: 1.0]
     --p-end=<float>         P-annealing: final p [default: 0.2]
 
@@ -106,15 +109,21 @@ def get_arch_kwargs(arch: str, args: dict) -> dict:
     if arch == "vanilla":
         kwargs["l1_weight"] = float(args["--l1-weight"])
 
-    elif arch in ("topk", "batchtopk"):
+    elif arch == "topk":
         kwargs["k"] = int(args["--k"])
         kwargs["aux_loss_weight"] = float(args["--aux-loss-weight"])
+
+    elif arch == "batchtopk":
+        kwargs["k"] = int(args["--k"])
+        # BatchTopKSAE has no aux_loss_weight parameter
 
     elif arch == "gated":
         kwargs["l1_weight"] = float(args["--gated-l1"])
 
     elif arch == "jumprelu":
-        kwargs["threshold"] = float(args["--jump-threshold"])
+        kwargs["theta_init"] = float(args["--jump-threshold"])
+        kwargs["l0_target"] = float(args["--l0-target"])
+        # bandwidth, l0_weight use constructor defaults for now
 
     elif arch == "p-annealing":
         kwargs["p_start"] = float(args["--p-start"])
@@ -149,6 +158,8 @@ def main():
     lr = float(args["--lr"])
     seed = int(args["--seed"])
     log_every = int(args["--log-every"])
+    patience = int(args["--patience"])
+    min_improvement = float(args["--min-improvement"])
 
     # Device
     device_arg = args["--device"]
@@ -172,8 +183,9 @@ def main():
     print(f"Architecture: {arch}")
     print(f"Game: {game}, Hook: {hook}")
     print(f"Device: {device}")
+    es_info = f", patience={patience} (min_imp={min_improvement:.1%})" if patience > 0 else ""
     print(
-        f"Hyperparameters: expansion={expansion}x, batch_size={batch_size}, num_batches={num_batches}, lr={lr}"
+        f"Hyperparameters: expansion={expansion}x, batch_size={batch_size}, num_batches={num_batches}, lr={lr}{es_info}"
     )
 
     # Load data
@@ -211,6 +223,8 @@ def main():
         log_every=log_every,
         seed=seed,
         metrics_file=metrics_file,
+        patience=patience,
+        min_improvement=min_improvement,
     )
 
     # Prepare metadata
@@ -221,6 +235,8 @@ def main():
         "lr": lr,
         "seed": seed,
         "log_every": log_every,
+        "patience": patience,
+        "min_improvement": min_improvement,
         **arch_kwargs,
     }
 
@@ -234,9 +250,10 @@ def main():
         "hyperparameters": all_hyperparams,
         "constructor_kwargs": arch_kwargs,
         "training_results": {
-            "num_steps": results["num_steps"],
+            "final_step": results["final_step"],
             "num_epochs": results["num_epochs"],
             "wall_time_seconds": results["wall_time_seconds"],
+            "early_stopped": results["early_stopped"],
         },
         "final_metrics": results["final_metrics"],
     }

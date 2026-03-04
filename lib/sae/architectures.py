@@ -138,10 +138,12 @@ class TopKSAE(BaseSAE):
         super().__init__(d_input, d_dict, device)
         self.k = k
         self.aux_loss_weight = aux_loss_weight
+        self._pre_act: torch.Tensor | None = None
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         # Apply ReLU first (matches TopK(ReLU(z), k) in the paper)
         pre_act = F.relu((x - self.b_dec) @ self.W_enc + self.b_enc)
+        self._pre_act = pre_act  # stored for aux loss on dead features
         topk_vals, topk_idx = torch.topk(pre_act, self.k, dim=-1)
         h = torch.zeros_like(pre_act)
         h.scatter_(-1, topk_idx, topk_vals)
@@ -151,9 +153,30 @@ class TopKSAE(BaseSAE):
         x, x_hat, h = result["x"], result["x_hat"], result["h"]
         l_reconstruct = (x - x_hat).pow(2).sum(dim=-1).mean()
 
-        # Aux loss: penalise dead features — fraction of batch each feature is never active
-        alive_frac = (h > 0).float().mean(dim=0)  # (d_dict,)  avg activation rate
-        l_aux = (alive_frac == 0).float().sum()  # count of completely dead features
+        # Aux loss: reconstruct residual using dead features (Gao et al. 2024).
+        # Previous version counted dead features — a step function with zero
+        # gradient everywhere, so dead features could never revive.
+        alive_mask = (h > 0).any(dim=0)  # (d_dict,) True if feature fired
+        num_dead = int((~alive_mask).sum().item())
+
+        if num_dead > 0 and self._pre_act is not None:
+            # Mask pre-activations to dead features only
+            dead_pre_act = self._pre_act * (~alive_mask).float().unsqueeze(0)
+
+            # TopK among dead features to select which ones get gradient
+            k_aux = min(self.k, num_dead)
+            topk_vals, topk_idx = torch.topk(dead_pre_act, k_aux, dim=-1)
+            h_dead = torch.zeros_like(dead_pre_act)
+            h_dead.scatter_(-1, topk_idx, topk_vals)
+
+            # Dead features reconstruct the residual (no b_dec — already in x_hat)
+            residual = x - x_hat.detach()
+            x_hat_dead = h_dead @ self.W_dec
+            l_aux = (residual - x_hat_dead).pow(2).sum(dim=-1).mean()
+        else:
+            l_aux = torch.tensor(0.0, device=x.device)
+
+        self._pre_act = None  # free memory
 
         loss = l_reconstruct + self.aux_loss_weight * l_aux
         return {

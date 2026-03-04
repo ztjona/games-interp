@@ -28,30 +28,39 @@ def compute_metrics(sae: BaseSAE, x: torch.Tensor) -> dict[str, float]:
 
     Returns:
         l0:                 average active features per sample
+        l0_std:             std of active features per sample (plot as gray band)
         fvu:                fraction of variance unexplained
         mse:                mean squared reconstruction error
         dead_features_pct:  % of features inactive across the whole batch
+        median_feat_freq:   median per-feature firing rate across the batch
+                            (complements dead%: tracks typical feature utilisation)
     """
     sae.eval()
     with torch.no_grad():
         result = sae(x)
         x_hat, h = result["x_hat"], result["h"]
 
-        l0 = (h > 0).float().sum(dim=-1).mean().item()
+        active_per_sample = (h > 0).float().sum(dim=-1)
+        l0 = active_per_sample.mean().item()
+        l0_std = active_per_sample.std().item()
 
         mse = (x - x_hat).pow(2).sum(dim=-1).mean().item()
         var_x = x.var(dim=0).sum().item()
         fvu = mse / max(var_x, 1e-8)
 
-        alive = (h > 0).any(dim=0).float()
+        firing_rates = (h > 0).float().mean(dim=0)  # (d_dict,)
+        alive = (firing_rates > 0).float()
         dead_pct = (1.0 - alive.mean().item()) * 100.0
+        median_feat_freq = firing_rates.median().item()
 
     sae.train()
     return {
         "l0": round(l0, 2),
+        "l0_std": round(l0_std, 2),
         "fvu": round(fvu, 6),
         "mse": round(mse, 6),
         "dead_features_pct": round(dead_pct, 2),
+        "median_feat_freq": round(median_feat_freq, 6),
     }
 
 
@@ -97,6 +106,8 @@ def train_sae(
     log_every: int = 500,
     seed: int = 42,
     metrics_file: Path | str | None = None,
+    patience: int = 0,
+    min_improvement: float = 0.01,
 ) -> dict[str, Any]:
     """Train an SAE on pre-collected activation data.
 
@@ -105,10 +116,14 @@ def train_sae(
 
     Args:
         metrics_file: Optional path to write metrics as JSONL for live monitoring
+        patience: Early-stop after this many eval windows with no FVU improvement.
+                  0 (default) disables early stopping.
+        min_improvement: Minimum relative FVU improvement to reset patience counter.
+                         E.g. 0.01 means FVU must drop by at least 1% relative.
 
     Returns:
-        dict with keys: num_steps, num_epochs, wall_time_seconds,
-                        final_metrics, metrics_log
+        dict with keys: final_step, num_epochs, wall_time_seconds,
+                        final_metrics, metrics_log, early_stopped
     """
     torch.manual_seed(seed)
 
@@ -118,6 +133,12 @@ def train_sae(
     metrics_log: list[dict] = []
     step = 0
     epoch = 0
+
+    # Early stopping state
+    best_fvu = float("inf")
+    best_step = 0
+    patience_counter = 0
+    early_stopped = False
 
     # Open metrics file for live logging
     metrics_fh = None
@@ -176,14 +197,40 @@ def train_sae(
                     metrics_fh.flush()  # Ensure immediate write for live plotting
 
                 # Update progress bar with latest metrics
-                pbar.set_postfix(
-                    {
-                        "loss": f"{log_entry['loss']:.4f}",
-                        "L0": f"{eval_metrics['l0']:.1f}",
-                        "FVU": f"{eval_metrics['fvu']:.4f}",
-                        "dead": f"{eval_metrics['dead_features_pct']:.1f}%",
-                    }
-                )
+                postfix = {
+                    "loss": f"{log_entry['loss']:.4f}",
+                    "L0": f"{eval_metrics['l0']:.1f}",
+                    "FVU": f"{eval_metrics['fvu']:.4f}",
+                    "dead": f"{eval_metrics['dead_features_pct']:.1f}%",
+                }
+
+                # Early stopping check
+                current_fvu = eval_metrics["fvu"]
+                if current_fvu < best_fvu * (1 - min_improvement):
+                    best_fvu = current_fvu
+                    best_step = step
+                    patience_counter = 0
+                else:
+                    patience_counter += 1
+
+                if patience > 0:
+                    postfix["pat"] = f"{patience_counter}/{patience}"
+                    if patience_counter >= patience:
+                        early_stopped = True
+                        _stderr(
+                            f"Early stopping at step {step}: "
+                            f"FVU {current_fvu:.6f} has not improved "
+                            f"by >{min_improvement:.1%} over best "
+                            f"{best_fvu:.6f} (step {best_step}) "
+                            f"for {patience} eval windows."
+                        )
+                        pbar.set_postfix(postfix)
+                        break
+
+                pbar.set_postfix(postfix)
+
+        if early_stopped:
+            break
 
     pbar.close()
 
@@ -208,11 +255,12 @@ def train_sae(
         sae.train()
 
     return {
-        "num_steps": step,
+        "final_step": step,
         "num_epochs": epoch,
         "wall_time_seconds": round(wall_time, 2),
         "final_metrics": final_metrics,
         "metrics_log": metrics_log,
+        "early_stopped": early_stopped,
     }
 
 

@@ -6,6 +6,9 @@ Test categories:
   3. BatchTopK calibration — inference L0 ≈ k after calibrate_thresholds()
   4. Checkpoint round-trip — load(save(sae)) gives identical reconstructions
   5. Training sanity       — 100 steps reduces loss, FVU < 1.0, some features alive
+  6. Aux loss gradients    — TopK dead features receive non-zero gradients
+  7. Metrics completeness  — l0_std, median_feat_freq present and sensible
+  8. Early stopping        — patience triggers stop, disabled by default
 """
 
 import sys
@@ -286,3 +289,137 @@ class TestTrainingSanity:
         assert (
             dead_pct < 100.0
         ), f"{arch}: 100% of features are dead after {NUM_STEPS} steps"
+
+
+# ===========================================================================
+# 6. Aux loss gradients — dead features must receive gradient signal
+# ===========================================================================
+
+
+class TestAuxLossGradients:
+
+    def test_topk_dead_features_receive_gradient(self):
+        """TopK aux loss must provide non-zero gradients to dead feature weights.
+
+        Before the fix, the aux loss was a step function (count of dead features)
+        with zero gradient everywhere, making dead features irrecoverable.
+        """
+        sae = TopKSAE(D_INPUT, D_DICT, k=K, device=DEVICE)
+        x = _batch()
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        losses["loss"].backward()
+
+        h = result["h"]
+        dead_mask = ~(h > 0).any(dim=0)
+
+        if dead_mask.sum() == 0:
+            pytest.skip("No dead features in this batch — cannot test aux gradient")
+
+        dead_grad_norm = sae.W_enc.grad[:, dead_mask].norm().item()
+        assert dead_grad_norm > 0, (
+            f"TopK dead features get zero gradient (norm={dead_grad_norm:.6f}). "
+            f"Aux loss is not providing a learning signal."
+        )
+
+    def test_topk_aux_loss_is_zero_when_all_alive(self):
+        """If no features are dead, aux loss should be zero."""
+        # Use k = D_DICT so all features fire
+        sae = TopKSAE(D_INPUT, D_DICT, k=D_DICT, device=DEVICE)
+        x = _batch()
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        assert losses["l_aux"].item() == 0.0, (
+            "Aux loss should be 0 when all features are alive"
+        )
+
+
+# ===========================================================================
+# 7. Metrics completeness — new metrics present and sensible
+# ===========================================================================
+
+
+class TestMetricsCompleteness:
+
+    def test_new_metrics_present(self):
+        """compute_metrics must return l0_std and median_feat_freq."""
+        from lib.sae.train import compute_metrics
+
+        sae = _make("vanilla")
+        metrics = compute_metrics(sae, _batch())
+        assert "l0_std" in metrics, "l0_std missing from metrics"
+        assert "median_feat_freq" in metrics, "median_feat_freq missing from metrics"
+
+    def test_l0_std_is_zero_for_topk(self):
+        """TopK activates exactly K features per sample, so L0 std must be 0."""
+        from lib.sae.train import compute_metrics
+
+        sae = _make("topk")
+        metrics = compute_metrics(sae, _batch())
+        assert metrics["l0_std"] == 0.0, (
+            f"TopK L0 std should be exactly 0 (exact K per sample), got {metrics['l0_std']}"
+        )
+
+    def test_median_feat_freq_bounded(self):
+        """Median feature frequency must be in [0, 1]."""
+        from lib.sae.train import compute_metrics
+
+        for arch in ARCHITECTURES:
+            sae = _make(arch)
+            metrics = compute_metrics(sae, _batch())
+            mff = metrics["median_feat_freq"]
+            assert 0.0 <= mff <= 1.0, (
+                f"{arch}: median_feat_freq={mff} is outside [0, 1]"
+            )
+
+    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    def test_all_metrics_keys_present(self, arch):
+        """Every architecture must return the full set of expected metric keys."""
+        from lib.sae.train import compute_metrics
+
+        expected_keys = {"l0", "l0_std", "fvu", "mse", "dead_features_pct", "median_feat_freq"}
+        sae = _make(arch)
+        metrics = compute_metrics(sae, _batch())
+        missing = expected_keys - set(metrics.keys())
+        assert not missing, f"{arch}: missing metric keys: {missing}"
+
+
+# ===========================================================================
+# 8. Early stopping
+# ===========================================================================
+
+
+class TestEarlyStopping:
+
+    def test_disabled_by_default(self):
+        """With patience=0 (default), training runs all num_batches steps."""
+        sae = _make("vanilla")
+        results = train_sae(sae, _DATA, num_batches=50, batch_size=BATCH, lr=1e-3, log_every=10)
+        assert results["final_step"] == 50
+        assert results["early_stopped"] is False
+
+    def test_triggers_before_max_steps(self):
+        """With aggressive patience, training should stop before num_batches.
+
+        Strategy: train 20 steps first (SAE learns something), then continue
+        with patience=2. The well-trained SAE should plateau quickly on the
+        tiny synthetic data and trigger early stop before 500 additional steps.
+        """
+        sae = _make("vanilla")
+        # Pre-train so FVU is already low — plateau will come fast
+        train_sae(sae, _DATA, num_batches=100, batch_size=BATCH, lr=1e-3, log_every=50)
+
+        # Now train with very aggressive patience on an already-converged SAE
+        results = train_sae(
+            sae, _DATA, num_batches=500, batch_size=BATCH, lr=1e-3,
+            log_every=10, patience=3, min_improvement=0.5,  # require 50% improvement
+        )
+        assert results["early_stopped"] is True
+        assert results["final_step"] < 500
+
+    def test_results_keys(self):
+        """Results dict must contain early_stopped and final_step keys."""
+        sae = _make("vanilla")
+        results = train_sae(sae, _DATA, num_batches=20, batch_size=BATCH, lr=1e-3, log_every=10)
+        assert "early_stopped" in results
+        assert "final_step" in results
