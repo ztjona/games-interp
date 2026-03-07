@@ -60,4 +60,4 @@ def register_training_run(
     with open(registry_file, "w") as f:
         json.dump(registry, f, indent=2)
 
-    print(f"📝 Registered training run: {run_id}")
+    print(f"Registered training run: {run_id}")

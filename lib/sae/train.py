@@ -26,6 +26,8 @@ def _stderr(msg: str):
 def compute_metrics(sae: BaseSAE, x: torch.Tensor) -> dict[str, float]:
     """Compute standard SAE evaluation metrics on a batch.
 
+    Does NOT change the model's training/eval mode — caller is responsible.
+
     Returns:
         l0:                 average active features per sample
         l0_std:             std of active features per sample (plot as gray band)
@@ -35,7 +37,6 @@ def compute_metrics(sae: BaseSAE, x: torch.Tensor) -> dict[str, float]:
         median_feat_freq:   median per-feature firing rate across the batch
                             (complements dead%: tracks typical feature utilisation)
     """
-    sae.eval()
     with torch.no_grad():
         result = sae(x)
         x_hat, h = result["x_hat"], result["h"]
@@ -53,7 +54,6 @@ def compute_metrics(sae: BaseSAE, x: torch.Tensor) -> dict[str, float]:
         dead_pct = (1.0 - alive.mean().item()) * 100.0
         median_feat_freq = firing_rates.median().item()
 
-    sae.train()
     return {
         "l0": round(l0, 2),
         "l0_std": round(l0_std, 2),
@@ -157,86 +157,91 @@ def train_sae(
     # Progress bar
     pbar = tqdm(total=num_batches, desc="Training", unit="step")
 
-    while step < num_batches:
-        epoch += 1
-        for batch in iter_batches(data, batch_size, shuffle=True):
-            if step >= num_batches:
+    stop_reason: str | None = None
+    try:
+        while step < num_batches:
+            epoch += 1
+            for batch in iter_batches(data, batch_size, shuffle=True):
+                if step >= num_batches:
+                    break
+
+                result = sae(batch)
+                losses = sae.compute_loss(result)
+                loss = losses["loss"]
+
+                optimizer.zero_grad()
+                loss.backward()
+                torch.nn.utils.clip_grad_norm_(sae.parameters(), 1.0)
+                optimizer.step()
+                pbar.update(1)
+                sae.normalize_decoder()
+
+                step += 1
+
+                if step % log_every == 0 or step == num_batches:
+                    eval_metrics = compute_metrics(sae, batch)
+                    log_entry: dict[str, Any] = {
+                        "step": step,
+                        "loss": round(loss.item(), 6),
+                        **{
+                            k: round(v.item(), 6) if isinstance(v, torch.Tensor) else v
+                            for k, v in losses.items()
+                            if k != "loss"
+                        },
+                        **eval_metrics,
+                    }
+
+                    metrics_log.append(log_entry)
+
+                    # Write to JSONL file for live monitoring
+                    if metrics_fh:
+                        metrics_fh.write(json.dumps(log_entry) + "\n")
+                        metrics_fh.flush()  # Ensure immediate write for live plotting
+
+                    # Update progress bar with latest metrics
+                    postfix = {
+                        "loss": f"{log_entry['loss']:.4f}",
+                        "L0": f"{eval_metrics['l0']:.1f}",
+                        "FVU": f"{eval_metrics['fvu']:.4f}",
+                        "dead": f"{eval_metrics['dead_features_pct']:.1f}%",
+                    }
+
+                    # Early stopping check
+                    current_fvu = eval_metrics["fvu"]
+                    if current_fvu < best_fvu * (1 - min_improvement):
+                        best_fvu = current_fvu
+                        best_step = step
+                        patience_counter = 0
+                    else:
+                        patience_counter += 1
+
+                    if patience > 0:
+                        postfix["pat"] = f"{patience_counter}/{patience}"
+                        if patience_counter >= patience:
+                            early_stopped = True
+                            _stderr(
+                                f"Early stopping at step {step}: "
+                                f"FVU {current_fvu:.6f} has not improved "
+                                f"by >{min_improvement:.1%} over best "
+                                f"{best_fvu:.6f} (step {best_step}) "
+                                f"for {patience} eval windows."
+                            )
+                            pbar.set_postfix(postfix)
+                            break
+
+                    pbar.set_postfix(postfix)
+
+            if early_stopped:
                 break
 
-            result = sae(batch)
-            losses = sae.compute_loss(result)
-            loss = losses["loss"]
-
-            optimizer.zero_grad()
-            loss.backward()
-            torch.nn.utils.clip_grad_norm_(sae.parameters(), 1.0)
-            optimizer.step()
-            pbar.update(1)
-            sae.normalize_decoder()
-
-            step += 1
-
-            if step % log_every == 0 or step == num_batches:
-                eval_metrics = compute_metrics(sae, batch)
-                log_entry: dict[str, Any] = {
-                    "step": step,
-                    "loss": round(loss.item(), 6),
-                    **{
-                        k: round(v.item(), 6) if isinstance(v, torch.Tensor) else v
-                        for k, v in losses.items()
-                        if k != "loss"
-                    },
-                    **eval_metrics,
-                }
-
-                metrics_log.append(log_entry)
-
-                # Write to JSONL file for live monitoring
-                if metrics_fh:
-                    metrics_fh.write(json.dumps(log_entry) + "\n")
-                    metrics_fh.flush()  # Ensure immediate write for live plotting
-
-                # Update progress bar with latest metrics
-                postfix = {
-                    "loss": f"{log_entry['loss']:.4f}",
-                    "L0": f"{eval_metrics['l0']:.1f}",
-                    "FVU": f"{eval_metrics['fvu']:.4f}",
-                    "dead": f"{eval_metrics['dead_features_pct']:.1f}%",
-                }
-
-                # Early stopping check
-                current_fvu = eval_metrics["fvu"]
-                if current_fvu < best_fvu * (1 - min_improvement):
-                    best_fvu = current_fvu
-                    best_step = step
-                    patience_counter = 0
-                else:
-                    patience_counter += 1
-
-                if patience > 0:
-                    postfix["pat"] = f"{patience_counter}/{patience}"
-                    if patience_counter >= patience:
-                        early_stopped = True
-                        _stderr(
-                            f"Early stopping at step {step}: "
-                            f"FVU {current_fvu:.6f} has not improved "
-                            f"by >{min_improvement:.1%} over best "
-                            f"{best_fvu:.6f} (step {best_step}) "
-                            f"for {patience} eval windows."
-                        )
-                        pbar.set_postfix(postfix)
-                        break
-
-                pbar.set_postfix(postfix)
-
-        if early_stopped:
-            break
-
-    pbar.close()
-
-    # Close metrics file
-    if metrics_fh:
-        metrics_fh.close()
+        stop_reason = "early_stopped" if early_stopped else "completed"
+    finally:
+        pbar.close()
+        if metrics_fh:
+            if stop_reason is not None:  # None means interrupted — write nothing
+                metrics_fh.write(json.dumps({"stop_reason": stop_reason}) + "\n")
+                metrics_fh.flush()
+            metrics_fh.close()
 
     wall_time = time.time() - t_start
     _stderr(f"Training complete. {step} steps in {wall_time:.1f}s ({epoch} epochs)")
@@ -248,9 +253,14 @@ def train_sae(
         _stderr("Threshold calibration complete.")
 
     # Final evaluation on a larger held-out sample
+    # BatchTopK: evaluate in training mode (batch-level sparsity) since per-feature
+    # inference thresholds produce incomparable metrics (different sparsity mechanism).
     with torch.no_grad():
         eval_sample = data[: min(len(data), batch_size * 4)]
-        sae.eval()
+        if isinstance(sae, BatchTopKSAE):
+            sae.train()
+        else:
+            sae.eval()
         final_metrics = compute_metrics(sae, eval_sample)
         sae.train()
 

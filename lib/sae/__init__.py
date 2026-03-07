@@ -10,6 +10,13 @@ from .architectures import (
     TopKSAE,
     VanillaSAE,
 )
+from .eval import (
+    FeatureBSPMatching,
+    compute_board_reconstruction,
+    compute_coverage,
+    evaluate_sae,
+    match_features_to_bsps,
+)
 from .hooks import ActivationStore, list_hooks, load_game_model
 from .registry import register_training_run
 from .train import (
@@ -31,6 +38,12 @@ __all__ = [
     "JumpReLUSAE",
     "PAnnealingSAE",
     "ARCHITECTURES",
+    # Evaluation
+    "FeatureBSPMatching",
+    "match_features_to_bsps",
+    "compute_coverage",
+    "compute_board_reconstruction",
+    "evaluate_sae",
     # Hooks
     "ActivationStore",
     "load_game_model",

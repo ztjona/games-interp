@@ -249,13 +249,16 @@ class BatchTopKSAE(BaseSAE):
                 pre_act = (batch - self.b_dec) @ self.W_enc + self.b_enc
                 all_pre_acts.append(F.relu(pre_act))
 
-        pre_acts = torch.cat(all_pre_acts, dim=0)  # (N, d_dict)
+        # Concatenate on CPU to avoid CUDA OOM on large datasets (N * d_dict can be ~1 GiB)
+        pre_acts = torch.cat([t.cpu() for t in all_pre_acts], dim=0)  # (N, d_dict)
 
         # Target active fraction per feature: k / d_dict
         # Threshold = (1 - target_frac) quantile of the relu'd activations
         target_active_frac = self.k / self.d_dict
         quantile_level = float(max(0.0, min(1.0 - target_active_frac, 1.0)))
-        thresholds = torch.quantile(pre_acts, quantile_level, dim=0)  # (d_dict,)
+        thresholds = torch.quantile(pre_acts, quantile_level, dim=0).to(
+            self._threshold_estimate.device
+        )  # (d_dict,)
 
         self._threshold_estimate.copy_(thresholds)
         self._thresholds_calibrated = True
@@ -283,13 +286,21 @@ class GatedSAE(BaseSAE):
     Paper: Rajamanoharan et al. 2024a (gated-sae)
 
     Equations:
-        gate_pre = W_gate (x - b_dec) + b_gate
-        g        = 1[gate_pre > 0]           (which features fire)
-        m        = ReLU(W_enc (x - b_dec) + b_enc)  (how much)
-        h        = g ⊙ m
-        L        = ||x - x_hat||^2 + alpha * ||ReLU(gate_pre)||_1
+        gate_pre  = W_gate (x - b_dec) + b_gate
+        g         = 1[gate_pre > 0]                  (hard gate, which features fire)
+        m         = ReLU(W_enc (x - b_dec) + b_enc)  (magnitude, how much)
+        h         = g ⊙ m
+        x_hat_via = ReLU(gate_pre) @ W_dec + b_dec   (auxiliary, soft-gate reconstruction)
+        L         = ||x - x_hat||^2
+                  + alpha * ||ReLU(gate_pre)||_1      (sparsity on gate)
+                  + ||x - x_hat_via||^2              (via-gate: routes recon grad to W_gate)
 
-    L1 on gate pre-activations eliminates shrinkage on h.
+    The hard gate g = 1[gate_pre > 0] is a step function with zero gradient,
+    so W_gate would otherwise receive NO signal from the reconstruction loss —
+    only the L1 penalty, which pushes all gate values toward zero (total
+    collapse). The via-gate auxiliary loss fixes this by decoding ReLU(gate_pre)
+    through a frozen W_dec, routing reconstruction gradients back to W_gate.
+    W_dec.detach() ensures the auxiliary loss trains only gate parameters.
     """
 
     def __init__(
@@ -323,15 +334,24 @@ class GatedSAE(BaseSAE):
         x, x_hat = result["x"], result["x_hat"]
         l_reconstruct = (x - x_hat).pow(2).sum(dim=-1).mean()
 
-        # L1 on gate pre-activations (not on h — avoids shrinkage)
+        # L1 on gate pre-activations (anti-shrinkage)
         assert self._gate_pre is not None
-        l_sparsity = F.relu(self._gate_pre).sum(dim=-1).mean()
+        gate_pre = self._gate_pre
+        self._gate_pre = None  # free memory
+        l_sparsity = F.relu(gate_pre).sum(dim=-1).mean()
 
-        loss = l_reconstruct + self.l1_weight * l_sparsity
+        # Via-gate auxiliary loss: the only path for reconstruction gradients
+        # to reach W_gate. Uses ReLU(gate_pre) as a soft, differentiable gate
+        # decoded through frozen W_dec (detached so only W_gate is updated here).
+        x_hat_via_gate = F.relu(gate_pre) @ self.W_dec.detach() + self.b_dec.detach()
+        l_aux = (x - x_hat_via_gate).pow(2).sum(dim=-1).mean()
+
+        loss = l_reconstruct + self.l1_weight * l_sparsity + l_aux
         return {
             "loss": loss,
             "l_reconstruct": l_reconstruct.detach(),
             "l_sparsity": l_sparsity.detach(),
+            "l_aux": l_aux.detach(),
         }
 
 
@@ -346,11 +366,22 @@ class JumpReLUSAE(BaseSAE):
     Paper: Rajamanoharan et al. 2024b (jumprelu-sae)
 
     Equations:
-        z    = W_enc (x - b_dec) + b_enc
-        h_i  = z_i * 1[z_i > theta_i]       (JumpReLU, theta_i learnable)
-        L    = ||x - x_hat||^2 + lambda * (L0 - L0_target)^2
+        z         = W_enc (x - b_dec) + b_enc
+        h_i       = z_i * 1[z_i > theta_i]            (JumpReLU, theta_i learnable)
+        L0_approx = sum_i sigmoid((z_i - theta_i) / epsilon)   (differentiable L0)
+        L         = ||x - x_hat||^2 + lambda * (L0_approx - L0_target)^2
 
-    Gradients through the indicator use a sigmoid STE with bandwidth epsilon.
+    Two STE paths:
+    1. Reconstruction loss → h via mask_hard + (mask_soft - mask_soft.detach())
+       → trains both W_enc and theta toward better reconstruction.
+    2. L0 penalty → L0_approx via sigmoid((z - theta) / epsilon)
+       → trains theta to hit the sparsity target.
+
+    Bug that was present: using (h > 0).float() for the penalty has zero
+    gradient w.r.t. theta, so the L0 penalty was a no-op and theta drifted
+    to near-zero (all features always active, L0 ≈ d_dict regardless of target).
+    The fix stores z from encode() and uses sigmoid STE in compute_loss().
+
     Thresholds are parameterised in log-space to enforce theta_i > 0.
     """
 
@@ -373,6 +404,9 @@ class JumpReLUSAE(BaseSAE):
         self.log_theta = nn.Parameter(
             torch.full((d_dict,), float(np.log(theta_init)), device=device)
         )
+        self._z: torch.Tensor | None = (
+            None  # stored during training for differentiable L0 penalty
+        )
 
     @property
     def theta(self) -> torch.Tensor:
@@ -383,11 +417,13 @@ class JumpReLUSAE(BaseSAE):
         theta = self.theta
 
         if self.training:
-            # Straight-Through Estimator: forward = hard threshold, backward = sigmoid
+            # STE path 1 (reconstruction): forward = hard threshold, backward = sigmoid
             mask_hard = (z > theta).float()
             mask_soft = torch.sigmoid((z - theta) / self.bandwidth)
             mask = mask_hard + (mask_soft - mask_soft.detach())
+            self._z = z  # store for differentiable L0 penalty in compute_loss
         else:
+            self._z = None
             mask = (z > theta).float()
 
         return z * mask
@@ -395,13 +431,29 @@ class JumpReLUSAE(BaseSAE):
     def compute_loss(self, result: dict) -> dict[str, torch.Tensor]:
         x, x_hat, h = result["x"], result["x_hat"], result["h"]
         l_reconstruct = (x - x_hat).pow(2).sum(dim=-1).mean()
-        l0 = (h > 0).float().sum(dim=-1).mean()
-        l_sparsity = (l0 - self.l0_target).pow(2)
+
+        # True L0 for logging (step function — no gradient)
+        l0_true = (h > 0).float().sum(dim=-1).mean()
+
+        # STE path 2 (sparsity): differentiable L0 approximation via sigmoid.
+        # (h > 0).float() has zero gradient w.r.t. theta — that was the bug.
+        # sigmoid((z - theta) / epsilon) is the kernel estimator from the paper.
+        if self.training and self._z is not None:
+            l0_soft = (
+                torch.sigmoid((self._z - self.theta) / self.bandwidth)
+                .sum(dim=-1)
+                .mean()
+            )
+            l_sparsity = (l0_soft - self.l0_target).pow(2)
+            self._z = None  # free memory
+        else:
+            l_sparsity = torch.tensor(0.0, device=x.device)
+
         loss = l_reconstruct + self.l0_weight * l_sparsity
         return {
             "loss": loss,
             "l_reconstruct": l_reconstruct.detach(),
-            "l0": l0.detach(),
+            "l0": l0_true.detach(),  # true L0 for monitoring
         }
 
 
