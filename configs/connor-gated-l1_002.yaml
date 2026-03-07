@@ -1,0 +1,19 @@
+# Connor: Gated SAE l1=0.002 (lower than all tested values: 0.005, 0.01)
+# Rationale: Both gated variants had ~41% dead features. Lower L1 should push L0 higher
+# (more active features), potentially reducing dead% and improving coverage. The gated
+# architecture already has the best FVU (0.000295 at l1=0.005); we want more live features.
+experiment: connor
+architecture: gated
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+gated_l1: 0.002
+label: "gated l1=2e-3"

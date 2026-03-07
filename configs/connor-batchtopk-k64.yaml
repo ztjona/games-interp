@@ -1,0 +1,19 @@
+# Connor: BatchTopK k=64
+# Rationale: Only k=32 was tested for BatchTopK. At k=64, variable-sparsity batch-level
+# constraint may outperform TopK-k64 (dead=72%) since BatchTopK distributes the budget
+# more evenly across diverse position complexities (l0_std was 9.34 at k=32 vs 0 for TopK).
+experiment: connor
+architecture: batchtopk
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+k: 64
+label: "batchtopk k=64"

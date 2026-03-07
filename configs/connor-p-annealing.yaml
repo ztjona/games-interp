@@ -1,0 +1,20 @@
+# Connor: p-annealing (L_p curriculum, p: 1.0 → 0.2)
+# Rationale: Only untested architecture from the 6-arch suite. Anneals p from L1 toward
+# near-L0, acting as a curriculum from soft sparsity to hard sparsity. May find a better
+# sparsity–reconstruction trade-off than fixed-penalty architectures.
+experiment: connor
+architecture: p-annealing
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+p_start: 1.0
+p_end: 0.2
+label: "p-annealing p=1→0.2"

@@ -1,0 +1,19 @@
+# Connor: JumpReLU l0_target=128
+# Rationale: Fair comparison to topk-k128 (dead=74.8%, board_recon=0.818) at same avg L0.
+# JumpReLU variable sparsity may outperform fixed TopK at L0=128.
+experiment: connor
+architecture: jumprelu
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+jump_threshold: 0.001
+l0_target: 128
+label: "jumprelu t=128"
