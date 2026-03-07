@@ -1,0 +1,20 @@
+# Connor: JumpReLU l0_target=32 + expansion=16 (2x features, fewer dead)
+# Dead features (~89%) are the main bottleneck. 2x expansion doubles
+# the feature pool, giving the aux loss more capacity to revive features
+# and potentially expanding BSP coverage well past 0.21.
+experiment: connor
+architecture: jumprelu
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 16
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+jump_threshold: 0.001
+l0_target: 32
+label: "jumprelu t=32 exp16"

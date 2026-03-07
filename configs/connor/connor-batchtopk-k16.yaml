@@ -1,0 +1,18 @@
+# Connor: BatchTopK k=16 (variable-L0, sparser than k32)
+# Tests whether variable-L0 at sparser regime produces cleaner features
+# than the batchtopk-k32 winner (coverage 0.2093).
+experiment: connor
+architecture: batchtopk
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+k: 16
+label: "batchtopk k=16"

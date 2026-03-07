@@ -1,0 +1,19 @@
+# Connor: JumpReLU l0_target=64 + expansion=16 (best board-recon target + 2x features)
+# t64 has best fraction_reconstructable (0.5183). Doubling expansion
+# aims to cut dead features and further improve board reconstruction.
+experiment: connor
+architecture: jumprelu
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 16
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+jump_threshold: 0.001
+l0_target: 64
+label: "jumprelu t=64 exp16"

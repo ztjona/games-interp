@@ -1,0 +1,8 @@
+# Comparison config: all 6 Connor experiments
+run_ids:
+  - connor-jumprelu-t16-exp8-fc1
+  - connor-jumprelu-t48-exp8-fc1
+  - connor-jumprelu-t32-exp16-fc1
+  - connor-jumprelu-t64-exp16-fc1
+  - connor-batchtopk-k16-exp8-fc1
+  - connor-batchtopk-k64-exp8-fc1

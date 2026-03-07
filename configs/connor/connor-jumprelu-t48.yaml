@@ -1,0 +1,19 @@
+# Connor: JumpReLU l0_target=48 (gap fill between t32 and t64)
+# t32 wins on coverage, t64 wins on board reconstruction.
+# t48 tests whether there's a sweet spot combining both.
+experiment: connor
+architecture: jumprelu
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+jump_threshold: 0.001
+l0_target: 48
+label: "jumprelu t=48"

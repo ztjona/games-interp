@@ -1,0 +1,19 @@
+# Connor: BatchTopK k=64 (variable-L0, scaled up from k32)
+# k32 batchtopk had good coverage (0.2093) and cov_above_50 (0.2256).
+# k64 tests whether more active features per batch improves coverage
+# without losing the variable-L0 advantage.
+experiment: connor
+architecture: batchtopk
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 3e-4
+seed: 42
+log_every: 100
+
+k: 64
+label: "batchtopk k=64"
