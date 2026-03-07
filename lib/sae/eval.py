@@ -220,7 +220,7 @@ def evaluate_sae(
     """Run full Layer 1 evaluation: coverage + board reconstruction.
 
     Args:
-        sae:                  A BaseSAE instance (should be in eval mode).
+        sae:                  A BaseSAE instance.
         activations:          (N, d_input) raw activation tensor.
         bsp_labels:           (N, num_bsps) binary BSP labels.
         precision_threshold:  Threshold for board reconstruction (default 0.9).
@@ -229,8 +229,23 @@ def evaluate_sae(
     Returns:
         Dict combining coverage and reconstruction metrics plus structural
         metrics (FVU, L0, dead_features_pct, mse).
+
+    Note on BatchTopK:
+        BatchTopK is evaluated in *training mode* (batch-level sparsity) so
+        that L0 matches the training-time sparsity target.  The calibrated
+        per-feature inference thresholds lose accuracy on out-of-distribution
+        batch sizes and are therefore not used for evaluation.
     """
+    from .architectures import BatchTopKSAE
     from .train import compute_metrics
+
+    # BatchTopK must run in training mode to enforce batch-level sparsity;
+    # all other architectures use eval mode.
+    is_batchtopk = isinstance(sae, BatchTopKSAE)
+    if is_batchtopk:
+        sae.train()
+    else:
+        sae.eval()
 
     N = activations.shape[0]
     device = next(sae.parameters()).device

@@ -5,7 +5,7 @@ from board game neural networks (Quarto, Othello, Tic-tac-toe).
 
 ## Status (March 2026)
 
-**Phase:** Bug-fix re-runs — arnold sweep complete, 2 architectures invalidated, arnold_beta queued.
+**Phase:** Coverage evaluated — 11 valid experiments done, JumpReLU leads, causal verification next.
 
 | Milestone | Status |
 |-----------|--------|
@@ -15,11 +15,36 @@ from board game neural networks (Quarto, Othello, Tic-tac-toe).
 | SAE library (6 architectures) | Done — vanilla, topk, batchtopk, gated, jumprelu, p-annealing |
 | Pilot experiments | Done — vanilla + topk on fc1 |
 | Bug fixes (aux loss, metrics, kwargs) | Done — 2026-03-04 |
-| Architecture sweep ("arnold") | Done — 13 runs; 6 valid, 7 invalid (see results below) |
+| Architecture sweep ("arnold") | Done — 13 runs; 6 valid, 7 invalid |
 | Bug fixes (gated via-gate, JumpReLU L0 gradient) | Done — 2026-03-06 |
-| Architecture re-runs ("arnold_beta") | **Next** — 5 runs (gated ×2, jumprelu ×2, topk k=128) |
-| BSP coverage evaluation | Pending — after arnold_beta |
-| Causal verification | Pending |
+| Architecture re-runs ("arnold_beta") | Done — 5 runs (gated ×2, jumprelu ×2, topk k=128) |
+| BSP coverage evaluation | **Done** — 11 valid experiments evaluated (2026-03-07) |
+| Causal verification | **Next** |
+
+### Coverage Results — Arnold + Arnold Beta (2026-03-07)
+
+11 valid experiments evaluated on fc1, gorilla BSP set (164 BSPs), amalgam dataset (240,845 positions).
+
+| SAE | L0 | FVU | Coverage | Cov>50% | Cov>75% | Board Rec | Reconstruct |
+|-----|----|-----|----------|---------|---------|-----------|-------------|
+| **arnold_beta-jumprelu-t64** | 62.8 | 0.062% | 0.206 | 0.195 | 0.024 | **0.826** | **51.8%** |
+| **arnold_beta-jumprelu-t32** | 33.9 | 0.264% | **0.214** | **0.213** | **0.055** | 0.822 | 50.6% |
+| arnold_beta-topk-k128 | 128.0 | 0.014% | 0.182 | 0.165 | 0.024 | 0.818 | 49.4% |
+| arnold-batchtopk-k32 | 32.0 | 0.199% | 0.209 | 0.226 | 0.031 | 0.817 | 49.4% |
+| arnold_beta-gated-l1_005 | 330.9 | 0.030% | 0.191 | 0.134 | 0.018 | 0.806 | 46.3% |
+| arnold_beta-gated-l1_01 | 274.0 | 0.037% | 0.205 | 0.201 | 0.037 | 0.801 | 45.1% |
+| arnold-topk-k64 | 64.0 | 0.047% | 0.200 | 0.177 | 0.018 | 0.809 | 47.0% |
+| arnold-topk-k32 | 32.0 | 0.242% | 0.201 | 0.159 | 0.012 | 0.799 | 44.5% |
+| arnold-vanilla-l1_01 | 393.3 | 0.077% | 0.205 | 0.207 | 0.043 | 0.678 | 18.3% |
+| arnold-vanilla-l1_005 | 493.1 | 0.071% | 0.195 | 0.165 | 0.037 | 0.719 | 28.1% |
+| arnold-vanilla-l1_05 | 233.8 | 0.134% | 0.204 | 0.189 | 0.037 | 0.620 | 12.8% |
+
+**Key findings (2026-03-07):**
+- Coverage is narrow across all architectures (~0.18–0.21 mean F1 on 164 BSPs). The signal is in **board reconstruction** (does any single feature reach ≥90% precision?).
+- JumpReLU (t64) achieves the best board reconstruction (82.6%) and fraction of reconstructable BSPs (51.8%) — best overall.
+- Vanilla SAEs have comparable coverage but much weaker board reconstruction (62–72%), suggesting dense features with low per-feature precision.
+- Sparse architectures (TopK, BatchTopK, JumpReLU with correct L0) reconstruct far more BSPs despite similar mean F1.
+- BatchTopK eval must be run in **train mode** (batch-level sparsity), not inference mode (calibrated thresholds collapse L0 at eval time).
 
 ### Arnold Sweep Results (2026-03-06)
 
@@ -88,7 +113,10 @@ games-interp/
 │       └── hooks.py         #   Model hook utilities
 ├── saes/                    # Trained SAE checkpoints (per game)
 │   ├── quarto/              #   {experiment}-{arch}-{hook}-*.pt
-│   │   └── training_registry.json  # Experiment metadata
+│   │   ├── training_registry.json  # Experiment metadata
+│   │   ├── eval_registry.json      # Coverage/reconstruction results (per run)
+│   │   ├── {run_id}_h.pt           # Cached (N×d_dict) activations [gitignored]
+│   │   └── {run_id}_matching-{animal}.pt  # Cached F1 matrices [gitignored]
 │   ├── othello/
 │   └── tictactoe/
 ├── data/                    # Activation datasets & game states (.pt)
@@ -286,19 +314,51 @@ Each training run appears as a separate colored trace on shared subplots for eas
 streaming writes during training and easy incremental parsing. Each line contains:
 `{"step": int, "loss": float, "l0": float, "fvu": float, "dead_features_pct": float}`
 
-#### Advanced Training via Skills (For Custom Architectures)
-
-Training and evaluation scripts live in the agent skill directories and are invoked
-from the project root:
+#### SAE Evaluation (Coverage + Board Reconstruction)
 
 ```bash
-# Training
+# Evaluate a single checkpoint (auto-resolves data and BSP paths from metadata)
+python sae_eval.py evaluate saes/quarto/arnold_beta-jumprelu-t64-exp8-fc1.pt
+
+# Force re-evaluation (also regenerates h and matching caches)
+python sae_eval.py evaluate saes/quarto/arnold_beta-jumprelu-t64-exp8-fc1.pt --force
+
+# Evaluate all valid experiments at once
+for f in saes/quarto/arnold-batchtopk-k32-exp8-fc1.pt \
+          saes/quarto/arnold-topk-k32-exp8-fc1.pt \
+          saes/quarto/arnold-topk-k64-exp8-fc1.pt \
+          saes/quarto/arnold-vanilla-l1_005-exp8-fc1.pt \
+          saes/quarto/arnold-vanilla-l1_01-exp8-fc1.pt \
+          saes/quarto/arnold-vanilla-l1_05-exp8-fc1.pt \
+          saes/quarto/arnold_beta-gated-l1_005-exp8-fc1.pt \
+          saes/quarto/arnold_beta-gated-l1_01-exp8-fc1.pt \
+          saes/quarto/arnold_beta-jumprelu-t32-exp8-fc1.pt \
+          saes/quarto/arnold_beta-jumprelu-t64-exp8-fc1.pt \
+          saes/quarto/arnold_beta-topk-k128-exp8-fc1.pt; do
+  python sae_eval.py evaluate "$f"
+done
+
+# Browse results
+python sae_eval.py history
+python sae_eval.py history --arch jumprelu
+
+# Side-by-side comparison
+python sae_eval.py compare arnold_beta-jumprelu-t64-exp8-fc1 arnold_beta-topk-k128-exp8-fc1
+```
+
+**Evaluation caches** (written to `saes/{game}/`, gitignored via `*.pt`):
+- `{run_id}_h.pt` — full `(N × d_dict)` activation matrix; reused by downstream analysis
+- `{run_id}_matching-{animal}.pt` — `(d_dict × num_bsps)` precision / recall / F1 tensors
+
+The notebook `notebooks/sae_feature_analysis.ipynb` loads these caches directly — no re-encoding needed when switching models.
+
+#### Advanced Training via Skills (For Custom Architectures)
+
+Training scripts live in the agent skill directories:
+
+```bash
 python ~/.agents/skills/sae-implementation/scripts/sae_train.py train <arch> \
     --model <path> --hook <layer> --data <path> [options]
-
-# Evaluation
-python ~/.agents/skills/sae-board-bench/scripts/sae_eval.py evaluate <checkpoint> \
-    --model <path> --game <name> --hook <layer> --data <path>
 ```
 
 ## Games

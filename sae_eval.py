@@ -3,13 +3,11 @@
 Usage:
     sae_eval.py evaluate <checkpoint> [options]
     sae_eval.py compare [<run_ids>...] [options]
-    sae_eval.py history [--game=<name>] [--arch=<name>]
     sae_eval.py -h | --help
 
 Commands:
     evaluate    Run Layer 1 evaluation (coverage + board reconstruction)
     compare     Side-by-side comparison of evaluated runs
-    history     Browse evaluation registry
 
 Arguments:
     <checkpoint>    Path to trained SAE .pt file
@@ -26,8 +24,6 @@ Options:
     --device=<dev>          Device (cuda|cpu|auto) [default: auto]
     --force                 Re-evaluate even if results exist in the registry
     --config=<path>         YAML config listing run_ids for compare
-    --game=<name>           Filter history by game
-    --arch=<name>           Filter history by architecture
     --verbose               Enable debug-level logging
     -h --help               Show this help
 
@@ -49,11 +45,6 @@ Examples:
     # Compare runs from a config file
     python sae_eval.py compare --config configs/compare-arnold.yaml
 
-    # Browse all evaluations
-    python sae_eval.py history
-
-    # Filter history
-    python sae_eval.py history --arch topk
 """
 
 from __future__ import annotations
@@ -69,7 +60,17 @@ import torch
 import yaml
 from docopt import docopt
 
-from lib.sae import load_checkpoint, load_activation_data, evaluate_sae
+from tqdm import tqdm
+
+from lib.sae import load_checkpoint, load_activation_data
+from lib.sae.architectures import BatchTopKSAE
+from lib.sae.eval import (
+    FeatureBSPMatching,
+    match_features_to_bsps,
+    compute_coverage,
+    compute_board_reconstruction,
+)
+from lib.sae.train import compute_metrics
 
 log = logging.getLogger("sae_eval")
 
@@ -271,18 +272,72 @@ def cmd_evaluate(args: dict) -> None:
 
     log.info("  Samples: %d, BSPs: %d", activations.shape[0], bsp_labels.shape[1])
 
-    # Run evaluation
-    sae.eval()
-    metrics = evaluate_sae(
-        sae,
-        activations,
-        bsp_labels,
-        precision_threshold=precision_thresh,
-        batch_size=batch_size,
-    )
+    # Set inference mode — BatchTopK must stay in train() for batch-level sparsity
+    if isinstance(sae, BatchTopKSAE):
+        sae.train()
+    else:
+        sae.eval()
 
-    # Remove per_bsp_accuracy from top-level output (too verbose for JSON summary)
-    metrics.pop("per_bsp_accuracy", [])
+    N = activations.shape[0]
+    saes_dir = Path(f"saes/{game}")
+    cache_dir = saes_dir / "cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+
+    # ── 1. Encode activations → h  (cached to disk) ───────────────────────────────────
+    h_cache = cache_dir / f"{run_id}_h.pt"
+    if h_cache.exists() and not force:
+        h = torch.load(h_cache, map_location="cpu", weights_only=True)
+        log.info("  h loaded from cache: %s", h_cache)
+    else:
+        h_parts = []
+        n_batches = (N + batch_size - 1) // batch_size
+        with torch.no_grad():
+            for i in tqdm(
+                range(0, N, batch_size), total=n_batches, desc="Encoding", unit="batch"
+            ):
+                batch = activations[i : i + batch_size].to(device)
+                result = sae(batch)
+                h_parts.append(result["h"].cpu())
+        h = torch.cat(h_parts, dim=0)  # (N, d_dict) float32 CPU
+        torch.save(h, h_cache)
+        log.info("  h cached → %s", h_cache)
+
+    # ── 2. Feature–BSP matching  (cached to disk) ────────────────────────
+    matching_cache = cache_dir / f"{run_id}_matching-{animal}.pt"
+    if matching_cache.exists() and not force:
+        c = torch.load(matching_cache, map_location="cpu", weights_only=False)
+        matching = FeatureBSPMatching(
+            precision=c["precision"],
+            recall=c["recall"],
+            f1=c["f1"],
+            best_f1_per_bsp=c["best_f1_per_bsp"],
+            best_feature_per_bsp=c["best_feature_per_bsp"],
+        )
+        log.info("  matching loaded from cache: %s", matching_cache)
+    else:
+        matching = match_features_to_bsps(h, bsp_labels)
+        torch.save(
+            {
+                "precision": matching.precision,
+                "recall": matching.recall,
+                "f1": matching.f1,
+                "best_f1_per_bsp": matching.best_f1_per_bsp,
+                "best_feature_per_bsp": matching.best_feature_per_bsp,
+            },
+            matching_cache,
+        )
+        log.info("  matching cached → %s", matching_cache)
+
+    # ── 3. Coverage + board reconstruction + structural metrics ──────────
+    coverage_metrics = compute_coverage(matching)
+    reconstruction = compute_board_reconstruction(
+        matching, h, bsp_labels, precision_threshold=precision_thresh
+    )
+    eval_sample = activations[: min(N, batch_size)].to(device)
+    structural = compute_metrics(sae, eval_sample)
+
+    metrics = {**structural, **coverage_metrics, **reconstruction}
+    metrics.pop("per_bsp_accuracy", None)
 
     # Register
     _register_eval(run_id, game, checkpoint_path, info, animal, metrics, tag)
@@ -460,56 +515,6 @@ def cmd_compare(args: dict) -> None:
         print(row)
 
 
-def cmd_history(args: dict) -> None:
-    """List all evaluation runs."""
-    filter_game = args["--game"]
-    filter_arch = args["--arch"]
-
-    all_entries = []
-    for game_dir in sorted(Path("saes").iterdir()):
-        if not game_dir.is_dir():
-            continue
-        game = game_dir.name
-        if filter_game and game != filter_game:
-            continue
-
-        registry = _load_registry(game)
-        for run_id, entry in registry.items():
-            if filter_arch and entry.get("architecture", "") != filter_arch:
-                continue
-            all_entries.append((run_id, entry))
-
-    if not all_entries:
-        log.info("No evaluation runs found.")
-        return
-
-    # Sort by timestamp
-    all_entries.sort(key=lambda x: x[1].get("timestamp", ""))
-
-    # Table header
-    fmt = "{:<45} {:>8} {:>6} {:>6} {:>8} {:>8} {:>8} {:>8}"
-    print(
-        fmt.format("Run ID", "Arch", "L0", "FVU", "Cover", "Cov>75", "BRecon", "BSPs")
-    )
-    print("-" * 110)
-
-    for run_id, entry in all_entries:
-        m = entry.get("metrics", {})
-        arch = entry.get("architecture", "?")[:8]
-        print(
-            fmt.format(
-                run_id[:45],
-                arch,
-                f"{m.get('l0', 0):.1f}",
-                f"{m.get('fvu', 0):.4f}",
-                f"{m.get('coverage', 0):.4f}",
-                f"{m.get('coverage_above_75', 0):.4f}",
-                f"{m.get('board_reconstruction', 0):.4f}",
-                entry.get("bsp_set", "?"),
-            )
-        )
-
-
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
@@ -530,8 +535,6 @@ def main():
         cmd_evaluate(args)
     elif args["compare"]:
         cmd_compare(args)
-    elif args["history"]:
-        cmd_history(args)
 
 
 if __name__ == "__main__":

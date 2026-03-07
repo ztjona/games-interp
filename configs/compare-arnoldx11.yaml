@@ -1,0 +1,14 @@
+# Comparison config: all 11 valid Arnold + Arnold Beta experiments
+# Each entry can be a plain string (run_id) or {id: ..., label: ...}
+run_ids:
+  - arnold-batchtopk-k32-exp8-fc1
+  - arnold-topk-k32-exp8-fc1
+  - arnold-topk-k64-exp8-fc1
+  - arnold-vanilla-l1_005-exp8-fc1
+  - arnold-vanilla-l1_01-exp8-fc1
+  - arnold-vanilla-l1_05-exp8-fc1
+  - arnold_beta-gated-l1_005-exp8-fc1
+  - arnold_beta-gated-l1_01-exp8-fc1
+  - arnold_beta-jumprelu-t32-exp8-fc1
+  - arnold_beta-jumprelu-t64-exp8-fc1
+  - arnold_beta-topk-k128-exp8-fc1
