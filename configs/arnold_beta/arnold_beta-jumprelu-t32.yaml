@@ -1,5 +1,5 @@
-# Arnold sweep: JumpReLU SAE with l0_target=32 (learned threshold)
-experiment: arnold
+# Arnold Beta: JumpReLU l0_target=32 (fixed differentiable L0 penalty)
+experiment: arnold_beta
 architecture: jumprelu
 game: quarto
 hook: fc1
@@ -14,4 +14,4 @@ log_every: 100
 
 jump_threshold: 0.001
 l0_target: 32
-label: "jumprelu L0=32"
+label: "jumprelu t=32 (fixed)"

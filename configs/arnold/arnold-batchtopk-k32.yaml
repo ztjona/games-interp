@@ -13,3 +13,4 @@ seed: 42
 log_every: 100
 
 k: 32
+label: "batchtopk k=32"

@@ -13,3 +13,4 @@ seed: 42
 log_every: 100
 
 gated_l1: 0.01
+label: "gated l1=1e-2"

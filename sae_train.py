@@ -138,6 +138,13 @@ def build_filename_suffix(arch: str, arch_kwargs: dict, expansion: int) -> str:
 
     if arch in ("topk", "batchtopk"):
         parts.append(f"k{arch_kwargs['k']}")
+    elif arch in ("vanilla", "gated"):
+        l1 = arch_kwargs.get("l1_weight", 0)
+        # e.g. 0.005 -> "l1_005", 0.01 -> "l1_01"
+        l1_str = str(l1).replace("0.", "").replace(".", "")
+        parts.append(f"l1_{l1_str}")
+    elif arch == "jumprelu":
+        parts.append(f"t{int(arch_kwargs['l0_target'])}")
 
     parts.append(f"exp{expansion}")
 
@@ -183,7 +190,9 @@ def main():
     print(f"Architecture: {arch}")
     print(f"Game: {game}, Hook: {hook}")
     print(f"Device: {device}")
-    es_info = f", patience={patience} (min_imp={min_improvement:.1%})" if patience > 0 else ""
+    es_info = (
+        f", patience={patience} (min_imp={min_improvement:.1%})" if patience > 0 else ""
+    )
     print(
         f"Hyperparameters: expansion={expansion}x, batch_size={batch_size}, num_batches={num_batches}, lr={lr}{es_info}"
     )
@@ -214,18 +223,24 @@ def main():
     print()
 
     # Train
-    results = train_sae(
-        sae,
-        data,
-        num_batches,
-        batch_size,
-        lr,
-        log_every=log_every,
-        seed=seed,
-        metrics_file=metrics_file,
-        patience=patience,
-        min_improvement=min_improvement,
-    )
+    try:
+        results = train_sae(
+            sae,
+            data,
+            num_batches,
+            batch_size,
+            lr,
+            log_every=log_every,
+            seed=seed,
+            metrics_file=metrics_file,
+            patience=patience,
+            min_improvement=min_improvement,
+        )
+    except KeyboardInterrupt:
+        print(
+            "\nTraining interrupted. Partial metrics written to JSONL. No checkpoint saved."
+        )
+        return
 
     # Prepare metadata
     all_hyperparams = {

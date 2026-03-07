@@ -14,3 +14,4 @@ log_every: 100
 
 jump_threshold: 0.001
 l0_target: 64
+label: "jumprelu L0=64"

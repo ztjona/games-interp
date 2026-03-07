@@ -14,3 +14,4 @@ log_every: 100
 
 k: 32
 aux_loss_weight: 0.01
+label: "topk k=32"

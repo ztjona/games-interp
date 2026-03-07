@@ -1,0 +1,5 @@
+# Comparison config: Arnold TopK variants
+# Each entry can be a plain string (run_id) or {id: ..., label: ...}
+run_ids:
+  - arnold-topk-k32-exp8-fc1
+  - arnold-topk-k64-exp8-fc1

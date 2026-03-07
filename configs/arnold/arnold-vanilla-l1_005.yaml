@@ -13,3 +13,4 @@ seed: 42
 log_every: 100
 
 l1_weight: 0.005
+label: "vanilla l1=5e-3"

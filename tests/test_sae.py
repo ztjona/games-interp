@@ -329,8 +329,115 @@ class TestAuxLossGradients:
         x = _batch()
         result = sae(x)
         losses = sae.compute_loss(result)
-        assert losses["l_aux"].item() == 0.0, (
-            "Aux loss should be 0 when all features are alive"
+        assert (
+            losses["l_aux"].item() == 0.0
+        ), "Aux loss should be 0 when all features are alive"
+
+    def test_gated_wgate_receives_reconstruction_gradient(self):
+        """W_gate must receive non-zero gradient from the reconstruction loss.
+
+        The hard gate g = (gate_pre > 0).float() is a step function, so the main
+        reconstruction path has ∂loss/∂W_gate = 0. The via-gate auxiliary loss
+        (decoding ReLU(gate_pre) through frozen W_dec) is the only path that
+        routes reconstruction signal back to W_gate.
+
+        Without this fix, W_gate only receives gradient from the L1 sparsity
+        penalty, which monotonically pushes all gate activations to zero —
+        causing total collapse (L0→0, FVU→1, dead→100%) as seen in the arnold sweep.
+        """
+        sae = GatedSAE(D_INPUT, D_DICT, l1_weight=1e-3, device=DEVICE)
+        sae.train()
+        x = _batch()
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        losses["loss"].backward()
+
+        assert sae.W_gate.grad is not None, "W_gate has no gradient at all"
+        wgate_grad_norm = sae.W_gate.grad.norm().item()
+        assert wgate_grad_norm > 0, (
+            f"W_gate gradient is zero (norm={wgate_grad_norm:.6f}). "
+            "The via-gate auxiliary loss is not routing reconstruction gradients "
+            "to W_gate. Without this, the L1 penalty will collapse all gates to zero."
+        )
+
+    def test_gated_wgate_gradient_comes_from_reconstruction_not_only_l1(self):
+        """Verify gradient reaches W_gate even when L1 weight is zero.
+
+        If l1_weight=0, the only gradient path to W_gate is the via-gate aux loss.
+        This isolates the fix from the sparsity term — if W_gate has zero gradient
+        here, the via-gate aux loss is broken.
+        """
+        sae = GatedSAE(D_INPUT, D_DICT, l1_weight=0.0, device=DEVICE)
+        sae.train()
+        x = _batch()
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        losses["loss"].backward()
+
+        assert sae.W_gate.grad is not None, "W_gate has no gradient with l1_weight=0"
+        wgate_grad_norm = sae.W_gate.grad.norm().item()
+        assert wgate_grad_norm > 0, (
+            f"W_gate gradient is zero even with l1_weight=0 (norm={wgate_grad_norm:.6f}). "
+            "The via-gate auxiliary loss must route gradients to W_gate independently."
+        )
+
+    def test_jumprelu_theta_receives_sparsity_gradient(self):
+        """log_theta must receive non-zero gradient from the L0 sparsity penalty.
+
+        The original bug: the L0 penalty was computed as (h > 0).float().sum(),
+        which is a step function with ∂/∂theta = 0 everywhere. The fix replaces
+        this with the sigmoid kernel estimator σ((z−θ)/ε), which is differentiable
+        w.r.t. theta and thus drives theta toward the l0_target.
+
+        Without the fix, theta never moves and L0 converges to ~d_dict regardless
+        of the target (as observed: t32 → L0=595, t64 → L0=604 in arnold sweep).
+        """
+        sae = JumpReLUSAE(D_INPUT, D_DICT, l0_target=K, device=DEVICE)
+        sae.train()
+        x = _batch()
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        losses["loss"].backward()
+
+        assert sae.log_theta.grad is not None, "log_theta has no gradient at all"
+        theta_grad_norm = sae.log_theta.grad.norm().item()
+        assert theta_grad_norm > 0, (
+            f"log_theta gradient is zero (norm={theta_grad_norm:.6f}). "
+            "The L0 sparsity penalty is not differentiable w.r.t. theta. "
+            "Use the sigmoid kernel estimator σ((z−θ)/ε) instead of (h>0).float()."
+        )
+
+    def test_jumprelu_l0_converges_toward_target(self):
+        """After training, L0 should move toward l0_target (not stay near d_dict).
+
+        Uses a target well below the natural L0 of random data to make the
+        direction of movement unambiguous. After 500 steps, L0 must be closer
+        to the target than it was at initialisation.
+        """
+        target = K  # K=8 is well below d_dict=64
+        sae = JumpReLUSAE(D_INPUT, D_DICT, l0_target=float(target), device=DEVICE)
+
+        # Measure initial L0 (random weights, near d_dict)
+        sae.eval()
+        with torch.no_grad():
+            h_init = sae.encode(_batch())
+        l0_init = (h_init > 0).float().sum(dim=-1).mean().item()
+
+        # Train with sparsity pressure
+        train_sae(sae, _DATA, num_batches=500, batch_size=BATCH, lr=3e-4, log_every=999)
+
+        sae.eval()
+        with torch.no_grad():
+            h_final = sae.encode(_batch())
+        l0_final = (h_final > 0).float().sum(dim=-1).mean().item()
+
+        dist_init = abs(l0_init - target)
+        dist_final = abs(l0_final - target)
+        assert dist_final < dist_init, (
+            f"JumpReLU L0 did not converge toward target={target}. "
+            f"Initial L0={l0_init:.1f} (dist={dist_init:.1f}), "
+            f"Final L0={l0_final:.1f} (dist={dist_final:.1f}). "
+            "The L0 penalty may have zero gradient w.r.t. theta."
         )
 
 
@@ -356,9 +463,9 @@ class TestMetricsCompleteness:
 
         sae = _make("topk")
         metrics = compute_metrics(sae, _batch())
-        assert metrics["l0_std"] == 0.0, (
-            f"TopK L0 std should be exactly 0 (exact K per sample), got {metrics['l0_std']}"
-        )
+        assert (
+            metrics["l0_std"] == 0.0
+        ), f"TopK L0 std should be exactly 0 (exact K per sample), got {metrics['l0_std']}"
 
     def test_median_feat_freq_bounded(self):
         """Median feature frequency must be in [0, 1]."""
@@ -368,16 +475,23 @@ class TestMetricsCompleteness:
             sae = _make(arch)
             metrics = compute_metrics(sae, _batch())
             mff = metrics["median_feat_freq"]
-            assert 0.0 <= mff <= 1.0, (
-                f"{arch}: median_feat_freq={mff} is outside [0, 1]"
-            )
+            assert (
+                0.0 <= mff <= 1.0
+            ), f"{arch}: median_feat_freq={mff} is outside [0, 1]"
 
     @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
     def test_all_metrics_keys_present(self, arch):
         """Every architecture must return the full set of expected metric keys."""
         from lib.sae.train import compute_metrics
 
-        expected_keys = {"l0", "l0_std", "fvu", "mse", "dead_features_pct", "median_feat_freq"}
+        expected_keys = {
+            "l0",
+            "l0_std",
+            "fvu",
+            "mse",
+            "dead_features_pct",
+            "median_feat_freq",
+        }
         sae = _make(arch)
         metrics = compute_metrics(sae, _batch())
         missing = expected_keys - set(metrics.keys())
@@ -394,7 +508,9 @@ class TestEarlyStopping:
     def test_disabled_by_default(self):
         """With patience=0 (default), training runs all num_batches steps."""
         sae = _make("vanilla")
-        results = train_sae(sae, _DATA, num_batches=50, batch_size=BATCH, lr=1e-3, log_every=10)
+        results = train_sae(
+            sae, _DATA, num_batches=50, batch_size=BATCH, lr=1e-3, log_every=10
+        )
         assert results["final_step"] == 50
         assert results["early_stopped"] is False
 
@@ -411,8 +527,14 @@ class TestEarlyStopping:
 
         # Now train with very aggressive patience on an already-converged SAE
         results = train_sae(
-            sae, _DATA, num_batches=500, batch_size=BATCH, lr=1e-3,
-            log_every=10, patience=3, min_improvement=0.5,  # require 50% improvement
+            sae,
+            _DATA,
+            num_batches=500,
+            batch_size=BATCH,
+            lr=1e-3,
+            log_every=10,
+            patience=3,
+            min_improvement=0.5,  # require 50% improvement
         )
         assert results["early_stopped"] is True
         assert results["final_step"] < 500
@@ -420,6 +542,8 @@ class TestEarlyStopping:
     def test_results_keys(self):
         """Results dict must contain early_stopped and final_step keys."""
         sae = _make("vanilla")
-        results = train_sae(sae, _DATA, num_batches=20, batch_size=BATCH, lr=1e-3, log_every=10)
+        results = train_sae(
+            sae, _DATA, num_batches=20, batch_size=BATCH, lr=1e-3, log_every=10
+        )
         assert "early_stopped" in results
         assert "final_step" in results

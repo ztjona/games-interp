@@ -5,7 +5,7 @@ from board game neural networks (Quarto, Othello, Tic-tac-toe).
 
 ## Status (March 2026)
 
-**Phase:** Architecture sweep preparation — pilot runs complete, bugs fixed, ready for systematic experiments.
+**Phase:** Bug-fix re-runs — arnold sweep complete, 2 architectures invalidated, arnold_beta queued.
 
 | Milestone | Status |
 |-----------|--------|
@@ -13,27 +13,62 @@ from board game neural networks (Quarto, Othello, Tic-tac-toe).
 | Position collection (4 opponent modes) | Done — 240K unique positions |
 | BSP computation (164 properties) | Done — gorilla (164) + fox (87) |
 | SAE library (6 architectures) | Done — vanilla, topk, batchtopk, gated, jumprelu, p-annealing |
-| Pilot experiments | Done — vanilla + topk on fc1 (see analysis below) |
+| Pilot experiments | Done — vanilla + topk on fc1 |
 | Bug fixes (aux loss, metrics, kwargs) | Done — 2026-03-04 |
-| Architecture sweep ("arnold") | **Next** — 10 runs, 5K steps each |
-| BSP coverage evaluation | Pending — after sweep |
+| Architecture sweep ("arnold") | Done — 13 runs; 6 valid, 7 invalid (see results below) |
+| Bug fixes (gated via-gate, JumpReLU L0 gradient) | Done — 2026-03-06 |
+| Architecture re-runs ("arnold_beta") | **Next** — 5 runs (gated ×2, jumprelu ×2, topk k=128) |
+| BSP coverage evaluation | Pending — after arnold_beta |
 | Causal verification | Pending |
+
+### Arnold Sweep Results (2026-03-06)
+
+**Valid runs** (no implementation bugs, results are interpretable):
+
+| SAE | FVU | L0 | L0σ | Dead% | Med.Freq | Notes |
+|-----|-----|-----|------|-------|---------|-------|
+| vanilla l1=0.005 | 0.071% | 494 | 22.6 | 3.4% | 0.49 | Baseline |
+| vanilla l1=0.01 | 0.077% | 394 | 28.5 | 2.2% | 0.41 | **Best overall** |
+| vanilla l1=0.05 | 0.135% | 235 | 26.2 | 3.1% | 0.27 | Sparsest vanilla |
+| topk k=32 | 0.243% | 32 | 0.0 | 61.2% | 0.0 | High dead (geometry mismatch) |
+| topk k=64 | 0.048% | 64 | 0.0 | 72.5% | 0.0 | High dead (geometry mismatch) |
+| batchtopk k=32 | 0.202% | 32 | 9.4 | 82.5% | 0.0 | High dead (geometry mismatch) |
+
+**Invalid runs** (bugs in implementation — do not use for comparisons):
+
+| SAE | Outcome | Bug | Fix |
+|-----|---------|-----|-----|
+| gated l1=0.005 | FVU=1.0, L0=0, dead=99% | W_gate got zero recon gradient | Via-gate aux loss added |
+| gated l1=0.01 | FVU=1.0, L0=0, dead=99% | Same | Via-gate aux loss added |
+| jumprelu t=32 | L0=595 ≠ 32 | L0 penalty had ∂/∂θ=0 | Sigmoid STE for L0 |
+| jumprelu t=64 | L0=604 ≠ 64 | Same | Sigmoid STE for L0 |
+| gated (default) | FVU=1.0 | Key collision + via-gate bug | Fixed |
+| jumprelu (default) | Crashed step 1800 | Not in arnold configs (manual test) | N/A |
+| vanilla (default) | Crashed step 1100 | Not in arnold configs (manual test) | N/A |
+
+**Key findings:**
+- Natural L0 for fc1 is ~400/1024 (39%). TopK k=32/64 forces 3–6% active, causing geometry mismatch and high dead features. k=128 (12.5%) tested in arnold_beta.
+- Vanilla l1=0.01 is the current best: FVU=0.077%, 2.2% dead, but L0=394 is too high for per-feature interpretability.
+- Both gated and jumprelu had zero-gradient bugs in their sparsity mechanisms. Fixed 2026-03-06.
 
 ### Pilot Results Summary
 
 | SAE | FVU | L0 | Dead % | Verdict |
 |-----|-----|----|--------|---------|
-| Vanilla (exp8, l1=0.001) | 0.018% | 574 | 28.5% | Near-identity collapse — L1 too weak |
+| Vanilla (exp8, l1=0.001) | 0.018% | 574 | 28.5% | Near-identity: L1 too weak (valid data point) |
 | TopK k=16 (exp8) | 0.78% | 16 | 88.7% | **INVALID** — aux loss had zero-gradient bug |
 
-Both pilot runs converged by ~5K of 25K steps. Key learning: 25K steps unnecessary for this model; 5K sufficient for sweep.
+### Bug Fixes Log
 
-### Recent Fixes (2026-03-04)
-
+**2026-03-04:**
 - **TopK aux loss**: Replaced step-function dead count (zero gradient) with residual reconstruction through dead features (Gao et al. 2024)
 - **Metrics**: Added `l0_std` (sparsity variation across positions) and `median_feat_freq` (typical feature utilization)
-- **Constructor kwargs**: Fixed BatchTopK (was passing unsupported `aux_loss_weight`) and JumpReLU (was passing `threshold` instead of `theta_init`)
-- **Test suite**: 48 tests covering all 6 architectures, aux loss gradients, and metrics completeness
+- **Constructor kwargs**: Fixed BatchTopK and JumpReLU constructor argument names
+- **Test suite**: 51 tests covering all 6 architectures
+
+**2026-03-06:**
+- **GatedSAE via-gate**: `(gate_pre > 0).float()` blocks all reconstruction gradient to W_gate. Added via-gate auxiliary loss `||x − ReLU(gate_pre)@W_dec.detach()||²` (Rajamanoharan et al. 2024a)
+- **JumpReLU L0 penalty**: `(h>0).float()` has zero gradient w.r.t. theta. Replaced with sigmoid kernel estimator `σ((z−θ)/ε)` for differentiable L0 (Rajamanoharan et al. 2024b)
 
 ## Project Structure
 

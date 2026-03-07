@@ -1,5 +1,5 @@
-# Arnold sweep: Gated SAE with l1=0.005 (anti-shrinkage, matches vanilla for comparison)
-experiment: arnold
+# Arnold Beta: Gated SAE l1=0.01 (fixed via-gate auxiliary loss)
+experiment: arnold_beta
 architecture: gated
 game: quarto
 hook: fc1
@@ -12,5 +12,5 @@ lr: 3e-4
 seed: 42
 log_every: 100
 
-gated_l1: 0.005
-label: "gated l1=5e-3"
+gated_l1: 0.01
+label: "gated l1=1e-2 (fixed)"
