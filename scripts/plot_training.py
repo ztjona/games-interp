@@ -1,7 +1,7 @@
 """Live training metrics plotter using Plotly Dash.
 
 Usage:
-    plot_training.py <metrics_jsonl>... [--live] [--port=<n>]
+    plot_training.py <metrics_jsonl>... [--live] [--port=<n>] [--hide-invalid]
     plot_training.py -h | --help
 
 Arguments:
@@ -11,6 +11,7 @@ Options:
     -h --help           Show this help message
     --live              Start live monitoring server (updates every 10s)
     --port=<n>          Server port [default: 8050]
+    --hide-invalid      Omit runs marked invalid in training_registry.json
 
 Examples:
     # One-time static plot (opens in browser)
@@ -108,6 +109,10 @@ _COLORS = [
     "navy",
 ]
 
+_INVALID_DASH = "dash"
+_INVALID_WIDTH = 1.5
+_VALID_WIDTH = 2.5
+
 
 def _find_config_yaml(jsonl_path: Path) -> dict | None:
     """Find the best-matching YAML config by longest-prefix match on the stem."""
@@ -157,6 +162,31 @@ def _make_label(jsonl_path: Path, config: dict | None) -> str:
     return stem
 
 
+def _run_id_from_path(jsonl_path: Path) -> str:
+    stem = jsonl_path.stem
+    if stem.endswith("_metrics"):
+        stem = stem[: -len("_metrics")]
+    return stem
+
+
+def _registry_entry(jsonl_path: Path) -> dict:
+    """Return the training_registry.json entry for this run, or {} if absent."""
+    registry_path = jsonl_path.parent / "training_registry.json"
+    if not registry_path.exists():
+        return {}
+    with open(registry_path, encoding="utf-8") as f:
+        registry = json.load(f)
+    return registry.get(_run_id_from_path(jsonl_path), {})
+
+
+def _line_style(info: dict, color: str) -> dict:
+    width = _VALID_WIDTH if info["is_valid"] else _INVALID_WIDTH
+    style = dict(color=color, width=width)
+    if not info["is_valid"]:
+        style["dash"] = _INVALID_DASH
+    return style
+
+
 def get_run_info(jsonl_path: Path) -> dict:
     """Return display info (label, loss_type, legend_name) for a run."""
     config = _find_config_yaml(jsonl_path)
@@ -164,27 +194,38 @@ def get_run_info(jsonl_path: Path) -> dict:
     arch = (config or {}).get("architecture", "")
     loss_type = _LOSS_TYPES.get(arch, "")
     stop_reason = load_stop_reason(jsonl_path)
+    entry = _registry_entry(jsonl_path)
+    is_valid = not entry.get("invalid", False)
+    invalid_reason = entry.get("invalid_reason") if not is_valid else None
     stop_suffix = {"early_stopped": " [ES]", "interrupted": " [INT]"}.get(
         stop_reason or "", ""
     )
+    validity_suffix = " [INVALID]" if not is_valid else ""
     legend_name = (
-        f"{label} [{loss_type}]{stop_suffix}" if loss_type else f"{label}{stop_suffix}"
+        f"{label} [{loss_type}]{validity_suffix}{stop_suffix}"
+        if loss_type
+        else f"{label}{validity_suffix}{stop_suffix}"
     )
     return {
         "label": label,
         "loss_type": loss_type,
         "legend_name": legend_name,
         "stop_reason": stop_reason,
+        "is_valid": is_valid,
+        "invalid_reason": invalid_reason,
     }
 
 
-def create_figure(jsonl_paths: list[Path]) -> go.Figure:
+def create_figure(jsonl_paths: list[Path], hide_invalid: bool = False) -> go.Figure:
     """Create Plotly figure from metrics files."""
     all_runs: list[tuple[dict, list[dict]]] = []
     for jsonl_path in jsonl_paths:
         metrics = load_metrics(jsonl_path)
         if metrics:
-            all_runs.append((get_run_info(jsonl_path), metrics))
+            info = get_run_info(jsonl_path)
+            if hide_invalid and not info["is_valid"]:
+                continue
+            all_runs.append((info, metrics))
 
     if not all_runs:
         fig = go.Figure()
@@ -220,19 +261,30 @@ def create_figure(jsonl_paths: list[Path]) -> go.Figure:
         l0 = [m["l0"] for m in metrics]
         fvu = [m["fvu"] for m in metrics]
         dead_pct = [m["dead_features_pct"] for m in metrics]
+        line_style = _line_style(info, color)
 
-        shared = dict(
-            mode="lines", line=dict(color=color), legendgroup=name, showlegend=False
-        )
+        shared = dict(mode="lines", line=line_style, legendgroup=name, showlegend=False)
         fig.add_trace(
             go.Scatter(
                 x=steps,
                 y=loss,
                 name=name,
                 mode="lines",
-                line=dict(color=color),
+                line=line_style,
                 legendgroup=name,
                 showlegend=True,
+                hovertemplate=(
+                    "%{fullData.name}<br>"
+                    "Step=%{x}<br>"
+                    "Loss=%{y:.4f}<br>"
+                    f"Validity={'valid' if info['is_valid'] else 'invalid'}"
+                    + (
+                        f"<br>Reason={info['invalid_reason']}"
+                        if info["invalid_reason"]
+                        else ""
+                    )
+                    + "<extra></extra>"
+                ),
             ),
             row=1,
             col=1,
@@ -268,9 +320,9 @@ def create_figure(jsonl_paths: list[Path]) -> go.Figure:
     return fig
 
 
-def plot_static(jsonl_paths: list[Path]):
+def plot_static(jsonl_paths: list[Path], hide_invalid: bool = False):
     """Create one-time static plot that opens in browser."""
-    fig = create_figure(jsonl_paths)
+    fig = create_figure(jsonl_paths, hide_invalid=hide_invalid)
     fig.show()
 
 
@@ -286,7 +338,7 @@ def find_free_port(start: int) -> int:
                 port += 1
 
 
-def plot_live(jsonl_paths: list[Path], port: int):
+def plot_live(jsonl_paths: list[Path], port: int, hide_invalid: bool = False):
     """Start live monitoring server with auto-refresh."""
     try:
         from dash import Dash, dcc, html
@@ -315,7 +367,7 @@ def plot_live(jsonl_paths: list[Path], port: int):
         Input("interval-component", "n_intervals"),
     )
     def update_graph(n):
-        fig = create_figure(jsonl_paths)
+        fig = create_figure(jsonl_paths, hide_invalid=hide_invalid)
 
         # Stats table — latest metrics per run
         th_l = {
@@ -331,6 +383,7 @@ def plot_live(jsonl_paths: list[Path], port: int):
         header = html.Tr(
             [
                 html.Th("Run", style=th_l),
+                html.Th("Status", style=th_l),
                 html.Th("Step", style=th_r),
                 html.Th("Loss", style=th_r),
                 html.Th("L0", style=th_r),
@@ -360,7 +413,18 @@ def plot_live(jsonl_paths: list[Path], port: int):
                                 **td,
                                 "textAlign": "left",
                                 "color": c,
+                                "textDecoration": (
+                                    "line-through" if not info["is_valid"] else "none"
+                                ),
                                 "fontWeight": "bold",
+                            },
+                        ),
+                        html.Td(
+                            info["invalid_reason"] if not info["is_valid"] else "valid",
+                            style={
+                                **td,
+                                "textAlign": "left",
+                                "color": c,
                             },
                         ),
                         html.Td(f"{last['step']:,}", style=td),
@@ -407,8 +471,9 @@ if __name__ == "__main__":
     jsonl_paths = [Path(p) for p in args["<metrics_jsonl>"]]
     live = args["--live"]
     port = int(args["--port"])
+    hide_invalid = args["--hide-invalid"]
 
     if live:
-        plot_live(jsonl_paths, port)
+        plot_live(jsonl_paths, port, hide_invalid=hide_invalid)
     else:
-        plot_static(jsonl_paths)
+        plot_static(jsonl_paths, hide_invalid=hide_invalid)
