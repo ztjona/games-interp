@@ -4,12 +4,12 @@
   "game": "quarto",
   "num_bsps": 164,
   "categories": {
-    "cell_occupancy": 16,
-    "game_phase": 3,
-    "threat_line": 40,
-    "threat_square_2x2": 36,
     "global": 1,
     "offered_piece": 4,
+    "cell_occupancy": 16,
+    "threat_square_2x2": 36,
+    "threat_line": 40,
+    "game_phase": 3,
     "cell_attribute": 64
   },
   "filters": {
@@ -690,50 +690,50 @@
       "category": "threat_line"
     },
     {
-      "id": "diag_main_threat_size_tall",
-      "description": "Diag main has 3 of 4 sharing size",
+      "id": "diag_0_threat_size_tall",
+      "description": "Diag 0 has 3 of 4 sharing size",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_main_threat_coloration_dark",
-      "description": "Diag main has 3 of 4 sharing coloration",
+      "id": "diag_0_threat_coloration_dark",
+      "description": "Diag 0 has 3 of 4 sharing coloration",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_main_threat_shape_square",
-      "description": "Diag main has 3 of 4 sharing shape",
+      "id": "diag_0_threat_shape_square",
+      "description": "Diag 0 has 3 of 4 sharing shape",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_main_threat_hole_hollow",
-      "description": "Diag main has 3 of 4 sharing hole",
+      "id": "diag_0_threat_hole_hollow",
+      "description": "Diag 0 has 3 of 4 sharing hole",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_anti_threat_size_tall",
-      "description": "Diag anti has 3 of 4 sharing size",
+      "id": "diag_1_threat_size_tall",
+      "description": "Diag 1 has 3 of 4 sharing size",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_anti_threat_coloration_dark",
-      "description": "Diag anti has 3 of 4 sharing coloration",
+      "id": "diag_1_threat_coloration_dark",
+      "description": "Diag 1 has 3 of 4 sharing coloration",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_anti_threat_shape_square",
-      "description": "Diag anti has 3 of 4 sharing shape",
+      "id": "diag_1_threat_shape_square",
+      "description": "Diag 1 has 3 of 4 sharing shape",
       "type": "binary",
       "category": "threat_line"
     },
     {
-      "id": "diag_anti_threat_hole_hollow",
-      "description": "Diag anti has 3 of 4 sharing hole",
+      "id": "diag_1_threat_hole_hollow",
+      "description": "Diag 1 has 3 of 4 sharing hole",
       "type": "binary",
       "category": "threat_line"
     },

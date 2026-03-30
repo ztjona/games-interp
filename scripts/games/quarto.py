@@ -51,19 +51,21 @@ def load_model(model_path: str | Path, device: str = "cpu") -> nn.Module:
 
 
 # ──────────────────────────────────────────────────────────────────────
-# Bots
+# Bots (proper BotAI subclasses for quartopy compatibility)
 # ──────────────────────────────────────────────────────────────────────
 
+from quartopy import BotAI, Piece
 
-class _RandomBot:
-    """Minimal random bot for self-play (duck-types BotAI)."""
+
+class RandomBot(BotAI):
+    """Random bot that extends BotAI for proper quartopy integration."""
 
     @property
     def name(self):
         return "RandomBot"
 
     def __init__(self, **kw):
-        pass
+        super().__init__()
 
     def select(self, game, ith_option=0, *a, **kw):
         from random import choice
@@ -77,10 +79,11 @@ class _RandomBot:
         return choice(game.game_board.get_valid_moves())
 
 
-class _ModelBot:
+class ModelBot(BotAI):
     """Bot that plays using a trained QuartoCNN checkpoint.
 
-    Mirrors the caching logic of the project's ``CNN_bot``:
+    Extends BotAI for proper quartopy integration.
+    Mirrors the caching logic of hierarchical-SAE's ``CNN_bot``:
     - A single forward pass produces *both* board-position and piece-selection
       rankings, cached in ``_board_ranking`` / ``_piece_ranking``.
     - ``place_piece(ith_option=0)`` triggers a fresh forward pass; retries
@@ -88,29 +91,30 @@ class _ModelBot:
     - ``select()`` reuses the ranking from the most recent forward pass.
     """
 
+    @property
+    def name(self):
+        return f"ModelBot({self._label})"
+
     def __init__(
         self,
         model: nn.Module,
         deterministic: bool = False,
         temperature: float = 0.1,
+        label: str = "unknown",
         **kw,
     ):
+        super().__init__()
         self.model = model
-        self.deterministic = deterministic
-        self.temperature = temperature
+        self.DETERMINISTIC = deterministic
+        self.TEMPERATURE = temperature
+        self._label = label
         self._recalculate = True
-        self._board_ranking: torch.Tensor | None = None  # (1, 16)
-        self._piece_ranking: torch.Tensor | None = None  # (1, 16)
-
-    @property
-    def name(self):
-        return f"ModelBot({getattr(self.model, 'name', 'unknown')})"
+        self._board_ranking: torch.Tensor | None = None
+        self._piece_ranking: torch.Tensor | None = None
 
     # ── internal forward pass ────────────────────────────────────────
 
     def _calculate(self, game):
-        from quartopy.game.piece import Piece
-
         if self._recalculate:
             board_t = torch.tensor(
                 game.game_board.encode(), dtype=torch.float32
@@ -127,58 +131,32 @@ class _ModelBot:
             self._board_ranking, self._piece_ranking = self.model.predict(
                 board_t,
                 piece_t,
-                TEMPERATURE=self.temperature,
-                DETERMINISTIC=self.deterministic,
+                TEMPERATURE=self.TEMPERATURE,
+                DETERMINISTIC=self.DETERMINISTIC,
             )
             self._recalculate = False
 
     # ── placement ────────────────────────────────────────────────────
 
     def place_piece(self, game, piece, ith_option=0, *a, **kw):
-        self._recalculate = True
+        if ith_option == 0:
+            self._recalculate = True
         self._calculate(game)
 
-        # Walk board ranking, skip occupied cells
-        valid_count = 0
-        for rank_pos in range(self._board_ranking.shape[1]):
-            idx = int(self._board_ranking[0, rank_pos].item())
-            r, c = divmod(idx, 4)
-            if game.game_board.is_empty(r, c):
-                if valid_count == ith_option:
-                    return (r, c)
-                valid_count += 1
-
-        # Fallback (should never happen)
-        from random import choice
-
-        return choice(game.game_board.get_valid_moves())
+        idx_board = int(self._board_ranking[0, ith_option].item())
+        return game.game_board.get_position_index(idx_board)
 
     # ── selection ────────────────────────────────────────────────────
 
     def select(self, game, ith_option=0, *a, **kw):
-        from quartopy.game.piece import Piece
-
         # On the very first selection of a game, no placement has happened
         # yet, so we need a forward pass with the current (empty) board.
         if self._piece_ranking is None:
             self._recalculate = True
             self._calculate(game)
 
-        # Walk piece ranking, skip pieces no longer in storage
-        valid_count = 0
-        for rank_pos in range(self._piece_ranking.shape[1]):
-            piece_idx = int(self._piece_ranking[0, rank_pos].item())
-            piece = Piece.from_index(piece_idx)
-            if game.storage_board.find_piece(piece) is not None:
-                if valid_count == ith_option:
-                    return piece
-                valid_count += 1
-
-        # Fallback (should never happen)
-        from random import choice
-
-        r, c = choice(game.storage_board.get_valid_moves())
-        return game.storage_board.get_piece(r, c)
+        idx_piece = int(self._piece_ranking[0, ith_option].item())
+        return Piece.from_index(idx_piece)
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -234,21 +212,21 @@ def _make_bots(
 ) -> tuple[object, object]:
     """Instantiate fresh bots for a single game (no model reloading)."""
     if opponents == "random_v_random":
-        return _RandomBot(), _RandomBot()
+        return RandomBot(), RandomBot()
     if opponents == "model_v_random":
         return (
-            _ModelBot(model1, deterministic=False, temperature=0.1),
-            _RandomBot(),
+            ModelBot(model1, deterministic=False, temperature=0.1),
+            RandomBot(),
         )
     if opponents == "random_v_model":
         return (
-            _RandomBot(),
-            _ModelBot(model2, deterministic=False, temperature=0.1),
+            RandomBot(),
+            ModelBot(model2, deterministic=False, temperature=0.1),
         )
     if opponents == "model_v_model":
         return (
-            _ModelBot(model1, deterministic=False, temperature=0.1),
-            _ModelBot(model2, deterministic=False, temperature=0.1),
+            ModelBot(model1, deterministic=False, temperature=0.1),
+            ModelBot(model2, deterministic=False, temperature=0.1),
         )
     raise ValueError(
         f"Unknown opponent mode '{opponents}'. Choose from: {OPPONENT_MODES}"
@@ -293,7 +271,6 @@ def generate_positions(
     from random import seed as rseed
 
     from quartopy import QuartoGame
-    from quartopy.game.piece import Piece
     from tqdm.auto import tqdm
 
     rseed(seed)
@@ -301,7 +278,7 @@ def generate_positions(
     torch.manual_seed(seed)
 
     # Load model once, share across all games
-    shared_model = _load_shared_model(opponents, model_path, device)
+    shared_model = _load_shared_model(opponents, model_path, None, device)
 
     boards: list[np.ndarray] = []
     pieces: list[np.ndarray] = []
@@ -310,8 +287,8 @@ def generate_positions(
     desc = f"Quarto [{opponents}]"
 
     for game_idx in tqdm(range(num_games), desc=desc):
-        bot1, bot2 = _make_bots(opponents, shared_model)
-        game = QuartoGame(player1=bot1, player2=bot2, mode_2x2=False)
+        bot1, bot2 = _make_bots(opponents, *shared_model)
+        game = QuartoGame(player1=bot1, player2=bot2, mode_2x2=True)
 
         turn_count = 0
         while not game.player_won and not game.game_board.is_full():
@@ -443,8 +420,8 @@ def get_all_bsp_definitions() -> list[dict]:
         lines.append(("row", r, [(r, c) for c in range(4)]))
     for c in range(4):
         lines.append(("col", c, [(r, c) for r in range(4)]))
-    lines.append(("diag", 0, [(i, i) for i in range(4)]))
-    lines.append(("diag", 1, [(i, 3 - i) for i in range(4)]))
+    lines.append(("diag", "main", [(i, i) for i in range(4)]))
+    lines.append(("diag", "anti", [(i, 3 - i) for i in range(4)]))
 
     for line_type, line_idx, cells in lines:
         for attr_name in BINARY_ATTRS.keys():
@@ -628,20 +605,21 @@ def _compute_single_bsp(
 
 def _compute_line_threat(bsp_id: str, cells: dict) -> float:
     """Check if a line has 3 of 4 pieces sharing an attribute."""
-    # Parse: "row_2_threat_size_tall" → line_type='row', idx=2, attr='size_tall'
+    # Parse: "row_2_threat_size_tall" → line_type='row', idx='2', attr='size_tall'
+    #        "diag_main_threat_size_tall" → line_type='diag', idx='main'
     parts = bsp_id.split("_")
     line_type = parts[0]  # "row", "col", "diag"
-    line_idx = int(parts[1])
+    line_idx = parts[1]  # numeric string or "main"/"anti"
     attr_name = "_".join(parts[3:])  # "size_tall", "coloration_dark", etc.
 
     # Get cell coordinates
     if line_type == "row":
-        coords = [(line_idx, c) for c in range(4)]
+        coords = [(int(line_idx), c) for c in range(4)]
     elif line_type == "col":
-        coords = [(r, line_idx) for r in range(4)]
-    elif line_type == "diag" and line_idx == 0:
+        coords = [(r, int(line_idx)) for r in range(4)]
+    elif line_type == "diag" and line_idx == "main":
         coords = [(i, i) for i in range(4)]
-    elif line_type == "diag" and line_idx == 1:
+    elif line_type == "diag" and line_idx == "anti":
         coords = [(i, 3 - i) for i in range(4)]
     else:
         return 0.0

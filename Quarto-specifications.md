@@ -46,6 +46,31 @@ python scripts/sae_train.py list-hooks models/quarto/{model}.pt --model-class mo
 - One channel per piece type
 - 1 at index of offered piece, 0 elsewhere
 
+### Piece Index Mapping
+
+Index is a 4-bit binary encoding: `[size][coloration][shape][hole]`
+
+| Index | Binary | Size | Coloration | Shape | Hole |
+|-------|--------|------|------------|-------|------|
+| 0 | 0000 | SHORT | DARK | ROUND | SOLID |
+| 1 | 0001 | SHORT | DARK | ROUND | HOLLOW |
+| 2 | 0010 | SHORT | DARK | SQUARE | SOLID |
+| 3 | 0011 | SHORT | DARK | SQUARE | HOLLOW |
+| 4 | 0100 | SHORT | LIGHT | ROUND | SOLID |
+| 5 | 0101 | SHORT | LIGHT | ROUND | HOLLOW |
+| 6 | 0110 | SHORT | LIGHT | SQUARE | SOLID |
+| 7 | 0111 | SHORT | LIGHT | SQUARE | HOLLOW |
+| 8 | 1000 | TALL | DARK | ROUND | SOLID |
+| 9 | 1001 | TALL | DARK | ROUND | HOLLOW |
+| 10 | 1010 | TALL | DARK | SQUARE | SOLID |
+| 11 | 1011 | TALL | DARK | SQUARE | HOLLOW |
+| 12 | 1100 | TALL | LIGHT | ROUND | SOLID |
+| 13 | 1101 | TALL | LIGHT | ROUND | HOLLOW |
+| 14 | 1110 | TALL | LIGHT | SQUARE | SOLID |
+| 15 | 1111 | TALL | LIGHT | SQUARE | HOLLOW |
+
+Bit mapping: bit 3 = size_tall, bit 2 = coloration_light, bit 1 = shape_square, bit 0 = hole_hollow
+
 ## BSP (Board State Property) Definitions
 
 **Total:** 164 binary BSPs across 7 categories
@@ -189,6 +214,7 @@ BSP label sets are named after animals to indicate set size:
 
 **Notes:**
 - All position datasets use model **Aa_replay** checkpoint: `20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt`
+- Random baseline model (epoch 0, untrained): `20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt`
 - Raw files preserved for reference; unique files created via deduplication
 - Position counts are approximate before deduplication
 - BSP labels computed from position metadata, independent of boards/pieces tensors
@@ -238,13 +264,15 @@ python scripts/deduplicate_positions.py \
 
 ## Known Issues / TODOs
 
-1. **Piece encoding documentation:** The 16-dim one-hot encoding order is not explicitly documented
-   - Each of 16 channels corresponds to a specific (size, color, shape, hole) combination
-   - Need to document the index→attribute mapping
+*(None currently)*
 
-2. **2×2 mode in training data:** Current models may be trained on line-only or mixed win conditions
-   - Check model checkpoint metadata to confirm which win conditions were used during training
+## Resolved Issues
 
-3. **Diagonal BSP naming:** Diagonals use numeric indices (`diag_0`, `diag_1`), not descriptive names
-   - `diag_0` = main diagonal (0,0)→(3,3)
-   - `diag_1` = anti-diagonal (0,3)→(3,0)
+1. **Diagonal BSP naming** ✅ RESOLVED (2026-03-27) — Renamed `diag_0` → `diag_main`, `diag_1` → `diag_anti`
+
+1. **Piece encoding documentation** ✅ RESOLVED (2026-03-27) — See Piece Index Mapping table above.
+
+2. **mode_2x2 in position generation** ✅ RESOLVED (2026-03-27)
+   - `generate_positions` had `mode_2x2=False`; fixed to `True`
+   - Legacy data moved to `data/quarto/legacy_mode2x2_false/`
+   - Legacy SAEs moved to `saes/quarto/legacy_mode2x2_false/`
