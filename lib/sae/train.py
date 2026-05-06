@@ -72,12 +72,18 @@ def compute_metrics(sae: BaseSAE, x: torch.Tensor) -> dict[str, float]:
 def load_activation_data(data_path: str, device: str) -> torch.Tensor:
     """Load pre-collected activation tensor from a .pt file.
 
-    Expected shape: (N, d_activation) or (N, C, H, W) for conv layers.
+    Expected shape: (N, d_activation).  Conv layers must be pre-flattened
+    at collection time (use --flatten-position in collect_activations.py).
     """
     _stderr(f"Loading activation data from {data_path}...")
     data = torch.load(data_path, map_location=device, weights_only=True)
     if not isinstance(data, torch.Tensor):
         raise ValueError(f"Expected torch.Tensor, got {type(data)}")
+    if data.ndim != 2:
+        raise ValueError(
+            f"Activation tensor must be 2D (N, d_act), got shape {tuple(data.shape)}. "
+            "Re-collect with --flatten-position for conv layers."
+        )
     _stderr(f"Loaded {data.shape[0]} samples, shape: {data.shape}")
     return data
 

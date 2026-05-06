@@ -29,7 +29,9 @@ Options:
     --output <path>        Output .pt file path [default: auto]
     --num-games <int>      Number of games to play (if generating) [default: 10000]
     --device <str>         Device [default: cpu]
-    --flatten              Flatten conv activations (B,C,H,W) -> (B*H*W, C)
+    --flatten-position     Flatten conv activations per-position (B,C,H,W) -> (B, C*H*W)
+    --flatten-per-cell     Flatten conv activations per-cell (B,C,H,W) -> (B*H*W, C)
+    --flatten              Alias for --flatten-per-cell (legacy)
     --seed <int>           Random seed [default: 42]
     --batch-size <int>     Forward-pass batch size [default: 256]
 
@@ -73,9 +75,16 @@ PROJECT_DIR = Path(__file__).resolve().parent.parent
 class ActivationCollector:
     """Hook into a model layer and collect activations."""
 
-    def __init__(self, model: nn.Module, layer_name: str, flatten: bool = False):
+    def __init__(
+        self,
+        model: nn.Module,
+        layer_name: str,
+        flatten_position: bool = False,
+        flatten_per_cell: bool = False,
+    ):
         self.activations: list[torch.Tensor] = []
-        self.flatten = flatten
+        self.flatten_position = flatten_position
+        self.flatten_per_cell = flatten_per_cell
         self._hook = None
 
         found = False
@@ -91,9 +100,12 @@ class ActivationCollector:
 
     def _collect_hook(self, module, input, output):
         act = output.detach()
-        if self.flatten and act.ndim == 4:
+        if act.ndim == 4:
             B, C, H, W = act.shape
-            act = act.permute(0, 2, 3, 1).reshape(B * H * W, C)
+            if self.flatten_position:
+                act = act.reshape(B, C * H * W)
+            elif self.flatten_per_cell:
+                act = act.permute(0, 2, 3, 1).reshape(B * H * W, C)
         self.activations.append(act.cpu())
 
     def collect(self) -> torch.Tensor:
@@ -121,7 +133,14 @@ def main():
     positions_file = args.get("--positions-file")
     opponents = args["--opponents"]
     device = args["--device"]
-    flatten = args["--flatten"]
+    flatten_position = args["--flatten-position"]
+    flatten_per_cell = args["--flatten-per-cell"] or args["--flatten"]
+    if flatten_position and flatten_per_cell:
+        print(
+            "ERROR: --flatten-position and --flatten-per-cell are mutually exclusive",
+            file=sys.stderr,
+        )
+        sys.exit(1)
     seed = int(args["--seed"])
     num_games = int(args["--num-games"])
     batch_size = int(args["--batch-size"])
@@ -197,13 +216,22 @@ def main():
 
     # Determine output paths
     if args["--output"] == "auto" or args["--output"] is None:
-        suffix = "_flat" if flatten else ""
+        if flatten_position:
+            suffix = "_flatpos"
+        elif flatten_per_cell:
+            suffix = "_flatcell"
+        else:
+            suffix = ""
         fname = f"{hook}_{checkpoint_stem}_{opponents_tag}{suffix}_activations.pt"
         output_path = PROJECT_DIR / "data" / game / fname
     else:
         output_path = Path(args["--output"])
 
-    meta_path = output_path.with_name(output_path.stem + "_meta.pt") if not positions_file else None
+    meta_path = (
+        output_path.with_name(output_path.stem + "_meta.pt")
+        if not positions_file
+        else None
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     print(f"\nModel:      {model_path}", file=sys.stderr)
@@ -211,12 +239,18 @@ def main():
     print(f"Hook:       {hook}", file=sys.stderr)
     print(f"Game:       {game}", file=sys.stderr)
     print(f"Device:     {device}", file=sys.stderr)
-    print(f"Flatten:    {flatten}", file=sys.stderr)
+    print(
+        f"Flatten:    position={flatten_position}, per-cell={flatten_per_cell}",
+        file=sys.stderr,
+    )
     print(f"Output:     {output_path}", file=sys.stderr)
     if meta_path:
         print(f"Meta:       {meta_path}", file=sys.stderr)
     else:
-        print(f"Meta:       (none — positions file is the source of record)", file=sys.stderr)
+        print(
+            f"Meta:       (none — positions file is the source of record)",
+            file=sys.stderr,
+        )
     print(f"Samples:    {n_samples}", file=sys.stderr)
     print(f"Batch size: {batch_size}", file=sys.stderr)
 
@@ -227,7 +261,12 @@ def main():
     print(f"\nModel loaded: {arch_name} on {device}", file=sys.stderr)
 
     # ── Step 3: Collect activations ──────────────────────────────────
-    collector = ActivationCollector(model, hook, flatten=flatten)
+    collector = ActivationCollector(
+        model,
+        hook,
+        flatten_position=flatten_position,
+        flatten_per_cell=flatten_per_cell,
+    )
 
     board_tensor = torch.tensor(np.stack(boards), dtype=torch.float32)
     piece_tensor = torch.tensor(np.stack(pieces), dtype=torch.float32)
@@ -258,7 +297,8 @@ def main():
             str(Path(positions_file).resolve()) if positions_file else None
         ),
         "n_samples": n_samples,
-        "flatten": flatten,
+        "flatten_position": flatten_position,
+        "flatten_per_cell": flatten_per_cell,
         "seed": seed,
         "device": device,
         "collection_date": datetime.now().isoformat(),
