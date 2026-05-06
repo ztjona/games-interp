@@ -1,0 +1,17 @@
+# Campaign C: conv2-512 full architecture sweep at exp8
+# P-Annealing — B02 completion was exp4; this is exp8
+experiment: C14-c2arch-s42
+architecture: p-annealing
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+p_start: 1.0
+p_end: 0.2
+patience: 20
+min_improvement: 0.02

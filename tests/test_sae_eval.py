@@ -27,6 +27,7 @@ from lib.sae.eval import (
     FeatureBSPMatching,
     compute_board_reconstruction,
     compute_coverage,
+    compute_feature_sharing,
     evaluate_sae,
     match_features_to_bsps,
 )
@@ -231,6 +232,45 @@ class TestCoverage:
             "median_f1",
         }
         assert expected_keys == set(cov.keys())
+
+
+class TestFeatureSharing:
+
+    def test_feature_sharing_detects_reuse(self):
+        matching = FeatureBSPMatching(
+            precision=torch.zeros(4, 4),
+            recall=torch.zeros(4, 4),
+            f1=torch.zeros(4, 4),
+            best_f1_per_bsp=torch.tensor([1.0, 0.9, 0.8, 0.7]),
+            best_feature_per_bsp=torch.tensor([0, 0, 2, 3]),
+        )
+
+        sharing = compute_feature_sharing(matching)
+
+        assert sharing["num_features_used_by_best_matches"] == 3
+        assert sharing["max_bsps_per_feature"] == 2
+        assert sharing["num_shared_features"] == 1
+        assert sharing["num_bsps_with_shared_best_feature"] == 2
+        assert sharing["fraction_bsps_with_shared_best_feature"] == pytest.approx(
+            0.5, abs=1e-4
+        )
+
+    def test_feature_sharing_all_unique(self):
+        matching = FeatureBSPMatching(
+            precision=torch.zeros(4, 4),
+            recall=torch.zeros(4, 4),
+            f1=torch.zeros(4, 4),
+            best_f1_per_bsp=torch.ones(4),
+            best_feature_per_bsp=torch.tensor([0, 1, 2, 3]),
+        )
+
+        sharing = compute_feature_sharing(matching)
+
+        assert sharing["num_features_used_by_best_matches"] == 4
+        assert sharing["num_shared_features"] == 0
+        assert sharing["fraction_bsps_with_unique_best_feature"] == pytest.approx(
+            1.0, abs=1e-4
+        )
 
 
 # ===========================================================================
@@ -459,6 +499,7 @@ class TestEvaluateSAE:
         # Board reconstruction metrics
         assert "board_reconstruction" in results
         assert "num_reconstructable_bsps" in results
+        assert "feature_sharing" in results
 
     def test_trained_sae_has_nonzero_coverage(self):
         """A trained SAE on structured data should have some coverage > 0.
@@ -513,4 +554,5 @@ class TestEvaluateSAE:
 
         assert "coverage" in results
         assert "board_reconstruction" in results
+        assert "feature_sharing" in results
         assert 0.0 <= results["coverage"] <= 1.0

@@ -20,21 +20,19 @@ Options:
     --name <str>                   BSP set name (e.g., 'gorilla', 'fox'). Auto-detected from --output if omitted.
     --output <path>                Output .pt file for labels [default: auto]
     --schema-out <path>            Output JSON schema file [default: auto]
-    --categories <cats>            Comma-separated categories to include (e.g., "cell_occupancy,threat_line")
-                                   If not specified, includes all BSPs
+    --only-categories <cats>       Comma-separated categories to include. If omitted, includes all BSPs.
     --exclude-categories <cats>    Comma-separated categories to exclude
     --list-categories              List available BSP categories and exit
 
 Examples:
     # Compute all BSPs from a positions file (standard workflow)
-    python compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt --game quarto --name gorilla
+    compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt --game quarto --name gorilla
 
     # Only cell properties
-    python compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt --game quarto --name fox \\
-        --categories cell_occupancy,cell_attribute,offered_piece,game_phase
+    compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt --game quarto --name fox --only-categories cell_occupancy,cell_attribute
 
     # From legacy _meta.pt file
-    python compute_bsp_labels.py data/quarto/fc1_random_v_random_meta.pt --game quarto --name gorilla
+    compute_bsp_labels.py data/quarto/fc1_random_v_random_meta.pt --game quarto --name gorilla
 """
 
 from __future__ import annotations
@@ -45,6 +43,7 @@ from pathlib import Path
 
 import numpy as np
 import torch
+from tqdm import tqdm
 
 try:
     from docopt import docopt
@@ -116,8 +115,8 @@ def main():
 
     # Parse category filters
     include_cats = None
-    if args["--categories"]:
-        include_cats = [c.strip() for c in args["--categories"].split(",")]
+    if args["--only-categories"]:
+        include_cats = [c.strip() for c in args["--only-categories"].split(",")]
 
     exclude_cats = None
     if args["--exclude-categories"]:
@@ -151,9 +150,7 @@ def main():
 
     # Compute BSP vectors
     bsp_vectors = []
-    for i, meta in enumerate(metadata_list):
-        if i % 10000 == 0:
-            print(f"  Progress: {i}/{n_samples}", file=sys.stderr)
+    for meta in tqdm(metadata_list, desc="Computing BSPs", file=sys.stderr):
         vec = game_mod.compute_bsp_vector(meta, selected_ids)
         bsp_vectors.append(vec)
 
@@ -226,7 +223,7 @@ def main():
         "num_bsps": len(selected_bsps),
         "categories": category_summary,
         "filters": {
-            "include_categories": include_cats,
+            "only_categories": include_cats,
             "exclude_categories": exclude_cats,
         },
         "bsps": selected_bsps,

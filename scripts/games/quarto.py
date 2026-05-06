@@ -361,24 +361,28 @@ def generate_positions(
 # BSP (Board State Property) Computation
 # ──────────────────────────────────────────────────────────────────────
 
-# Binary encoding convention:
-#   cell_r_c_size_tall:         1 = TALL,   0 = SHORT
-#   cell_r_c_coloration_dark:   1 = DARK,   0 = LIGHT
-#   cell_r_c_shape_square:      1 = SQUARE, 0 = ROUND
-#   cell_r_c_hole_hollow:       1 = HOLLOW, 0 = SOLID
+# Binary encoding convention — using quartopy's own naming:
+#   cell_r_c_tall:        1 = TALL,        0 = LITTLE
+#   cell_r_c_black:       1 = BLACK,       0 = WHITE
+#   cell_r_c_square:      1 = SQUARE,      0 = CIRCLE
+#   cell_r_c_with_hole:   1 = WITH_HOLE,   0 = WITHOUT_HOLE
+#
+# BINARY_ATTRS: bsp_suffix → (metadata_key, positive_value, negative_value)
 
 BINARY_ATTRS = {
-    "size_tall": ("TALL", "SHORT"),
-    "coloration_dark": ("DARK", "LIGHT"),
-    "shape_square": ("SQUARE", "ROUND"),
-    "hole_hollow": ("HOLLOW", "SOLID"),
+    "tall": ("size", "TALL", "LITTLE"),
+    "black": ("coloration", "BLACK", "WHITE"),
+    "square": ("shape", "SQUARE", "CIRCLE"),
+    "with_hole": ("hole", "WITH_HOLE", "WITHOUT_HOLE"),
 }
 
 
 def get_all_bsp_definitions() -> list[dict]:
-    """Return metadata for all available BSPs (164 total).
+    """Return metadata for all available BSPs (337 total).
 
-    All BSPs are binary (1 or 0). Categories:
+    All BSPs are binary (1 or 0).
+
+    Gorilla (164 BSPs):
     - cell_occupancy: 16 BSPs
     - cell_attribute: 64 BSPs
     - threat_line: 40 BSPs (rows, cols, diagonals)
@@ -386,6 +390,15 @@ def get_all_bsp_definitions() -> list[dict]:
     - offered_piece: 4 BSPs
     - game_phase: 3 BSPs
     - global: 1 BSP
+
+    Hawk — reframed (173 BSPs):
+    - reframed_count: 40 BSPs (line count >=3)
+    - reframed_completable: 40 BSPs (line threat + offered matches)
+    - reframed_any_threat: 10 BSPs (any attribute threat per line)
+    - reframed_sq_count: 36 BSPs (2x2 square count >=3)
+    - reframed_sq_completable: 36 BSPs (2x2 square threat + offered matches)
+    - reframed_sq_any_threat: 9 BSPs (any attribute threat per square)
+    - reframed_global: 2 BSPs (board-level threat/completable)
     """
     bsps = []
 
@@ -404,10 +417,10 @@ def get_all_bsp_definitions() -> list[dict]:
     # Cell attributes (64)
     for r in range(4):
         for c in range(4):
-            for attr_name, (pos_val, neg_val) in BINARY_ATTRS.items():
+            for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
                 bsps.append(
                     {
-                        "id": f"cell_{r}_{c}_{attr_name}",
+                        "id": f"cell_{r}_{c}_{suffix}",
                         "description": f"Piece at ({r},{c}) is {pos_val} (1) else {neg_val} (0)",
                         "type": "binary",
                         "category": "cell_attribute",
@@ -424,12 +437,11 @@ def get_all_bsp_definitions() -> list[dict]:
     lines.append(("diag", "anti", [(i, 3 - i) for i in range(4)]))
 
     for line_type, line_idx, cells in lines:
-        for attr_name in BINARY_ATTRS.keys():
-            attr_clean = attr_name.split("_")[0]
+        for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
             bsps.append(
                 {
-                    "id": f"{line_type}_{line_idx}_threat_{attr_name}",
-                    "description": f"{line_type.capitalize()} {line_idx} has 3 of 4 sharing {attr_clean}",
+                    "id": f"{line_type}_{line_idx}_threat_{suffix}",
+                    "description": f"{line_type.capitalize()} {line_idx}: 3 of 4 are {pos_val}",
                     "type": "binary",
                     "category": "threat_line",
                 }
@@ -438,22 +450,21 @@ def get_all_bsp_definitions() -> list[dict]:
     # 2x2 square threats (36)
     for top_r in range(3):
         for left_c in range(3):
-            for attr_name in BINARY_ATTRS.keys():
-                attr_clean = attr_name.split("_")[0]
+            for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
                 bsps.append(
                     {
-                        "id": f"square_{top_r}_{left_c}_threat_{attr_name}",
-                        "description": f"2x2 square at ({top_r},{left_c}) has 3 of 4 sharing {attr_clean}",
+                        "id": f"square_{top_r}_{left_c}_threat_{suffix}",
+                        "description": f"2x2 at ({top_r},{left_c}): 3 of 4 are {pos_val}",
                         "type": "binary",
                         "category": "threat_square_2x2",
                     }
                 )
 
     # Offered piece (4)
-    for attr_name, (pos_val, neg_val) in BINARY_ATTRS.items():
+    for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
         bsps.append(
             {
-                "id": f"offered_{attr_name}",
+                "id": f"offered_{suffix}",
                 "description": f"Offered piece is {pos_val} (1) else {neg_val} (0)",
                 "type": "binary",
                 "category": "offered_piece",
@@ -491,6 +502,104 @@ def get_all_bsp_definitions() -> list[dict]:
             "description": "There is an immediate winning placement",
             "type": "binary",
             "category": "global",
+        }
+    )
+
+    # ── Reframed BSPs (hawk set — Nanda-inspired) ──────────────────────────
+    # These reframe threat concepts under alternative bases that may match
+    # the model's internal representation more closely.
+
+    # Reframed count: ≥3 pieces in line share attribute (40)
+    for line_type, line_idx, cells_coords in lines:
+        for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"{line_type}_{line_idx}_count_ge3_{suffix}",
+                    "description": f"{line_type.capitalize()} {line_idx}: >=3 occupied cells are {pos_val}",
+                    "type": "binary",
+                    "category": "reframed_count",
+                }
+            )
+
+    # Reframed completable: threat AND offered piece has that attribute (40)
+    for line_type, line_idx, cells_coords in lines:
+        for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"{line_type}_{line_idx}_completable_{suffix}",
+                    "description": f"{line_type.capitalize()} {line_idx}: threat in {pos_val} AND offered piece is {pos_val}",
+                    "type": "binary",
+                    "category": "reframed_completable",
+                }
+            )
+
+    # Reframed any-threat: any attribute creates a threat in this line (10)
+    for line_type, line_idx, cells_coords in lines:
+        bsps.append(
+            {
+                "id": f"{line_type}_{line_idx}_any_threat",
+                "description": f"{line_type.capitalize()} {line_idx}: at least one attribute has a threat pattern",
+                "type": "binary",
+                "category": "reframed_any_threat",
+            }
+        )
+
+    # ── Reframed 2×2 square BSPs (hawk set) ──────────────────────────────
+    squares = []
+    for top_r in range(3):
+        for left_c in range(3):
+            squares.append((top_r, left_c))
+
+    # Reframed square count: ≥3 pieces in 2×2 square share attribute (36)
+    for top_r, left_c in squares:
+        for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"square_{top_r}_{left_c}_count_ge3_{suffix}",
+                    "description": f"2x2 at ({top_r},{left_c}): >=3 occupied cells are {pos_val}",
+                    "type": "binary",
+                    "category": "reframed_sq_count",
+                }
+            )
+
+    # Reframed square completable: threat AND offered piece has attribute (36)
+    for top_r, left_c in squares:
+        for suffix, (meta_key, pos_val, neg_val) in BINARY_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"square_{top_r}_{left_c}_completable_{suffix}",
+                    "description": f"2x2 at ({top_r},{left_c}): threat in {pos_val} AND offered piece is {pos_val}",
+                    "type": "binary",
+                    "category": "reframed_sq_completable",
+                }
+            )
+
+    # Reframed square any-threat: any attribute creates a threat in this square (9)
+    for top_r, left_c in squares:
+        bsps.append(
+            {
+                "id": f"square_{top_r}_{left_c}_any_threat",
+                "description": f"2x2 at ({top_r},{left_c}): at least one attribute has a threat pattern",
+                "type": "binary",
+                "category": "reframed_sq_any_threat",
+            }
+        )
+
+    # Reframed global (2)
+    bsps.append(
+        {
+            "id": "board_threat_exists",
+            "description": "At least one threat exists on any line",
+            "type": "binary",
+            "category": "reframed_global",
+        }
+    )
+    bsps.append(
+        {
+            "id": "board_completable_exists",
+            "description": "At least one threat is completable with the offered piece",
+            "type": "binary",
+            "category": "reframed_global",
         }
     )
 
@@ -548,43 +657,74 @@ def _compute_single_bsp(
         key = f"{parts[1]}_{parts[2]}_occupied"
         return 1.0 if cells.get(key, False) else 0.0
 
-    # Cell attributes
-    if bsp_id.startswith("cell_") and any(a in bsp_id for a in BINARY_ATTRS):
-        parts = bsp_id.split("_")  # ['cell', r, c, attr, value]
+    # Cell attributes — e.g. "cell_0_0_tall", "cell_2_3_with_hole"
+    if bsp_id.startswith("cell_") and not bsp_id.endswith("_occupied"):
+        parts = bsp_id.split("_")  # ['cell', r, c, suffix...]
         r, c = parts[1], parts[2]
-        attr_key = f"{r}_{c}_{parts[3]}"  # e.g., "0_0_size"
+        suffix = "_".join(parts[3:])  # 'tall', 'black', 'with_hole', etc.
 
-        # Check if cell is occupied
+        if suffix not in BINARY_ATTRS:
+            return 0.0
+
         if not cells.get(f"{r}_{c}_occupied", False):
             return 0.0
 
-        # Get the attribute value from metadata
-        attr_raw = parts[3]  # "size", "coloration", "shape", "hole"
-        attr_value = cells.get(attr_key, "")
-
-        # Determine binary convention
-        attr_name = "_".join(parts[3:])  # "size_tall", "coloration_dark", etc.
-        if attr_name in BINARY_ATTRS:
-            pos_val, _ = BINARY_ATTRS[attr_name]
-            return 1.0 if attr_value == pos_val else 0.0
-
-        return 0.0
+        meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+        return 1.0 if cells.get(f"{r}_{c}_{meta_key}", "") == pos_val else 0.0
 
     # Line threats
-    if bsp_id.startswith(("row_", "col_", "diag_")) and "threat" in bsp_id:
+    if (
+        bsp_id.startswith(("row_", "col_", "diag_"))
+        and "threat" in bsp_id
+        and "any_threat" not in bsp_id
+    ):
         return _compute_line_threat(bsp_id, cells)
 
-    # Square threats
-    if bsp_id.startswith("square_") and "threat" in bsp_id:
+    # Square threats (gorilla)
+    if bsp_id.startswith("square_") and "_threat_" in bsp_id:
         return _compute_square_threat(bsp_id, cells)
 
-    # Offered piece
+    # ── Reframed BSPs (hawk) — lines ─────────────────────────────────────
+
+    # Count ≥3 in line — e.g. "row_0_count_ge3_tall"
+    if "count_ge3" in bsp_id and bsp_id.startswith(("row_", "col_", "diag_")):
+        return _compute_line_count_ge3(bsp_id, cells)
+
+    # Completable threat — e.g. "row_0_completable_tall"
+    if "completable_" in bsp_id and bsp_id.startswith(("row_", "col_", "diag_")):
+        return _compute_line_completable(bsp_id, cells, offered)
+
+    # Any threat in line — e.g. "row_0_any_threat"
+    if bsp_id.endswith("_any_threat") and bsp_id.startswith(("row_", "col_", "diag_")):
+        return _compute_line_any_threat(bsp_id, cells)
+
+    # ── Reframed BSPs (hawk) — 2×2 squares ──────────────────────────────
+
+    # Count ≥3 in square — e.g. "square_0_0_count_ge3_tall"
+    if bsp_id.startswith("square_") and "count_ge3" in bsp_id:
+        return _compute_square_count_ge3(bsp_id, cells)
+
+    # Completable threat in square — e.g. "square_0_0_completable_tall"
+    if bsp_id.startswith("square_") and "completable_" in bsp_id:
+        return _compute_square_completable(bsp_id, cells, offered)
+
+    # Any threat in square — e.g. "square_0_0_any_threat"
+    if bsp_id.startswith("square_") and "any_threat" in bsp_id:
+        return _compute_square_any_threat(bsp_id, cells)
+
+    # Board-level reframed globals
+    if bsp_id == "board_threat_exists":
+        return _compute_board_threat_exists(cells)
+
+    if bsp_id == "board_completable_exists":
+        return _compute_board_completable_exists(cells, offered)
+
+    # Offered piece — e.g. "offered_tall", "offered_with_hole"
     if bsp_id.startswith("offered_"):
-        attr_name = bsp_id.replace("offered_", "")  # "size_tall", etc.
-        if attr_name in BINARY_ATTRS:
-            pos_val, _ = BINARY_ATTRS[attr_name]
-            attr_raw = attr_name.split("_")[0]  # "size", "coloration", etc.
-            return 1.0 if offered.get(attr_raw, "") == pos_val else 0.0
+        suffix = bsp_id.replace("offered_", "")  # 'tall', 'black', etc.
+        if suffix in BINARY_ATTRS:
+            meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+            return 1.0 if offered.get(meta_key, "") == pos_val else 0.0
         return 0.0
 
     # Game phase
@@ -605,12 +745,12 @@ def _compute_single_bsp(
 
 def _compute_line_threat(bsp_id: str, cells: dict) -> float:
     """Check if a line has 3 of 4 pieces sharing an attribute."""
-    # Parse: "row_2_threat_size_tall" → line_type='row', idx='2', attr='size_tall'
-    #        "diag_main_threat_size_tall" → line_type='diag', idx='main'
+    # Parse: "row_2_threat_tall" → line_type='row', idx='2', suffix='tall'
+    #        "diag_main_threat_with_hole" → line_type='diag', idx='main', suffix='with_hole'
     parts = bsp_id.split("_")
     line_type = parts[0]  # "row", "col", "diag"
     line_idx = parts[1]  # numeric string or "main"/"anti"
-    attr_name = "_".join(parts[3:])  # "size_tall", "coloration_dark", etc.
+    suffix = "_".join(parts[3:])  # 'tall', 'black', 'with_hole', etc.
 
     # Get cell coordinates
     if line_type == "row":
@@ -624,20 +764,16 @@ def _compute_line_threat(bsp_id: str, cells: dict) -> float:
     else:
         return 0.0
 
-    # Count pieces with attribute and empty cells
-    attr_raw = attr_name.split("_")[0]
-    pos_val, _ = BINARY_ATTRS[attr_name]
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
 
     matching = 0
     empty = 0
 
     for r, c in coords:
-        key_occupied = f"{r}_{c}_occupied"
-        if not cells.get(key_occupied, False):
+        if not cells.get(f"{r}_{c}_occupied", False):
             empty += 1
         else:
-            key_attr = f"{r}_{c}_{attr_raw}"
-            if cells.get(key_attr, "") == pos_val:
+            if cells.get(f"{r}_{c}_{meta_key}", "") == pos_val:
                 matching += 1
 
     # Threat: exactly 3 matching, 1 empty
@@ -646,11 +782,12 @@ def _compute_line_threat(bsp_id: str, cells: dict) -> float:
 
 def _compute_square_threat(bsp_id: str, cells: dict) -> float:
     """Check if a 2x2 square has 3 of 4 pieces sharing an attribute."""
-    # Parse: "square_1_2_threat_shape_square" → top_r=1, left_c=2, attr='shape_square'
+    # Parse: "square_1_2_threat_square" → top_r=1, left_c=2, suffix='square'
+    #        "square_0_0_threat_with_hole" → top_r=0, left_c=0, suffix='with_hole'
     parts = bsp_id.split("_")
     top_r = int(parts[1])
     left_c = int(parts[2])
-    attr_name = "_".join(parts[4:])  # "size_tall", etc.
+    suffix = "_".join(parts[4:])  # 'tall', 'black', 'with_hole', etc.
 
     coords = [
         (top_r, left_c),
@@ -659,23 +796,247 @@ def _compute_square_threat(bsp_id: str, cells: dict) -> float:
         (top_r + 1, left_c + 1),
     ]
 
-    attr_raw = attr_name.split("_")[0]
-    pos_val, _ = BINARY_ATTRS[attr_name]
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
 
     matching = 0
     empty = 0
 
     for r, c in coords:
-        key_occupied = f"{r}_{c}_occupied"
-        if not cells.get(key_occupied, False):
+        if not cells.get(f"{r}_{c}_occupied", False):
             empty += 1
         else:
-            key_attr = f"{r}_{c}_{attr_raw}"
-            if cells.get(key_attr, "") == pos_val:
+            if cells.get(f"{r}_{c}_{meta_key}", "") == pos_val:
                 matching += 1
 
     # Threat: exactly 3 matching, 1 empty
     return 1.0 if (matching == 3 and empty == 1) else 0.0
+
+
+# ── Reframed BSP helpers (hawk set) ──────────────────────────────────────
+
+
+def _parse_line_coords(parts: list[str]) -> list[tuple[int, int]] | None:
+    """Parse line type and index from split BSP ID parts, return cell coordinates."""
+    line_type = parts[0]
+    line_idx = parts[1]
+    if line_type == "row":
+        return [(int(line_idx), c) for c in range(4)]
+    elif line_type == "col":
+        return [(r, int(line_idx)) for r in range(4)]
+    elif line_type == "diag" and line_idx == "main":
+        return [(i, i) for i in range(4)]
+    elif line_type == "diag" and line_idx == "anti":
+        return [(i, 3 - i) for i in range(4)]
+    return None
+
+
+def _parse_square_coords(parts: list[str]) -> list[tuple[int, int]] | None:
+    """Parse square top-left from split BSP ID parts, return 4 cell coordinates."""
+    # "square_0_0_count_ge3_tall" -> parts[0]='square', [1]='0', [2]='0', ...
+    if parts[0] != "square":
+        return None
+    top_r = int(parts[1])
+    left_c = int(parts[2])
+    return [
+        (top_r, left_c),
+        (top_r, left_c + 1),
+        (top_r + 1, left_c),
+        (top_r + 1, left_c + 1),
+    ]
+
+
+def _count_matching_in_line(
+    coords: list[tuple[int, int]], meta_key: str, pos_val: str, cells: dict
+) -> tuple[int, int]:
+    """Count pieces matching attribute and empty cells in a line.
+
+    Returns (matching_count, empty_count).
+    """
+    matching = 0
+    empty = 0
+    for r, c in coords:
+        if not cells.get(f"{r}_{c}_occupied", False):
+            empty += 1
+        elif cells.get(f"{r}_{c}_{meta_key}", "") == pos_val:
+            matching += 1
+    return matching, empty
+
+
+def _compute_line_count_ge3(bsp_id: str, cells: dict) -> float:
+    """>=3 occupied pieces in line share attribute (ignores empty cells).
+
+    E.g. "row_0_count_ge3_tall": among occupied cells in row 0, are >=3 TALL?
+    """
+    parts = bsp_id.split("_")
+    # "row_0_count_ge3_tall" -> parts[0]='row', [1]='0', [2]='count', [3]='ge3', [4:]='tall'
+    # "diag_main_count_ge3_with_hole" -> [0]='diag', [1]='main', [2]='count', [3]='ge3', [4:]='with_hole'
+    suffix = "_".join(parts[4:])
+    coords = _parse_line_coords(parts)
+    if coords is None or suffix not in BINARY_ATTRS:
+        return 0.0
+
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+    matching, _ = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    return 1.0 if matching >= 3 else 0.0
+
+
+def _compute_line_completable(bsp_id: str, cells: dict, offered: dict) -> float:
+    """Threat exists AND offered piece has the same attribute.
+
+    E.g. "row_0_completable_tall": row 0 has threat in TALL AND offered piece is TALL.
+    """
+    parts = bsp_id.split("_")
+    # "row_0_completable_tall" -> [0]='row', [1]='0', [2]='completable', [3:]='tall'
+    suffix = "_".join(parts[3:])
+    coords = _parse_line_coords(parts)
+    if coords is None or suffix not in BINARY_ATTRS:
+        return 0.0
+
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+
+    # Check threat first
+    matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    if not (matching == 3 and empty == 1):
+        return 0.0
+
+    # Check offered piece has the attribute
+    return 1.0 if offered.get(meta_key, "") == pos_val else 0.0
+
+
+def _compute_line_any_threat(bsp_id: str, cells: dict) -> float:
+    """Any attribute creates a threat in this line.
+
+    E.g. "row_0_any_threat": row 0 has a threat for at least one of tall/black/square/with_hole.
+    """
+    parts = bsp_id.split("_")
+    # "row_0_any_threat" -> [0]='row', [1]='0', [2]='any', [3]='threat'
+    coords = _parse_line_coords(parts)
+    if coords is None:
+        return 0.0
+
+    for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+        matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        if matching == 3 and empty == 1:
+            return 1.0
+    return 0.0
+
+
+# ── Reframed 2×2 square BSP helpers ─────────────────────────────────────
+
+
+def _compute_square_count_ge3(bsp_id: str, cells: dict) -> float:
+    """>=3 occupied pieces in 2x2 square share attribute.
+
+    E.g. "square_0_0_count_ge3_tall": among occupied cells in 2x2 at (0,0), are >=3 TALL?
+    """
+    parts = bsp_id.split("_")
+    # "square_0_0_count_ge3_tall" -> [0]='square', [1]='0', [2]='0', [3]='count', [4]='ge3', [5:]='tall'
+    suffix = "_".join(parts[5:])
+    coords = _parse_square_coords(parts)
+    if coords is None or suffix not in BINARY_ATTRS:
+        return 0.0
+
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+    matching, _ = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    return 1.0 if matching >= 3 else 0.0
+
+
+def _compute_square_completable(bsp_id: str, cells: dict, offered: dict) -> float:
+    """Threat in 2x2 square AND offered piece has matching attribute.
+
+    E.g. "square_0_0_completable_tall": 2x2 at (0,0) has threat in TALL AND offered is TALL.
+    """
+    parts = bsp_id.split("_")
+    # "square_0_0_completable_tall" -> [0]='square', [1]='0', [2]='0', [3]='completable', [4:]='tall'
+    suffix = "_".join(parts[4:])
+    coords = _parse_square_coords(parts)
+    if coords is None or suffix not in BINARY_ATTRS:
+        return 0.0
+
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+
+    # Check threat first
+    matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    if not (matching == 3 and empty == 1):
+        return 0.0
+
+    # Check offered piece has the attribute
+    return 1.0 if offered.get(meta_key, "") == pos_val else 0.0
+
+
+def _compute_square_any_threat(bsp_id: str, cells: dict) -> float:
+    """Any attribute creates a threat in this 2x2 square.
+
+    E.g. "square_0_0_any_threat": 2x2 at (0,0) has a threat for any attribute.
+    """
+    parts = bsp_id.split("_")
+    # "square_0_0_any_threat" -> [0]='square', [1]='0', [2]='0', [3]='any', [4]='threat'
+    coords = _parse_square_coords(parts)
+    if coords is None:
+        return 0.0
+
+    for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+        matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        if matching == 3 and empty == 1:
+            return 1.0
+    return 0.0
+
+
+_ALL_LINE_COORDS = (
+    [("row", i, [(i, c) for c in range(4)]) for i in range(4)]
+    + [("col", i, [(r, i) for r in range(4)]) for i in range(4)]
+    + [("diag", "main", [(i, i) for i in range(4)])]
+    + [("diag", "anti", [(i, 3 - i) for i in range(4)])]
+)
+
+_ALL_SQUARE_COORDS = [
+    (
+        top_r,
+        left_c,
+        [
+            (top_r, left_c),
+            (top_r, left_c + 1),
+            (top_r + 1, left_c),
+            (top_r + 1, left_c + 1),
+        ],
+    )
+    for top_r in range(3)
+    for left_c in range(3)
+]
+
+
+def _compute_board_threat_exists(cells: dict) -> float:
+    """At least one line or 2x2 square has a threat for any attribute."""
+    for _, _, coords in _ALL_LINE_COORDS:
+        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+            if matching == 3 and empty == 1:
+                return 1.0
+    for _, _, coords in _ALL_SQUARE_COORDS:
+        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+            if matching == 3 and empty == 1:
+                return 1.0
+    return 0.0
+
+
+def _compute_board_completable_exists(cells: dict, offered: dict) -> float:
+    """At least one line or 2x2 square has a threat completable with the offered piece."""
+    if not offered:
+        return 0.0
+    for _, _, coords in _ALL_LINE_COORDS:
+        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+            if matching == 3 and empty == 1:
+                if offered.get(meta_key, "") == pos_val:
+                    return 1.0
+    for _, _, coords in _ALL_SQUARE_COORDS:
+        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+            if matching == 3 and empty == 1:
+                if offered.get(meta_key, "") == pos_val:
+                    return 1.0
+    return 0.0
 
 
 def _compute_winning_move_exists(cells: dict, offered: dict) -> float:

@@ -1,0 +1,14 @@
+# Anakin Tier I: TopK k=64 on conv2 exp=4 — same sparsity ratio as fc1 k=32 exp=8
+experiment: anakin
+architecture: topk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 4
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+aux_loss_weight: 0.01

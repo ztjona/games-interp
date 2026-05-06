@@ -10,11 +10,11 @@
 
 ## Piece Attributes
 
-Each piece has 4 binary attributes:
-- **Size:** TALL or SHORT
-- **Coloration:** DARK or LIGHT
-- **Shape:** SQUARE or ROUND
-- **Hole:** HOLLOW or SOLID
+Each piece has 4 binary attributes (quartopy naming):
+- **Size:** TALL or LITTLE
+- **Coloration:** BLACK or WHITE
+- **Shape:** SQUARE or CIRCLE
+- **Hole:** WITH_HOLE or WITHOUT_HOLE
 
 Total unique pieces: 2^4 = 16
 
@@ -25,8 +25,8 @@ Total unique pieces: 2^4 = 16
 **Hookable layers:**
 - `fc_in_piece` — (B,16) Piece input embedding
 - `conv1` — (B,16,4,4) Early spatial features
-- `conv2` — (B,32,4,4) Higher-level spatial
-- `fc1` — (B,128) **Recommended hook point** — shared bottleneck before dual heads
+- `conv2` — (B,32,4,4) Higher-level spatial. **Recommended hook point for threat-focused probes/SAEs after Phase 1F**
+- `fc1` — (B,128) Shared bottleneck before dual heads. Still useful for bottleneck comparisons, but no longer the preferred hook for threat recovery.
 - `fc2_board` — (B,16) Board placement Q-values
 - `fc2_piece` — (B,16) Piece selection Q-values
 
@@ -52,24 +52,24 @@ Index is a 4-bit binary encoding: `[size][coloration][shape][hole]`
 
 | Index | Binary | Size | Coloration | Shape | Hole |
 |-------|--------|------|------------|-------|------|
-| 0 | 0000 | SHORT | DARK | ROUND | SOLID |
-| 1 | 0001 | SHORT | DARK | ROUND | HOLLOW |
-| 2 | 0010 | SHORT | DARK | SQUARE | SOLID |
-| 3 | 0011 | SHORT | DARK | SQUARE | HOLLOW |
-| 4 | 0100 | SHORT | LIGHT | ROUND | SOLID |
-| 5 | 0101 | SHORT | LIGHT | ROUND | HOLLOW |
-| 6 | 0110 | SHORT | LIGHT | SQUARE | SOLID |
-| 7 | 0111 | SHORT | LIGHT | SQUARE | HOLLOW |
-| 8 | 1000 | TALL | DARK | ROUND | SOLID |
-| 9 | 1001 | TALL | DARK | ROUND | HOLLOW |
-| 10 | 1010 | TALL | DARK | SQUARE | SOLID |
-| 11 | 1011 | TALL | DARK | SQUARE | HOLLOW |
-| 12 | 1100 | TALL | LIGHT | ROUND | SOLID |
-| 13 | 1101 | TALL | LIGHT | ROUND | HOLLOW |
-| 14 | 1110 | TALL | LIGHT | SQUARE | SOLID |
-| 15 | 1111 | TALL | LIGHT | SQUARE | HOLLOW |
+| 0 | 0000 | LITTLE | BLACK | CIRCLE | WITHOUT_HOLE |
+| 1 | 0001 | LITTLE | BLACK | CIRCLE | WITH_HOLE |
+| 2 | 0010 | LITTLE | BLACK | SQUARE | WITHOUT_HOLE |
+| 3 | 0011 | LITTLE | BLACK | SQUARE | WITH_HOLE |
+| 4 | 0100 | LITTLE | WHITE | CIRCLE | WITHOUT_HOLE |
+| 5 | 0101 | LITTLE | WHITE | CIRCLE | WITH_HOLE |
+| 6 | 0110 | LITTLE | WHITE | SQUARE | WITHOUT_HOLE |
+| 7 | 0111 | LITTLE | WHITE | SQUARE | WITH_HOLE |
+| 8 | 1000 | TALL | BLACK | CIRCLE | WITHOUT_HOLE |
+| 9 | 1001 | TALL | BLACK | CIRCLE | WITH_HOLE |
+| 10 | 1010 | TALL | BLACK | SQUARE | WITHOUT_HOLE |
+| 11 | 1011 | TALL | BLACK | SQUARE | WITH_HOLE |
+| 12 | 1100 | TALL | WHITE | CIRCLE | WITHOUT_HOLE |
+| 13 | 1101 | TALL | WHITE | CIRCLE | WITH_HOLE |
+| 14 | 1110 | TALL | WHITE | SQUARE | WITHOUT_HOLE |
+| 15 | 1111 | TALL | WHITE | SQUARE | WITH_HOLE |
 
-Bit mapping: bit 3 = size_tall, bit 2 = coloration_light, bit 1 = shape_square, bit 0 = hole_hollow
+Bit mapping: bit 3 = TALL, bit 2 = WHITE, bit 1 = SQUARE, bit 0 = WITH_HOLE
 
 ## BSP (Board State Property) Definitions
 
@@ -89,19 +89,19 @@ Bit mapping: bit 3 = size_tall, bit 2 = coloration_light, bit 1 = shape_square, 
 
 ### Binary Encoding Convention
 
-**Cell and offered piece attributes use explicit positive naming:**
-- `*_size_tall`: 1 = TALL, 0 = SHORT
-- `*_coloration_dark`: 1 = DARK, 0 = LIGHT
-- `*_shape_square`: 1 = SQUARE, 0 = ROUND
-- `*_hole_hollow`: 1 = HOLLOW, 0 = SOLID
+**Cell and offered piece attributes use quartopy enum naming directly:**
+- `*_tall`: 1 = TALL, 0 = LITTLE
+- `*_black`: 1 = BLACK, 0 = WHITE
+- `*_square`: 1 = SQUARE, 0 = CIRCLE
+- `*_with_hole`: 1 = WITH_HOLE, 0 = WITHOUT_HOLE
 
 **Example BSP IDs:**
 - `cell_0_0_occupied` — Is top-left cell occupied?
-- `cell_0_0_size_tall` — Is piece at (0,0) TALL?
-- `cell_2_3_coloration_dark` — Is piece at (2,3) DARK?
-- `row_0_threat_size_tall` — Does row 0 have 3 TALL pieces + 1 empty cell?
-- `square_1_1_threat_shape_square` — Does 2×2 at (1,1) have 3 SQUARE pieces?
-- `offered_hole_hollow` — Is the offered piece HOLLOW?
+- `cell_0_0_tall` — Is piece at (0,0) TALL?
+- `cell_2_3_black` — Is piece at (2,3) BLACK?
+- `row_0_threat_tall` — Does row 0 have 3 TALL pieces + 1 empty cell?
+- `square_1_1_threat_square` — Does 2×2 at (1,1) have 3 SQUARE pieces?
+- `offered_with_hole` — Is the offered piece WITH_HOLE?
 - `game_phase_mid` — Are there 6-11 pieces on board?
 
 ### Threat Detection Rules
@@ -144,6 +144,7 @@ python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
 | Animal Name | Count | Categories Included |
 |-------------|-------|---------------------|
 | `gorilla` | 164 | ALL (complete set) |
+| `hawk` | 173 | Reframed line + square threat/count BSPs + global |
 | `elephant` | 80 | cell_occupancy + cell_attribute (no threats) |
 | `cheetah` | 56 | cell_occupancy + threat_line (no attributes) |
 | `penguin` | 128 | ALL except threat_square_2x2 |
@@ -191,15 +192,32 @@ BSP label sets are named after animals to indicate set size:
 - BSP labels: `bsp_labels-{animal_name}_{count}.pt`
 - BSP schema: `bsp_schema-{animal_name}_{count}.json`
 
+**SAE follow-up run naming (from 2026-04-24 onward):**
+- Use experiment IDs of the form `{Major}{Minor}-{tag}-s{seed}`.
+- `Major` is one uppercase letter for the campaign family (`A`, `B`, `C`, ...).
+- `Minor` is a zero-padded two-digit condition index inside that campaign (`01`, `02`, ...).
+- `tag` is a short semantic label such as `random-control`, `conv2-completion`, or `seedpanel`.
+- `s{seed}` is mandatory for any fixed-seed run, even when the config filename already implies the seed.
+- The trainer already appends architecture and hook, so put the campaign ID in `experiment:` rather than duplicating the full config name.
+
+**Examples:**
+- `A01-random-control-s42` → `A01-random-control-s42-batchtopk-k16-exp8-fc1.pt`
+- `A02-random-control-s42` → `A02-random-control-s42-topk-k32-exp8-conv2.pt`
+- `B03-conv2-completion-s42` → `B03-conv2-completion-s42-topk-k64-exp2-conv2.pt`
+
+**Rule of use:**
+- Reuse the same `{Major}{Minor}-{tag}` only for the same experimental condition; vary `s{seed}` for replicated seeds.
+- Allocate a new `{Major}{Minor}` whenever the condition itself changes (hook, architecture family, data source, or research purpose).
+
 ## Dataset Catalog
 
-**Current datasets** (as of March 2026):
+**Current datasets** (as of April 2026):
 
 ### Position Datasets
 
 | Name | Description | Source Files | Model | N Positions | Generation Date |
 |------|-------------|--------------|-------|-------------|-----------------|
-| `amalgam` | Combined all opponent modes, deduplicated | `positions-random_v_random_raw.pt`<br>`positions-model_v_random-Aa_replay_raw.pt`<br>`positions-random_v_model-Aa_replay_raw.pt`<br>`positions-model_v_model-Aa_replay_raw.pt` | Aa_replay (20260227_1103) | TBD | 2026-03-03 |
+| `amalgam` | Combined all opponent modes, deduplicated | `positions-random_v_random_raw.pt`<br>`positions-model_v_random-Aa_replay_raw.pt`<br>`positions-random_v_model-Aa_replay_raw.pt`<br>`positions-model_v_model-Aa_replay_raw.pt` | Aa_replay (20260227_1103) | 275,916 | 2026-03-03 |
 | `copper` | random_v_random only (not yet created) | `positions-random_v_random_raw.pt` | N/A | ~121 | 2026-03-03 |
 | `bronze` | model_v_random only (not yet created) | `positions-model_v_random-Aa_replay_raw.pt` | Aa_replay | ~102K | 2026-03-03 |
 | `iron` | random_v_model only (not yet created) | `positions-random_v_model-Aa_replay_raw.pt` | Aa_replay | ~101K | 2026-03-03 |
@@ -210,6 +228,7 @@ BSP label sets are named after animals to indicate set size:
 | Name | BSP Count | Categories Included | Source Dataset | Generation Date | Purpose |
 |------|-----------|---------------------|----------------|-----------------|---------|
 | `gorilla` | 164 | ALL (cell_occupancy, cell_attribute, threat_line, threat_square_2x2, offered_piece, game_phase, global) | amalgam | TBD | Full coverage evaluation |
+| `hawk_173` | 173 | reframed_count, reframed_completable, reframed_any_threat, reframed_sq_count, reframed_sq_completable, reframed_sq_any_threat, reframed_global | amalgam | 2026-03-31 refresh | Reframed threat evaluation |
 | `fox` | 87 | cell_occupancy, cell_attribute, offered_piece, game_phase | (extractable from gorilla) | N/A | Positional properties only |
 
 **Notes:**
@@ -276,3 +295,9 @@ python scripts/deduplicate_positions.py \
    - `generate_positions` had `mode_2x2=False`; fixed to `True`
    - Legacy data moved to `data/quarto/legacy_mode2x2_false/`
    - Legacy SAEs moved to `saes/quarto/legacy_mode2x2_false/`
+
+3. **BSP naming convention aligned to quartopy** ✅ RESOLVED (2026-03-28)
+   - Old convention used arbitrary names: `size_tall`, `coloration_dark`, `shape_square`, `hole_hollow`
+   - New convention uses quartopy enum values directly: `tall`, `black`, `square`, `with_hole`
+   - BSP IDs changed: e.g. `cell_0_0_size_tall` → `cell_0_0_tall`, `offered_coloration_dark` → `offered_black`
+   - **Requires regeneration:** BSP labels, linear probes, SAE evaluations with BSPs

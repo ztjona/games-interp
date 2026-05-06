@@ -1,5 +1,6 @@
 *.jsonl
-
+.claude/
+SELF-IMPROVEMENT.md
 # Python
 __pycache__/
 *.py[cod]

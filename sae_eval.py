@@ -3,11 +3,13 @@
 Usage:
     sae_eval.py evaluate <checkpoint> [options]
     sae_eval.py compare [<run_ids>...] [options]
+    sae_eval.py history [--game=<game>] [options]
     sae_eval.py -h | --help
 
 Commands:
     evaluate    Run Layer 1 evaluation (coverage + board reconstruction)
     compare     Side-by-side comparison of evaluated runs
+    history     List all evaluated runs from the registry
 
 Arguments:
     <checkpoint>    Path to trained SAE .pt file
@@ -23,14 +25,15 @@ Options:
     --tag=<str>             Human-readable tag for this evaluation
     --device=<dev>          Device (cuda|cpu|auto) [default: auto]
     --force                 Re-evaluate even if results exist in the registry
+    --game=<game>           Game filter for history command [default: quarto]
     --config=<path>         YAML config listing run_ids for compare
     --verbose               Enable debug-level logging
     -h --help               Show this help
 
 Auto-resolution (from checkpoint metadata):
-    data    → data/{game}/{hook}_amalgam_activations.pt
-    bsps    → data/{game}/bsp_labels-{animal}_{count}.pt  (by glob)
-    schema  → data/{game}/bsp_schema-{animal}_{count}.json
+    data    -> data/{game}/{hook}_amalgam_activations.pt
+    bsps    -> data/{game}/bsp_labels-{animal}_{count}.pt  (by glob)
+    schema  -> data/{game}/bsp_schema-{animal}_{count}.json
 
 Examples:
     # Evaluate with full BSP set (gorilla)
@@ -68,6 +71,8 @@ from lib.sae.eval import (
     FeatureBSPMatching,
     match_features_to_bsps,
     compute_coverage,
+    compute_feature_sharing,
+    compute_per_category_coverage,
     compute_board_reconstruction,
 )
 from lib.sae.train import compute_metrics
@@ -80,8 +85,20 @@ log = logging.getLogger("sae_eval")
 # ---------------------------------------------------------------------------
 
 
-def _resolve_data_path(game: str, hook: str) -> Path:
-    """Auto-resolve activation data from game and hook."""
+def _resolve_data_path(game: str, hook: str, metadata: dict | None = None) -> Path:
+    """Auto-resolve activation data from game and hook.
+
+    Prefers data_path stored in checkpoint metadata (set during training),
+    falling back to the convention data/{game}/{hook}_amalgam_activations.pt.
+    """
+    # Prefer the exact path used during training
+    if metadata and "data_path" in metadata:
+        meta_path = Path(metadata["data_path"])
+        if meta_path.exists():
+            return meta_path
+        log.warning("  data_path from checkpoint metadata not found: %s", meta_path)
+        log.warning("  Falling back to convention-based resolution.")
+
     path = Path(f"data/{game}/{hook}_amalgam_activations.pt")
     if not path.exists():
         log.error("Activation data not found: %s", path)
@@ -157,10 +174,15 @@ def _register_eval(
     metrics: dict,
     tag: str | None,
 ) -> None:
-    """Save evaluation results to the eval registry."""
+    """Save evaluation results to the eval registry.
+
+    Registry keys use the format ``run_id:bsp_set`` so the same checkpoint can
+    be evaluated against multiple BSP sets without overwriting previous results.
+    """
     registry = _load_registry(game)
-    registry[run_id] = {
+    registry[f"{run_id}:{bsp_set}"] = {
         "timestamp": datetime.now().isoformat(),
+        "run_id": run_id,
         "checkpoint": checkpoint_path,
         "architecture": info["architecture"],
         "experiment": info["experiment"],
@@ -203,9 +225,14 @@ def cmd_evaluate(args: dict) -> None:
     game, hook = info["game"], info["hook"]
 
     registry = _load_registry(game)
-    if run_id in registry and not force:
-        cached = registry[run_id]
-        log.info("Found cached evaluation for '%s' (use --force to recompute)", run_id)
+    cache_key = f"{run_id}:{animal}"
+    if cache_key in registry and not force:
+        cached = registry[cache_key]
+        log.info(
+            "Found cached evaluation for '%s' on '%s' (use --force to recompute)",
+            run_id,
+            animal,
+        )
         output = {
             "run_id": run_id,
             "checkpoint": cached.get("checkpoint", checkpoint_path),
@@ -241,7 +268,7 @@ def cmd_evaluate(args: dict) -> None:
     if data_arg and data_arg != "auto":
         data_path = Path(data_arg)
     else:
-        data_path = _resolve_data_path(game, hook)
+        data_path = _resolve_data_path(game, hook, metadata)
 
     bsp_label_arg = args["--bsp-labels"]
     bsp_schema_arg = args["--bsp-schema"]
@@ -262,6 +289,20 @@ def cmd_evaluate(args: dict) -> None:
 
     # Load data
     activations = load_activation_data(str(data_path), device)
+
+    # Validate activation shape matches SAE input dimension
+    act_dim = activations.shape[-1]
+    if act_dim != sae.d_input:
+        log.error(
+            "Shape mismatch: activations have d=%d but SAE expects d_input=%d",
+            act_dim,
+            sae.d_input,
+        )
+        log.error("  Activation file: %s", data_path)
+        if metadata and "data_path" in metadata:
+            log.error("  Hint: checkpoint was trained on '%s'", metadata["data_path"])
+        sys.exit(1)
+
     bsp_labels = torch.load(bsp_label_path, map_location="cpu", weights_only=True)
 
     # Load schema for BSP names in output
@@ -330,6 +371,8 @@ def cmd_evaluate(args: dict) -> None:
 
     # ── 3. Coverage + board reconstruction + structural metrics ──────────
     coverage_metrics = compute_coverage(matching)
+    feature_sharing = compute_feature_sharing(matching)
+    per_category = compute_per_category_coverage(matching, bsp_schema)
     reconstruction = compute_board_reconstruction(
         matching, h, bsp_labels, precision_threshold=precision_thresh
     )
@@ -338,6 +381,9 @@ def cmd_evaluate(args: dict) -> None:
 
     metrics = {**structural, **coverage_metrics, **reconstruction}
     metrics.pop("per_bsp_accuracy", None)
+    metrics["feature_sharing"] = feature_sharing
+    if per_category:
+        metrics["per_category"] = per_category
 
     # Register
     _register_eval(run_id, game, checkpoint_path, info, animal, metrics, tag)
@@ -387,6 +433,20 @@ def _print_summary(
     log.info("  Coverage:             %.4f", metrics.get("coverage", 0))
     log.info("  Coverage >50%%:        %.4f", metrics.get("coverage_above_50", 0))
     log.info("  Coverage >75%%:        %.4f", metrics.get("coverage_above_75", 0))
+    feature_sharing = metrics.get("feature_sharing", {})
+    if feature_sharing:
+        log.info(
+            "  Features used:         %d",
+            feature_sharing.get("num_features_used_by_best_matches", 0),
+        )
+        log.info(
+            "  BSPs on shared feats:  %.4f",
+            feature_sharing.get("fraction_bsps_with_shared_best_feature", 0),
+        )
+        log.info(
+            "  Max BSPs / feature:    %d",
+            feature_sharing.get("max_bsps_per_feature", 0),
+        )
     log.info("  Board reconstruction: %.4f", metrics.get("board_reconstruction", 0))
     log.info(
         "  Reconstructable BSPs: %d / %s (%.1f%%)",
@@ -394,8 +454,107 @@ def _print_summary(
         metrics.get("num_bsps", "?"),
         metrics.get("fraction_reconstructable", 0) * 100,
     )
+    per_cat = metrics.get("per_category")
+    if per_cat:
+        log.info("-" * 60)
+        log.info("  Per-category coverage (mean F1):")
+        for cat, vals in sorted(per_cat.items()):
+            log.info(
+                "    %-22s  %.4f  (%d BSPs)",
+                cat,
+                vals["mean_f1"],
+                vals["count"],
+            )
     log.info("=" * 60)
     log.info("  Saved to eval registry: %s", _registry_path(game))
+
+
+def cmd_history(args: dict) -> None:
+    """List all evaluated runs from the registry."""
+    game = args["--game"]
+
+    # If no game specified, scan all game directories
+    games = [game] if game else [d.name for d in Path("saes").iterdir() if d.is_dir()]
+
+    all_entries = []
+    for g in games:
+        registry = _load_registry(g)
+        for reg_key, entry in registry.items():
+            if reg_key in ("experiments", "version", "note"):
+                continue
+            # Support both new-style keys (run_id:bsp_set) and legacy plain run_id keys
+            run_id = entry.get("run_id", reg_key)
+            all_entries.append((run_id, g, entry))
+
+    if not all_entries:
+        print("No evaluated runs found.")
+        return
+
+    # Sort by timestamp
+    all_entries.sort(key=lambda x: x[2].get("timestamp", ""))
+
+    # Define columns
+    metrics_cols = [
+        ("fvu", ".4f"),
+        ("l0", ".0f"),
+        ("dead_features_pct", ".0f"),
+        ("coverage", ".3f"),
+        ("coverage_above_50", ".3f"),
+        ("board_reconstruction", ".3f"),
+    ]
+
+    # Header
+    header = f"{'Run ID':<45} {'Arch':<10} {'Hook':<6} {'BSPs':<8}"
+    for col, _ in metrics_cols:
+        short = (
+            col.replace("_features_pct", "%")
+            .replace("_above_50", ">50")
+            .replace("board_reconstruction", "board_rec")
+        )
+        header += f" {short:>10}"
+    # Per-category columns (if any entry has them)
+    has_categories = any(
+        "per_category" in e.get("metrics", {}) for _, _, e in all_entries
+    )
+    category_cols = []
+    if has_categories:
+        # Collect all category names across entries
+        for _, _, e in all_entries:
+            for cat in e.get("metrics", {}).get("per_category", {}):
+                if cat not in category_cols:
+                    category_cols.append(cat)
+        for cat in category_cols:
+            header += f" {cat[:12]:>12}"
+
+    print(header)
+    print("-" * len(header))
+
+    for run_id, g, entry in all_entries:
+        m = entry.get("metrics", {})
+        row = (
+            f"{run_id:<45} "
+            f"{entry.get('architecture', '?'):<10} "
+            f"{entry.get('hook', '?'):<6} "
+            f"{entry.get('bsp_set', '?'):<8}"
+        )
+        for col, fmt in metrics_cols:
+            val = m.get(col)
+            if val is not None:
+                row += f" {val:>10{fmt}}"
+            else:
+                row += f" {'—':>10}"
+        if has_categories:
+            per_cat = m.get("per_category", {})
+            for cat in category_cols:
+                cat_data = per_cat.get(cat, {})
+                val = cat_data.get("mean_f1")
+                if val is not None:
+                    row += f" {val:>12.3f}"
+                else:
+                    row += f" {'—':>12}"
+        print(row)
+
+    print(f"\nTotal: {len(all_entries)} evaluated run(s)")
 
 
 def cmd_compare(args: dict) -> None:
@@ -438,13 +597,22 @@ def cmd_compare(args: dict) -> None:
             reg = _load_registry(game_dir.name)
             registries.update(reg)
 
-    # Collect entries
+    # Collect entries — support both "run_id:bsp_set" exact keys and plain run_ids
     entries = []
     for rid in run_ids:
-        if rid not in registries:
-            log.warning("Run '%s' not found in any eval registry", rid)
-            continue
-        entries.append((rid, registries[rid]))
+        if rid in registries:
+            entries.append((rid, registries[rid]))
+        else:
+            # Fall back: find most recent entry whose stored run_id field matches
+            matches = [
+                (k, v) for k, v in registries.items() if v.get("run_id", k) == rid
+            ]
+            if matches:
+                matches.sort(key=lambda x: x[1].get("timestamp", ""))
+                _, entry = matches[-1]
+                entries.append((rid, entry))
+            else:
+                log.warning("Run '%s' not found in any eval registry", rid)
 
     if len(entries) < 2:
         log.error("Need at least 2 valid runs to compare.")
@@ -514,6 +682,33 @@ def cmd_compare(args: dict) -> None:
                 row += f"  {sign}{delta:{fmt}} {marker}"
         print(row)
 
+    # Per-category coverage comparison (if any entry has per_category)
+    all_cats: list[str] = []
+    for _, entry in entries:
+        for cat in entry.get("metrics", {}).get("per_category", {}):
+            if cat not in all_cats:
+                all_cats.append(cat)
+
+    if all_cats:
+        print()
+        cat_header = f"{'Category Coverage':<{label_width}}"
+        for rid, _ in entries:
+            cat_header += f"  {rid:>{col_width}}"
+        print(cat_header)
+        print("-" * len(cat_header))
+
+        for cat in sorted(all_cats):
+            row = f"{cat:<{label_width}}"
+            for _, entry in entries:
+                per_cat = entry.get("metrics", {}).get("per_category", {})
+                cat_data = per_cat.get(cat, {})
+                val = cat_data.get("mean_f1")
+                if val is not None:
+                    row += f"  {val:{col_width}.4f}"
+                else:
+                    row += f"  {'—':>{col_width}}"
+            print(row)
+
 
 # ---------------------------------------------------------------------------
 # Main
@@ -535,6 +730,8 @@ def main():
         cmd_evaluate(args)
     elif args["compare"]:
         cmd_compare(args)
+    elif args["history"]:
+        cmd_history(args)
 
 
 if __name__ == "__main__":

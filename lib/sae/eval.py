@@ -120,6 +120,101 @@ def compute_coverage(matching: FeatureBSPMatching) -> dict[str, float]:
     }
 
 
+def compute_per_category_coverage(
+    matching: FeatureBSPMatching,
+    bsp_schema: dict | list | None,
+) -> dict[str, dict[str, float]] | None:
+    """Compute coverage broken down by BSP category.
+
+    Args:
+        matching:   Output of match_features_to_bsps().
+        bsp_schema: Either a list of BSP dicts (each with 'category' key),
+                    or the full schema dict with a 'bsps' key containing
+                    that list. Index must align with matching.best_f1_per_bsp.
+
+    Returns:
+        Dict mapping category name to {count, mean_f1, min_f1, max_f1, median_f1},
+        or None if bsp_schema is not available.
+    """
+    if bsp_schema is None:
+        return None
+
+    # Accept both the full schema dict and bare list
+    if isinstance(bsp_schema, dict):
+        bsp_list = bsp_schema.get("bsps", [])
+    else:
+        bsp_list = bsp_schema
+
+    if not bsp_list:
+        return None
+
+    best_f1 = matching.best_f1_per_bsp
+
+    # Group BSP indices by category
+    categories: dict[str, list[int]] = {}
+    for i, bsp in enumerate(bsp_list):
+        cat = bsp.get("category", "unknown")
+        categories.setdefault(cat, []).append(i)
+
+    result = {}
+    for cat, indices in sorted(categories.items()):
+        cat_f1 = best_f1[indices]
+        result[cat] = {
+            "count": len(indices),
+            "mean_f1": round(cat_f1.mean().item(), 4),
+            "min_f1": round(cat_f1.min().item(), 4),
+            "max_f1": round(cat_f1.max().item(), 4),
+            "median_f1": round(cat_f1.median().item(), 4),
+        }
+
+    return result
+
+
+def compute_feature_sharing(matching: FeatureBSPMatching) -> dict[str, float | int]:
+    """Summarize reuse of SAE features under independent best-BSP matching."""
+    num_bsps = int(matching.best_feature_per_bsp.shape[0])
+    num_features = int(matching.f1.shape[0])
+
+    if num_bsps == 0 or num_features == 0:
+        return {
+            "num_features_used_by_best_matches": 0,
+            "fraction_features_used_by_best_matches": 0.0,
+            "mean_bsps_per_used_feature": 0.0,
+            "max_bsps_per_feature": 0,
+            "num_shared_features": 0,
+            "fraction_shared_features": 0.0,
+            "num_bsps_with_unique_best_feature": 0,
+            "fraction_bsps_with_unique_best_feature": 0.0,
+            "num_bsps_with_shared_best_feature": 0,
+            "fraction_bsps_with_shared_best_feature": 0.0,
+        }
+
+    reuse_counts = torch.bincount(matching.best_feature_per_bsp, minlength=num_features)
+    used_counts = reuse_counts[reuse_counts > 0]
+
+    num_features_used = int(used_counts.shape[0])
+    num_shared_features = int((used_counts > 1).sum().item())
+    num_unique_bsp = int((used_counts == 1).sum().item())
+    num_shared_bsp = num_bsps - num_unique_bsp
+
+    return {
+        "num_features_used_by_best_matches": num_features_used,
+        "fraction_features_used_by_best_matches": round(
+            num_features_used / num_features, 4
+        ),
+        "mean_bsps_per_used_feature": round(used_counts.float().mean().item(), 4),
+        "max_bsps_per_feature": int(used_counts.max().item()),
+        "num_shared_features": num_shared_features,
+        "fraction_shared_features": round(
+            num_shared_features / max(num_features_used, 1), 4
+        ),
+        "num_bsps_with_unique_best_feature": num_unique_bsp,
+        "fraction_bsps_with_unique_best_feature": round(num_unique_bsp / num_bsps, 4),
+        "num_bsps_with_shared_best_feature": num_shared_bsp,
+        "fraction_bsps_with_shared_best_feature": round(num_shared_bsp / num_bsps, 4),
+    }
+
+
 # ---------------------------------------------------------------------------
 # Board Reconstruction
 # ---------------------------------------------------------------------------
@@ -274,6 +369,9 @@ def evaluate_sae(
     # Coverage
     coverage = compute_coverage(matching)
 
+    # Feature sharing / reuse under the current many-to-one matching policy
+    feature_sharing = compute_feature_sharing(matching)
+
     # Board reconstruction
     reconstruction = compute_board_reconstruction(
         matching, h, bsp_labels_cpu, precision_threshold=precision_threshold
@@ -282,5 +380,6 @@ def evaluate_sae(
     return {
         **structural,
         **coverage,
+        "feature_sharing": feature_sharing,
         **reconstruction,
     }

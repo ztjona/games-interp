@@ -1,0 +1,16 @@
+# Campaign C: conv2-512 full architecture sweep at exp8
+# BatchTopK k=16 — fc1 winner arch, never tested on conv2
+experiment: C03-c2arch-s42
+architecture: batchtopk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16
+patience: 20
+min_improvement: 0.02

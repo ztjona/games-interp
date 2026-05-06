@@ -1,0 +1,14 @@
+# Anakin Tier B: TopK k=64 on fc1 — medium sparsity
+experiment: anakin
+architecture: topk
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+aux_loss_weight: 0.01

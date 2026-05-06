@@ -1,0 +1,13 @@
+# Anakin Tier G: Gated L1=5e-4 on fc1 — lower penalty for more alive features
+experiment: anakin
+architecture: gated
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+gated_l1: 0.0005

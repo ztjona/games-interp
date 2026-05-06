@@ -14,6 +14,8 @@ from .eval import (
     FeatureBSPMatching,
     compute_board_reconstruction,
     compute_coverage,
+    compute_feature_sharing,
+    compute_per_category_coverage,
     evaluate_sae,
     match_features_to_bsps,
 )
@@ -42,6 +44,8 @@ __all__ = [
     "FeatureBSPMatching",
     "match_features_to_bsps",
     "compute_coverage",
+    "compute_feature_sharing",
+    "compute_per_category_coverage",
     "compute_board_reconstruction",
     "evaluate_sae",
     # Hooks

@@ -1,0 +1,13 @@
+# Follow-up: rerun missing conv2 vanilla checkpoint on a faster GPU
+experiment: B04-conv2-completion-s42
+architecture: vanilla
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 4
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+l1_weight: 0.001

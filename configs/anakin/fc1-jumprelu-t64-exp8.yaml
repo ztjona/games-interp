@@ -1,0 +1,14 @@
+# Anakin Tier A: JumpReLU l0_target=64 on fc1
+experiment: anakin
+architecture: jumprelu
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64

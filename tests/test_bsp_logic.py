@@ -52,47 +52,47 @@ class TestQuartoBSPs:
         assert vec[1] == 0.0, "Cell (0,1) should be empty"
 
     def test_binary_attributes(self):
-        """Test binary attribute encoding (TALL=1, SHORT=0)."""
+        """Test binary attribute encoding (TALL=1, LITTLE=0, etc.)."""
         metadata = {
             "n_pieces": 2,
             "cells": {
                 "0_0_occupied": True,
                 "0_0_size": "TALL",
-                "0_0_coloration": "DARK",
+                "0_0_coloration": "BLACK",
                 "0_0_shape": "SQUARE",
-                "0_0_hole": "HOLLOW",
+                "0_0_hole": "WITH_HOLE",
                 "1_1_occupied": True,
-                "1_1_size": "SHORT",
-                "1_1_coloration": "LIGHT",
-                "1_1_shape": "ROUND",
-                "1_1_hole": "SOLID",
+                "1_1_size": "LITTLE",
+                "1_1_coloration": "WHITE",
+                "1_1_shape": "CIRCLE",
+                "1_1_hole": "WITHOUT_HOLE",
             },
             "offered_piece": {},
         }
 
         bsp_ids = [
-            "cell_0_0_size_tall",
-            "cell_0_0_coloration_dark",
-            "cell_0_0_shape_square",
-            "cell_0_0_hole_hollow",
-            "cell_1_1_size_tall",
-            "cell_1_1_coloration_dark",
-            "cell_1_1_shape_square",
-            "cell_1_1_hole_hollow",
+            "cell_0_0_tall",
+            "cell_0_0_black",
+            "cell_0_0_square",
+            "cell_0_0_with_hole",
+            "cell_1_1_tall",
+            "cell_1_1_black",
+            "cell_1_1_square",
+            "cell_1_1_with_hole",
         ]
         vec = compute_bsp_vector(metadata, bsp_ids)
 
         # Cell (0,0): all positive attributes
         assert vec[0] == 1.0, "TALL should be 1"
-        assert vec[1] == 1.0, "DARK should be 1"
+        assert vec[1] == 1.0, "BLACK should be 1"
         assert vec[2] == 1.0, "SQUARE should be 1"
-        assert vec[3] == 1.0, "HOLLOW should be 1"
+        assert vec[3] == 1.0, "WITH_HOLE should be 1"
 
         # Cell (1,1): all negative attributes
-        assert vec[4] == 0.0, "SHORT should be 0"
-        assert vec[5] == 0.0, "LIGHT should be 0"
-        assert vec[6] == 0.0, "ROUND should be 0"
-        assert vec[7] == 0.0, "SOLID should be 0"
+        assert vec[4] == 0.0, "LITTLE should be 0"
+        assert vec[5] == 0.0, "WHITE should be 0"
+        assert vec[6] == 0.0, "CIRCLE should be 0"
+        assert vec[7] == 0.0, "WITHOUT_HOLE should be 0"
 
     def test_line_threat(self):
         """Test line threat detection (3 of 4 same attribute, 1 empty)."""
@@ -111,7 +111,7 @@ class TestQuartoBSPs:
             "offered_piece": {},
         }
 
-        bsp_ids = ["row_0_threat_size_tall", "row_0_threat_coloration_dark"]
+        bsp_ids = ["row_0_threat_tall", "row_0_threat_black"]
         vec = compute_bsp_vector(metadata, bsp_ids)
 
         assert vec[0] == 1.0, "Row 0 should have size threat (3 TALL + 1 empty)"
@@ -119,22 +119,22 @@ class TestQuartoBSPs:
 
     def test_square_threat(self):
         """Test 2x2 square threat detection (3 of 4 same attribute, 1 empty)."""
-        # Square at (0,0): (0,0), (0,1), (1,0) have DARK, (1,1) empty → threat!
+        # Square at (0,0): (0,0), (0,1), (1,0) have BLACK, (1,1) empty → threat!
         metadata = {
             "n_pieces": 3,
             "cells": {
                 "0_0_occupied": True,
-                "0_0_coloration": "DARK",
+                "0_0_coloration": "BLACK",
                 "0_1_occupied": True,
-                "0_1_coloration": "DARK",
+                "0_1_coloration": "BLACK",
                 "1_0_occupied": True,
-                "1_0_coloration": "DARK",
+                "1_0_coloration": "BLACK",
                 "1_1_occupied": False,
             },
             "offered_piece": {},
         }
 
-        bsp_ids = ["square_0_0_threat_coloration_dark", "square_0_0_threat_size_tall"]
+        bsp_ids = ["square_0_0_threat_black", "square_0_0_threat_tall"]
         vec = compute_bsp_vector(metadata, bsp_ids)
 
         assert vec[0] == 1.0, "Square (0,0) should have coloration threat"
@@ -147,24 +147,24 @@ class TestQuartoBSPs:
             "cells": {},
             "offered_piece": {
                 "size": "TALL",
-                "coloration": "LIGHT",
+                "coloration": "WHITE",
                 "shape": "SQUARE",
-                "hole": "SOLID",
+                "hole": "WITHOUT_HOLE",
             },
         }
 
         bsp_ids = [
-            "offered_size_tall",
-            "offered_coloration_dark",
-            "offered_shape_square",
-            "offered_hole_hollow",
+            "offered_tall",
+            "offered_black",
+            "offered_square",
+            "offered_with_hole",
         ]
         vec = compute_bsp_vector(metadata, bsp_ids)
 
         assert vec[0] == 1.0, "Offered piece is TALL"
-        assert vec[1] == 0.0, "Offered piece is LIGHT (not DARK)"
+        assert vec[1] == 0.0, "Offered piece is WHITE (not BLACK)"
         assert vec[2] == 1.0, "Offered piece is SQUARE"
-        assert vec[3] == 0.0, "Offered piece is SOLID (not HOLLOW)"
+        assert vec[3] == 0.0, "Offered piece is WITHOUT_HOLE"
 
     def test_game_phases(self):
         """Test game phase detection (early/mid/late)."""
@@ -189,7 +189,7 @@ class TestQuartoBSPs:
         """Test that get_all_bsp_definitions returns expected count and structure."""
         bsps = get_all_bsp_definitions()
 
-        assert len(bsps) == 164, "Should have 164 total BSPs"
+        assert len(bsps) == 337, "Should have 337 total BSPs (164 gorilla + 173 hawk)"
 
         # Check all BSPs are binary
         for bsp in bsps:
@@ -212,6 +212,13 @@ class TestQuartoBSPs:
             "offered_piece": 4,
             "game_phase": 3,
             "global": 1,
+            "reframed_count": 40,
+            "reframed_completable": 40,
+            "reframed_any_threat": 10,
+            "reframed_sq_count": 36,
+            "reframed_sq_completable": 36,
+            "reframed_sq_any_threat": 9,
+            "reframed_global": 2,
         }
 
         assert categories == expected_counts, f"Category counts mismatch: {categories}"
@@ -227,15 +234,312 @@ class TestQuartoBSPs:
         }
 
         bsp_ids = [
-            "cell_0_0_size_tall",
-            "cell_0_0_coloration_dark",
-            "cell_0_0_shape_square",
-            "cell_0_0_hole_hollow",
+            "cell_0_0_tall",
+            "cell_0_0_black",
+            "cell_0_0_square",
+            "cell_0_0_with_hole",
         ]
         vec = compute_bsp_vector(metadata, bsp_ids)
 
         # All attributes should be 0 for empty cell
         assert all(v == 0.0 for v in vec), "Empty cells should have all attributes = 0"
+
+
+class TestHawkBSPs:
+    """Test reframed (hawk) BSP computation correctness."""
+
+    def _threat_board(self):
+        """Row 0: 3 TALL pieces + 1 empty = threat in TALL.
+
+        All 3 are also BLACK, so row 0 also has threat in BLACK.
+        """
+        return {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_size": "TALL",
+                "0_0_coloration": "BLACK",
+                "0_0_shape": "SQUARE",
+                "0_0_hole": "WITH_HOLE",
+                "0_1_occupied": True,
+                "0_1_size": "TALL",
+                "0_1_coloration": "BLACK",
+                "0_1_shape": "CIRCLE",
+                "0_1_hole": "WITHOUT_HOLE",
+                "0_2_occupied": True,
+                "0_2_size": "TALL",
+                "0_2_coloration": "BLACK",
+                "0_2_shape": "SQUARE",
+                "0_2_hole": "WITHOUT_HOLE",
+                "0_3_occupied": False,
+            },
+            "offered_piece": {
+                "size": "TALL",
+                "coloration": "WHITE",
+                "shape": "CIRCLE",
+                "hole": "WITH_HOLE",
+            },
+        }
+
+    def test_count_ge3(self):
+        """count_ge3: >=3 occupied cells in line share attribute."""
+        meta = self._threat_board()
+        bsp_ids = [
+            "row_0_count_ge3_tall",  # 3 TALL -> yes
+            "row_0_count_ge3_black",  # 3 BLACK -> yes
+            "row_0_count_ge3_square",  # 2 SQUARE -> no
+            "row_0_count_ge3_with_hole",  # 1 WITH_HOLE -> no
+        ]
+        vec = compute_bsp_vector(meta, bsp_ids)
+        assert vec[0] == 1.0, "3 TALL >= 3"
+        assert vec[1] == 1.0, "3 BLACK >= 3"
+        assert vec[2] == 0.0, "Only 2 SQUARE < 3"
+        assert vec[3] == 0.0, "Only 1 WITH_HOLE < 3"
+
+    def test_count_ge3_full_line(self):
+        """count_ge3 fires even when all 4 cells are occupied (no empty cell)."""
+        meta = {
+            "n_pieces": 4,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_size": "TALL",
+                "0_1_occupied": True,
+                "0_1_size": "TALL",
+                "0_2_occupied": True,
+                "0_2_size": "TALL",
+                "0_3_occupied": True,
+                "0_3_size": "LITTLE",
+            },
+            "offered_piece": {},
+        }
+        vec = compute_bsp_vector(meta, ["row_0_count_ge3_tall"])
+        assert vec[0] == 1.0, "3 TALL out of 4 occupied >= 3"
+
+    def test_completable_yes(self):
+        """completable: threat exists AND offered piece has attribute."""
+        meta = self._threat_board()  # row 0 threat in TALL, offered is TALL
+        vec = compute_bsp_vector(meta, ["row_0_completable_tall"])
+        assert vec[0] == 1.0, "Threat in TALL + offered is TALL = completable"
+
+    def test_completable_no_wrong_offered(self):
+        """completable: threat exists BUT offered piece does NOT have attribute."""
+        meta = self._threat_board()  # row 0 threat in BLACK, offered is WHITE
+        vec = compute_bsp_vector(meta, ["row_0_completable_black"])
+        assert vec[0] == 0.0, "Threat in BLACK but offered is WHITE = not completable"
+
+    def test_completable_no_threat(self):
+        """completable: no threat even though offered has attribute."""
+        meta = self._threat_board()  # no threat in SQUARE (only 2 match)
+        vec = compute_bsp_vector(meta, ["row_0_completable_square"])
+        assert vec[0] == 0.0, "No threat in SQUARE = not completable"
+
+    def test_any_threat(self):
+        """any_threat: OR across all attribute threats for a line."""
+        meta = self._threat_board()  # row 0 has threats in TALL and BLACK
+        bsp_ids = [
+            "row_0_any_threat",  # yes (TALL threat exists)
+            "col_0_any_threat",  # no (only 1 piece in col 0)
+        ]
+        vec = compute_bsp_vector(meta, bsp_ids)
+        assert vec[0] == 1.0, "Row 0 has at least one threat"
+        assert vec[1] == 0.0, "Col 0 has only 1 piece, no threat"
+
+    def test_board_threat_exists(self):
+        """board_threat_exists: any threat anywhere on the board."""
+        meta = self._threat_board()
+        vec = compute_bsp_vector(meta, ["board_threat_exists"])
+        assert vec[0] == 1.0, "Board has threats"
+
+    def test_board_threat_exists_empty(self):
+        """board_threat_exists: no threats on empty board."""
+        meta = {"n_pieces": 0, "cells": {}, "offered_piece": {}}
+        vec = compute_bsp_vector(meta, ["board_threat_exists"])
+        assert vec[0] == 0.0, "Empty board has no threats"
+
+    def test_board_completable_exists(self):
+        """board_completable_exists: at least one completable threat."""
+        meta = self._threat_board()  # TALL threat + offered is TALL
+        vec = compute_bsp_vector(meta, ["board_completable_exists"])
+        assert vec[0] == 1.0, "TALL threat completable with TALL offered"
+
+    def test_board_completable_not_exists(self):
+        """board_completable_exists: threats exist but none completable."""
+        meta = self._threat_board()
+        # Override offered piece to have NONE of the threat attributes
+        meta["offered_piece"] = {
+            "size": "LITTLE",  # not TALL
+            "coloration": "WHITE",  # not BLACK
+            "shape": "CIRCLE",
+            "hole": "WITHOUT_HOLE",
+        }
+        vec = compute_bsp_vector(meta, ["board_completable_exists"])
+        assert vec[0] == 0.0, "Threats exist but offered completes none"
+
+    def test_hawk_definitions_count(self):
+        """Hawk set should have exactly 173 BSPs across 7 reframed categories."""
+        bsps = get_all_bsp_definitions()
+        hawk = [b for b in bsps if b["category"].startswith("reframed_")]
+
+        cats = {}
+        for b in hawk:
+            cats[b["category"]] = cats.get(b["category"], 0) + 1
+
+        assert cats == {
+            "reframed_count": 40,
+            "reframed_completable": 40,
+            "reframed_any_threat": 10,
+            "reframed_sq_count": 36,
+            "reframed_sq_completable": 36,
+            "reframed_sq_any_threat": 9,
+            "reframed_global": 2,
+        }
+        assert len(hawk) == 173
+
+    def test_diag_reframed(self):
+        """Diagonal reframed BSPs parse correctly."""
+        # Main diagonal: (0,0), (1,1), (2,2), (3,3)
+        # 3 TALL on diagonal + 1 empty
+        meta = {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_size": "TALL",
+                "1_1_occupied": True,
+                "1_1_size": "TALL",
+                "2_2_occupied": True,
+                "2_2_size": "TALL",
+                "3_3_occupied": False,
+            },
+            "offered_piece": {
+                "size": "TALL",
+                "coloration": "BLACK",
+                "shape": "SQUARE",
+                "hole": "WITH_HOLE",
+            },
+        }
+        bsp_ids = [
+            "diag_main_count_ge3_tall",
+            "diag_main_completable_tall",
+            "diag_main_any_threat",
+            "diag_anti_any_threat",
+        ]
+        vec = compute_bsp_vector(meta, bsp_ids)
+        assert vec[0] == 1.0, "Diag main has 3 TALL"
+        assert vec[1] == 1.0, "Diag main threat + offered TALL = completable"
+        assert vec[2] == 1.0, "Diag main has a threat"
+        assert vec[3] == 0.0, "Diag anti has no pieces = no threat"
+
+    def test_square_count_ge3(self):
+        """Square count_ge3: >=3 occupied cells in 2x2 square share attribute."""
+        # 2x2 at (0,0): cells (0,0), (0,1), (1,0) are BLACK. (1,1) empty.
+        meta = {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_coloration": "BLACK",
+                "0_1_occupied": True,
+                "0_1_coloration": "BLACK",
+                "1_0_occupied": True,
+                "1_0_coloration": "BLACK",
+                "1_1_occupied": False,
+            },
+            "offered_piece": {},
+        }
+        bsp_ids = [
+            "square_0_0_count_ge3_black",  # 3 BLACK -> yes
+            "square_0_0_count_ge3_tall",  # no size info -> no
+        ]
+        vec = compute_bsp_vector(meta, bsp_ids)
+        assert vec[0] == 1.0, "3 BLACK in 2x2 >= 3"
+        assert vec[1] == 0.0, "No TALL data in 2x2"
+
+    def test_square_completable(self):
+        """Square completable: threat in 2x2 AND offered piece has attribute."""
+        meta = {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_coloration": "BLACK",
+                "0_1_occupied": True,
+                "0_1_coloration": "BLACK",
+                "1_0_occupied": True,
+                "1_0_coloration": "BLACK",
+                "1_1_occupied": False,
+            },
+            "offered_piece": {
+                "size": "TALL",
+                "coloration": "BLACK",
+                "shape": "CIRCLE",
+                "hole": "WITHOUT_HOLE",
+            },
+        }
+        bsp_ids = [
+            "square_0_0_completable_black",  # threat + offered BLACK -> yes
+            "square_0_0_completable_tall",  # no threat in TALL -> no
+        ]
+        vec = compute_bsp_vector(meta, bsp_ids)
+        assert vec[0] == 1.0, "BLACK threat + offered BLACK = completable"
+        assert vec[1] == 0.0, "No TALL threat = not completable"
+
+    def test_square_any_threat(self):
+        """Square any_threat: any attribute creates a threat in 2x2 square."""
+        meta = {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_coloration": "BLACK",
+                "0_1_occupied": True,
+                "0_1_coloration": "BLACK",
+                "1_0_occupied": True,
+                "1_0_coloration": "BLACK",
+                "1_1_occupied": False,
+            },
+            "offered_piece": {},
+        }
+        bsp_ids = [
+            "square_0_0_any_threat",  # BLACK threat -> yes
+            "square_1_1_any_threat",  # no pieces in that square -> no
+        ]
+        vec = compute_bsp_vector(meta, bsp_ids)
+        assert vec[0] == 1.0, "2x2 at (0,0) has BLACK threat"
+        assert vec[1] == 0.0, "2x2 at (1,1) has no pieces"
+
+    def test_board_threat_exists_via_square(self):
+        """board_threat_exists detects threats in 2x2 squares, not just lines."""
+        # Only have a 2x2 square threat, no line threats
+        meta = {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_coloration": "BLACK",
+                "0_1_occupied": True,
+                "0_1_coloration": "BLACK",
+                "1_0_occupied": True,
+                "1_0_coloration": "BLACK",
+                "1_1_occupied": False,
+            },
+            "offered_piece": {},
+        }
+        vec = compute_bsp_vector(meta, ["board_threat_exists"])
+        assert vec[0] == 1.0, "Board has a 2x2 square threat"
+
+    def test_gorilla_square_threat_still_works(self):
+        """Gorilla square_threat dispatch not broken by hawk additions."""
+        meta = {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True,
+                "0_0_coloration": "BLACK",
+                "0_1_occupied": True,
+                "0_1_coloration": "BLACK",
+                "1_0_occupied": True,
+                "1_0_coloration": "BLACK",
+                "1_1_occupied": False,
+            },
+            "offered_piece": {},
+        }
+        vec = compute_bsp_vector(meta, ["square_0_0_threat_black"])
+        assert vec[0] == 1.0, "Gorilla square threat still detects correctly"
 
 
 if __name__ == "__main__":

@@ -21,6 +21,8 @@ Options:
     --log-every=<n>         Log metrics every N steps [default: 500]
     --patience=<int>        Early-stop after N eval windows with no FVU improvement. 0=off [default: 0]
     --min-improvement=<f>   Min relative FVU improvement to reset patience [default: 0.01]
+    --l0-patience=<int>     Early-stop if L0 plateau lasts N eval windows. 0=off [default: 0]
+    --l0-min-change=<f>     Min absolute L0 change per window to reset L0 counter [default: 5.0]
     --device=<dev>          Device (cuda|cpu|auto) [default: auto]
 
     # Architecture-specific hyperparameters
@@ -167,6 +169,8 @@ def main():
     log_every = int(args["--log-every"])
     patience = int(args["--patience"])
     min_improvement = float(args["--min-improvement"])
+    l0_patience = int(args["--l0-patience"])
+    l0_min_change = float(args["--l0-min-change"])
 
     # Device
     device_arg = args["--device"]
@@ -191,7 +195,14 @@ def main():
     print(f"Game: {game}, Hook: {hook}")
     print(f"Device: {device}")
     es_info = (
-        f", patience={patience} (min_imp={min_improvement:.1%})" if patience > 0 else ""
+        f", patience={patience} (min_imp={min_improvement:.1%})"
+        + (
+            f", l0_patience={l0_patience} (min_chg={l0_min_change})"
+            if l0_patience > 0
+            else ""
+        )
+        if patience > 0 or l0_patience > 0
+        else ""
     )
     print(
         f"Hyperparameters: expansion={expansion}x, batch_size={batch_size}, num_batches={num_batches}, lr={lr}{es_info}"
@@ -235,6 +246,8 @@ def main():
             metrics_file=metrics_file,
             patience=patience,
             min_improvement=min_improvement,
+            l0_patience=l0_patience,
+            l0_min_change=l0_min_change,
         )
     except KeyboardInterrupt:
         print(

@@ -1,34 +1,27 @@
 {
   "overall": {
-    "coverage": 0.1314,
-    "coverage_above_50": 0.128,
+    "coverage": 0.1938,
+    "coverage_above_50": 0.1524,
     "coverage_above_75": 0.0122,
     "num_bsps": 164,
     "min_f1": 0.0,
     "max_f1": 0.8728,
-    "median_f1": 0.0
+    "median_f1": 0.1316
   },
   "per_category": {
     "cell_occupancy": {
       "count": 16,
-      "mean_f1": 0.5637,
+      "mean_f1": 0.5636,
       "min_f1": 0.463,
       "max_f1": 0.693,
       "median_f1": 0.5425
     },
-    "game_phase": {
-      "count": 3,
-      "mean_f1": 0.5452,
-      "min_f1": 0.0029,
-      "max_f1": 0.8728,
-      "median_f1": 0.7599
-    },
-    "threat_line": {
-      "count": 40,
-      "mean_f1": 0.0,
-      "min_f1": 0.0,
-      "max_f1": 0.0,
-      "median_f1": 0.0
+    "cell_attribute": {
+      "count": 64,
+      "mean_f1": 0.2808,
+      "min_f1": 0.1086,
+      "max_f1": 0.57,
+      "median_f1": 0.2601
     },
     "threat_square_2x2": {
       "count": 36,
@@ -37,6 +30,20 @@
       "max_f1": 0.0,
       "median_f1": 0.0
     },
+    "threat_line": {
+      "count": 40,
+      "mean_f1": 0.0,
+      "min_f1": 0.0,
+      "max_f1": 0.0,
+      "median_f1": 0.0
+    },
+    "offered_piece": {
+      "count": 4,
+      "mean_f1": 0.6481,
+      "min_f1": 0.5939,
+      "max_f1": 0.6912,
+      "median_f1": 0.6537
+    },
     "global": {
       "count": 1,
       "mean_f1": 0.5642,
@@ -44,19 +51,12 @@
       "max_f1": 0.5642,
       "median_f1": 0.5642
     },
-    "offered_piece": {
-      "count": 4,
-      "mean_f1": 0.3175,
-      "min_f1": 0.0,
-      "max_f1": 0.676,
-      "median_f1": 0.2969
-    },
-    "cell_attribute": {
-      "count": 64,
-      "mean_f1": 0.1416,
-      "min_f1": 0.0,
-      "max_f1": 0.5308,
-      "median_f1": 0.0624
+    "game_phase": {
+      "count": 3,
+      "mean_f1": 0.5452,
+      "min_f1": 0.0029,
+      "max_f1": 0.8728,
+      "median_f1": 0.7599
     }
   },
   "per_bsp": [
@@ -77,7 +77,7 @@
     {
       "bsp_id": "cell_0_2_occupied",
       "category": "cell_occupancy",
-      "f1": 0.5757,
+      "f1": 0.5756,
       "skipped": false,
       "train_pos_rate": 0.327
     },
@@ -173,1012 +173,1012 @@
       "train_pos_rate": 0.3624
     },
     {
-      "bsp_id": "cell_0_0_size_tall",
+      "bsp_id": "cell_0_0_tall",
       "category": "cell_attribute",
       "f1": 0.19,
       "skipped": false,
       "train_pos_rate": 0.1758
     },
     {
-      "bsp_id": "cell_0_0_coloration_dark",
+      "bsp_id": "cell_0_0_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.132,
+      "skipped": false,
+      "train_pos_rate": 0.1719
     },
     {
-      "bsp_id": "cell_0_0_shape_square",
+      "bsp_id": "cell_0_0_square",
       "category": "cell_attribute",
       "f1": 0.1616,
       "skipped": false,
       "train_pos_rate": 0.1779
     },
     {
-      "bsp_id": "cell_0_0_hole_hollow",
+      "bsp_id": "cell_0_0_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1313,
+      "skipped": false,
+      "train_pos_rate": 0.1753
     },
     {
-      "bsp_id": "cell_0_1_size_tall",
+      "bsp_id": "cell_0_1_tall",
       "category": "cell_attribute",
       "f1": 0.3303,
       "skipped": false,
       "train_pos_rate": 0.1589
     },
     {
-      "bsp_id": "cell_0_1_coloration_dark",
+      "bsp_id": "cell_0_1_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1886,
+      "skipped": false,
+      "train_pos_rate": 0.1603
     },
     {
-      "bsp_id": "cell_0_1_shape_square",
+      "bsp_id": "cell_0_1_square",
       "category": "cell_attribute",
       "f1": 0.2089,
       "skipped": false,
       "train_pos_rate": 0.1586
     },
     {
-      "bsp_id": "cell_0_1_hole_hollow",
+      "bsp_id": "cell_0_1_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1887,
+      "skipped": false,
+      "train_pos_rate": 0.1553
     },
     {
-      "bsp_id": "cell_0_2_size_tall",
+      "bsp_id": "cell_0_2_tall",
       "category": "cell_attribute",
       "f1": 0.2825,
       "skipped": false,
       "train_pos_rate": 0.1648
     },
     {
-      "bsp_id": "cell_0_2_coloration_dark",
+      "bsp_id": "cell_0_2_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2289,
+      "skipped": false,
+      "train_pos_rate": 0.1633
     },
     {
-      "bsp_id": "cell_0_2_shape_square",
+      "bsp_id": "cell_0_2_square",
       "category": "cell_attribute",
       "f1": 0.206,
       "skipped": false,
       "train_pos_rate": 0.1648
     },
     {
-      "bsp_id": "cell_0_2_hole_hollow",
+      "bsp_id": "cell_0_2_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2946,
+      "skipped": false,
+      "train_pos_rate": 0.1632
     },
     {
-      "bsp_id": "cell_0_3_size_tall",
+      "bsp_id": "cell_0_3_tall",
       "category": "cell_attribute",
-      "f1": 0.343,
+      "f1": 0.3432,
       "skipped": false,
       "train_pos_rate": 0.2037
     },
     {
-      "bsp_id": "cell_0_3_coloration_dark",
+      "bsp_id": "cell_0_3_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2293,
+      "skipped": false,
+      "train_pos_rate": 0.1972
     },
     {
-      "bsp_id": "cell_0_3_shape_square",
+      "bsp_id": "cell_0_3_square",
       "category": "cell_attribute",
       "f1": 0.2671,
       "skipped": false,
       "train_pos_rate": 0.2023
     },
     {
-      "bsp_id": "cell_0_3_hole_hollow",
+      "bsp_id": "cell_0_3_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3293,
+      "skipped": false,
+      "train_pos_rate": 0.2006
     },
     {
-      "bsp_id": "cell_1_0_size_tall",
+      "bsp_id": "cell_1_0_tall",
       "category": "cell_attribute",
       "f1": 0.2843,
       "skipped": false,
       "train_pos_rate": 0.164
     },
     {
-      "bsp_id": "cell_1_0_coloration_dark",
+      "bsp_id": "cell_1_0_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1921,
+      "skipped": false,
+      "train_pos_rate": 0.1618
     },
     {
-      "bsp_id": "cell_1_0_shape_square",
+      "bsp_id": "cell_1_0_square",
       "category": "cell_attribute",
       "f1": 0.1842,
       "skipped": false,
       "train_pos_rate": 0.162
     },
     {
-      "bsp_id": "cell_1_0_hole_hollow",
+      "bsp_id": "cell_1_0_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2838,
+      "skipped": false,
+      "train_pos_rate": 0.1635
     },
     {
-      "bsp_id": "cell_1_1_size_tall",
+      "bsp_id": "cell_1_1_tall",
       "category": "cell_attribute",
       "f1": 0.4708,
       "skipped": false,
       "train_pos_rate": 0.1616
     },
     {
-      "bsp_id": "cell_1_1_coloration_dark",
+      "bsp_id": "cell_1_1_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3986,
+      "skipped": false,
+      "train_pos_rate": 0.163
     },
     {
-      "bsp_id": "cell_1_1_shape_square",
+      "bsp_id": "cell_1_1_square",
       "category": "cell_attribute",
       "f1": 0.3167,
       "skipped": false,
       "train_pos_rate": 0.162
     },
     {
-      "bsp_id": "cell_1_1_hole_hollow",
+      "bsp_id": "cell_1_1_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.4786,
+      "skipped": false,
+      "train_pos_rate": 0.1598
     },
     {
-      "bsp_id": "cell_1_2_size_tall",
+      "bsp_id": "cell_1_2_tall",
       "category": "cell_attribute",
       "f1": 0.5121,
       "skipped": false,
       "train_pos_rate": 0.1706
     },
     {
-      "bsp_id": "cell_1_2_coloration_dark",
+      "bsp_id": "cell_1_2_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3854,
+      "skipped": false,
+      "train_pos_rate": 0.1726
     },
     {
-      "bsp_id": "cell_1_2_shape_square",
+      "bsp_id": "cell_1_2_square",
       "category": "cell_attribute",
       "f1": 0.3849,
       "skipped": false,
       "train_pos_rate": 0.1704
     },
     {
-      "bsp_id": "cell_1_2_hole_hollow",
+      "bsp_id": "cell_1_2_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.5636,
+      "skipped": false,
+      "train_pos_rate": 0.1739
     },
     {
-      "bsp_id": "cell_1_3_size_tall",
+      "bsp_id": "cell_1_3_tall",
       "category": "cell_attribute",
       "f1": 0.2628,
       "skipped": false,
       "train_pos_rate": 0.1602
     },
     {
-      "bsp_id": "cell_1_3_coloration_dark",
+      "bsp_id": "cell_1_3_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1796,
+      "skipped": false,
+      "train_pos_rate": 0.1622
     },
     {
-      "bsp_id": "cell_1_3_shape_square",
+      "bsp_id": "cell_1_3_square",
       "category": "cell_attribute",
       "f1": 0.1946,
       "skipped": false,
       "train_pos_rate": 0.1611
     },
     {
-      "bsp_id": "cell_1_3_hole_hollow",
+      "bsp_id": "cell_1_3_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3338,
+      "skipped": false,
+      "train_pos_rate": 0.1601
     },
     {
-      "bsp_id": "cell_2_0_size_tall",
+      "bsp_id": "cell_2_0_tall",
       "category": "cell_attribute",
       "f1": 0.2602,
       "skipped": false,
       "train_pos_rate": 0.1648
     },
     {
-      "bsp_id": "cell_2_0_coloration_dark",
+      "bsp_id": "cell_2_0_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.18,
+      "skipped": false,
+      "train_pos_rate": 0.164
     },
     {
-      "bsp_id": "cell_2_0_shape_square",
+      "bsp_id": "cell_2_0_square",
       "category": "cell_attribute",
       "f1": 0.1927,
       "skipped": false,
       "train_pos_rate": 0.1624
     },
     {
-      "bsp_id": "cell_2_0_hole_hollow",
+      "bsp_id": "cell_2_0_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2443,
+      "skipped": false,
+      "train_pos_rate": 0.1642
     },
     {
-      "bsp_id": "cell_2_1_size_tall",
+      "bsp_id": "cell_2_1_tall",
       "category": "cell_attribute",
       "f1": 0.4767,
       "skipped": false,
       "train_pos_rate": 0.191
     },
     {
-      "bsp_id": "cell_2_1_coloration_dark",
+      "bsp_id": "cell_2_1_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.4869,
+      "skipped": false,
+      "train_pos_rate": 0.1912
     },
     {
-      "bsp_id": "cell_2_1_shape_square",
+      "bsp_id": "cell_2_1_square",
       "category": "cell_attribute",
       "f1": 0.4081,
       "skipped": false,
       "train_pos_rate": 0.1928
     },
     {
-      "bsp_id": "cell_2_1_hole_hollow",
+      "bsp_id": "cell_2_1_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.57,
+      "skipped": false,
+      "train_pos_rate": 0.1908
     },
     {
-      "bsp_id": "cell_2_2_size_tall",
+      "bsp_id": "cell_2_2_tall",
       "category": "cell_attribute",
       "f1": 0.5308,
       "skipped": false,
       "train_pos_rate": 0.1698
     },
     {
-      "bsp_id": "cell_2_2_coloration_dark",
+      "bsp_id": "cell_2_2_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3482,
+      "skipped": false,
+      "train_pos_rate": 0.1682
     },
     {
-      "bsp_id": "cell_2_2_shape_square",
+      "bsp_id": "cell_2_2_square",
       "category": "cell_attribute",
       "f1": 0.4033,
       "skipped": false,
       "train_pos_rate": 0.1655
     },
     {
-      "bsp_id": "cell_2_2_hole_hollow",
+      "bsp_id": "cell_2_2_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.4558,
+      "skipped": false,
+      "train_pos_rate": 0.1696
     },
     {
-      "bsp_id": "cell_2_3_size_tall",
+      "bsp_id": "cell_2_3_tall",
       "category": "cell_attribute",
       "f1": 0.3147,
       "skipped": false,
       "train_pos_rate": 0.1556
     },
     {
-      "bsp_id": "cell_2_3_coloration_dark",
+      "bsp_id": "cell_2_3_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1743,
+      "skipped": false,
+      "train_pos_rate": 0.1547
     },
     {
-      "bsp_id": "cell_2_3_shape_square",
+      "bsp_id": "cell_2_3_square",
       "category": "cell_attribute",
       "f1": 0.2313,
       "skipped": false,
       "train_pos_rate": 0.1575
     },
     {
-      "bsp_id": "cell_2_3_hole_hollow",
+      "bsp_id": "cell_2_3_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3023,
+      "skipped": false,
+      "train_pos_rate": 0.1564
     },
     {
-      "bsp_id": "cell_3_0_size_tall",
+      "bsp_id": "cell_3_0_tall",
       "category": "cell_attribute",
       "f1": 0.2326,
       "skipped": false,
       "train_pos_rate": 0.1723
     },
     {
-      "bsp_id": "cell_3_0_coloration_dark",
+      "bsp_id": "cell_3_0_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1086,
+      "skipped": false,
+      "train_pos_rate": 0.1707
     },
     {
-      "bsp_id": "cell_3_0_shape_square",
+      "bsp_id": "cell_3_0_square",
       "category": "cell_attribute",
       "f1": 0.1309,
       "skipped": false,
       "train_pos_rate": 0.167
     },
     {
-      "bsp_id": "cell_3_0_hole_hollow",
+      "bsp_id": "cell_3_0_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1909,
+      "skipped": false,
+      "train_pos_rate": 0.1685
     },
     {
-      "bsp_id": "cell_3_1_size_tall",
+      "bsp_id": "cell_3_1_tall",
       "category": "cell_attribute",
       "f1": 0.2994,
       "skipped": false,
       "train_pos_rate": 0.1628
     },
     {
-      "bsp_id": "cell_3_1_coloration_dark",
+      "bsp_id": "cell_3_1_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1912,
+      "skipped": false,
+      "train_pos_rate": 0.1637
     },
     {
-      "bsp_id": "cell_3_1_shape_square",
+      "bsp_id": "cell_3_1_square",
       "category": "cell_attribute",
       "f1": 0.2013,
       "skipped": false,
       "train_pos_rate": 0.1632
     },
     {
-      "bsp_id": "cell_3_1_hole_hollow",
+      "bsp_id": "cell_3_1_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.3089,
+      "skipped": false,
+      "train_pos_rate": 0.1607
     },
     {
-      "bsp_id": "cell_3_2_size_tall",
+      "bsp_id": "cell_3_2_tall",
       "category": "cell_attribute",
       "f1": 0.307,
       "skipped": false,
       "train_pos_rate": 0.1612
     },
     {
-      "bsp_id": "cell_3_2_coloration_dark",
+      "bsp_id": "cell_3_2_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2196,
+      "skipped": false,
+      "train_pos_rate": 0.1611
     },
     {
-      "bsp_id": "cell_3_2_shape_square",
+      "bsp_id": "cell_3_2_square",
       "category": "cell_attribute",
       "f1": 0.1411,
       "skipped": false,
       "train_pos_rate": 0.1623
     },
     {
-      "bsp_id": "cell_3_2_hole_hollow",
+      "bsp_id": "cell_3_2_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.2599,
+      "skipped": false,
+      "train_pos_rate": 0.1619
     },
     {
-      "bsp_id": "cell_3_3_size_tall",
+      "bsp_id": "cell_3_3_tall",
       "category": "cell_attribute",
       "f1": 0.2102,
       "skipped": false,
       "train_pos_rate": 0.1817
     },
     {
-      "bsp_id": "cell_3_3_coloration_dark",
+      "bsp_id": "cell_3_3_black",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1268,
+      "skipped": false,
+      "train_pos_rate": 0.1793
     },
     {
-      "bsp_id": "cell_3_3_shape_square",
+      "bsp_id": "cell_3_3_square",
       "category": "cell_attribute",
       "f1": 0.1248,
       "skipped": false,
       "train_pos_rate": 0.181
     },
     {
-      "bsp_id": "cell_3_3_hole_hollow",
+      "bsp_id": "cell_3_3_with_hole",
       "category": "cell_attribute",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.1989,
+      "skipped": false,
+      "train_pos_rate": 0.1807
     },
     {
-      "bsp_id": "row_0_threat_size_tall",
+      "bsp_id": "row_0_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0101
     },
     {
-      "bsp_id": "row_0_threat_coloration_dark",
+      "bsp_id": "row_0_threat_black",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0099
     },
     {
-      "bsp_id": "row_0_threat_shape_square",
+      "bsp_id": "row_0_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0103
     },
     {
-      "bsp_id": "row_0_threat_hole_hollow",
+      "bsp_id": "row_0_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0099
     },
     {
-      "bsp_id": "row_1_threat_size_tall",
+      "bsp_id": "row_1_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0098
     },
     {
-      "bsp_id": "row_1_threat_coloration_dark",
+      "bsp_id": "row_1_threat_black",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0099
     },
     {
-      "bsp_id": "row_1_threat_shape_square",
+      "bsp_id": "row_1_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.009
     },
     {
-      "bsp_id": "row_1_threat_hole_hollow",
+      "bsp_id": "row_1_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0101
     },
     {
-      "bsp_id": "row_2_threat_size_tall",
+      "bsp_id": "row_2_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0116
     },
     {
-      "bsp_id": "row_2_threat_coloration_dark",
+      "bsp_id": "row_2_threat_black",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.011
     },
     {
-      "bsp_id": "row_2_threat_shape_square",
+      "bsp_id": "row_2_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0101
     },
     {
-      "bsp_id": "row_2_threat_hole_hollow",
+      "bsp_id": "row_2_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0102
     },
     {
-      "bsp_id": "row_3_threat_size_tall",
+      "bsp_id": "row_3_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0098
     },
     {
-      "bsp_id": "row_3_threat_coloration_dark",
+      "bsp_id": "row_3_threat_black",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.01
     },
     {
-      "bsp_id": "row_3_threat_shape_square",
+      "bsp_id": "row_3_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0091
     },
     {
-      "bsp_id": "row_3_threat_hole_hollow",
+      "bsp_id": "row_3_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0094
     },
     {
-      "bsp_id": "col_0_threat_size_tall",
+      "bsp_id": "col_0_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0101
     },
     {
-      "bsp_id": "col_0_threat_coloration_dark",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "col_0_threat_shape_square",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0101
-    },
-    {
-      "bsp_id": "col_0_threat_hole_hollow",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "col_1_threat_size_tall",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0106
-    },
-    {
-      "bsp_id": "col_1_threat_coloration_dark",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "col_1_threat_shape_square",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.01
-    },
-    {
-      "bsp_id": "col_1_threat_hole_hollow",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "col_2_threat_size_tall",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0099
-    },
-    {
-      "bsp_id": "col_2_threat_coloration_dark",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "col_2_threat_shape_square",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.01
-    },
-    {
-      "bsp_id": "col_2_threat_hole_hollow",
-      "category": "threat_line",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "col_3_threat_size_tall",
+      "bsp_id": "col_0_threat_black",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0103
     },
     {
-      "bsp_id": "col_3_threat_coloration_dark",
+      "bsp_id": "col_0_threat_square",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0101
     },
     {
-      "bsp_id": "col_3_threat_shape_square",
+      "bsp_id": "col_0_threat_with_hole",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0101
+    },
+    {
+      "bsp_id": "col_1_threat_tall",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0106
+    },
+    {
+      "bsp_id": "col_1_threat_black",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.011
+    },
+    {
+      "bsp_id": "col_1_threat_square",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.01
+    },
+    {
+      "bsp_id": "col_1_threat_with_hole",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.01
+    },
+    {
+      "bsp_id": "col_2_threat_tall",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0099
+    },
+    {
+      "bsp_id": "col_2_threat_black",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0098
+    },
+    {
+      "bsp_id": "col_2_threat_square",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.01
+    },
+    {
+      "bsp_id": "col_2_threat_with_hole",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0102
+    },
+    {
+      "bsp_id": "col_3_threat_tall",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0103
+    },
+    {
+      "bsp_id": "col_3_threat_black",
+      "category": "threat_line",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0095
+    },
+    {
+      "bsp_id": "col_3_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0096
     },
     {
-      "bsp_id": "col_3_threat_hole_hollow",
+      "bsp_id": "col_3_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0102
     },
     {
-      "bsp_id": "diag_main_threat_size_tall",
+      "bsp_id": "diag_main_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0118
     },
     {
-      "bsp_id": "diag_main_threat_coloration_dark",
+      "bsp_id": "diag_main_threat_black",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0117
     },
     {
-      "bsp_id": "diag_main_threat_shape_square",
+      "bsp_id": "diag_main_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0115
     },
     {
-      "bsp_id": "diag_main_threat_hole_hollow",
+      "bsp_id": "diag_main_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0109
     },
     {
-      "bsp_id": "diag_anti_threat_size_tall",
+      "bsp_id": "diag_anti_threat_tall",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0129
     },
     {
-      "bsp_id": "diag_anti_threat_coloration_dark",
+      "bsp_id": "diag_anti_threat_black",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.013
     },
     {
-      "bsp_id": "diag_anti_threat_shape_square",
+      "bsp_id": "diag_anti_threat_square",
       "category": "threat_line",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0131
     },
     {
-      "bsp_id": "diag_anti_threat_hole_hollow",
+      "bsp_id": "diag_anti_threat_with_hole",
       "category": "threat_line",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0132
     },
     {
-      "bsp_id": "square_0_0_threat_size_tall",
+      "bsp_id": "square_0_0_threat_tall",
       "category": "threat_square_2x2",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0096
     },
     {
-      "bsp_id": "square_0_0_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_0_0_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0098
-    },
-    {
-      "bsp_id": "square_0_0_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_0_1_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0093
-    },
-    {
-      "bsp_id": "square_0_1_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_0_1_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0092
-    },
-    {
-      "bsp_id": "square_0_1_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_0_2_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0107
-    },
-    {
-      "bsp_id": "square_0_2_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_0_2_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0104
-    },
-    {
-      "bsp_id": "square_0_2_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_1_0_threat_size_tall",
+      "bsp_id": "square_0_0_threat_black",
       "category": "threat_square_2x2",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.01
     },
     {
-      "bsp_id": "square_1_0_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_1_0_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0099
-    },
-    {
-      "bsp_id": "square_1_0_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_1_1_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0107
-    },
-    {
-      "bsp_id": "square_1_1_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_1_1_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0109
-    },
-    {
-      "bsp_id": "square_1_1_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_1_2_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0096
-    },
-    {
-      "bsp_id": "square_1_2_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_1_2_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0093
-    },
-    {
-      "bsp_id": "square_1_2_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_2_0_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0112
-    },
-    {
-      "bsp_id": "square_2_0_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_2_0_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0111
-    },
-    {
-      "bsp_id": "square_2_0_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_2_1_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0094
-    },
-    {
-      "bsp_id": "square_2_1_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_2_1_threat_shape_square",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0099
-    },
-    {
-      "bsp_id": "square_2_1_threat_hole_hollow",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_2_2_threat_size_tall",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": false,
-      "train_pos_rate": 0.0101
-    },
-    {
-      "bsp_id": "square_2_2_threat_coloration_dark",
-      "category": "threat_square_2x2",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
-    },
-    {
-      "bsp_id": "square_2_2_threat_shape_square",
+      "bsp_id": "square_0_0_threat_square",
       "category": "threat_square_2x2",
       "f1": 0.0,
       "skipped": false,
       "train_pos_rate": 0.0098
     },
     {
-      "bsp_id": "square_2_2_threat_hole_hollow",
+      "bsp_id": "square_0_0_threat_with_hole",
       "category": "threat_square_2x2",
       "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "skipped": false,
+      "train_pos_rate": 0.0096
     },
     {
-      "bsp_id": "offered_size_tall",
+      "bsp_id": "square_0_1_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0093
+    },
+    {
+      "bsp_id": "square_0_1_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0099
+    },
+    {
+      "bsp_id": "square_0_1_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0092
+    },
+    {
+      "bsp_id": "square_0_1_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0098
+    },
+    {
+      "bsp_id": "square_0_2_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0107
+    },
+    {
+      "bsp_id": "square_0_2_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0105
+    },
+    {
+      "bsp_id": "square_0_2_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0104
+    },
+    {
+      "bsp_id": "square_0_2_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.011
+    },
+    {
+      "bsp_id": "square_1_0_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.01
+    },
+    {
+      "bsp_id": "square_1_0_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0098
+    },
+    {
+      "bsp_id": "square_1_0_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0099
+    },
+    {
+      "bsp_id": "square_1_0_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0103
+    },
+    {
+      "bsp_id": "square_1_1_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0107
+    },
+    {
+      "bsp_id": "square_1_1_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0118
+    },
+    {
+      "bsp_id": "square_1_1_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0109
+    },
+    {
+      "bsp_id": "square_1_1_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0107
+    },
+    {
+      "bsp_id": "square_1_2_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0096
+    },
+    {
+      "bsp_id": "square_1_2_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0098
+    },
+    {
+      "bsp_id": "square_1_2_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0093
+    },
+    {
+      "bsp_id": "square_1_2_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0099
+    },
+    {
+      "bsp_id": "square_2_0_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0112
+    },
+    {
+      "bsp_id": "square_2_0_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0114
+    },
+    {
+      "bsp_id": "square_2_0_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0111
+    },
+    {
+      "bsp_id": "square_2_0_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0106
+    },
+    {
+      "bsp_id": "square_2_1_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0094
+    },
+    {
+      "bsp_id": "square_2_1_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0097
+    },
+    {
+      "bsp_id": "square_2_1_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0099
+    },
+    {
+      "bsp_id": "square_2_1_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0105
+    },
+    {
+      "bsp_id": "square_2_2_threat_tall",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0101
+    },
+    {
+      "bsp_id": "square_2_2_threat_black",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0102
+    },
+    {
+      "bsp_id": "square_2_2_threat_square",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0098
+    },
+    {
+      "bsp_id": "square_2_2_threat_with_hole",
+      "category": "threat_square_2x2",
+      "f1": 0.0,
+      "skipped": false,
+      "train_pos_rate": 0.0103
+    },
+    {
+      "bsp_id": "offered_tall",
       "category": "offered_piece",
       "f1": 0.5939,
       "skipped": false,
       "train_pos_rate": 0.4995
     },
     {
-      "bsp_id": "offered_coloration_dark",
+      "bsp_id": "offered_black",
       "category": "offered_piece",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.6912,
+      "skipped": false,
+      "train_pos_rate": 0.5012
     },
     {
-      "bsp_id": "offered_shape_square",
+      "bsp_id": "offered_square",
       "category": "offered_piece",
       "f1": 0.676,
       "skipped": false,
       "train_pos_rate": 0.5
     },
     {
-      "bsp_id": "offered_hole_hollow",
+      "bsp_id": "offered_with_hole",
       "category": "offered_piece",
-      "f1": 0.0,
-      "skipped": true,
-      "train_pos_rate": 0.0
+      "f1": 0.6313,
+      "skipped": false,
+      "train_pos_rate": 0.5006
     },
     {
       "bsp_id": "game_phase_early",

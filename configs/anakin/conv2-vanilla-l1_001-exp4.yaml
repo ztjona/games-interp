@@ -1,0 +1,13 @@
+# Anakin Tier I: Vanilla L1=1e-3 on conv2 — hook comparison
+experiment: anakin
+architecture: vanilla
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 4
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+l1_weight: 0.001

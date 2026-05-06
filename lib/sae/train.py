@@ -108,6 +108,8 @@ def train_sae(
     metrics_file: Path | str | None = None,
     patience: int = 0,
     min_improvement: float = 0.01,
+    l0_patience: int = 0,
+    l0_min_change: float = 5.0,
 ) -> dict[str, Any]:
     """Train an SAE on pre-collected activation data.
 
@@ -120,6 +122,11 @@ def train_sae(
                   0 (default) disables early stopping.
         min_improvement: Minimum relative FVU improvement to reset patience counter.
                          E.g. 0.01 means FVU must drop by at least 1% relative.
+        l0_patience: Early-stop if L0 changes by less than l0_min_change for this
+                     many consecutive eval windows.  0 (default) disables.  Do NOT
+                     enable for TopK/BatchTopK — their L0 is always exactly k.
+        l0_min_change: Minimum absolute L0 change per window to reset the L0
+                       plateau counter.  Default 5.0 units.
 
     Returns:
         dict with keys: final_step, num_epochs, wall_time_seconds,
@@ -134,11 +141,14 @@ def train_sae(
     step = 0
     epoch = 0
 
-    # Early stopping state
+    # Early stopping state — FVU-based
     best_fvu = float("inf")
     best_step = 0
     patience_counter = 0
     early_stopped = False
+    # Early stopping state — L0 plateau
+    prev_l0: float | None = None
+    l0_patience_counter = 0
 
     # Open metrics file for live logging
     metrics_fh = None
@@ -206,7 +216,7 @@ def train_sae(
                         "dead": f"{eval_metrics['dead_features_pct']:.1f}%",
                     }
 
-                    # Early stopping check
+                    # Early stopping — FVU plateau
                     current_fvu = eval_metrics["fvu"]
                     if current_fvu < best_fvu * (1 - min_improvement):
                         best_fvu = current_fvu
@@ -228,6 +238,27 @@ def train_sae(
                             )
                             pbar.set_postfix(postfix)
                             break
+
+                    # Early stopping — L0 plateau
+                    current_l0 = eval_metrics["l0"]
+                    if prev_l0 is not None:
+                        if abs(current_l0 - prev_l0) < l0_min_change:
+                            l0_patience_counter += 1
+                        else:
+                            l0_patience_counter = 0
+                        if l0_patience > 0:
+                            postfix["l0pat"] = f"{l0_patience_counter}/{l0_patience}"
+                            if l0_patience_counter >= l0_patience:
+                                early_stopped = True
+                                _stderr(
+                                    f"Early stopping at step {step}: "
+                                    f"L0 plateau — change {abs(current_l0 - prev_l0):.1f} "
+                                    f"< {l0_min_change} for {l0_patience} eval windows "
+                                    f"(current L0={current_l0:.1f})."
+                                )
+                                pbar.set_postfix(postfix)
+                                break
+                    prev_l0 = current_l0
 
                     pbar.set_postfix(postfix)
 

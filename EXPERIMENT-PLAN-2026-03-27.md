@@ -24,14 +24,16 @@
 
 These hypotheses were formulated from the legacy runs. They remain plausible but **unvalidated** — the corrected data pipeline may change results significantly (2×2 square wins add 36 BSPs and change the game's strategic landscape).
 
-| # | Hypothesis | Test |
-|---|-----------|------|
-| H1 | **fc1 doesn't encode BSPs linearly** — the 128-dim bottleneck may lack capacity or encode information nonlinearly | Linear probe baseline (Phase 1) |
-| H2 | **Feature absorption** — hierarchical BSPs cause child features to absorb parent directions | Feature anchoring (Phase 3), absorption analysis |
-| H3 | **Concept heterogeneity** — BSP complexity varies enormously; TopK assumes uniform intrinsic dimensionality | SpaDE (Phase 3), per-category coverage breakdown |
-| H4 | **Training is too short** — 5000 batches may be insufficient for feature crystallization | Longer training (Phase 2) |
-| H5 | **Feature shrinkage** — L1/ReLU-based architectures shrink feature magnitudes | p-annealing (Phase 2) |
-| H6 | **Wrong hook point** — other layers may encode BSPs more cleanly | Multi-hook sweep (Phase 1) |
+| # | Hypothesis | Status | Test |
+|---|-----------|--------|------|
+| H1 | **fc1 encodes cell-level BSPs linearly but not threats** — occupancy/attributes are linearly accessible (F1≈0.6-1.0); threats are non-linear conjunctions (F1≈0.02-0.11) | ✅ CONFIRMED (Phase 1A, 2026-03-31) | Linear probe baseline |
+| H1b | **Wrong feature basis** — following Nanda (emergent-linear-representations-world-models), threats may be linearly accessible under a reframed basis (e.g. relative to offered piece, or threat-count encodings) | ⚠️ PARTIAL (Phase 1D, 2026-03-31) — Count basis 14× better (F1=0.315 vs 0.022), but completability near-zero. Threats are partially linearizable, not fully. | Phase 1D: Reframed linear probes |
+| H2 | **Feature absorption** — hierarchical BSPs cause child features to absorb parent directions | OPEN | Feature anchoring (Phase 3), absorption analysis |
+| H3 | **Concept heterogeneity** — BSP complexity varies enormously; TopK assumes uniform intrinsic dimensionality | OPEN | SpaDE (Phase 3), per-category coverage breakdown |
+| H4 | ~~**Training is too short**~~ | DROPPED — non-linearity, not training length, is the bottleneck | ~~Longer training~~ |
+| H5 | **Feature shrinkage** — L1/ReLU-based architectures shrink feature magnitudes | OPEN | p-annealing (Phase 2) |
+| H6 | **Wrong hook point** — other layers may encode BSPs more cleanly | OPEN | Multi-hook sweep (Phase 1) |
+| H7 | **Offered piece is not learned** — trained model ≈ random model on offered piece attributes (F1 0.60 vs 0.65); fc1 representations don't reflect piece selection strategy | ✅ CONFIRMED (Phase 1A, 2026-03-31) | Linear probe baseline |
 
 ---
 
@@ -79,6 +81,25 @@ All data, activations, BSP labels, and SAE runs prior to this plan were generate
 
 **Implementation:** Write a simple `scripts/linear_probe_baseline.py` script. ~1 hour to implement and run.
 
+**Results (2026-03-31):**
+
+| Category (n) | Trained F1 | Random F1 | Δ |
+|---|---:|---:|---:|
+| cell_occupancy (16) | 0.998 | 0.564 | +0.434 |
+| cell_attribute (64) | 0.611 | 0.281 | +0.330 |
+| game_phase (3) | 0.909 | 0.545 | +0.364 |
+| offered_piece (4) | 0.602 | 0.648 | -0.046 |
+| global (1) | 0.698 | 0.564 | +0.134 |
+| threat_line (40) | 0.022 | 0.000 | +0.022 |
+| threat_square_2x2 (36) | 0.113 | 0.000 | +0.113 |
+| **Overall** | **0.402** | **0.194** | **+0.208** |
+
+**Key findings:**
+- **Cell-level concepts are linearly accessible** — occupancy near-perfect, attributes solid
+- **Threats are NOT linearly accessible** — despite the model needing them to win 82% of games
+- **Offered piece is NOT learned** — random model matches trained (H7 confirmed)
+- The model likely encodes threats non-linearly OR in a different basis (motivates Phase 1D)
+
 #### 1B. Per-Category Coverage Breakdown
 **Rationale:** The 0.20 mean coverage might hide extreme variance across BSP categories. Threats (complex conjunctions) may have near-zero coverage while occupancy (simple binary) may be well-covered.
 
@@ -103,6 +124,141 @@ All data, activations, BSP labels, and SAE runs prior to this plan were generate
 
 **Literature basis:** Residual stream analysis (residual-stream-analysis-multi-layer) shows features are layer-specific per-token.
 
+#### 1D. Reframed Linear Probes (Nanda-inspired)
+**Rationale:** Nanda et al. (emergent-linear-representations-world-models) showed that OthelloGPT's board state appeared non-linear under BLACK/WHITE basis but was perfectly linear under the model's natural MINE/YOURS basis. Our fc1 threat probes score near-zero (F1≈0.02), but the model wins 82% of games — the information must be present. The apparent non-linearity may be an artifact of the wrong feature basis.
+
+**Approach:** Design alternative probe targets that reframe threat BSPs to match fc1's likely encoding:
+1. **Attribute-count encoding:** Instead of binary `row_0_threat_tall`, probe for the *count* of TALL pieces in row 0 (0-4). The model may represent "3 TALL in a row" as a count, not as a boolean conjunction.
+2. **Offered-piece-relative threats:** A threat only matters if the offered piece can complete it. Reframe: `row_0_completable_tall` = 1 iff row 0 has 3 TALL + 1 empty AND the offered piece is TALL.
+3. **Any-attribute threats per line:** Instead of per-attribute threats, probe for `row_0_has_any_threat` (OR across all 4 attributes). The model may collapse attribute-specific threats into a single "this line is dangerous" signal.
+4. **Distance-to-win encoding:** Number of threats on the board (0, 1, 2, ...).
+
+**Implementation:** Extend `compute_bsp_labels.py` to generate a "reframed" label set alongside gorilla. Then re-run linear probes on these new targets.
+
+**Expected outcome:** If reframed probes achieve F1 > 0.5 on threats, the model *does* linearly encode threat information — just not in our original basis. This would make SAE feature recovery feasible and redirect the interpretation of SAE features.
+
+**Cost:** Low — label computation + probe training (~2h).
+**Information value:** Very high — could completely change our understanding of what fc1 encodes.
+
+**Results (2026-03-31):**
+
+BSP set: **hawk** (92 BSPs across 4 reframed categories). Probes run on exactly the same fc1 activations as gorilla.
+
+| Category (n) | Trained F1 | Random F1 | Δ |
+|---|---:|---:|---:|
+| reframed_count (40) | 0.315 | 0.000 | +0.315 |
+| reframed_completable (40) | 0.003 | 0.000 | +0.003 |
+| reframed_any_threat (10) | 0.086 | 0.000 | +0.086 |
+| reframed_global (2) | 0.418 | 0.231 | +0.187 |
+| **Overall (hawk)** | **0.157** | **0.005** | **+0.152** |
+
+**Cross-comparison with gorilla threat categories on the same activations:**
+
+| Probe Target | Gorilla threat_line F1 | Hawk reframed_count F1 | Ratio |
+|---|---:|---:|---:|
+| Trained | 0.022 | 0.315 | **14× improvement** |
+| Random | 0.000 | 0.000 | — |
+
+**Key findings:**
+- **Reframed counts are partially linearly accessible** — F1=0.315 (vs 0.022 for gorilla threat_line). The model encodes "how many matching pieces in a line" more linearly than the boolean "is there a threat?"
+- **Completability is NOT linearly accessible** — F1=0.003, near zero. The conjunction of "threat exists AND offered piece completes it" is genuinely non-linear in fc1. This is an AND over two different representation subspaces (board state × offered piece), confirming the model doesn't fuse these in fc1.
+- **Any-threat (OR reduction)** — F1=0.086, modest improvement over per-attribute threats (0.022). OR-aggregation across attributes helps but doesn't fully linearize.
+- **Global threat existence** — F1=0.418, best in hawk. The scalar "is there any threat on the board?" is moderately accessible.
+- **Random baseline near zero across all hawk categories** — confirms these are genuinely learned representations, not architectural artifacts.
+
+**Decision gate assessment:** Reframed probes did NOT reach the F1 > 0.5 threshold to declare threats "linearly accessible in a different basis." Result is **intermediate**: count-based reframing reveals partial linear structure (14× improvement), but threats remain fundamentally harder than cell-level properties. This suggests:
+1. fc1 encodes partial threat information (attribute counts per line) but not the full conjunction
+2. The conjunction (3-of-4 matching + one empty) likely requires non-linear computation
+3. SAE features may capture the count-based intermediate better than final threat booleans
+4. **Implication for SAE evaluation:** The hawk reframed_count BSPs (F1=0.315) represent a realistic SAE target — non-trivial but achievable. Evaluating SAEs on hawk alongside gorilla will give a more nuanced picture.
+
+**Update (2026-04-06):** Hawk was expanded to 173 BSPs by adding 2×2 square reframings, and the fc1 probes were rerun on the updated set. The trained model reaches overall F1=0.200 vs 0.005 for the random control; the new square-count category is substantially linearly accessible (F1=0.455), while square completability remains low (F1=0.027). This preserves the original conclusion: fc1 contains partial count-like threat structure but not the full conjunction.
+
+---
+
+### Phase 1E: Anakin Sweep — Systematic SAE Architecture Comparison (experiment "anakin")
+**Created:** 2026-04-01  
+**Status:** ✅ DONE (2026-04-01 to 2026-04-02). 28/33 configs completed, 5 timed out on GPU 0.
+
+**Execution summary:** Run across 3 GPUs on 2026-04-01. GPUs 1 & 2 completed all 22 configs in ~90 min each. GPU 0 processed 6/11 configs (~9 hours) — 5 conv2 and exp=16 configs timed out at the 1-hour-per-config limit due to GPU 0 being significantly slower. All 5 partials had converged FVU (relative change <3.5% in last 3 logged steps) at 70–94% of training, so they are informative without re-running.
+
+**Results:** See RESEARCH-STATUS.md for full analysis. Key conclusion: **architecture choice matters less than hook point (conv2 > fc1) and staying in the right sparsity regime (L0=16–64 for best coverage).**
+
+**Rationale:** Phases 1A–1D established the linear probe ceiling and the fc1 representation structure. Now we need to systematically test whether any SAE architecture can *match or exceed* probe performance on the accessible BSPs, and *discover structure* in the less-accessible ones. The existing SAE baseline (topk-k32-exp8-fc1) has coverage=0.30 — below the probe ceiling of 0.40 for gorilla. A comprehensive sweep over architectures, sparsity levels, expansion factors, and hooks is needed before investing in novel approaches (Phase 3).
+
+**Design:** 33 configs across 11 tiers, covering:
+- **6 architectures:** vanilla, topk, batchtopk, gated, jumprelu, p-annealing
+- **2 hooks:** fc1 (128-dim, 23 configs) and conv2 (512-dim, 10 configs)
+- **3 expansion factors:** 4, 8, 16 for fc1; 2, 4, 8 for conv2
+- **Sparsity sweep:** k ∈ {16, 32, 64, 128} for topk; k ∈ {16, 32, 64} for batchtopk; l0 ∈ {32, 64, 128} for jumprelu
+- **Seed stability:** 3 seeds (42, 43, 44) on topk-k32-exp8-fc1
+- All configs: 25000 training steps, batch_size=4096, lr=3e-4, gorilla BSP evaluation
+
+**Key conv2 note:** All conv2 configs use the 512-dim full-spatial representation (`conv2_512_amalgam_activations.pt`, 275K × 512), not the per-cell representation. This means d_dict at exp=4 is 2048 — sparsity ratios are matched to fc1 (k=64/2048 ≈ k=32/1024 ≈ 3.12%).
+
+**Infrastructure:**
+- Config generator: `scripts/generate_anakin_configs.py`
+- Sweep orchestrator: `run_sweep.py` (supports --split for multi-GPU)
+- Pre-flight validator: `validate_sweep.py --smoke-test`
+- Configs: `configs/anakin/*.yaml` (33 files)
+
+**Execution (3 GPUs in parallel):**
+```bash
+python validate_sweep.py --smoke-test
+# Then in 3 separate terminals:
+python run_sweep.py --configs=configs/anakin --gpu=0 --split=1/3 --eval --skip-existing
+python run_sweep.py --configs=configs/anakin --gpu=1 --split=2/3 --eval --skip-existing
+python run_sweep.py --configs=configs/anakin --gpu=2 --split=3/3 --eval --skip-existing
+```
+
+**Decision gates after sweep:**
+- ~~If max coverage > 0.35 → identify best architecture, sweep hyperparams further~~ → **max coverage = 0.338 (close). BatchTopK-k16 and conv2-TopK-k64 are best. No further sweeping needed — architecture is not the bottleneck.**
+- ~~If max coverage < 0.25 across all archs → SAE approach may be limited~~ → **Not triggered. SAEs work, just not for threats.**
+- ~~If conv2 >> fc1 → redirect all future work to conv2 hook~~ → **conv2 has a real edge (Tier 1 vs Tier 2) but the gap is modest (~0.03 coverage). conv2 experiments should be prioritized but fc1 is not worthless.**
+- ~~If p-annealing dominates → confirms Karvonen et al.~~ → **P-annealing is in Tier 2 (bulk), not Tier 1. Does not dominate for Quarto, contradicting Karvonen et al.'s Othello results.**
+- ~~If seed stability < 0.6 cosine → consider Archetypal SAE~~ → **Coverage stability is good (σ=0.004). Decoder cosine stability still un-measured.**
+- ~~Compare per-category: which architecture best recovers threats vs cell properties~~ → **No architecture recovers threats. The bottleneck is the network's non-linear encoding of threats, not the SAE architecture.**
+
+**Decision gate outcomes — new directions prompted:**
+1. **H8 (spatial threat encoding):** The model processes offered piece + board through conv layers. Threats are spatial patterns (3-in-a-line). Conv2 outperforms fc1 for spatial BSPs. Linear probe on conv2 activations would reveal whether threat info exists spatially before the fc1 bottleneck destroys it. → **Phase 1F**
+2. **Offered_piece F1=0.667 is a trivial baseline artifact.** The offered piece is entangled through 2 conv layers by fc1. Not a useful evaluation signal. → **Drop offered_piece from focus; probe fc_in_piece hook if piece identity matters.**
+3. **Coverage metric has a noise floor.** With 76 threat BSPs at ~0.07 F1, they drag the mean. Per-category coverage is the only meaningful lens.
+
+### Phase 1F: Conv2 Linear Probe — Test Spatial Threat Encoding (H8)
+**Created:** 2026-04-06
+**Status:** ✅ DONE (2026-04-24)
+
+**Rationale:** The Anakin sweep confirms threats are undetectable at fc1 across ALL architectures. The linear probe on fc1 also gets F1≈0.02 on threat_line. But the model wins 82% of games, so it MUST represent threats somewhere. Conv2 (32×4×4=512d) retains spatial structure — and threats are inherently spatial (3 aligned pieces + 1 empty cell). If threats are linearly accessible at conv2 but not fc1, this proves the fc1 bottleneck (128-d) collapses spatial threat information into nonlinear representations.
+
+**Method:**
+- Ran `linear_probe_baseline.py` on `data/quarto/conv2_512_amalgam_activations.pt` with gorilla BSP labels
+- Compared threat_line and threat_square F1 between conv2 and fc1 probes
+- Collected random-model conv2 activations and ran the same probe as a control
+
+**Results:**
+
+| Category | fc1 probe | conv2 probe | conv2 random |
+|---|:---:|:---:|:---:|
+| cell_occupancy | 0.998 | 1.000 | 0.829 |
+| cell_attribute | 0.611 | 0.971 | 0.782 |
+| threat_line | 0.022 | 0.502 | 0.019 |
+| threat_square_2x2 | 0.113 | 0.680 | 0.016 |
+| offered_piece | 0.602 | 0.789 | 0.718 |
+| global | 0.698 | 0.694 | 0.634 |
+| game_phase | 0.909 | 0.936 | 0.685 |
+| **Overall** | **0.402** | **0.789** | **0.428** |
+
+**Interpretation:**
+- **H8 confirmed.** Threat information is linearly accessible in conv2 and largely gone by fc1.
+- The trained-vs-random gap is decisive for threat BSPs (`threat_line`: 0.502 vs 0.019, `threat_square_2x2`: 0.680 vs 0.016), so this is learned spatial structure rather than a generic convolutional prior.
+- Some categories remain high even in the random control (`cell_occupancy`, `cell_attribute`, `offered_piece`, `global`), so raw overall coverage is no longer enough on conv2. Category-wise comparisons against the random control are required.
+- **Research consequence:** do not spend the next cycle on another broad sweep of the same unsupervised SAE families. The main gap is now between the conv2 probe ceiling and the current SAE recoverability.
+
+**Cost:** Low (~1h, completed).
+**Information value:** Critical — it decisively redirects future work toward conv2-based SAE recovery and away from fc1 threat analysis.
+
+**Literature basis:** Karvonen et al. (sae-evaluation-metrics) found p-annealing best for board games; Bricken et al. and Gao et al. showed TopK outperforms vanilla on LLMs; Hindupur et al. (projecting-assumptions-duality) predict architecture-dependent failures on heterogeneous concept sets.
+
 ---
 
 ### Phase 2: Training Improvements (medium cost)
@@ -118,14 +274,8 @@ All data, activations, BSP labels, and SAE runs prior to this plan were generate
 
 **Key concern:** Current implementation uses fixed `lp_weight`. Karvonen et al. use adaptive coefficient annealing (rescaling λ at each step to keep penalty magnitude constant as p changes). Check if this is implemented; if not, it may need to be added.
 
-#### 2B. Longer Training (experiment "edison")
-**Rationale:** 5000 batches may be insufficient. Feature crystallization in SAEs often requires extended training, especially for TopK where dead feature revival depends on aux loss.
-
-- Retrain the best-performing config (arnold_beta-jumprelu-t32, which has best coverage) with:
-  - 25,000 batches (5× current)
-  - 50,000 batches (10× current)
-- Monitor metrics at checkpoints to detect early saturation vs. continued improvement
-- If improvement plateaus early, training length is not the bottleneck
+#### ~~2B. Longer Training~~ — DROPPED
+**Dropped (2026-03-31):** Phase 1A results show the bottleneck is non-linear encoding of threats, not insufficient training. Longer training would only improve already-high categories (occupancy, attributes) with diminishing returns.
 
 #### 2C. Higher Expansion with Dead Feature Mitigation
 **Rationale:** Expansion 16 failed because of 95%+ dead features. The aux loss weight or mechanism may be insufficient. Before giving up on scaling width, try stronger dead feature revival.
@@ -202,22 +352,35 @@ All data, activations, BSP labels, and SAE runs prior to this plan were generate
 
 ## Execution Priority
 
-| Priority | Experiment | Cost | Information Value | Dependency |
-|----------|-----------|------|-------------------|------------|
-| **0** | 0. Data regeneration + random baseline | Low-Medium | **Prerequisite** — all subsequent work depends on this | None |
-| **1** | 1A. Linear probe baseline | Low (1h) | **Critical** — determines if fc1 is viable | Phase 0 |
-| **2** | 1B. Per-category coverage | Negligible | **High** — identifies which BSPs fail | Phase 0 |
-| **3** | 2A. p-Annealing | Medium (2-3h train) | **High** — directly validated on board games | Phase 0 |
-| **4** | 1C. Multi-hook sweep | Medium (collect + train) | **High** — may redirect all work | None |
-| **5** | 2B. Longer training | Medium-High | Medium — may just confirm saturation | None |
-| **6** | 3A. Guided SAE (G-SAE) | High (implement + train) | **Very High** — novel, exploits BSP labels | 1A |
-| **7** | 2C. Higher expansion + aux | Medium | Medium | None |
-| **8** | 3B. Feature anchoring | High (implement) | High | 1A |
-| **9** | 4A. Absorption detection | Medium (implement) | High — explains failure mode | 1A |
-| **10** | 4B. Stability across seeds | Medium (3× train) | Medium | Best config known |
-| **11** | 3C. SpaDE | Very High (new arch) | High but risky | 1B confirms heterogeneity |
-| **12** | 3D. End-to-end SAE | Very High (new training loop) | High | Model architecture access |
-| **13** | 4C. Discovery evaluation | Low (qualitative) | Medium | Good SAE available |
+| Priority | Experiment | Cost | Information Value | Dependency | Status |
+|----------|-----------|------|-------------------|------------|--------|
+| **0** | 0. Data regeneration + random baseline | Low-Medium | **Prerequisite** | None | ✅ DONE |
+| **1** | 1A. Linear probe baseline | Low (1h) | **Critical** | Phase 0 | ✅ DONE |
+| **2** | 1B. Per-category coverage | Negligible | **High** | Phase 0 | ✅ DONE (integrated into sae_eval.py) |
+| **3** | 1C. Multi-hook sweep (conv2) | Medium | **High** — may redirect all work | Phase 0 | SAE trained, needs re-eval |
+| **4** | **1D. Reframed linear probes** | **Low (2h)** | **Very High** — Nanda-inspired, could unlock threats | Phase 1A | ✅ DONE — partial success (count F1=0.315, completable≈0) |
+| **5** | **1E. Anakin sweep** | **Medium (4 days GPU)** | **Very High** — systematic arch comparison, hook comparison, sparsity/expansion sweep | Phase 0, 1A | ✅ DONE — 28/33 completed, 5 partial (converged). See RESEARCH-STATUS.md for full analysis |
+| **5.1** | **1F. Conv2 linear probe** | **Low (1h)** | **Very High** — tests H8, determines if threats are spatially encoded before fc1 collapses them | Phase 0 | ✅ DONE — H8 confirmed |
+| **5.1b** | **A/B follow-up panel recovery (B03+B04 retrain, A01/A02/B01–B04 gorilla eval)** | **Low (3–4h)** | **Required** — completes the conv2-completion + random-control panel that the 2026-04-24 power loss interrupted | A/B configs in `configs/followup/` | ✅ DONE (2026-04-28) |
+| **5.4** | **Phase 2A: Conv2 arch sweep (C/D/F/G campaigns, 33 configs)** | **High (100–250 CPU-h)** | **Very High** — first full architecture comparison on conv2-512; establishes whether BatchTopK-k16 advantage holds at conv2 and whether exp16 helps | C10/C11 excluded (gated L0 locked) | **IN QUEUE — re-run with fixed timeout (2026-05-04)** |
+| **5.2** | **1G. Hawk 173 SAE evaluation** | **Low (2h)** | **Very High** — evaluate best SAEs on reframed line+square threat BSPs now that conv2 threat accessibility is known | Phase 1D, 1F, 5.4 | gated on 5.4 |
+| **5.2b** | **1G'. Conv2 linear probe on hawk_173** | **Low (1h)** | **Very High** — establishes the conv2 ceiling for reframed threats (currently only fc1-hawk is known) | Phase 1F | **NEXT** |
+| **5.3** | **1H. Conv2 feature reuse / absorption analysis** | **Low-Medium** | **High** — determines whether multiple BSPs collapse onto shared SAE features despite strong probe accessibility | 1E, 1F, 5.4 | gated on 5.4 |
+| **6** | 2A. p-Annealing | Medium (2-3h) | **High** — directly validated on board games | Phase 0 | ⊂ Anakin sweep (included in Tier A) |
+| **7** | 3A. Guided SAE (G-SAE) | High | **Very High** — novel, exploits BSP labels | 1A, 1E, 1F, 1G, 1H | gated on 1G+1H |
+| **8** | 2C. Higher expansion + aux | Medium | Medium | None | ⊂ Anakin sweep (Tiers E, F) |
+| **9** | 3B. Feature anchoring | High | High | 1A, 1G, 1H | gated on 1G+1H |
+| **10** | 4A. Absorption detection | Medium | High — explains failure mode | 1E | superseded by 1H |
+| ~~11~~ | ~~2B. Longer training~~ | ~~Medium-High~~ | ~~Medium~~ | | DROPPED |
+| **12** | 3C. SpaDE | Very High | High but risky | 1B | |
+| **13** | 3D. End-to-end SAE | Very High | High | Model architecture access | |
+| **14** | 4C. Discovery evaluation | Low (qualitative) | Medium | Good SAE from 1E | |
+| **15** | 4B. Stability across seeds | Medium (3× train) | Medium | Best config known | ⊂ Anakin sweep (Tier H) |
+| ~~D1~~ | ~~Broad unsupervised architecture sweep (re-run)~~ | ~~Medium~~ | ~~Low~~ | — | **DEPRIORITIZED 2026-04-27** — Anakin showed σ=0.004 across seeds; the gap is not the architecture |
+| ~~D2~~ | ~~fc1 deep-dive on threats~~ | ~~Low~~ | ~~Low~~ | — | **DEPRIORITIZED 2026-04-27** — Phase 1F redirected threat work to conv2 |
+| ~~D3~~ | ~~`offered_piece` as a coverage signal~~ | — | — | — | **DEPRIORITIZED 2026-04-27** — F1=0.667 is the trivial all-positive baseline (P=0.5, R=1.0); keep in per-category breakdowns for transparency, exclude from headline rankings |
+
+**Naming note (2026-04-24):** All new follow-up runs should use experiment IDs of the form `{Major}{Minor}-{tag}-s{seed}`. For the current queue, `A01`/`A02` are random-model controls and `B01`–`B04` are conv2 completion reruns. Do not rely on YAML filenames alone; the checkpoint stem is built from the config's `experiment:` field.
 
 ---
 
@@ -226,6 +389,7 @@ All data, activations, BSP labels, and SAE runs prior to this plan were generate
 | Paper Tag | Key Insight for This Plan |
 |-----------|--------------------------|
 | sae-evaluation-metrics | Coverage + board reconstruction metrics; p-annealing; board game SAE benchmark (our gold standard comparison) |
+| emergent-linear-representations-world-models | **Linear representations emerge under the right basis.** OthelloGPT appeared non-linear under BLACK/WHITE but was linear under MINE/YOURS. Motivates Phase 1D: reframing threat BSPs may reveal linear structure in fc1 |
 | Feature-Monosemanticity-Score-GSAE | G-SAE nearly doubles monosemanticity with supervised conditioning; FMS metric |
 | unified-theory-sparse-dictionary-learning | SDL is underdetermined; feature anchoring restores identifiability; explains dead features and absorption theoretically |
 | projecting-assumptions-duality-sparse-autoencoders | Architecture↔geometry duality; TopK fails on heterogeneous concepts; SpaDE proposal |
@@ -242,8 +406,9 @@ All data, activations, BSP labels, and SAE runs prior to this plan were generate
 
 ## Decision Gates
 
-- **After Phase 1A:** If linear probe coverage < 0.30 on fc1 → abandon fc1, pivot to conv2 or multi-hook approach
-- **After Phase 1A:** If linear probe coverage > 0.50 on fc1 → fc1 is viable, the SAE is the bottleneck → proceed with Phase 2+3
+- **After Phase 1A:** ✅ RESOLVED — Linear probe coverage = 0.40 on fc1. Cell-level BSPs are linearly accessible (F1 0.6-1.0). Threats are not (F1 ≈ 0). fc1 is viable for cell-level concepts; threat coverage requires non-linear disentangling or basis reframing.
+- **After Phase 1C:** If conv2 coverage on threats >> fc1 → spatial layer may encode threats more explicitly → redirect threat-focused work to conv2
+- **After Phase 1D:** ⚠️ RESOLVED PARTIAL (2026-03-31) — Reframed count probes reached F1=0.315 (14× improvement) but did not cross 0.5 threshold. Completability near-zero. Threats are **partially linearizable** via count-based reframing. Implication: SAEs should be evaluated on both gorilla (hard booleans) and hawk (reframed counts) to capture the intermediate structure. G-SAE / E2E approaches remain valuable for capturing the non-linear conjunction residual.
 - **After Phase 2A:** If p-annealing coverage < 0.25 → feature shrinkage alone doesn't explain the gap → prioritize Phase 3
 - **After Phase 2A:** If p-annealing coverage > 0.35 → p-annealing is the answer → sweep hyperparameters extensively
 - **After Phase 3A:** If G-SAE coverage > 0.40 → supervised conditioning works → investigate how much supervision is needed (partial labels, fewer BSPs)

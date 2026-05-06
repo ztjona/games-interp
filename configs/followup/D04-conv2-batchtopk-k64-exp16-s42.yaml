@@ -1,0 +1,16 @@
+# Campaign D: conv2-512 expansion factor exp16
+# BatchTopK k=64 exp16
+experiment: D04-c2exp16-s42
+architecture: batchtopk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 16
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+patience: 20
+min_improvement: 0.02

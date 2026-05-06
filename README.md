@@ -3,25 +3,31 @@
 PhD research project using Sparse Autoencoders (SAEs) to extract interpretable features
 from board game neural networks (Quarto, Othello, Tic-tac-toe).
 
-## Status (March 2026)
+## Status (April 2026)
 
-**Phase:** Coverage evaluated — 11 valid experiments done, JumpReLU leads, causal verification next.
+**Phase:** Post-regeneration Quarto SAE work is active. Phase 1F confirmed that threat information is linearly accessible in conv2 and largely lost by fc1. The next step is to test whether the current SAEs recover that structure, especially on hawk_173.
 
 | Milestone | Status |
 |-----------|--------|
 | Quarto CNN trained (Aa_replay) | Done |
-| Position collection (4 opponent modes) | Done — 240K unique positions |
-| BSP computation (164 properties) | Done — gorilla (164) + fox (87) |
+| Position collection (4 opponent modes) | Done — 275,916 unique positions |
+| BSP computation | Done — gorilla_164 + hawk_173 on disk |
 | SAE library (6 architectures) | Done — vanilla, topk, batchtopk, gated, jumprelu, p-annealing |
-| Pilot experiments | Done — vanilla + topk on fc1 |
-| Bug fixes (aux loss, metrics, kwargs) | Done — 2026-03-04 |
-| Architecture sweep ("arnold") | Done — 13 runs; 6 valid, 7 invalid |
-| Bug fixes (gated via-gate, JumpReLU L0 gradient) | Done — 2026-03-06 |
-| Architecture re-runs ("arnold_beta") | Done — 5 runs (gated ×2, jumprelu ×2, topk k=128) |
-| BSP coverage evaluation | **Done** — 11 valid experiments evaluated (2026-03-07) |
-| Causal verification | **Next** |
+| fc1 linear probes | Done — gorilla + hawk_173 + random controls |
+| conv2 hook comparison | Done — conv2 TopK baseline evaluated |
+| Anakin sweep | Done — 28 checkpoints + 5 converged partials |
+| Conv2 linear probe (Phase 1F) | Done — gorilla conv2 coverage 0.789 vs 0.428 random control |
+| Next decision point | Hawk_173 SAE eval + conv2 feature-reuse analysis |
 
-### Coverage Results — Arnold + Arnold Beta (2026-03-07)
+**Current source-of-truth docs:**
+- `RESEARCH-STATUS.md` — active status, winners, open hypotheses
+- `EXPERIMENT-PLAN-2026-03-27.md` — active plan and decision gates
+- `Quarto-specifications.md` — Quarto model, data, hooks, BSP sets
+- `BSP-schema-summary.md` — gorilla/hawk BSP semantics and probe status
+
+**Historical note:** The Arnold and Arnold Beta sections below are pre-regeneration results from the legacy `mode_2x2=False` pipeline. They are kept for provenance only and should not be used to plan new work.
+
+### Historical Coverage Results — Arnold + Arnold Beta (2026-03-07, legacy_mode2x2_false)
 
 11 valid experiments evaluated on fc1, gorilla BSP set (164 BSPs), amalgam dataset (240,845 positions).
 
@@ -397,7 +403,9 @@ x_board (16,4,4) ─── concat ──→ (17,4,4)
 - **Naming Conventions:** 
   - Position datasets use **metals theme** (copper, bronze, iron, steel, amalgam)
   - BSP sets use **animals theme** (gorilla, fox, etc.) — user chooses names based on scope
-  - See [SELF-IMPROVEMENT.md](SELF-IMPROVEMENT.md) for detailed naming strategy
+    - SAE follow-up runs now use prefixed experiment IDs: `{Major}{Minor}-{tag}-s{seed}`
+    - Put the campaign ID in `experiment:` and let the trainer append architecture + hook to the checkpoint stem
+    - See [Quarto-specifications.md](Quarto-specifications.md) for the active Quarto naming policy
 - **Coverage:** Fraction of BSPs with a matching SAE feature (high F1)
 - **Causal Verification:** Clamp/ablation tests to distinguish correlation from causation
 - **Provenance:** Each dataset tracks source files, model checkpoint, deduplication stats, and creation date

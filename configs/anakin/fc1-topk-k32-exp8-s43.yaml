@@ -1,0 +1,14 @@
+# Anakin Tier H: TopK k=32 exp=8 seed=43 — stability check
+experiment: anakin-s43
+architecture: topk
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 43
+log_every: 500
+k: 32
+aux_loss_weight: 0.01

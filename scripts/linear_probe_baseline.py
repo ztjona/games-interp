@@ -22,16 +22,9 @@ Options:
     --output=<path>        Save results JSON to this path [default: auto]
 
 Examples:
-    python scripts/linear_probe_baseline.py \\
-        data/quarto/fc1_amalgam_activations.pt \\
-        data/quarto/bsp_labels-gorilla_164.pt \\
-        data/quarto/bsp_schema-gorilla_164.json
+    linear_probe_baseline.py data/quarto/fc1_amalgam_activations.pt data/quarto/bsp_labels-gorilla_164.pt data/quarto/bsp_schema-gorilla_164.json
 
-    python scripts/linear_probe_baseline.py \\
-        data/quarto/fc1_amalgam_random_activations.pt \\
-        data/quarto/bsp_labels-gorilla_164.pt \\
-        data/quarto/bsp_schema-gorilla_164.json \\
-        --output data/quarto/linear_probe_random_results.json
+    linear_probe_baseline.py data/quarto/fc1_amalgam_random_activations.pt data/quarto/bsp_labels-gorilla_164.pt data/quarto/bsp_schema-gorilla_164.json --output data/quarto/linear_probe_random_results.json
 """
 
 from __future__ import annotations
@@ -46,12 +39,36 @@ import torch
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
+from tqdm import tqdm
 
 try:
     from docopt import docopt
 except ImportError:
     print("Install docopt: pip install docopt", file=sys.stderr)
     sys.exit(1)
+
+
+def _infer_bsp_set_name(bsp_path: Path, schema: dict) -> str:
+    """Infer a stable BSP set name for metadata and auto-generated outputs."""
+    bsp_set_name = schema.get("bsp_set_name")
+    if bsp_set_name:
+        return str(bsp_set_name)
+
+    stem = bsp_path.stem
+    prefix = "bsp_labels-"
+    if stem.startswith(prefix):
+        return stem[len(prefix) :]
+    return stem
+
+
+def _default_output_path(act_path: Path, bsp_path: Path, schema: dict) -> Path:
+    """Build the default result path.
+
+    Including the BSP set name avoids collisions when the same activation file is
+    probed against multiple BSP subsets.
+    """
+    bsp_set_name = _infer_bsp_set_name(bsp_path, schema)
+    return act_path.parent / f"linear_probe_{bsp_set_name}_{act_path.stem}_results.json"
 
 
 def main():
@@ -112,7 +129,7 @@ def main():
     results_per_bsp = []
     t0 = time.time()
 
-    for i in range(num_bsps):
+    for i in tqdm(range(num_bsps), desc="Probing BSPs", file=sys.stderr):
         bsp_id = bsp_defs[i]["id"]
         category = bsp_defs[i]["category"]
         y_train_i = Y_train[:, i]
@@ -151,13 +168,6 @@ def main():
                 "train_pos_rate": round(float(y_train_i.mean()), 4),
             }
         )
-
-        if (i + 1) % 20 == 0:
-            elapsed = time.time() - t0
-            print(
-                f"  [{i+1}/{num_bsps}] elapsed={elapsed:.1f}s",
-                file=sys.stderr,
-            )
 
     total_time = time.time() - t0
     print(f"Done in {total_time:.1f}s", file=sys.stderr)
@@ -202,6 +212,7 @@ def main():
         "config": {
             "activations": str(act_path),
             "bsp_labels": str(bsp_path),
+            "bsp_set": _infer_bsp_set_name(bsp_path, schema),
             "C": C,
             "test_frac": test_frac,
             "seed": seed,
@@ -212,7 +223,7 @@ def main():
     }
 
     if output_path == "auto" or output_path is None:
-        output_path = act_path.parent / f"linear_probe_{act_path.stem}_results.json"
+        output_path = _default_output_path(act_path, bsp_path, schema)
     else:
         output_path = Path(output_path)
 

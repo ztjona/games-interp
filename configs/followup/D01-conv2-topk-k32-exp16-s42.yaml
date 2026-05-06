@@ -1,0 +1,17 @@
+# Campaign D: conv2-512 expansion factor exp16
+# TopK k=32 exp16 — does 512d benefit from d_dict=8192?
+experiment: D01-c2exp16-s42
+architecture: topk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 16
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

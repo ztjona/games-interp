@@ -1,0 +1,14 @@
+# Anakin Tier I: p-Annealing on conv2 exp=4
+experiment: anakin
+architecture: p-annealing
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 4
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+p_start: 1.0
+p_end: 0.2

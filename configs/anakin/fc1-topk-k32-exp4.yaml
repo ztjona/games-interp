@@ -1,0 +1,14 @@
+# Anakin Tier E: TopK k=32 exp=4 on fc1 — narrow dict (512)
+experiment: anakin
+architecture: topk
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 4
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01

@@ -1,0 +1,14 @@
+# Follow-up: random-model SAE control mirroring the strongest threat-focused conv2 run
+experiment: A02-random-control-s42
+architecture: topk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_random_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 5000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01

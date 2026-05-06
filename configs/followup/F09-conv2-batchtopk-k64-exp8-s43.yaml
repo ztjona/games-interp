@@ -1,0 +1,16 @@
+# Campaign F: seed stability for leading conv2 architectures
+# BatchTopK k=64 exp8 — seed 43 replicate
+experiment: F09-c2seeds-s43
+architecture: batchtopk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 43
+log_every: 500
+k: 64
+patience: 20
+min_improvement: 0.02

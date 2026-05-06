@@ -1,0 +1,13 @@
+# Anakin Tier F: Gated L1=2e-3 exp=16 on fc1 — scaling test
+experiment: anakin
+architecture: gated
+game: quarto
+hook: fc1
+data: data/quarto/fc1_amalgam_activations.pt
+expansion: 16
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+gated_l1: 0.002

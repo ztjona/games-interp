@@ -1,0 +1,17 @@
+# Campaign C: conv2-512 full architecture sweep at exp8
+# TopK k=128 — high TopK sparsity on conv2 at exp8 (untested)
+experiment: C02-c2arch-s42
+architecture: topk
+game: quarto
+hook: conv2
+data: data/quarto/conv2_512_amalgam_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 128
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02
