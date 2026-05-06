@@ -40,6 +40,9 @@ Notes:
     - GPU 0 (RTX 4000) gets conv2 configs first (heavier), P4000s get fc1 first.
     - Failures are logged and skipped — the sweep continues.
     - Progress is logged to logs/sweep_{gpu}_{timestamp}.log
+    - --skip-existing checks for a .pt checkpoint file. JSONL-only partial runs
+      (no .pt saved) will NOT be skipped and will re-run from scratch, which is
+      correct. If you want to skip a run that produced no .pt, delete its YAML.
 """
 
 from __future__ import annotations

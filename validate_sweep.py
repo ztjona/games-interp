@@ -1,12 +1,13 @@
-"""Pre-flight validator for the Anakin SAE sweep.
+"""Pre-flight validator for SAE sweeps.
 
-Checks that the target machine has everything needed to run 4 days of
-unattended SAE training + evaluation. Run this BEFORE starting the sweep.
+Checks that the target machine has everything needed to run unattended
+SAE training + evaluation. Run this BEFORE starting any sweep.
 
 Usage:
-    python validate_sweep.py [--device=<dev>] [--smoke-test]
+    python validate_sweep.py [--configs=<dir>] [--device=<dev>] [--smoke-test]
 
 Options:
+    --configs=<dir>  Config directory to validate [default: configs/followup]
     --device=<dev>   Device to validate (cuda, cpu, auto) [default: auto]
     --smoke-test     Run a 10-step training smoke test per architecture (~2 min)
 """
@@ -28,9 +29,9 @@ if str(_PROJECT_ROOT) not in sys.path:
 
 # ── Checks ────────────────────────────────────────────────────────────────
 
-PASS = "\033[92m✓\033[0m"
-FAIL = "\033[91m✗\033[0m"
-WARN = "\033[93m⚠\033[0m"
+PASS = "\033[92mPASS\033[0m"
+FAIL = "\033[91mFAIL\033[0m"
+WARN = "\033[93mWARN\033[0m"
 
 results: list[tuple[str, str, str]] = []  # (status, name, detail)
 
@@ -139,6 +140,17 @@ def check_project_files():
         "data/quarto/bsp_schema-gorilla_164.json": "Gorilla BSP schema",
     }
 
+    model_files = {
+        "models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt": "Trained Aa_replay model (C/D/F campaigns)",
+        "models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt": "Random-weight model (G-series controls)",
+    }
+
+    for fpath, desc in model_files.items():
+        p = _PROJECT_ROOT / fpath
+        ok = p.exists()
+        size = f"{p.stat().st_size / 1e3:.0f} KB" if ok else "MISSING"
+        check(fpath.split("/")[-1], ok, f"{desc} — {size}")
+
     for fpath, desc in critical_files.items():
         p = _PROJECT_ROOT / fpath
         ok = p.exists()
@@ -237,13 +249,12 @@ def check_sae_library(device: str):
 # ── 5. Config validation ─────────────────────────────────────────────────
 
 
-def check_configs():
-    section("5. Anakin Sweep Configs")
+def check_configs(config_dir: Path):
+    section(f"5. Sweep Configs ({config_dir})")
     import yaml
 
-    config_dir = _PROJECT_ROOT / "configs" / "anakin"
     if not config_dir.exists():
-        check("configs/anakin/ directory", False, "MISSING — create configs first")
+        check(str(config_dir), False, "MISSING — create configs first")
         return []
 
     configs = sorted(config_dir.glob("*.yaml"))
@@ -290,8 +301,8 @@ def check_configs():
                 errors.append("missing 'k' for topk/batchtopk")
             if arch == "vanilla" and "l1_weight" not in cfg:
                 errors.append("missing 'l1_weight' for vanilla")
-            if arch == "gated" and "gated_l1" not in cfg:
-                errors.append("missing 'gated_l1' for gated")
+            if arch == "gated" and "l1_weight" not in cfg and "gated_l1" not in cfg:
+                errors.append("missing 'l1_weight' (or legacy 'gated_l1') for gated")
             if arch == "jumprelu" and "l0_target" not in cfg:
                 errors.append("missing 'l0_target' for jumprelu")
             if arch == "p-annealing" and ("p_start" not in cfg or "p_end" not in cfg):
@@ -303,7 +314,7 @@ def check_configs():
                 # Estimate output path to check for collisions
                 suffix = _build_suffix(cfg)
                 out_name = f"{cfg['experiment']}-{suffix}-{cfg['hook']}"
-                check(f"  {name}", True, f"→ {out_name}.pt")
+                check(f"  {name}", True, f"-> {out_name}.pt")
                 valid_configs.append((cfg_path, cfg, out_name))
 
         except Exception as e:
@@ -480,21 +491,26 @@ def check_eval_pipeline(device: str):
 
 def main():
     print("\n" + "=" * 60)
-    print("  Anakin Sweep — Pre-flight Validation")
+    print("  SAE Sweep — Pre-flight Validation")
     print("=" * 60)
 
     # Parse args
     do_smoke = "--smoke-test" in sys.argv
     device_arg = "auto"
+    config_dir = _PROJECT_ROOT / "configs" / "followup"
     for arg in sys.argv[1:]:
         if arg.startswith("--device="):
             device_arg = arg.split("=", 1)[1]
+        elif arg.startswith("--configs="):
+            config_dir = Path(arg.split("=", 1)[1])
+            if not config_dir.is_absolute():
+                config_dir = _PROJECT_ROOT / config_dir
 
     check_packages()
     device = check_gpu(device_arg)
     check_project_files()
     check_sae_library(device)
-    valid_configs = check_configs()
+    valid_configs = check_configs(config_dir)
 
     if do_smoke and valid_configs:
         smoke_test(device, valid_configs)

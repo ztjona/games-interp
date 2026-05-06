@@ -1,0 +1,3 @@
+{"step": 50, "loss": 21.865013, "l_reconstruct": 21.554722, "l_sparsity": 310.291626, "l0": 484.64, "l0_std": 14.12, "fvu": 0.063429, "mse": 20.69936, "dead_features_pct": 0.2, "median_feat_freq": 0.467285}
+{"step": 100, "loss": 6.275259, "l_reconstruct": 5.954938, "l_sparsity": 320.320374, "l0": 511.32, "l0_std": 12.58, "fvu": 0.018049, "mse": 5.847292, "dead_features_pct": 0.29, "median_feat_freq": 0.499512}
+{"step": 150, "loss": 3.652837, "l_reconstruct": 3.327597, "l_sparsity": 325.239258, "l0": 528.18, "l0_std": 11.97, "fvu": 0.010049, "mse": 3.286119, "dead_features_pct": 0.39, "median_feat_freq": 0.527344}

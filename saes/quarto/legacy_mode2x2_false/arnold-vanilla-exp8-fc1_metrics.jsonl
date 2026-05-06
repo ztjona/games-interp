@@ -1,0 +1,11 @@
+{"step": 100, "loss": 8.481598, "l_reconstruct": 5.853608, "l_sparsity": 262.799042, "l0": 470.45, "l0_std": 16.55, "fvu": 0.017765, "mse": 5.755166, "dead_features_pct": 0.39, "median_feat_freq": 0.459473}
+{"step": 200, "loss": 4.4578, "l_reconstruct": 2.394887, "l_sparsity": 206.291275, "l0": 461.21, "l0_std": 17.57, "fvu": 0.007275, "mse": 2.370092, "dead_features_pct": 0.59, "median_feat_freq": 0.450928}
+{"step": 300, "loss": 3.17349, "l_reconstruct": 1.446804, "l_sparsity": 172.668594, "l0": 455.27, "l0_std": 18.21, "fvu": 0.004458, "mse": 1.436932, "dead_features_pct": 0.59, "median_feat_freq": 0.449463}
+{"step": 400, "loss": 2.551619, "l_reconstruct": 1.025286, "l_sparsity": 152.633286, "l0": 452.63, "l0_std": 19.13, "fvu": 0.003179, "mse": 1.019471, "dead_features_pct": 0.88, "median_feat_freq": 0.454102}
+{"step": 500, "loss": 2.233826, "l_reconstruct": 0.819468, "l_sparsity": 141.435837, "l0": 450.91, "l0_std": 20.09, "fvu": 0.002464, "mse": 0.815702, "dead_features_pct": 1.66, "median_feat_freq": 0.45752}
+{"step": 600, "loss": 1.997621, "l_reconstruct": 0.682756, "l_sparsity": 131.486557, "l0": 448.3, "l0_std": 21.09, "fvu": 0.002044, "mse": 0.678607, "dead_features_pct": 2.25, "median_feat_freq": 0.458984}
+{"step": 700, "loss": 1.823786, "l_reconstruct": 0.590877, "l_sparsity": 123.290909, "l0": 446.07, "l0_std": 21.46, "fvu": 0.001782, "mse": 0.587532, "dead_features_pct": 2.73, "median_feat_freq": 0.459961}
+{"step": 800, "loss": 1.693233, "l_reconstruct": 0.527561, "l_sparsity": 116.567261, "l0": 443.46, "l0_std": 21.78, "fvu": 0.001616, "mse": 0.528114, "dead_features_pct": 2.25, "median_feat_freq": 0.462646}
+{"step": 900, "loss": 1.581333, "l_reconstruct": 0.473599, "l_sparsity": 110.773399, "l0": 441.32, "l0_std": 22.36, "fvu": 0.001443, "mse": 0.471326, "dead_features_pct": 2.44, "median_feat_freq": 0.455566}
+{"step": 1000, "loss": 1.523302, "l_reconstruct": 0.456697, "l_sparsity": 106.6605, "l0": 438.44, "l0_std": 22.98, "fvu": 0.001436, "mse": 0.464445, "dead_features_pct": 2.93, "median_feat_freq": 0.457275}
+{"step": 1100, "loss": 1.474112, "l_reconstruct": 0.43716, "l_sparsity": 103.695206, "l0": 436.79, "l0_std": 22.43, "fvu": 0.001349, "mse": 0.435466, "dead_features_pct": 2.64, "median_feat_freq": 0.449951}
