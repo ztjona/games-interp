@@ -1,4 +1,3 @@
-*.jsonl
 .claude/
 SELF-IMPROVEMENT.md
 # Python
@@ -19,10 +18,11 @@ env/
 *.pt
 *.pth
 *.ckpt
+# Note: *.jsonl are intentionally NOT ignored — they are small metrics files tracked in git.
 
 # Logs
 logs/
-
+# Note: *.jsonl (SAE metrics) are tracked by git for multi-device result sharing.
 # IDE
 .vscode/
 .idea/

@@ -358,6 +358,29 @@ python sae_eval.py compare arnold_beta-jumprelu-t64-exp8-fc1 arnold_beta-topk-k1
 
 The notebook `notebooks/sae_feature_analysis.ipynb` loads these caches directly — no re-encoding needed when switching models.
 
+#### Visualization data export (for boardSAE-atlas)
+
+The sibling [`boardSAE-atlas`](../boardSAE-atlas/) static site loads JSON bundles
+and ONNX-exported encoders from `boardSAE-atlas/public/{data,models}/<game>/`.
+Both files are produced by scripts in this repo:
+
+```bash
+# 1. JSON bundles (registry, BSP catalogue, feature pages, top-board galleries).
+#    Auto-picks the top-N SAEs by coverage on the chosen BSP set.
+python scripts/export_viz_data.py --game quarto
+
+# 2. ONNX encoders (game net + each shipped SAE).
+python scripts/export_onnx.py --game quarto
+```
+
+`export_onnx.py` refuses to ship a BatchTopK SAE whose `_threshold_estimate`
+buffer is all zeros — that should never happen for SAEs produced by
+`sae_train.py` (calibration is the last step of `train_sae()`), but if you
+hit it (training crashed between the SGD loop and the calibration call),
+either re-train or rerun with `--allow-uncalibrated`. ONNX export uses the
+legacy TorchScript backend (its deprecation warning is suppressed); revisit
+`dynamo=True` once it's the default in PyTorch 2.9.
+
 #### Advanced Training via Skills (For Custom Architectures)
 
 Training scripts live in the agent skill directories:

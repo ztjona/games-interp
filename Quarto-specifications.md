@@ -151,6 +151,60 @@ python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
 
 *Note: Animal names are chosen by user when creating BSP sets.*
 
+## New Machine Bootstrap
+
+To regenerate all datasets from scratch on a new machine (when `.pt` files are not available via network share or cloud sync):
+
+**Prerequisites — transfer these two files (~600 KB total, easily emailed or USB):**
+- `models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt` — **trained** Aa_replay model (C/D/F campaigns)
+- `models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt` — **epoch-0 random weights** (G-series random controls only)
+
+**Full regeneration sequence (~45–90 min on a GPU):**
+```bash
+MODEL=models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt
+RANDOM_MODEL=models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt
+
+# 1. Generate raw positions (all 4 opponent modes; ~20 min)
+for mode in random_v_random model_v_random random_v_model model_v_model; do
+    python scripts/generate_positions.py --game quarto --opponents $mode \
+        --model $MODEL --num-games 10000 --seed 42
+done
+
+# 2. Deduplicate AFTER aggregating (not before)
+python scripts/deduplicate_positions.py \
+    data/quarto/positions-random_v_random_raw.pt \
+    data/quarto/positions-model_v_random-Aa_replay_raw.pt \
+    data/quarto/positions-random_v_model-Aa_replay_raw.pt \
+    data/quarto/positions-model_v_model-Aa_replay_raw.pt \
+    --output data/quarto/positions-amalgam_unique.pt
+
+# 3a. Collect conv2 activations — trained model (~10 min)
+python scripts/collect_activations.py $MODEL --hook conv2 --game quarto \
+    --positions-file data/quarto/positions-amalgam_unique.pt \
+    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda
+
+# 3b. Collect conv2 activations — random-weight model (G-series controls)
+python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
+    --positions-file data/quarto/positions-amalgam_unique.pt \
+    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda
+
+# 4. Compute BSP labels (position-level; shared across all hooks)
+python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
+    --game quarto --name gorilla
+python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
+    --game quarto --name hawk_173
+
+# 5. Verify everything is in place
+python validate_sweep.py
+```
+
+**Notes:**
+- Steps 3a/3b can run in parallel on different GPUs.
+- BSP label files are position-level (not hook-specific), so Step 4 only needs to run once regardless of how many activation hooks you collect.
+- If you only need C/D/F campaigns (no G-series), skip Step 3b.
+
+---
+
 ## Data Collection
 
 **Opponent modes:**

@@ -54,6 +54,12 @@ Live training monitor (Dash, port 8050):
 python scripts/plot_training.py 'saes/quarto/*_metrics.jsonl' --live
 ```
 
+Visualization data export (for the sibling `boardSAE-atlas/` static site):
+```bash
+python scripts/export_viz_data.py --game quarto                  # JSON bundles → public/data/quarto/
+python scripts/export_onnx.py --game quarto                      # ONNX encoders → public/models/quarto/
+```
+
 Linear-probe baseline (upper bound for any SAE on the same activations):
 ```bash
 python scripts/linear_probe_baseline.py \
@@ -62,12 +68,39 @@ python scripts/linear_probe_baseline.py \
     data/quarto/bsp_schema-gorilla_164.json
 ```
 
-Data pipeline (rarely needed — datasets already exist on disk):
+Data pipeline (rarely needed — datasets already exist on disk).
+Models: trained=`20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt`, random=`20260226_1420-…_E_0000.pt` (both in `models/quarto/`).
 ```bash
-python scripts/collect_activations.py <model.pt> --hook fc1 --game quarto --opponents random_v_random ...
-python scripts/deduplicate_positions.py <raw1.pt> <raw2.pt> ... --output positions-amalgam_unique.pt
-python scripts/collect_activations.py <model.pt> --hook fc1 --game quarto --positions-file <positions.pt>
-python scripts/compute_bsp_labels.py <positions.pt> --game quarto --name gorilla
+# Step 1 — Generate raw positions (once; reused for all activation hooks)
+MODEL=models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt
+for mode in random_v_random model_v_random random_v_model model_v_model; do
+    python scripts/generate_positions.py --game quarto --opponents $mode --model $MODEL --num-games 10000 --seed 42
+done
+
+# Step 2 — Deduplicate AFTER aggregating all four raw files
+python scripts/deduplicate_positions.py \
+    data/quarto/positions-random_v_random_raw.pt \
+    data/quarto/positions-model_v_random-Aa_replay_raw.pt \
+    data/quarto/positions-random_v_model-Aa_replay_raw.pt \
+    data/quarto/positions-model_v_model-Aa_replay_raw.pt \
+    --output data/quarto/positions-amalgam_unique.pt
+
+# Step 3 — Collect activations for primary hook (trained model)
+python scripts/collect_activations.py $MODEL --hook conv2 --game quarto \
+    --positions-file data/quarto/positions-amalgam_unique.pt \
+    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda
+
+# Step 3b — Collect activations for random-model controls (G-series)
+RANDOM_MODEL=models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt
+python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
+    --positions-file data/quarto/positions-amalgam_unique.pt \
+    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda
+
+# Step 4 — Compute BSP labels (position-level; same file serves all hooks)
+python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
+    --game quarto --name gorilla
+python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
+    --game quarto --name hawk_173
 ```
 
 ## Architecture
@@ -126,6 +159,7 @@ These naming rules are project-specific and are required for files to flow throu
 ## Things that have bitten this project before
 
 - **BatchTopK eval mode**: must run in **train mode** (batch-level sparsity). Inference mode uses calibrated thresholds and collapses L0 at eval time. `sae_eval.py` handles this — preserve that behavior if you touch evaluation.
+- **BatchTopK `_thresholds_calibrated` does not survive save/load**. The flag is a plain Python attribute, not a registered buffer, so it is *not* in `state_dict()` and resets to `False` on every `load_checkpoint()`. To detect whether a loaded BatchTopK was calibrated, check the buffer instead: `torch.any(sae._threshold_estimate != 0)`. The buffer *is* persisted, and `train_sae()` calibrates it as the last step of training, so any SAE produced via the normal pipeline is fine. `export_onnx.py` uses the buffer-based check.
 - **Decoder normalization**: `normalize_decoder()` must run after every optimizer step; without it, the L1 penalty trivially shrinks `h` instead of producing sparsity.
 - **`offered_piece` BSPs** sit at the trivial-baseline F1 ≈ 0.667 (P=0.5, R=1.0). Any run reporting that exact number found *no* discriminative features, not real signal. Keep it in per-category breakdowns for transparency, but **exclude it from headline / threat-focused rankings** (deprioritized 2026-04-27).
 - **No new broad unsupervised arch sweeps on fc1** (deprioritized 2026-04-27; scope narrowed 2026-04-29). Anakin's σ=0.004 settles this *for fc1*: within the well-tuned fc1 middle ground, additional variants yield <0.01 coverage gains. This does NOT apply to conv2: batchtopk, vanilla, and p-annealing have never been run on conv2; SAE/LP efficiency on conv2 is only 42% vs 84% on fc1; and the fc1 winner (BatchTopK-k16) has never been tested on conv2. A full architecture sweep on conv2 is justified (Campaigns C–G, launched 2026-04-29). New fc1 sweeps should focus on Guided/anchored/E2E variants.
