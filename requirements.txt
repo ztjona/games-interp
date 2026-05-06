@@ -1,9 +1,19 @@
-dash==4.0.0
+# Core dependencies
 docopt==0.6.2
-numpy==2.4.2
-plotly==6.3.0
-pytest==8.4.2
-PyYAML==6.0.3
-quartopy==0.1.0
-torch==2.8.0
-tqdm==4.67.1
+numpy>=1.24
+PyYAML>=6.0
+scikit-learn>=1.3
+torch>=2.0           # GPU: install from https://pytorch.org with matching CUDA version
+tqdm>=4.64
+
+# Game library (local editable install — NOT on PyPI)
+# On a new machine: pip install -e /path/to/Quartopy
+# quartopy==0.1.0  # kept for reference; install manually
+
+# Visualization / export (optional)
+dash>=2.0
+plotly>=5.0
+onnxruntime>=1.17    # only needed for export_onnx.py parity check
+
+# Development
+pytest>=7.0

@@ -14,15 +14,19 @@ venv/
 .venv/
 env/
 
-# PyTorch checkpoints (large files — track with Git LFS or exclude)
-*.pt
-*.pth
+# PyTorch large data files (regeneratable or too large to track)
+data/**/*.pt
+data/**/*.pth
+models/**/*.pt
+models/**/*.pth
 *.ckpt
-# Note: *.jsonl are intentionally NOT ignored — they are small metrics files tracked in git.
+# SAE checkpoints (saes/**/*.pt) are also large and NOT tracked by default.
+# Force-add only the key ones: git add -f saes/quarto/<run_id>.pt
+# Metrics (*.jsonl) and registry JSONs ARE tracked (small, useful for cross-device sync).
+saes/**/*.pt
 
 # Logs
 logs/
-# Note: *.jsonl (SAE metrics) are tracked by git for multi-device result sharing.
 # IDE
 .vscode/
 .idea/

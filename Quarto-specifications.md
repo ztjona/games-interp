@@ -155,6 +155,8 @@ python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
 
 To regenerate all datasets from scratch on a new machine (when `.pt` files are not available via network share or cloud sync):
 
+SAE checkpoints are tracked in git. Only the large dataset files (activation tensors, BSP labels) and game model weights must be transferred or regenerated.
+
 **Prerequisites — transfer these two files (~600 KB total, easily emailed or USB):**
 - `models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt` — **trained** Aa_replay model (C/D/F campaigns)
 - `models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt` — **epoch-0 random weights** (G-series random controls only)
@@ -179,14 +181,15 @@ python scripts/deduplicate_positions.py \
     --output data/quarto/positions-amalgam_unique.pt
 
 # 3a. Collect conv2 activations — trained model (~10 min)
+# --flatten-position: (B,C,H,W) -> (B, C*H*W); required for conv hooks so SAE sees 2D data
 python scripts/collect_activations.py $MODEL --hook conv2 --game quarto \
     --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda
+    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda --flatten-position
 
 # 3b. Collect conv2 activations — random-weight model (G-series controls)
 python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
     --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda
+    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda --flatten-position
 
 # 4. Compute BSP labels (position-level; shared across all hooks)
 python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \

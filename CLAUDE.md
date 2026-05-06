@@ -70,6 +70,8 @@ python scripts/linear_probe_baseline.py \
 
 Data pipeline (rarely needed — datasets already exist on disk).
 Models: trained=`20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt`, random=`20260226_1420-…_E_0000.pt` (both in `models/quarto/`).
+All four raw files were generated with `--seed 42` on 2026-03-27 — the exact seed is stored
+in the provenance dict inside each `.pt` file so it can always be verified.
 ```bash
 # Step 1 — Generate raw positions (once; reused for all activation hooks)
 MODEL=models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt
@@ -77,7 +79,8 @@ for mode in random_v_random model_v_random random_v_model model_v_model; do
     python scripts/generate_positions.py --game quarto --opponents $mode --model $MODEL --num-games 10000 --seed 42
 done
 
-# Step 2 — Deduplicate AFTER aggregating all four raw files
+# Step 2 — Aggregate all four raw files, then deduplicate across them (NOT per-file!)
+# This is both the aggregation and deduplication step in one command.
 python scripts/deduplicate_positions.py \
     data/quarto/positions-random_v_random_raw.pt \
     data/quarto/positions-model_v_random-Aa_replay_raw.pt \
@@ -86,15 +89,16 @@ python scripts/deduplicate_positions.py \
     --output data/quarto/positions-amalgam_unique.pt
 
 # Step 3 — Collect activations for primary hook (trained model)
+# Use --flatten-position for conv layers (B,C,H,W) -> (B, C*H*W); not needed for fc1
 python scripts/collect_activations.py $MODEL --hook conv2 --game quarto \
     --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda
+    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda --flatten-position
 
 # Step 3b — Collect activations for random-model controls (G-series)
 RANDOM_MODEL=models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt
 python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
     --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda
+    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda --flatten-position
 
 # Step 4 — Compute BSP labels (position-level; same file serves all hooks)
 python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
@@ -134,7 +138,7 @@ Single source of truth for: model loading (`QuartoCNN.from_file`), the four oppo
 - `data/<game>/bsp_schema-<animal>_<count>.json` — BSP definitions
 - `saes/<game>/{run_id}.pt` + `{run_id}_metrics.jsonl` + `training_registry.json` + `eval_registry.json`
 - `eval_registry.json` keys use the format `run_id:bsp_set` (e.g. `A01-random-control-s42-batchtopk-k16-exp8-fc1:gorilla`) so the same checkpoint can be evaluated against multiple BSP sets without collision. Legacy entries with plain `run_id` keys are still read correctly.
-- `*.pt` and `logs/` are gitignored
+- `saes/*.pt` checkpoints are gitignored by default; force-add key ones with `git add -f`. `*.jsonl` metrics and `*_registry.json` files are tracked.
 
 ### Quarto model — hookable layers
 
