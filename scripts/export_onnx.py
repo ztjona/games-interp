@@ -66,6 +66,15 @@ from lib.sae.architectures import (  # noqa: E402
     JumpReLUSAE,
 )
 
+# Suppress torch.onnx legacy-exporter deprecation noise (we keep the legacy
+# TorchScript path because dynamo-export occasionally drops parity on custom
+# modules; revisit when PyTorch 2.9 makes the switch mandatory).
+import warnings  # noqa: E402
+
+warnings.filterwarnings(
+    "ignore", category=DeprecationWarning, module="torch.onnx"
+)
+
 log = logging.getLogger("export_onnx")
 
 
@@ -178,9 +187,17 @@ def _prepare_sae_for_export(sae: BaseSAE) -> None:
 
 
 def _is_batchtopk_uncalibrated(sae: BaseSAE) -> bool:
-    return isinstance(sae, BatchTopKSAE) and not getattr(
-        sae, "_thresholds_calibrated", False
-    )
+    """True if the SAE is BatchTopK and `_threshold_estimate` is still zeros.
+
+    The `_thresholds_calibrated` flag on the module is a plain Python attribute
+    (not a buffer), so it does not survive save_checkpoint/load_checkpoint and
+    can't be used as the source of truth here. The buffer `_threshold_estimate`
+    *is* persisted, and its `__init__` default is all-zeros — so a freshly
+    initialized BatchTopK and a calibrated one are distinguishable by content.
+    """
+    if not isinstance(sae, BatchTopKSAE):
+        return False
+    return not bool(torch.any(sae._threshold_estimate != 0).item())
 
 
 # ---------------------------------------------------------------------------
@@ -350,14 +367,14 @@ def main():
                 )
             else:
                 log.error(
-                    "  Refusing to ship %s — BatchTopK thresholds NOT calibrated.",
+                    "  Refusing to ship %s — BatchTopK `_threshold_estimate` is "
+                    "all zeros.",
                     sae_name,
                 )
                 log.error(
-                    "  Calibrate first:  python scripts/calibrate_batchtopk.py "
-                    "saes/%s/%s.pt",
-                    game,
-                    sae_name,
+                    "  Normal training (sae_train.py) calibrates at the end of "
+                    "the loop, so this likely means training crashed between "
+                    "the SGD loop and the calibration step. Re-train the SAE."
                 )
                 log.error("  Or rerun with --allow-uncalibrated to ship anyway.")
                 sys.exit(2)
