@@ -1,6 +1,8 @@
 # BSP Schema Summary — Quarto
 
-**Source:** `scripts/games/quarto.py` → `get_all_bsp_definitions()` (337 total BSPs)
+**Source:** `scripts/games/quarto.py` → `get_all_bsp_definitions()` returns 337 BSPs as a *menu* (the union of all defined sets), not a usable evaluation target.
+
+> **Use one BSP set at a time.** Gorilla (164) and Hawk (173) are **alternative bases** for the same threat concepts — see "Gorilla ↔ Hawk Correspondence" below. Evaluating an SAE against the 337-union conflates raw and reframed signals and produces a meaningless coverage number. Always run `compute_bsp_labels.py --name gorilla` and `--name hawk` separately; `BSP_SETS` in `quarto.py` makes this resolution automatic. The two named sets canonical files on disk are `bsp_labels-gorilla_164.pt` and `bsp_labels-hawk_173.pt`. A `*_337.pt` file is a sign the filter step was skipped.
 
 ## Gorilla Set (164 BSPs) — Raw Game Properties
 

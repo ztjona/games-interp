@@ -190,6 +190,93 @@ def check_project_files():
     check("saes/quarto/ writable", True)
 
 
+# ── 3b. Data scale (catch smoke-test-sized files) ────────────────────────
+
+
+MIN_AMALGAM_POSITIONS = 100_000
+
+
+def check_data_scale():
+    """Catch the failure mode where an upstream step ran with --num-games 1
+    (or similar) and produced a 16-row positions file that propagated through
+    activation collection and BSP labelling. Past incident: 2026-05-07,
+    Deep Brain bootstrap. See CLAUDE.md "Things that have bitten".
+    """
+    section("3b. Data Scale")
+
+    import torch
+
+    positions_path = _PROJECT_ROOT / "data" / "quarto" / "positions-amalgam_unique.pt"
+    if not positions_path.exists():
+        check(
+            "positions-amalgam_unique.pt",
+            False,
+            "MISSING — run generate_positions.py + deduplicate_positions.py first",
+        )
+        return
+
+    try:
+        pos = torch.load(positions_path, map_location="cpu", weights_only=False)
+    except Exception as e:
+        check("Load positions-amalgam_unique.pt", False, str(e))
+        return
+
+    n_positions = len(pos.get("metadata", []))
+    provenance = pos.get("provenance", {}) or {}
+    # Amalgam files keep per-source num_games under source_provenances; raw
+    # files keep it at the top level. Try both.
+    sources = provenance.get("source_provenances") or []
+    if sources:
+        num_games_str = ", ".join(
+            f"{s.get('opponents', '?')}:{s.get('num_games', '?')}" for s in sources
+        )
+    else:
+        num_games_str = str(provenance.get("num_games", "unknown"))
+
+    check(
+        f"Amalgam positions >= {MIN_AMALGAM_POSITIONS:,}",
+        n_positions >= MIN_AMALGAM_POSITIONS,
+        f"got {n_positions:,} rows (num_games per source: {num_games_str}). "
+        + (
+            "A small count typically means an upstream step ran with --num-games 1; "
+            "1 Quarto game ≈ 16 positions. Re-run generate_positions.py with "
+            "--num-games 10000 across all 4 opponent modes."
+            if n_positions < MIN_AMALGAM_POSITIONS
+            else "OK"
+        ),
+    )
+
+    # Cross-check downstream tensors line up with positions count. If they
+    # don't, the pipeline was run partially against a stale positions file.
+    downstream = [
+        ("data/quarto/fc1_amalgam_activations.pt", "fc1 activations"),
+        ("data/quarto/fc1_amalgam_random_activations.pt", "fc1 random activations"),
+        ("data/quarto/conv2_512_amalgam_activations.pt", "conv2 activations"),
+        (
+            "data/quarto/conv2_512_amalgam_random_activations.pt",
+            "conv2 random activations",
+        ),
+        ("data/quarto/bsp_labels-gorilla_164.pt", "gorilla labels"),
+        ("data/quarto/bsp_labels-hawk_173.pt", "hawk labels"),
+    ]
+    for rel, desc in downstream:
+        p = _PROJECT_ROOT / rel
+        if not p.exists():
+            continue
+        try:
+            t = torch.load(p, map_location="cpu", weights_only=False)
+            n = t.shape[0] if hasattr(t, "shape") else len(t)
+        except Exception as e:
+            check(f"  {desc} row count", False, str(e), critical=False)
+            continue
+        check(
+            f"  {desc} rows == positions ({n:,})",
+            n == n_positions,
+            "" if n == n_positions else f"mismatch: {n:,} vs positions {n_positions:,}",
+            critical=False,
+        )
+
+
 # ── 4. SAE library integrity ─────────────────────────────────────────────
 
 
@@ -204,18 +291,36 @@ def check_sae_library(device: str):
         ", ".join(ARCHITECTURES.keys()),
     )
 
-    # Load a small slice of data to test
-    data_path = "data/quarto/fc1_amalgam_activations.pt"
+    # Load a small slice of data to test — prefer conv2, fall back to fc1
+    candidates = [
+        ("data/quarto/conv2_512_amalgam_activations.pt", "conv2"),
+        ("data/quarto/fc1_amalgam_activations.pt", "fc1"),
+    ]
+    data_path = None
+    for path, label in candidates:
+        p = _PROJECT_ROOT / path
+        if p.exists() and p.stat().st_size > 1024:  # >1 KB means not empty
+            data_path = path
+            break
+
+    if data_path is None:
+        check(
+            "Load activations for smoke test",
+            False,
+            "No activation file found — run collect_activations.py first",
+        )
+        return
+
     try:
         data = load_activation_data(data_path, device)
         check(
-            f"Load fc1 activations",
+            f"Load activations ({data_path})",
             True,
             f"shape={tuple(data.shape)}, device={data.device}",
         )
         d_input = data.shape[-1]
     except Exception as e:
-        check("Load fc1 activations", False, str(e))
+        check("Load activations", False, str(e))
         return
 
     # Test each architecture can instantiate + forward pass
@@ -509,6 +614,7 @@ def main():
     check_packages()
     device = check_gpu(device_arg)
     check_project_files()
+    check_data_scale()
     check_sae_library(device)
     valid_configs = check_configs(config_dir)
 

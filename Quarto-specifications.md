@@ -163,8 +163,8 @@ SAE checkpoints are tracked in git. Only the large dataset files (activation ten
 
 **Full regeneration sequence (~45–90 min on a GPU):**
 ```bash
-MODEL=models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt
-RANDOM_MODEL=models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt
+MODEL="models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt"
+RANDOM_MODEL="models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt"
 
 # 1. Generate raw positions (all 4 opponent modes; ~20 min)
 for mode in random_v_random model_v_random random_v_model model_v_model; do

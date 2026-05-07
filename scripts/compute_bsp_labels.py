@@ -17,10 +17,15 @@ Arguments:
 Options:
     -h --help                      Show this help message
     --game <name>                  Game name: quarto, othello, tictactoe
-    --name <str>                   BSP set name (e.g., 'gorilla', 'fox'). Auto-detected from --output if omitted.
+    --name <str>                   BSP set name (e.g., 'gorilla', 'hawk'). If the name matches an
+                                   entry in ``<game_module>.BSP_SETS`` and ``--only-categories`` is
+                                   not given, the corresponding category list is applied
+                                   automatically. Auto-detected from --output if omitted.
     --output <path>                Output .pt file for labels [default: auto]
     --schema-out <path>            Output JSON schema file [default: auto]
-    --only-categories <cats>       Comma-separated categories to include. If omitted, includes all BSPs.
+    --only-categories <cats>       Comma-separated categories to include. Overrides any
+                                   ``--name``-implied filter. If omitted and ``--name`` does not
+                                   resolve to a known set, ALL BSPs are included (not recommended).
     --exclude-categories <cats>    Comma-separated categories to exclude
     --list-categories              List available BSP categories and exit
 
@@ -113,10 +118,50 @@ def main():
         )
         return
 
-    # Parse category filters
+    # Resolve animal_name early so it can drive auto-filtering when --name
+    # matches a known set in game_mod.BSP_SETS.
+    animal_name = args["--name"]
+    if animal_name is None:
+        output_arg = args["--output"]
+        if output_arg and output_arg != "auto":
+            output_stem = Path(output_arg).stem
+            if output_stem.startswith("bsp_labels-"):
+                name_part = output_stem[len("bsp_labels-") :]
+                animal_name = name_part.rsplit("_", 1)[0]
+    if animal_name:
+        animal_name = animal_name.strip().lower()
+
+    bsp_sets = getattr(game_mod, "BSP_SETS", {})
+
+    # Parse category filters. Precedence:
+    #   1. --only-categories (explicit) wins.
+    #   2. --name X with X in BSP_SETS auto-resolves to those categories.
+    #   3. Fallback to all BSPs (legacy), with a stderr warning — see
+    #      CLAUDE.md "Things that have bitten" for why this matters.
     include_cats = None
     if args["--only-categories"]:
         include_cats = [c.strip() for c in args["--only-categories"].split(",")]
+        if animal_name and animal_name in bsp_sets and set(include_cats) != set(bsp_sets[animal_name]):
+            print(
+                f"WARNING: --name '{animal_name}' implies categories {bsp_sets[animal_name]} "
+                f"but --only-categories {include_cats} was given. Using --only-categories.",
+                file=sys.stderr,
+            )
+    elif animal_name and animal_name in bsp_sets:
+        include_cats = list(bsp_sets[animal_name])
+        print(
+            f"--name '{animal_name}' resolved to {len(include_cats)} categories: {include_cats}",
+            file=sys.stderr,
+        )
+    else:
+        known = sorted(bsp_sets.keys())
+        print(
+            f"WARNING: no --only-categories given and --name {'(unset)' if not animal_name else f'{animal_name!r}'} "
+            f"does not match a known BSP set ({known}). Falling back to ALL BSPs "
+            f"({len(all_bsps)} total). This is almost never what you want — see "
+            f"BSP-schema-summary.md.",
+            file=sys.stderr,
+        )
 
     exclude_cats = None
     if args["--exclude-categories"]:
@@ -173,20 +218,8 @@ def main():
     for cat, count in sorted(category_summary.items()):
         print(f"  {cat}: {count}", file=sys.stderr)
 
-    # Get BSP set name from CLI args or auto-detect from output path
-    animal_name = args["--name"]
-
-    if animal_name is None:
-        # Try to extract from --output path (e.g., "bsp_labels-fox_87.pt" -> "fox")
-        output_arg = args["--output"]
-        if output_arg and output_arg != "auto":
-            output_stem = Path(output_arg).stem  # "bsp_labels-fox_87"
-            # Try to extract name between "bsp_labels-" and "_{count}"
-            if output_stem.startswith("bsp_labels-"):
-                name_part = output_stem[len("bsp_labels-") :]  # "fox_87"
-                # Remove "_{count}" suffix if present
-                animal_name = name_part.rsplit("_", 1)[0]  # "fox"
-
+    # animal_name was resolved above (before filtering); now finalize the
+    # combined bsp_set_name used for output filenames.
     if not animal_name:
         print(
             "ERROR: Must provide --name <str> or use --output with embedded name (e.g., bsp_labels-fox_87.pt)",
@@ -194,7 +227,6 @@ def main():
         )
         sys.exit(1)
 
-    animal_name = animal_name.strip().lower()
     bsp_set_name = f"{animal_name}_{len(selected_bsps)}"
     print(f"\nUsing BSP set name: {bsp_set_name}", file=sys.stderr)
 

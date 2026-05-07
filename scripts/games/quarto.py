@@ -377,8 +377,41 @@ BINARY_ATTRS = {
 }
 
 
+# Named BSP sets (animal → list of categories). Each set is intended to be
+# evaluated as a unit; the union (337) is a *menu*, not a usable set, because
+# gorilla and hawk are alternative bases for the same threat concepts (see
+# BSP-schema-summary.md: "Gorilla ↔ Hawk Correspondence"). Always evaluate
+# gorilla and hawk separately and report per-category.
+BSP_SETS: dict[str, list[str]] = {
+    "gorilla": [
+        "cell_occupancy",
+        "cell_attribute",
+        "threat_line",
+        "threat_square_2x2",
+        "offered_piece",
+        "game_phase",
+        "global",
+    ],
+    "hawk": [
+        "reframed_count",
+        "reframed_completable",
+        "reframed_any_threat",
+        "reframed_sq_count",
+        "reframed_sq_completable",
+        "reframed_sq_any_threat",
+        "reframed_global",
+    ],
+}
+
+
 def get_all_bsp_definitions() -> list[dict]:
-    """Return metadata for all available BSPs (337 total).
+    """Return metadata for all available BSPs (337 total — a *menu*, not a set).
+
+    The 337 returned BSPs are the union of two **alternative** sets that should
+    be evaluated separately (see ``BSP_SETS`` above and BSP-schema-summary.md).
+    Use ``compute_bsp_labels.py --name gorilla`` (or ``--name hawk``), which
+    resolves to the appropriate categories automatically.
+
 
     All BSPs are binary (1 or 0).
 
