@@ -52,7 +52,7 @@ from __future__ import annotations
 import json
 import logging
 import sys
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
@@ -60,6 +60,9 @@ import numpy as np
 import torch
 from docopt import docopt
 from tqdm import tqdm
+
+# Generated-at timestamps are stamped in Ecuador local time (UTC-05).
+ECT = timezone(timedelta(hours=-5), name="ECT")
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_DIR))
@@ -118,6 +121,40 @@ def _activations_path(game: str, hook: str) -> Path | None:
     """Best-effort: ``data/<game>/<hook>_amalgam_activations.pt``."""
     p = _data_dir(game) / f"{hook}_amalgam_activations.pt"
     return p if p.exists() else None
+
+
+def _models_dir(game: str) -> Path:
+    return PROJECT_DIR / "models" / game
+
+
+def _autopick_net(game: str) -> Path | None:
+    cands = sorted(
+        _models_dir(game).glob("*.pt"),
+        key=lambda p: p.stat().st_mtime,
+        reverse=True,
+    )
+    return cands[0] if cands else None
+
+
+def _count_net_params(game: str, device: str) -> int:
+    """Sum of ``p.numel()`` for the latest trained game net under ``models/<game>/``.
+
+    Returns 0 if no checkpoint is found or loading fails — the field is
+    cosmetic on the Overview page, not load-bearing for the rest of the bundle.
+    """
+    if game != "quarto":
+        return 0  # add other games when their loaders are wired in
+    path = _autopick_net(game)
+    if path is None:
+        log.warning("No net checkpoint found under %s — params=0.", _models_dir(game))
+        return 0
+    try:
+        from games.quarto import load_model  # type: ignore[import-not-found]
+        net = load_model(path, device=device)
+        return int(sum(p.numel() for p in net.parameters()))
+    except Exception as exc:  # pragma: no cover — best-effort
+        log.warning("Could not count params from %s (%s) — params=0.", path, exc)
+        return 0
 
 
 # ---------------------------------------------------------------------------
@@ -377,13 +414,21 @@ def _write_top_boards_file(
     h: torch.Tensor,
     boards: torch.Tensor,
     pieces: torch.Tensor,
+    matching: FeatureBSPMatching,
+    bsp_labels: torch.Tensor,
+    bsp_ids: list[str],
     top_k_boards: int,
 ) -> None:
-    """Per feature, dump top-K activating positions.
+    """Per feature, dump top-K activating + bottom-K non-firing positions.
+
+    For features with a non-zero best-aligned BSP, every emitted board carries
+    a ground-truth ``t`` flag (0/1) for that BSP, and a stratified bottom-K
+    sample of non-firing positions is included so the frontend can paint
+    TP/FP/TN/FN side-by-side.
 
     Handles both per-position SAEs (``h.shape[0] == len(positions)``) and
     per-cell SAEs (``h.shape[0] == 16 * len(positions)``) — for the latter we
-    record the source ``board_idx`` (cell info is not surfaced here).
+    aggregate to ``board_idx = sample // 16``.
     """
     n_positions = boards.shape[0]
     factor = h.shape[0] // n_positions if n_positions else 1
@@ -394,36 +439,116 @@ def _write_top_boards_file(
             max(factor, 1),
         )
 
-    per_feature: dict[str, list[dict]] = {}
+    per_feature: dict[str, dict] = {}
     d_dict = h.shape[1]
     k = min(top_k_boards, h.shape[0])
     if k == 0:
         out.write_text(json.dumps({"sae": sae_name, "per_feature": per_feature}))
         return
 
+    f1 = matching.f1  # (d_dict, num_bsps)
+    best_f1, best_bsp_idx = f1.max(dim=1)  # (d_dict,)
+    rng = np.random.default_rng(42)
+
     for i in range(d_dict):
         col = h[:, i]
         if (col > 0).sum() == 0:
             continue
+
+        feat_record: dict = {}
+        bsp_idx = int(best_bsp_idx[i].item())
+        f1_val = float(best_f1[i].item())
+        has_label = f1_val > 0
+        if has_label:
+            feat_record["bsp"] = bsp_ids[bsp_idx]
+            feat_record["f1"] = round(f1_val, 4)
+            label_vec = bsp_labels[:, bsp_idx]
+        else:
+            label_vec = None
+
+        # ── Top-K positives by activation ────────────────────────────
         vals, idx = torch.topk(col, k)
-        entries: list[dict] = []
-        seen_boards: set[int] = set()
+        top_entries: list[dict] = []
+        seen_top: set[int] = set()
         for v, j in zip(vals.tolist(), idx.tolist()):
             if v <= 0:
                 break
             board_idx = j // max(factor, 1)
-            if board_idx in seen_boards:
+            if board_idx in seen_top:
                 continue
-            seen_boards.add(board_idx)
-            entries.append(
-                {
-                    "b": _board_tensor_to_string(boards[board_idx]),
-                    "o": _piece_tensor_to_id(pieces[board_idx]),
-                    "a": round(float(v), 4),
+            seen_top.add(board_idx)
+            entry = {
+                "b": _board_tensor_to_string(boards[board_idx]),
+                "o": _piece_tensor_to_id(pieces[board_idx]),
+                "a": round(float(v), 4),
+            }
+            if label_vec is not None:
+                entry["t"] = int(label_vec[board_idx].item())
+            top_entries.append(entry)
+
+        feat_record["top"] = top_entries
+
+        # ── Bottom-K: positions where the feature DIDN'T fire, ──────
+        # ── stratified by label so we get FN + TN side-by-side. ─────
+        if has_label and label_vec is not None:
+            bottom_entries: list[dict] = []
+            non_fire_h_idx = torch.nonzero(col == 0, as_tuple=False).flatten()
+            if non_fire_h_idx.numel() > 0:
+                non_fire_boards = (
+                    np.unique(non_fire_h_idx.numpy() // max(factor, 1))
+                )
+                lbl_np = label_vec.numpy().astype(int)
+                pos_boards = non_fire_boards[lbl_np[non_fire_boards] == 1]
+                neg_boards = non_fire_boards[lbl_np[non_fire_boards] == 0]
+                target_pos = min(k // 2, len(pos_boards))
+                target_neg = min(k - target_pos, len(neg_boards))
+                # If positives are scarce, backfill the slack with negatives.
+                if target_pos < k // 2:
+                    target_neg = min(k - target_pos, len(neg_boards))
+                chosen_pos = (
+                    rng.choice(pos_boards, size=target_pos, replace=False)
+                    if target_pos > 0 else np.array([], dtype=int)
+                )
+                chosen_neg = (
+                    rng.choice(neg_boards, size=target_neg, replace=False)
+                    if target_neg > 0 else np.array([], dtype=int)
+                )
+                chosen = np.concatenate([chosen_pos, chosen_neg])
+                seen_bot: set[int] = set()
+                for board_idx in chosen.tolist():
+                    bi = int(board_idx)
+                    if bi in seen_bot:
+                        continue
+                    seen_bot.add(bi)
+                    bottom_entries.append({
+                        "b": _board_tensor_to_string(boards[bi]),
+                        "o": _piece_tensor_to_id(pieces[bi]),
+                        "a": 0.0,
+                        "t": int(label_vec[bi].item()),
+                    })
+            if bottom_entries:
+                feat_record["bottom"] = bottom_entries
+
+            # Activation histogram split by label — visualises the TP/FN
+            # vs TN/FP overlap of the feature's firing distribution.
+            h_np = col.numpy()
+            if factor == 16:
+                lbl_expanded = np.repeat(label_vec.numpy(), factor).astype(bool)
+            else:
+                lbl_expanded = label_vec.numpy().astype(bool)
+            h_max = float(h_np.max())
+            if h_max > 0 and lbl_expanded.shape[0] == h_np.shape[0]:
+                bins = 30
+                edges = np.linspace(0.0, h_max, bins + 1)
+                pos_counts, _ = np.histogram(h_np[lbl_expanded], bins=edges)
+                neg_counts, _ = np.histogram(h_np[~lbl_expanded], bins=edges)
+                feat_record["hist"] = {
+                    "edges": [round(float(e), 4) for e in edges.tolist()],
+                    "pos": [int(c) for c in pos_counts.tolist()],
+                    "neg": [int(c) for c in neg_counts.tolist()],
                 }
-            )
-        if entries:
-            per_feature[str(i)] = entries
+
+        per_feature[str(i)] = feat_record
 
     out.write_text(json.dumps({"sae": sae_name, "per_feature": per_feature}))
 
@@ -609,6 +734,8 @@ def main():
         if e["name"] in shipped:
             tiers.append({"tier": 2, "name": e["name"], "reason": "shipped"})
 
+    net_params = _count_net_params(game, device)
+
     (out_dir / "global_summary.json").write_text(
         json.dumps(
             {
@@ -618,11 +745,11 @@ def main():
                 "n_positions": int(n_positions),
                 "net_meta": {
                     "arch": "CNN (conv-conv-fc-fc)" if game == "quarto" else "?",
-                    "params": 0,
+                    "params": net_params,
                     "train_step": None,
                 },
                 "tiers": tiers,
-                "generated_at": datetime.now(timezone.utc).isoformat(),
+                "generated_at": datetime.now(ECT).isoformat(),
             }
         )
     )
@@ -713,6 +840,9 @@ def main():
             h,
             boards,
             pieces,
+            matching,
+            bsp_labels,
+            bsp_ids,
             int(args["--top-k-boards"]),
         )
 
