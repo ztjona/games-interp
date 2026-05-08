@@ -155,9 +155,9 @@ python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
 
 To regenerate all datasets from scratch on a new machine (when `.pt` files are not available via network share or cloud sync):
 
-SAE checkpoints are tracked in git. Only the large dataset files (activation tensors, BSP labels) and game model weights must be transferred or regenerated.
+SAE checkpoints and model weights are tracked in git (force-added with `git add -f`). Only the large dataset files (activation tensors, BSP labels) need regenerating — model weights are already in the repo.
 
-**Prerequisites — transfer these two files (~600 KB total, easily emailed or USB):**
+**Model weights**
 - `models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt` — **trained** Aa_replay model (C/D/F campaigns)
 - `models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt` — **epoch-0 random weights** (G-series random controls only)
 
@@ -191,20 +191,30 @@ python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
     --positions-file data/quarto/positions-amalgam_unique.pt \
     --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda --flatten-position
 
+# 3c. Collect fc1 activations — trained model (A-series; no --flatten-position for fc layers)
+python scripts/collect_activations.py $MODEL --hook fc1 --game quarto \
+    --positions-file data/quarto/positions-amalgam_unique.pt \
+    --output data/quarto/fc1_amalgam_activations.pt --device cuda
+
+# 3d. Collect fc1 activations — random-weight model (A01 random control)
+python scripts/collect_activations.py $RANDOM_MODEL --hook fc1 --game quarto \
+    --positions-file data/quarto/positions-amalgam_unique.pt \
+    --output data/quarto/fc1_amalgam_random_activations.pt --device cuda
+
 # 4. Compute BSP labels (position-level; shared across all hooks)
 python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
     --game quarto --name gorilla
 python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
-    --game quarto --name hawk_173
+    --game quarto --name hawk
 
 # 5. Verify everything is in place
 python validate_sweep.py
 ```
 
 **Notes:**
-- Steps 3a/3b can run in parallel on different GPUs.
+- Steps 3a/3b and 3c/3d can run in parallel on different GPUs.
 - BSP label files are position-level (not hook-specific), so Step 4 only needs to run once regardless of how many activation hooks you collect.
-- If you only need C/D/F campaigns (no G-series), skip Step 3b.
+- If you only need B–G campaigns (conv2 only, no A-series), skip Steps 3c/3d.
 
 ---
 

@@ -104,7 +104,7 @@ python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
 python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
     --game quarto --name gorilla
 python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
-    --game quarto --name hawk_173
+    --game quarto --name hawk
 ```
 
 ## Architecture
