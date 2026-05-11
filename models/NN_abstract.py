@@ -77,9 +77,10 @@ class NN_abstract(ABC, torch.nn.Module):
         assert x_board.shape[0] == 1, "Batch size of 1 is required for prediction"
         self.eval()
         with torch.no_grad():
-            # Move inputs to the same device as the model
-            x_board = x_board.to(self.device)
-            x_piece = x_piece.to(self.device)
+            # Move inputs to the same device as the model parameters
+            actual_device = next(self.parameters()).device
+            x_board = x_board.to(actual_device)
+            x_piece = x_piece.to(actual_device)
             qav_board, qav_piece = self.forward(x_board, x_piece)
 
             # Use tanh outputs directly for deterministic prediction
