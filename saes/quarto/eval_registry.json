@@ -3508,5 +3508,3446 @@
         }
       }
     }
+  },
+  "A01-random-control-s42-batchtopk-k16-exp8-fc1:gorilla": {
+    "timestamp": "2026-05-09T21:35:19.840917",
+    "run_id": "A01-random-control-s42-batchtopk-k16-exp8-fc1",
+    "checkpoint": "saes\\quarto\\A01-random-control-s42-batchtopk-k16-exp8-fc1.pt",
+    "architecture": "batchtopk",
+    "experiment": "A01-random-control-s42",
+    "game": "quarto",
+    "hook": "fc1",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 5.76,
+      "fvu": 0.359305,
+      "mse": 0.003022,
+      "dead_features_pct": 96.39,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2222,
+      "coverage_above_50": 0.0915,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0274,
+      "max_f1": 0.7242,
+      "median_f1": 0.3084,
+      "board_reconstruction": 0.8103,
+      "num_reconstructable_bsps": 99,
+      "fraction_reconstructable": 0.6037,
+      "mean_accuracy": 0.8103,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 34,
+        "fraction_features_used_by_best_matches": 0.0332,
+        "mean_bsps_per_used_feature": 4.8235,
+        "max_bsps_per_feature": 20,
+        "num_shared_features": 27,
+        "fraction_shared_features": 0.7941,
+        "num_bsps_with_unique_best_feature": 7,
+        "fraction_bsps_with_unique_best_feature": 0.0427,
+        "num_bsps_with_shared_best_feature": 157,
+        "fraction_bsps_with_shared_best_feature": 0.9573
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3316,
+          "min_f1": 0.2932,
+          "max_f1": 0.4061,
+          "median_f1": 0.3301
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.507,
+          "min_f1": 0.4801,
+          "max_f1": 0.5731,
+          "median_f1": 0.4959
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4636,
+          "min_f1": 0.0879,
+          "max_f1": 0.7242,
+          "median_f1": 0.5787
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5012,
+          "min_f1": 0.5012,
+          "max_f1": 0.5012,
+          "median_f1": 0.5012
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6674,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0338,
+          "min_f1": 0.0274,
+          "max_f1": 0.0443,
+          "median_f1": 0.0331
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0332,
+          "min_f1": 0.029,
+          "max_f1": 0.0414,
+          "median_f1": 0.0325
+        }
+      }
+    }
+  },
+  "B02-conv2-completion-s42-p-annealing-exp4-conv2:gorilla": {
+    "timestamp": "2026-05-09T21:37:49.802728",
+    "run_id": "B02-conv2-completion-s42-p-annealing-exp4-conv2",
+    "checkpoint": "saes\\quarto\\B02-conv2-completion-s42-p-annealing-exp4-conv2.pt",
+    "architecture": "p-annealing",
+    "experiment": "B02-conv2-completion-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 497.96,
+      "l0_std": 34.53,
+      "fvu": 0.00034,
+      "mse": 0.045522,
+      "dead_features_pct": 71.73,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2834,
+      "coverage_above_50": 0.1707,
+      "coverage_above_75": 0.0122,
+      "num_bsps": 164,
+      "min_f1": 0.0471,
+      "max_f1": 0.8177,
+      "median_f1": 0.3615,
+      "board_reconstruction": 0.8644,
+      "num_reconstructable_bsps": 149,
+      "fraction_reconstructable": 0.9085,
+      "mean_accuracy": 0.8644,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 24,
+        "fraction_features_used_by_best_matches": 0.0117,
+        "mean_bsps_per_used_feature": 6.8333,
+        "max_bsps_per_feature": 46,
+        "num_shared_features": 16,
+        "fraction_shared_features": 0.6667,
+        "num_bsps_with_unique_best_feature": 8,
+        "fraction_bsps_with_unique_best_feature": 0.0488,
+        "num_bsps_with_shared_best_feature": 156,
+        "fraction_bsps_with_shared_best_feature": 0.9512
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4143,
+          "min_f1": 0.3477,
+          "max_f1": 0.584,
+          "median_f1": 0.4057
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6165,
+          "min_f1": 0.5385,
+          "max_f1": 0.8129,
+          "median_f1": 0.5911
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.6461,
+          "min_f1": 0.4304,
+          "max_f1": 0.8177,
+          "median_f1": 0.6901
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5884,
+          "min_f1": 0.5884,
+          "max_f1": 0.5884,
+          "median_f1": 0.5884
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6697,
+          "min_f1": 0.6684,
+          "max_f1": 0.6726,
+          "median_f1": 0.6685
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0642,
+          "min_f1": 0.0471,
+          "max_f1": 0.0799,
+          "median_f1": 0.0655
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0646,
+          "min_f1": 0.0519,
+          "max_f1": 0.0815,
+          "median_f1": 0.0626
+        }
+      }
+    }
+  },
+  "C01-c2arch-s42-topk-k16-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T21:44:06.703188",
+    "run_id": "C01-c2arch-s42-topk-k16-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C01-c2arch-s42-topk-k16-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "C01-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 0.0,
+      "fvu": 0.025137,
+      "mse": 3.368225,
+      "dead_features_pct": 80.57,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3532,
+      "coverage_above_50": 0.3963,
+      "coverage_above_75": 0.0549,
+      "num_bsps": 164,
+      "min_f1": 0.0517,
+      "max_f1": 0.964,
+      "median_f1": 0.4749,
+      "board_reconstruction": 0.792,
+      "num_reconstructable_bsps": 94,
+      "fraction_reconstructable": 0.5732,
+      "mean_accuracy": 0.792,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 61,
+        "fraction_features_used_by_best_matches": 0.0149,
+        "mean_bsps_per_used_feature": 2.6885,
+        "max_bsps_per_feature": 14,
+        "num_shared_features": 32,
+        "fraction_shared_features": 0.5246,
+        "num_bsps_with_unique_best_feature": 29,
+        "fraction_bsps_with_unique_best_feature": 0.1768,
+        "num_bsps_with_shared_best_feature": 135,
+        "fraction_bsps_with_shared_best_feature": 0.8232
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5367,
+          "min_f1": 0.4467,
+          "max_f1": 0.643,
+          "median_f1": 0.5197
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.8023,
+          "min_f1": 0.6818,
+          "max_f1": 0.964,
+          "median_f1": 0.7455
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5573,
+          "min_f1": 0.3343,
+          "max_f1": 0.8042,
+          "median_f1": 0.5333
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.4943,
+          "min_f1": 0.4943,
+          "max_f1": 0.4943,
+          "median_f1": 0.4943
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6306,
+          "min_f1": 0.6259,
+          "max_f1": 0.6365,
+          "median_f1": 0.6264
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0758,
+          "min_f1": 0.0517,
+          "max_f1": 0.1176,
+          "median_f1": 0.0729
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.084,
+          "min_f1": 0.0625,
+          "max_f1": 0.1203,
+          "median_f1": 0.0785
+        }
+      }
+    }
+  },
+  "C04-c2arch-s42-batchtopk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T21:48:56.784029",
+    "run_id": "C04-c2arch-s42-batchtopk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C04-c2arch-s42-batchtopk-k32-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "C04-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 10.5,
+      "fvu": 0.01857,
+      "mse": 2.488311,
+      "dead_features_pct": 98.1,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3213,
+      "coverage_above_50": 0.2988,
+      "coverage_above_75": 0.0366,
+      "num_bsps": 164,
+      "min_f1": 0.0406,
+      "max_f1": 0.8588,
+      "median_f1": 0.4394,
+      "board_reconstruction": 0.8525,
+      "num_reconstructable_bsps": 136,
+      "fraction_reconstructable": 0.8293,
+      "mean_accuracy": 0.8525,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 46,
+        "fraction_features_used_by_best_matches": 0.0112,
+        "mean_bsps_per_used_feature": 3.5652,
+        "max_bsps_per_feature": 12,
+        "num_shared_features": 36,
+        "fraction_shared_features": 0.7826,
+        "num_bsps_with_unique_best_feature": 10,
+        "fraction_bsps_with_unique_best_feature": 0.061,
+        "num_bsps_with_shared_best_feature": 154,
+        "fraction_bsps_with_shared_best_feature": 0.939
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4927,
+          "min_f1": 0.4294,
+          "max_f1": 0.5511,
+          "median_f1": 0.4884
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7475,
+          "min_f1": 0.6689,
+          "max_f1": 0.8588,
+          "median_f1": 0.719
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5269,
+          "min_f1": 0.1427,
+          "max_f1": 0.7785,
+          "median_f1": 0.6595
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5792,
+          "min_f1": 0.5792,
+          "max_f1": 0.5792,
+          "median_f1": 0.5792
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0556,
+          "min_f1": 0.0406,
+          "max_f1": 0.0793,
+          "median_f1": 0.0538
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0595,
+          "min_f1": 0.0444,
+          "max_f1": 0.0837,
+          "median_f1": 0.0581
+        }
+      }
+    }
+  },
+  "C07-c2arch-s42-jumprelu-t32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T21:50:29.446571",
+    "run_id": "C07-c2arch-s42-jumprelu-t32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C07-c2arch-s42-jumprelu-t32-exp8-conv2.pt",
+    "architecture": "jumprelu",
+    "experiment": "C07-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 38.57,
+      "l0_std": 3.87,
+      "fvu": 0.025558,
+      "mse": 3.424713,
+      "dead_features_pct": 98.54,
+      "median_feat_freq": 0.0,
+      "coverage": 0.338,
+      "coverage_above_50": 0.3963,
+      "coverage_above_75": 0.061,
+      "num_bsps": 164,
+      "min_f1": 0.0386,
+      "max_f1": 0.969,
+      "median_f1": 0.337,
+      "board_reconstruction": 0.8575,
+      "num_reconstructable_bsps": 137,
+      "fraction_reconstructable": 0.8354,
+      "mean_accuracy": 0.8575,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 22,
+        "fraction_features_used_by_best_matches": 0.0054,
+        "mean_bsps_per_used_feature": 7.4545,
+        "max_bsps_per_feature": 16,
+        "num_shared_features": 18,
+        "fraction_shared_features": 0.8182,
+        "num_bsps_with_unique_best_feature": 4,
+        "fraction_bsps_with_unique_best_feature": 0.0244,
+        "num_bsps_with_shared_best_feature": 160,
+        "fraction_bsps_with_shared_best_feature": 0.9756
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5231,
+          "min_f1": 0.3253,
+          "max_f1": 0.6441,
+          "median_f1": 0.6001
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.8105,
+          "min_f1": 0.5606,
+          "max_f1": 0.969,
+          "median_f1": 0.9187
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5062,
+          "min_f1": 0.1381,
+          "max_f1": 0.7248,
+          "median_f1": 0.6555
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5642,
+          "min_f1": 0.5642,
+          "max_f1": 0.5642,
+          "median_f1": 0.5642
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0528,
+          "min_f1": 0.0394,
+          "max_f1": 0.1041,
+          "median_f1": 0.0471
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.059,
+          "min_f1": 0.0386,
+          "max_f1": 0.1462,
+          "median_f1": 0.052
+        }
+      }
+    }
+  },
+  "C12-c2arch-s42-vanilla-l1_0001-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T21:53:23.070386",
+    "run_id": "C12-c2arch-s42-vanilla-l1_0001-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C12-c2arch-s42-vanilla-l1_0001-exp8-conv2.pt",
+    "architecture": "vanilla",
+    "experiment": "C12-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 1868.64,
+      "l0_std": 20.32,
+      "fvu": 0.000725,
+      "mse": 0.097174,
+      "dead_features_pct": 53.56,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2326,
+      "coverage_above_50": 0.1402,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0268,
+      "max_f1": 0.7268,
+      "median_f1": 0.2934,
+      "board_reconstruction": 0.8166,
+      "num_reconstructable_bsps": 107,
+      "fraction_reconstructable": 0.6524,
+      "mean_accuracy": 0.8166,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 21,
+        "fraction_features_used_by_best_matches": 0.0051,
+        "mean_bsps_per_used_feature": 7.8095,
+        "max_bsps_per_feature": 29,
+        "num_shared_features": 17,
+        "fraction_shared_features": 0.8095,
+        "num_bsps_with_unique_best_feature": 4,
+        "fraction_bsps_with_unique_best_feature": 0.0244,
+        "num_bsps_with_shared_best_feature": 160,
+        "fraction_bsps_with_shared_best_feature": 0.9756
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3289,
+          "min_f1": 0.2913,
+          "max_f1": 0.473,
+          "median_f1": 0.3147
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5343,
+          "min_f1": 0.5026,
+          "max_f1": 0.608,
+          "median_f1": 0.5232
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4927,
+          "min_f1": 0.1287,
+          "max_f1": 0.7268,
+          "median_f1": 0.6227
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5381,
+          "min_f1": 0.5381,
+          "max_f1": 0.5381,
+          "median_f1": 0.5381
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6688,
+          "min_f1": 0.6681,
+          "max_f1": 0.6706,
+          "median_f1": 0.6682
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0478,
+          "min_f1": 0.0268,
+          "max_f1": 0.0824,
+          "median_f1": 0.0484
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0543,
+          "min_f1": 0.0284,
+          "max_f1": 0.1208,
+          "median_f1": 0.0511
+        }
+      }
+    }
+  },
+  "D01-c2exp16-s42-topk-k32-exp16-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:05:16.766612",
+    "run_id": "D01-c2exp16-s42-topk-k32-exp16-conv2",
+    "checkpoint": "saes\\quarto\\D01-c2exp16-s42-topk-k32-exp16-conv2.pt",
+    "architecture": "topk",
+    "experiment": "D01-c2exp16-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 0.0,
+      "fvu": 0.009798,
+      "mse": 1.312906,
+      "dead_features_pct": 94.03,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3046,
+      "coverage_above_50": 0.1402,
+      "coverage_above_75": 0.0122,
+      "num_bsps": 164,
+      "min_f1": 0.0672,
+      "max_f1": 0.7975,
+      "median_f1": 0.3683,
+      "board_reconstruction": 0.855,
+      "num_reconstructable_bsps": 138,
+      "fraction_reconstructable": 0.8415,
+      "mean_accuracy": 0.855,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 79,
+        "fraction_features_used_by_best_matches": 0.0096,
+        "mean_bsps_per_used_feature": 2.0759,
+        "max_bsps_per_feature": 12,
+        "num_shared_features": 31,
+        "fraction_shared_features": 0.3924,
+        "num_bsps_with_unique_best_feature": 48,
+        "fraction_bsps_with_unique_best_feature": 0.2927,
+        "num_bsps_with_shared_best_feature": 116,
+        "fraction_bsps_with_shared_best_feature": 0.7073
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4293,
+          "min_f1": 0.3598,
+          "max_f1": 0.4891,
+          "median_f1": 0.4332
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6512,
+          "min_f1": 0.5525,
+          "max_f1": 0.7839,
+          "median_f1": 0.6552
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5135,
+          "min_f1": 0.1666,
+          "max_f1": 0.7975,
+          "median_f1": 0.5765
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5074,
+          "min_f1": 0.5074,
+          "max_f1": 0.5074,
+          "median_f1": 0.5074
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6666,
+          "min_f1": 0.666,
+          "max_f1": 0.6674,
+          "median_f1": 0.6663
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0882,
+          "min_f1": 0.0672,
+          "max_f1": 0.1857,
+          "median_f1": 0.0799
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.1059,
+          "min_f1": 0.0751,
+          "max_f1": 0.1811,
+          "median_f1": 0.0966
+        }
+      }
+    }
+  },
+  "D04-c2exp16-s42-batchtopk-k64-exp16-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:13:58.128371",
+    "run_id": "D04-c2exp16-s42-batchtopk-k64-exp16-conv2",
+    "checkpoint": "saes\\quarto\\D04-c2exp16-s42-batchtopk-k64-exp16-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "D04-c2exp16-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 17.93,
+      "fvu": 0.006674,
+      "mse": 0.894321,
+      "dead_features_pct": 98.33,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3212,
+      "coverage_above_50": 0.311,
+      "coverage_above_75": 0.0305,
+      "num_bsps": 164,
+      "min_f1": 0.0406,
+      "max_f1": 0.7928,
+      "median_f1": 0.4479,
+      "board_reconstruction": 0.87,
+      "num_reconstructable_bsps": 156,
+      "fraction_reconstructable": 0.9512,
+      "mean_accuracy": 0.87,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 61,
+        "fraction_features_used_by_best_matches": 0.0074,
+        "mean_bsps_per_used_feature": 2.6885,
+        "max_bsps_per_feature": 11,
+        "num_shared_features": 41,
+        "fraction_shared_features": 0.6721,
+        "num_bsps_with_unique_best_feature": 20,
+        "fraction_bsps_with_unique_best_feature": 0.122,
+        "num_bsps_with_shared_best_feature": 144,
+        "fraction_bsps_with_shared_best_feature": 0.878
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4963,
+          "min_f1": 0.4085,
+          "max_f1": 0.5662,
+          "median_f1": 0.4964
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7097,
+          "min_f1": 0.6454,
+          "max_f1": 0.7916,
+          "median_f1": 0.699
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5566,
+          "min_f1": 0.134,
+          "max_f1": 0.7928,
+          "median_f1": 0.7429
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.6337,
+          "min_f1": 0.6337,
+          "max_f1": 0.6337,
+          "median_f1": 0.6337
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0573,
+          "min_f1": 0.0406,
+          "max_f1": 0.0776,
+          "median_f1": 0.0579
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0638,
+          "min_f1": 0.0455,
+          "max_f1": 0.0928,
+          "median_f1": 0.0634
+        }
+      }
+    }
+  },
+  "F03-c2seeds-s43-topk-k64-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:20:21.922207",
+    "run_id": "F03-c2seeds-s43-topk-k64-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F03-c2seeds-s43-topk-k64-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "F03-c2seeds-s43",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 0.0,
+      "fvu": 0.003644,
+      "mse": 0.488309,
+      "dead_features_pct": 92.82,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3311,
+      "coverage_above_50": 0.3415,
+      "coverage_above_75": 0.0183,
+      "num_bsps": 164,
+      "min_f1": 0.0563,
+      "max_f1": 0.8187,
+      "median_f1": 0.4554,
+      "board_reconstruction": 0.8426,
+      "num_reconstructable_bsps": 113,
+      "fraction_reconstructable": 0.689,
+      "mean_accuracy": 0.8426,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 94,
+        "fraction_features_used_by_best_matches": 0.0229,
+        "mean_bsps_per_used_feature": 1.7447,
+        "max_bsps_per_feature": 7,
+        "num_shared_features": 42,
+        "fraction_shared_features": 0.4468,
+        "num_bsps_with_unique_best_feature": 52,
+        "fraction_bsps_with_unique_best_feature": 0.3171,
+        "num_bsps_with_shared_best_feature": 112,
+        "fraction_bsps_with_shared_best_feature": 0.6829
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5029,
+          "min_f1": 0.4112,
+          "max_f1": 0.6116,
+          "median_f1": 0.5008
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6536,
+          "min_f1": 0.563,
+          "max_f1": 0.78,
+          "median_f1": 0.6184
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.6001,
+          "min_f1": 0.3049,
+          "max_f1": 0.8187,
+          "median_f1": 0.6766
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.6151,
+          "min_f1": 0.6151,
+          "max_f1": 0.6151,
+          "median_f1": 0.6151
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6655,
+          "min_f1": 0.6644,
+          "max_f1": 0.6667,
+          "median_f1": 0.6653
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0778,
+          "min_f1": 0.0563,
+          "max_f1": 0.1295,
+          "median_f1": 0.0744
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0965,
+          "min_f1": 0.066,
+          "max_f1": 0.1571,
+          "median_f1": 0.0915
+        }
+      }
+    }
+  },
+  "F06-c2seeds-s44-batchtopk-k16-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:24:19.865852",
+    "run_id": "F06-c2seeds-s44-batchtopk-k16-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F06-c2seeds-s44-batchtopk-k16-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "F06-c2seeds-s44",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 5.33,
+      "fvu": 0.037339,
+      "mse": 5.003314,
+      "dead_features_pct": 98.97,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3254,
+      "coverage_above_50": 0.378,
+      "coverage_above_75": 0.061,
+      "num_bsps": 164,
+      "min_f1": 0.0379,
+      "max_f1": 0.8816,
+      "median_f1": 0.448,
+      "board_reconstruction": 0.8635,
+      "num_reconstructable_bsps": 148,
+      "fraction_reconstructable": 0.9024,
+      "mean_accuracy": 0.8635,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 29,
+        "fraction_features_used_by_best_matches": 0.0071,
+        "mean_bsps_per_used_feature": 5.6552,
+        "max_bsps_per_feature": 12,
+        "num_shared_features": 29,
+        "fraction_shared_features": 1.0,
+        "num_bsps_with_unique_best_feature": 0,
+        "fraction_bsps_with_unique_best_feature": 0.0,
+        "num_bsps_with_shared_best_feature": 164,
+        "fraction_bsps_with_shared_best_feature": 1.0
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5025,
+          "min_f1": 0.4101,
+          "max_f1": 0.5675,
+          "median_f1": 0.5117
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7726,
+          "min_f1": 0.6886,
+          "max_f1": 0.8816,
+          "median_f1": 0.7643
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5063,
+          "min_f1": 0.1257,
+          "max_f1": 0.7244,
+          "median_f1": 0.6687
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5889,
+          "min_f1": 0.5889,
+          "max_f1": 0.5889,
+          "median_f1": 0.5889
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6668,
+          "min_f1": 0.6664,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0504,
+          "min_f1": 0.0379,
+          "max_f1": 0.0745,
+          "median_f1": 0.0469
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0571,
+          "min_f1": 0.0401,
+          "max_f1": 0.0906,
+          "median_f1": 0.0543
+        }
+      }
+    }
+  },
+  "F09-c2seeds-s43-batchtopk-k64-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:29:09.946126",
+    "run_id": "F09-c2seeds-s43-batchtopk-k64-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F09-c2seeds-s43-batchtopk-k64-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "F09-c2seeds-s43",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 19.52,
+      "fvu": 0.006067,
+      "mse": 0.813,
+      "dead_features_pct": 96.58,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3179,
+      "coverage_above_50": 0.3049,
+      "coverage_above_75": 0.0183,
+      "num_bsps": 164,
+      "min_f1": 0.0442,
+      "max_f1": 0.7816,
+      "median_f1": 0.4305,
+      "board_reconstruction": 0.861,
+      "num_reconstructable_bsps": 145,
+      "fraction_reconstructable": 0.8841,
+      "mean_accuracy": 0.861,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 70,
+        "fraction_features_used_by_best_matches": 0.0171,
+        "mean_bsps_per_used_feature": 2.3429,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 37,
+        "fraction_shared_features": 0.5286,
+        "num_bsps_with_unique_best_feature": 33,
+        "fraction_bsps_with_unique_best_feature": 0.2012,
+        "num_bsps_with_shared_best_feature": 131,
+        "fraction_bsps_with_shared_best_feature": 0.7988
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4913,
+          "min_f1": 0.4071,
+          "max_f1": 0.5804,
+          "median_f1": 0.4938
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6932,
+          "min_f1": 0.599,
+          "max_f1": 0.7816,
+          "median_f1": 0.6721
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5061,
+          "min_f1": 0.1193,
+          "max_f1": 0.7239,
+          "median_f1": 0.6751
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5751,
+          "min_f1": 0.5751,
+          "max_f1": 0.5751,
+          "median_f1": 0.5751
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6676,
+          "min_f1": 0.6665,
+          "max_f1": 0.6704,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0609,
+          "min_f1": 0.0442,
+          "max_f1": 0.0921,
+          "median_f1": 0.0589
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0666,
+          "min_f1": 0.0483,
+          "max_f1": 0.1011,
+          "median_f1": 0.0645
+        }
+      }
+    }
+  },
+  "G02-c2random-s42-batchtopk-k16-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:33:57.662202",
+    "run_id": "G02-c2random-s42-batchtopk-k16-exp8-conv2",
+    "checkpoint": "saes\\quarto\\G02-c2random-s42-batchtopk-k16-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "G02-c2random-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 6.51,
+      "fvu": 0.402122,
+      "mse": 0.077413,
+      "dead_features_pct": 98.41,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2299,
+      "coverage_above_50": 0.0854,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0312,
+      "max_f1": 0.7238,
+      "median_f1": 0.3038,
+      "board_reconstruction": 0.8328,
+      "num_reconstructable_bsps": 119,
+      "fraction_reconstructable": 0.7256,
+      "mean_accuracy": 0.8328,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 50,
+        "fraction_features_used_by_best_matches": 0.0122,
+        "mean_bsps_per_used_feature": 3.28,
+        "max_bsps_per_feature": 25,
+        "num_shared_features": 32,
+        "fraction_shared_features": 0.64,
+        "num_bsps_with_unique_best_feature": 18,
+        "fraction_bsps_with_unique_best_feature": 0.1098,
+        "num_bsps_with_shared_best_feature": 146,
+        "fraction_bsps_with_shared_best_feature": 0.8902
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3423,
+          "min_f1": 0.2865,
+          "max_f1": 0.442,
+          "median_f1": 0.3357
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5049,
+          "min_f1": 0.4767,
+          "max_f1": 0.5732,
+          "median_f1": 0.4922
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4668,
+          "min_f1": 0.0978,
+          "max_f1": 0.7238,
+          "median_f1": 0.5788
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5013,
+          "min_f1": 0.5013,
+          "max_f1": 0.5013,
+          "median_f1": 0.5013
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6674,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0413,
+          "min_f1": 0.0312,
+          "max_f1": 0.0512,
+          "median_f1": 0.0409
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0416,
+          "min_f1": 0.0362,
+          "max_f1": 0.0495,
+          "median_f1": 0.0412
+        }
+      }
+    }
+  },
+  "G05-c2random-s42-batchtopk-k64-exp16-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:42:38.499289",
+    "run_id": "G05-c2random-s42-batchtopk-k64-exp16-conv2",
+    "checkpoint": "saes\\quarto\\G05-c2random-s42-batchtopk-k64-exp16-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "G05-c2random-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 15.88,
+      "fvu": 0.037292,
+      "mse": 0.007179,
+      "dead_features_pct": 97.17,
+      "median_feat_freq": 0.0,
+      "coverage": 0.254,
+      "coverage_above_50": 0.1159,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0363,
+      "max_f1": 0.7262,
+      "median_f1": 0.3463,
+      "board_reconstruction": 0.8525,
+      "num_reconstructable_bsps": 136,
+      "fraction_reconstructable": 0.8293,
+      "mean_accuracy": 0.8525,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 86,
+        "fraction_features_used_by_best_matches": 0.0105,
+        "mean_bsps_per_used_feature": 1.907,
+        "max_bsps_per_feature": 10,
+        "num_shared_features": 35,
+        "fraction_shared_features": 0.407,
+        "num_bsps_with_unique_best_feature": 51,
+        "fraction_bsps_with_unique_best_feature": 0.311,
+        "num_bsps_with_shared_best_feature": 113,
+        "fraction_bsps_with_shared_best_feature": 0.689
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3927,
+          "min_f1": 0.3213,
+          "max_f1": 0.4766,
+          "median_f1": 0.3834
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5186,
+          "min_f1": 0.4799,
+          "max_f1": 0.6041,
+          "median_f1": 0.5086
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.469,
+          "min_f1": 0.0958,
+          "max_f1": 0.7262,
+          "median_f1": 0.5848
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5095,
+          "min_f1": 0.5095,
+          "max_f1": 0.5095,
+          "median_f1": 0.5095
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6665,
+          "min_f1": 0.6661,
+          "max_f1": 0.667,
+          "median_f1": 0.6662
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0478,
+          "min_f1": 0.0363,
+          "max_f1": 0.0649,
+          "median_f1": 0.0464
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0482,
+          "min_f1": 0.0398,
+          "max_f1": 0.0625,
+          "median_f1": 0.0469
+        }
+      }
+    }
+  },
+  "A02-random-control-s42-topk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:44:43.508152",
+    "run_id": "A02-random-control-s42-topk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\A02-random-control-s42-topk-k32-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "A02-random-control-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 0.0,
+      "fvu": 0.095888,
+      "mse": 0.01846,
+      "dead_features_pct": 86.16,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2244,
+      "coverage_above_50": 0.0854,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0606,
+      "max_f1": 0.7374,
+      "median_f1": 0.2754,
+      "board_reconstruction": 0.82,
+      "num_reconstructable_bsps": 110,
+      "fraction_reconstructable": 0.6707,
+      "mean_accuracy": 0.82,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 84,
+        "fraction_features_used_by_best_matches": 0.0205,
+        "mean_bsps_per_used_feature": 1.9524,
+        "max_bsps_per_feature": 43,
+        "num_shared_features": 19,
+        "fraction_shared_features": 0.2262,
+        "num_bsps_with_unique_best_feature": 65,
+        "fraction_bsps_with_unique_best_feature": 0.3963,
+        "num_bsps_with_shared_best_feature": 99,
+        "fraction_bsps_with_shared_best_feature": 0.6037
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.2967,
+          "min_f1": 0.2668,
+          "max_f1": 0.3659,
+          "median_f1": 0.2903
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5049,
+          "min_f1": 0.4767,
+          "max_f1": 0.5732,
+          "median_f1": 0.4922
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4589,
+          "min_f1": 0.0606,
+          "max_f1": 0.7374,
+          "median_f1": 0.5788
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5013,
+          "min_f1": 0.5013,
+          "max_f1": 0.5013,
+          "median_f1": 0.5013
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6674,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0686,
+          "min_f1": 0.0615,
+          "max_f1": 0.0772,
+          "median_f1": 0.0685
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.068,
+          "min_f1": 0.0614,
+          "max_f1": 0.0756,
+          "median_f1": 0.0672
+        }
+      }
+    }
+  },
+  "B03-conv2-completion-s42-topk-k64-exp2-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:47:48.342142",
+    "run_id": "B03-conv2-completion-s42-topk-k64-exp2-conv2",
+    "checkpoint": "saes\\quarto\\B03-conv2-completion-s42-topk-k64-exp2-conv2.pt",
+    "architecture": "topk",
+    "experiment": "B03-conv2-completion-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 0.0,
+      "fvu": 0.00673,
+      "mse": 0.90181,
+      "dead_features_pct": 84.28,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3125,
+      "coverage_above_50": 0.2561,
+      "coverage_above_75": 0.0244,
+      "num_bsps": 164,
+      "min_f1": 0.0478,
+      "max_f1": 0.9072,
+      "median_f1": 0.4282,
+      "board_reconstruction": 0.7563,
+      "num_reconstructable_bsps": 40,
+      "fraction_reconstructable": 0.2439,
+      "mean_accuracy": 0.7563,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 61,
+        "fraction_features_used_by_best_matches": 0.0596,
+        "mean_bsps_per_used_feature": 2.6885,
+        "max_bsps_per_feature": 9,
+        "num_shared_features": 38,
+        "fraction_shared_features": 0.623,
+        "num_bsps_with_unique_best_feature": 23,
+        "fraction_bsps_with_unique_best_feature": 0.1402,
+        "num_bsps_with_shared_best_feature": 141,
+        "fraction_bsps_with_shared_best_feature": 0.8598
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4783,
+          "min_f1": 0.4019,
+          "max_f1": 0.5658,
+          "median_f1": 0.4735
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6481,
+          "min_f1": 0.5846,
+          "max_f1": 0.7872,
+          "median_f1": 0.6289
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.6378,
+          "min_f1": 0.1865,
+          "max_f1": 0.9072,
+          "median_f1": 0.8196
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.6872,
+          "min_f1": 0.6872,
+          "max_f1": 0.6872,
+          "median_f1": 0.6872
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0619,
+          "min_f1": 0.0478,
+          "max_f1": 0.0821,
+          "median_f1": 0.0607
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.07,
+          "min_f1": 0.0548,
+          "max_f1": 0.0914,
+          "median_f1": 0.068
+        }
+      }
+    }
+  },
+  "C02-c2arch-s42-topk-k128-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:54:49.071784",
+    "run_id": "C02-c2arch-s42-topk-k128-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C02-c2arch-s42-topk-k128-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "C02-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 128.0,
+      "l0_std": 0.0,
+      "fvu": 0.001388,
+      "mse": 0.185946,
+      "dead_features_pct": 94.29,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3185,
+      "coverage_above_50": 0.311,
+      "coverage_above_75": 0.0244,
+      "num_bsps": 164,
+      "min_f1": 0.0514,
+      "max_f1": 0.8021,
+      "median_f1": 0.404,
+      "board_reconstruction": 0.8085,
+      "num_reconstructable_bsps": 99,
+      "fraction_reconstructable": 0.6037,
+      "mean_accuracy": 0.8085,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 67,
+        "fraction_features_used_by_best_matches": 0.0164,
+        "mean_bsps_per_used_feature": 2.4478,
+        "max_bsps_per_feature": 7,
+        "num_shared_features": 42,
+        "fraction_shared_features": 0.6269,
+        "num_bsps_with_unique_best_feature": 25,
+        "fraction_bsps_with_unique_best_feature": 0.1524,
+        "num_bsps_with_shared_best_feature": 139,
+        "fraction_bsps_with_shared_best_feature": 0.8476
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4917,
+          "min_f1": 0.3672,
+          "max_f1": 0.6206,
+          "median_f1": 0.4919
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6393,
+          "min_f1": 0.545,
+          "max_f1": 0.7745,
+          "median_f1": 0.601
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5507,
+          "min_f1": 0.2,
+          "max_f1": 0.8021,
+          "median_f1": 0.65
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5668,
+          "min_f1": 0.5668,
+          "max_f1": 0.5668,
+          "median_f1": 0.5668
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6673,
+          "min_f1": 0.6666,
+          "max_f1": 0.6689,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0714,
+          "min_f1": 0.0514,
+          "max_f1": 0.1058,
+          "median_f1": 0.0679
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0775,
+          "min_f1": 0.056,
+          "max_f1": 0.1041,
+          "median_f1": 0.0753
+        }
+      }
+    }
+  },
+  "C05-c2arch-s42-batchtopk-k64-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T22:59:39.912494",
+    "run_id": "C05-c2arch-s42-batchtopk-k64-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C05-c2arch-s42-batchtopk-k64-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "C05-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 17.44,
+      "fvu": 0.006679,
+      "mse": 0.894985,
+      "dead_features_pct": 96.73,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3212,
+      "coverage_above_50": 0.3659,
+      "coverage_above_75": 0.0366,
+      "num_bsps": 164,
+      "min_f1": 0.0428,
+      "max_f1": 0.8122,
+      "median_f1": 0.4255,
+      "board_reconstruction": 0.8525,
+      "num_reconstructable_bsps": 136,
+      "fraction_reconstructable": 0.8293,
+      "mean_accuracy": 0.8525,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 62,
+        "fraction_features_used_by_best_matches": 0.0151,
+        "mean_bsps_per_used_feature": 2.6452,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 41,
+        "fraction_shared_features": 0.6613,
+        "num_bsps_with_unique_best_feature": 21,
+        "fraction_bsps_with_unique_best_feature": 0.128,
+        "num_bsps_with_shared_best_feature": 143,
+        "fraction_bsps_with_shared_best_feature": 0.872
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4983,
+          "min_f1": 0.4011,
+          "max_f1": 0.5723,
+          "median_f1": 0.5051
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.708,
+          "min_f1": 0.6319,
+          "max_f1": 0.8122,
+          "median_f1": 0.6869
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5301,
+          "min_f1": 0.1564,
+          "max_f1": 0.7747,
+          "median_f1": 0.6592
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5694,
+          "min_f1": 0.5694,
+          "max_f1": 0.5694,
+          "median_f1": 0.5694
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0591,
+          "min_f1": 0.0428,
+          "max_f1": 0.0812,
+          "median_f1": 0.0585
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0627,
+          "min_f1": 0.0491,
+          "max_f1": 0.0817,
+          "median_f1": 0.0625
+        }
+      }
+    }
+  },
+  "C08-c2arch-s42-jumprelu-t64-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:01:09.846363",
+    "run_id": "C08-c2arch-s42-jumprelu-t64-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C08-c2arch-s42-jumprelu-t64-exp8-conv2.pt",
+    "architecture": "jumprelu",
+    "experiment": "C08-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 66.87,
+      "l0_std": 6.21,
+      "fvu": 0.013908,
+      "mse": 1.863638,
+      "dead_features_pct": 96.63,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3205,
+      "coverage_above_50": 0.3049,
+      "coverage_above_75": 0.0366,
+      "num_bsps": 164,
+      "min_f1": 0.0504,
+      "max_f1": 0.9484,
+      "median_f1": 0.3318,
+      "board_reconstruction": 0.8721,
+      "num_reconstructable_bsps": 154,
+      "fraction_reconstructable": 0.939,
+      "mean_accuracy": 0.8721,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 37,
+        "fraction_features_used_by_best_matches": 0.009,
+        "mean_bsps_per_used_feature": 4.4324,
+        "max_bsps_per_feature": 13,
+        "num_shared_features": 30,
+        "fraction_shared_features": 0.8108,
+        "num_bsps_with_unique_best_feature": 7,
+        "fraction_bsps_with_unique_best_feature": 0.0427,
+        "num_bsps_with_shared_best_feature": 157,
+        "fraction_bsps_with_shared_best_feature": 0.9573
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4732,
+          "min_f1": 0.3208,
+          "max_f1": 0.694,
+          "median_f1": 0.4683
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7071,
+          "min_f1": 0.522,
+          "max_f1": 0.9484,
+          "median_f1": 0.7047
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5287,
+          "min_f1": 0.2018,
+          "max_f1": 0.7243,
+          "median_f1": 0.6601
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5752,
+          "min_f1": 0.5752,
+          "max_f1": 0.5752,
+          "median_f1": 0.5752
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0757,
+          "min_f1": 0.0504,
+          "max_f1": 0.1702,
+          "median_f1": 0.0692
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0862,
+          "min_f1": 0.0552,
+          "max_f1": 0.1533,
+          "median_f1": 0.0763
+        }
+      }
+    }
+  },
+  "C13-c2arch-s42-vanilla-l1_001-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:05:41.590151",
+    "run_id": "C13-c2arch-s42-vanilla-l1_001-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C13-c2arch-s42-vanilla-l1_001-exp8-conv2.pt",
+    "architecture": "vanilla",
+    "experiment": "C13-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 1674.11,
+      "l0_std": 53.22,
+      "fvu": 0.000369,
+      "mse": 0.0495,
+      "dead_features_pct": 53.98,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2874,
+      "coverage_above_50": 0.189,
+      "coverage_above_75": 0.0183,
+      "num_bsps": 164,
+      "min_f1": 0.0449,
+      "max_f1": 0.8942,
+      "median_f1": 0.3612,
+      "board_reconstruction": 0.8199,
+      "num_reconstructable_bsps": 109,
+      "fraction_reconstructable": 0.6646,
+      "mean_accuracy": 0.8199,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 31,
+        "fraction_features_used_by_best_matches": 0.0076,
+        "mean_bsps_per_used_feature": 5.2903,
+        "max_bsps_per_feature": 28,
+        "num_shared_features": 18,
+        "fraction_shared_features": 0.5806,
+        "num_bsps_with_unique_best_feature": 13,
+        "fraction_bsps_with_unique_best_feature": 0.0793,
+        "num_bsps_with_shared_best_feature": 151,
+        "fraction_bsps_with_shared_best_feature": 0.9207
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4264,
+          "min_f1": 0.3542,
+          "max_f1": 0.5787,
+          "median_f1": 0.4141
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6389,
+          "min_f1": 0.5526,
+          "max_f1": 0.8942,
+          "median_f1": 0.622
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5844,
+          "min_f1": 0.1974,
+          "max_f1": 0.8586,
+          "median_f1": 0.6971
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.6495,
+          "min_f1": 0.6495,
+          "max_f1": 0.6495,
+          "median_f1": 0.6495
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6726,
+          "min_f1": 0.6681,
+          "max_f1": 0.6812,
+          "median_f1": 0.6687
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0595,
+          "min_f1": 0.0449,
+          "max_f1": 0.081,
+          "median_f1": 0.0591
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0596,
+          "min_f1": 0.0456,
+          "max_f1": 0.0905,
+          "median_f1": 0.0562
+        }
+      }
+    }
+  },
+  "D02-c2exp16-s42-topk-k64-exp16-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:18:04.303675",
+    "run_id": "D02-c2exp16-s42-topk-k64-exp16-conv2",
+    "checkpoint": "saes\\quarto\\D02-c2exp16-s42-topk-k64-exp16-conv2.pt",
+    "architecture": "topk",
+    "experiment": "D02-c2exp16-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 0.0,
+      "fvu": 0.003755,
+      "mse": 0.503222,
+      "dead_features_pct": 96.67,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3328,
+      "coverage_above_50": 0.3476,
+      "coverage_above_75": 0.0366,
+      "num_bsps": 164,
+      "min_f1": 0.0568,
+      "max_f1": 0.7941,
+      "median_f1": 0.4638,
+      "board_reconstruction": 0.8395,
+      "num_reconstructable_bsps": 114,
+      "fraction_reconstructable": 0.6951,
+      "mean_accuracy": 0.8395,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 90,
+        "fraction_features_used_by_best_matches": 0.011,
+        "mean_bsps_per_used_feature": 1.8222,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 43,
+        "fraction_shared_features": 0.4778,
+        "num_bsps_with_unique_best_feature": 47,
+        "fraction_bsps_with_unique_best_feature": 0.2866,
+        "num_bsps_with_shared_best_feature": 117,
+        "fraction_bsps_with_shared_best_feature": 0.7134
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5059,
+          "min_f1": 0.4012,
+          "max_f1": 0.6271,
+          "median_f1": 0.5015
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6732,
+          "min_f1": 0.5337,
+          "max_f1": 0.7933,
+          "median_f1": 0.6448
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5665,
+          "min_f1": 0.3009,
+          "max_f1": 0.7941,
+          "median_f1": 0.6047
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5508,
+          "min_f1": 0.5508,
+          "max_f1": 0.5508,
+          "median_f1": 0.5508
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6665,
+          "min_f1": 0.666,
+          "max_f1": 0.6673,
+          "median_f1": 0.6663
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0783,
+          "min_f1": 0.0568,
+          "max_f1": 0.1282,
+          "median_f1": 0.0756
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0937,
+          "min_f1": 0.0654,
+          "max_f1": 0.1355,
+          "median_f1": 0.0906
+        }
+      }
+    }
+  },
+  "F01-c2seeds-s43-topk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:24:35.295567",
+    "run_id": "F01-c2seeds-s43-topk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F01-c2seeds-s43-topk-k32-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "F01-c2seeds-s43",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 0.0,
+      "fvu": 0.010036,
+      "mse": 1.344857,
+      "dead_features_pct": 87.55,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3224,
+      "coverage_above_50": 0.2134,
+      "coverage_above_75": 0.061,
+      "num_bsps": 164,
+      "min_f1": 0.0696,
+      "max_f1": 0.8778,
+      "median_f1": 0.3836,
+      "board_reconstruction": 0.8411,
+      "num_reconstructable_bsps": 125,
+      "fraction_reconstructable": 0.7622,
+      "mean_accuracy": 0.8411,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 70,
+        "fraction_features_used_by_best_matches": 0.0171,
+        "mean_bsps_per_used_feature": 2.3429,
+        "max_bsps_per_feature": 10,
+        "num_shared_features": 32,
+        "fraction_shared_features": 0.4571,
+        "num_bsps_with_unique_best_feature": 38,
+        "fraction_bsps_with_unique_best_feature": 0.2317,
+        "num_bsps_with_shared_best_feature": 126,
+        "fraction_bsps_with_shared_best_feature": 0.7683
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4653,
+          "min_f1": 0.3759,
+          "max_f1": 0.5697,
+          "median_f1": 0.4763
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7161,
+          "min_f1": 0.5083,
+          "max_f1": 0.8778,
+          "median_f1": 0.7591
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5098,
+          "min_f1": 0.1961,
+          "max_f1": 0.786,
+          "median_f1": 0.5472
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5037,
+          "min_f1": 0.5037,
+          "max_f1": 0.5037,
+          "median_f1": 0.5037
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6344,
+          "min_f1": 0.6323,
+          "max_f1": 0.6369,
+          "median_f1": 0.6338
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0864,
+          "min_f1": 0.0696,
+          "max_f1": 0.1238,
+          "median_f1": 0.0818
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.1002,
+          "min_f1": 0.0754,
+          "max_f1": 0.143,
+          "median_f1": 0.0952
+        }
+      }
+    }
+  },
+  "F04-c2seeds-s44-topk-k64-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:31:33.052553",
+    "run_id": "F04-c2seeds-s44-topk-k64-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F04-c2seeds-s44-topk-k64-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "F04-c2seeds-s44",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 0.0,
+      "fvu": 0.00362,
+      "mse": 0.485056,
+      "dead_features_pct": 93.09,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3293,
+      "coverage_above_50": 0.2988,
+      "coverage_above_75": 0.0122,
+      "num_bsps": 164,
+      "min_f1": 0.0585,
+      "max_f1": 0.8244,
+      "median_f1": 0.4435,
+      "board_reconstruction": 0.8327,
+      "num_reconstructable_bsps": 109,
+      "fraction_reconstructable": 0.6646,
+      "mean_accuracy": 0.8327,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 95,
+        "fraction_features_used_by_best_matches": 0.0232,
+        "mean_bsps_per_used_feature": 1.7263,
+        "max_bsps_per_feature": 7,
+        "num_shared_features": 42,
+        "fraction_shared_features": 0.4421,
+        "num_bsps_with_unique_best_feature": 53,
+        "fraction_bsps_with_unique_best_feature": 0.3232,
+        "num_bsps_with_shared_best_feature": 111,
+        "fraction_bsps_with_shared_best_feature": 0.6768
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4968,
+          "min_f1": 0.396,
+          "max_f1": 0.6072,
+          "median_f1": 0.4932
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.6698,
+          "min_f1": 0.5553,
+          "max_f1": 0.7692,
+          "median_f1": 0.66
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5822,
+          "min_f1": 0.3302,
+          "max_f1": 0.8244,
+          "median_f1": 0.592
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5325,
+          "min_f1": 0.5325,
+          "max_f1": 0.5325,
+          "median_f1": 0.5325
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6472,
+          "min_f1": 0.6451,
+          "max_f1": 0.6484,
+          "median_f1": 0.6472
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0808,
+          "min_f1": 0.0585,
+          "max_f1": 0.125,
+          "median_f1": 0.0786
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0944,
+          "min_f1": 0.0722,
+          "max_f1": 0.1329,
+          "median_f1": 0.0884
+        }
+      }
+    }
+  },
+  "F07-c2seeds-s43-batchtopk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:36:19.830086",
+    "run_id": "F07-c2seeds-s43-batchtopk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F07-c2seeds-s43-batchtopk-k32-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "F07-c2seeds-s43",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 11.44,
+      "fvu": 0.018252,
+      "mse": 2.445779,
+      "dead_features_pct": 98.12,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3155,
+      "coverage_above_50": 0.2561,
+      "coverage_above_75": 0.0427,
+      "num_bsps": 164,
+      "min_f1": 0.041,
+      "max_f1": 0.8518,
+      "median_f1": 0.4212,
+      "board_reconstruction": 0.8627,
+      "num_reconstructable_bsps": 147,
+      "fraction_reconstructable": 0.8963,
+      "mean_accuracy": 0.8627,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 45,
+        "fraction_features_used_by_best_matches": 0.011,
+        "mean_bsps_per_used_feature": 3.6444,
+        "max_bsps_per_feature": 11,
+        "num_shared_features": 37,
+        "fraction_shared_features": 0.8222,
+        "num_bsps_with_unique_best_feature": 8,
+        "fraction_bsps_with_unique_best_feature": 0.0488,
+        "num_bsps_with_shared_best_feature": 156,
+        "fraction_bsps_with_shared_best_feature": 0.9512
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4772,
+          "min_f1": 0.3886,
+          "max_f1": 0.5435,
+          "median_f1": 0.4761
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7415,
+          "min_f1": 0.6362,
+          "max_f1": 0.8518,
+          "median_f1": 0.7313
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5298,
+          "min_f1": 0.1455,
+          "max_f1": 0.7935,
+          "median_f1": 0.6503
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5673,
+          "min_f1": 0.5673,
+          "max_f1": 0.5673,
+          "median_f1": 0.5673
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6674,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.057,
+          "min_f1": 0.041,
+          "max_f1": 0.0856,
+          "median_f1": 0.0554
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0622,
+          "min_f1": 0.0439,
+          "max_f1": 0.0909,
+          "median_f1": 0.0611
+        }
+      }
+    }
+  },
+  "F10-c2seeds-s44-batchtopk-k64-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:41:09.559292",
+    "run_id": "F10-c2seeds-s44-batchtopk-k64-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F10-c2seeds-s44-batchtopk-k64-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "F10-c2seeds-s44",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 19.69,
+      "fvu": 0.00608,
+      "mse": 0.81475,
+      "dead_features_pct": 96.46,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3267,
+      "coverage_above_50": 0.372,
+      "coverage_above_75": 0.0427,
+      "num_bsps": 164,
+      "min_f1": 0.0468,
+      "max_f1": 0.8319,
+      "median_f1": 0.4463,
+      "board_reconstruction": 0.8618,
+      "num_reconstructable_bsps": 146,
+      "fraction_reconstructable": 0.8902,
+      "mean_accuracy": 0.8618,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 66,
+        "fraction_features_used_by_best_matches": 0.0161,
+        "mean_bsps_per_used_feature": 2.4848,
+        "max_bsps_per_feature": 10,
+        "num_shared_features": 38,
+        "fraction_shared_features": 0.5758,
+        "num_bsps_with_unique_best_feature": 28,
+        "fraction_bsps_with_unique_best_feature": 0.1707,
+        "num_bsps_with_shared_best_feature": 136,
+        "fraction_bsps_with_shared_best_feature": 0.8293
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5024,
+          "min_f1": 0.4166,
+          "max_f1": 0.5687,
+          "median_f1": 0.5059
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7274,
+          "min_f1": 0.6085,
+          "max_f1": 0.8319,
+          "median_f1": 0.7103
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5422,
+          "min_f1": 0.1684,
+          "max_f1": 0.7785,
+          "median_f1": 0.6798
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5851,
+          "min_f1": 0.5851,
+          "max_f1": 0.5851,
+          "median_f1": 0.5851
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0625,
+          "min_f1": 0.0468,
+          "max_f1": 0.0988,
+          "median_f1": 0.0618
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0669,
+          "min_f1": 0.0503,
+          "max_f1": 0.1067,
+          "median_f1": 0.064
+        }
+      }
+    }
+  },
+  "G03-c2random-s42-batchtopk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-09T23:45:58.298308",
+    "run_id": "G03-c2random-s42-batchtopk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\G03-c2random-s42-batchtopk-k32-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "G03-c2random-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 10.86,
+      "fvu": 0.181503,
+      "mse": 0.034942,
+      "dead_features_pct": 96.8,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2452,
+      "coverage_above_50": 0.0854,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0357,
+      "max_f1": 0.7241,
+      "median_f1": 0.3263,
+      "board_reconstruction": 0.8362,
+      "num_reconstructable_bsps": 118,
+      "fraction_reconstructable": 0.7195,
+      "mean_accuracy": 0.8362,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 58,
+        "fraction_features_used_by_best_matches": 0.0142,
+        "mean_bsps_per_used_feature": 2.8276,
+        "max_bsps_per_feature": 23,
+        "num_shared_features": 35,
+        "fraction_shared_features": 0.6034,
+        "num_bsps_with_unique_best_feature": 23,
+        "fraction_bsps_with_unique_best_feature": 0.1402,
+        "num_bsps_with_shared_best_feature": 141,
+        "fraction_bsps_with_shared_best_feature": 0.8598
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3768,
+          "min_f1": 0.2979,
+          "max_f1": 0.4628,
+          "median_f1": 0.3697
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5045,
+          "min_f1": 0.4763,
+          "max_f1": 0.5728,
+          "median_f1": 0.4916
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.467,
+          "min_f1": 0.0985,
+          "max_f1": 0.7241,
+          "median_f1": 0.5783
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5009,
+          "min_f1": 0.5009,
+          "max_f1": 0.5009,
+          "median_f1": 0.5009
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6668,
+          "min_f1": 0.6663,
+          "max_f1": 0.6673,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0447,
+          "min_f1": 0.0357,
+          "max_f1": 0.0546,
+          "median_f1": 0.0438
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0464,
+          "min_f1": 0.0403,
+          "max_f1": 0.0551,
+          "median_f1": 0.0456
+        }
+      }
+    }
+  },
+  "B01-conv2-completion-s42-batchtopk-k64-exp4-conv2:gorilla": {
+    "timestamp": "2026-05-10T09:49:16.798039",
+    "run_id": "B01-conv2-completion-s42-batchtopk-k64-exp4-conv2",
+    "checkpoint": "saes\\quarto\\B01-conv2-completion-s42-batchtopk-k64-exp4-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "B01-conv2-completion-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 16.94,
+      "fvu": 0.007017,
+      "mse": 0.940254,
+      "dead_features_pct": 93.75,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3167,
+      "coverage_above_50": 0.3049,
+      "coverage_above_75": 0.0183,
+      "num_bsps": 164,
+      "min_f1": 0.0445,
+      "max_f1": 0.8684,
+      "median_f1": 0.431,
+      "board_reconstruction": 0.8251,
+      "num_reconstructable_bsps": 110,
+      "fraction_reconstructable": 0.6707,
+      "mean_accuracy": 0.8251,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 61,
+        "fraction_features_used_by_best_matches": 0.0298,
+        "mean_bsps_per_used_feature": 2.6885,
+        "max_bsps_per_feature": 10,
+        "num_shared_features": 37,
+        "fraction_shared_features": 0.6066,
+        "num_bsps_with_unique_best_feature": 24,
+        "fraction_bsps_with_unique_best_feature": 0.1463,
+        "num_bsps_with_shared_best_feature": 140,
+        "fraction_bsps_with_shared_best_feature": 0.8537
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4896,
+          "min_f1": 0.3886,
+          "max_f1": 0.5631,
+          "median_f1": 0.4838
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7038,
+          "min_f1": 0.5989,
+          "max_f1": 0.8684,
+          "median_f1": 0.6828
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5003,
+          "min_f1": 0.118,
+          "max_f1": 0.7239,
+          "median_f1": 0.6589
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5919,
+          "min_f1": 0.5919,
+          "max_f1": 0.5919,
+          "median_f1": 0.5919
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.667,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6667
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0578,
+          "min_f1": 0.0445,
+          "max_f1": 0.0828,
+          "median_f1": 0.0561
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0633,
+          "min_f1": 0.0467,
+          "max_f1": 0.0845,
+          "median_f1": 0.0624
+        }
+      }
+    }
+  },
+  "B04-conv2-completion-s42-vanilla-l1_001-exp4-conv2:gorilla": {
+    "timestamp": "2026-05-10T09:52:05.897503",
+    "run_id": "B04-conv2-completion-s42-vanilla-l1_001-exp4-conv2",
+    "checkpoint": "saes\\quarto\\B04-conv2-completion-s42-vanilla-l1_001-exp4-conv2.pt",
+    "architecture": "vanilla",
+    "experiment": "B04-conv2-completion-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 1051.44,
+      "l0_std": 21.01,
+      "fvu": 0.000496,
+      "mse": 0.066404,
+      "dead_features_pct": 45.9,
+      "median_feat_freq": 0.910889,
+      "coverage": 0.2713,
+      "coverage_above_50": 0.1463,
+      "coverage_above_75": 0.0061,
+      "num_bsps": 164,
+      "min_f1": 0.0446,
+      "max_f1": 0.8525,
+      "median_f1": 0.3665,
+      "board_reconstruction": 0.7913,
+      "num_reconstructable_bsps": 81,
+      "fraction_reconstructable": 0.4939,
+      "mean_accuracy": 0.7913,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 14,
+        "fraction_features_used_by_best_matches": 0.0068,
+        "mean_bsps_per_used_feature": 11.7143,
+        "max_bsps_per_feature": 42,
+        "num_shared_features": 8,
+        "fraction_shared_features": 0.5714,
+        "num_bsps_with_unique_best_feature": 6,
+        "fraction_bsps_with_unique_best_feature": 0.0366,
+        "num_bsps_with_shared_best_feature": 158,
+        "fraction_bsps_with_shared_best_feature": 0.9634
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4035,
+          "min_f1": 0.3606,
+          "max_f1": 0.5001,
+          "median_f1": 0.3864
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5828,
+          "min_f1": 0.5212,
+          "max_f1": 0.71,
+          "median_f1": 0.5606
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5676,
+          "min_f1": 0.1891,
+          "max_f1": 0.8525,
+          "median_f1": 0.6613
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.6115,
+          "min_f1": 0.6115,
+          "max_f1": 0.6115,
+          "median_f1": 0.6115
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6705,
+          "min_f1": 0.6685,
+          "max_f1": 0.6751,
+          "median_f1": 0.669
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0584,
+          "min_f1": 0.0474,
+          "max_f1": 0.0749,
+          "median_f1": 0.058
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0559,
+          "min_f1": 0.0446,
+          "max_f1": 0.081,
+          "median_f1": 0.0557
+        }
+      }
+    }
+  },
+  "C03-c2arch-s42-batchtopk-k16-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T09:56:50.411722",
+    "run_id": "C03-c2arch-s42-batchtopk-k16-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C03-c2arch-s42-batchtopk-k16-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "C03-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 6.45,
+      "fvu": 0.035622,
+      "mse": 4.773228,
+      "dead_features_pct": 98.97,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3215,
+      "coverage_above_50": 0.3476,
+      "coverage_above_75": 0.0549,
+      "num_bsps": 164,
+      "min_f1": 0.0345,
+      "max_f1": 0.8711,
+      "median_f1": 0.4406,
+      "board_reconstruction": 0.8677,
+      "num_reconstructable_bsps": 153,
+      "fraction_reconstructable": 0.9329,
+      "mean_accuracy": 0.8677,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 31,
+        "fraction_features_used_by_best_matches": 0.0076,
+        "mean_bsps_per_used_feature": 5.2903,
+        "max_bsps_per_feature": 12,
+        "num_shared_features": 28,
+        "fraction_shared_features": 0.9032,
+        "num_bsps_with_unique_best_feature": 3,
+        "fraction_bsps_with_unique_best_feature": 0.0183,
+        "num_bsps_with_shared_best_feature": 161,
+        "fraction_bsps_with_shared_best_feature": 0.9817
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4946,
+          "min_f1": 0.4184,
+          "max_f1": 0.5614,
+          "median_f1": 0.5038
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7697,
+          "min_f1": 0.6824,
+          "max_f1": 0.8711,
+          "median_f1": 0.7501
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4959,
+          "min_f1": 0.1226,
+          "max_f1": 0.724,
+          "median_f1": 0.6411
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5548,
+          "min_f1": 0.5548,
+          "max_f1": 0.5548,
+          "median_f1": 0.5548
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0499,
+          "min_f1": 0.0345,
+          "max_f1": 0.0719,
+          "median_f1": 0.0474
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0572,
+          "min_f1": 0.044,
+          "max_f1": 0.076,
+          "median_f1": 0.0548
+        }
+      }
+    }
+  },
+  "C06-c2arch-s42-batchtopk-k128-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:01:39.880424",
+    "run_id": "C06-c2arch-s42-batchtopk-k128-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C06-c2arch-s42-batchtopk-k128-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "C06-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 128.0,
+      "l0_std": 26.06,
+      "fvu": 0.001474,
+      "mse": 0.197573,
+      "dead_features_pct": 95.09,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3254,
+      "coverage_above_50": 0.3415,
+      "coverage_above_75": 0.0427,
+      "num_bsps": 164,
+      "min_f1": 0.0423,
+      "max_f1": 0.8236,
+      "median_f1": 0.435,
+      "board_reconstruction": 0.845,
+      "num_reconstructable_bsps": 129,
+      "fraction_reconstructable": 0.7866,
+      "mean_accuracy": 0.845,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 62,
+        "fraction_features_used_by_best_matches": 0.0151,
+        "mean_bsps_per_used_feature": 2.6452,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 36,
+        "fraction_shared_features": 0.5806,
+        "num_bsps_with_unique_best_feature": 26,
+        "fraction_bsps_with_unique_best_feature": 0.1585,
+        "num_bsps_with_shared_best_feature": 138,
+        "fraction_bsps_with_shared_best_feature": 0.8415
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4988,
+          "min_f1": 0.3917,
+          "max_f1": 0.6172,
+          "median_f1": 0.5014
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7107,
+          "min_f1": 0.6134,
+          "max_f1": 0.8236,
+          "median_f1": 0.6922
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5142,
+          "min_f1": 0.1285,
+          "max_f1": 0.7535,
+          "median_f1": 0.6605
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5742,
+          "min_f1": 0.5742,
+          "max_f1": 0.5742,
+          "median_f1": 0.5742
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6675,
+          "min_f1": 0.6665,
+          "max_f1": 0.6699,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0659,
+          "min_f1": 0.0423,
+          "max_f1": 0.0869,
+          "median_f1": 0.0633
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0737,
+          "min_f1": 0.0497,
+          "max_f1": 0.1121,
+          "median_f1": 0.0716
+        }
+      }
+    }
+  },
+  "C09-c2arch-s42-jumprelu-t128-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:03:05.256377",
+    "run_id": "C09-c2arch-s42-jumprelu-t128-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C09-c2arch-s42-jumprelu-t128-exp8-conv2.pt",
+    "architecture": "jumprelu",
+    "experiment": "C09-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 129.52,
+      "l0_std": 10.89,
+      "fvu": 0.006628,
+      "mse": 0.888162,
+      "dead_features_pct": 93.63,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3207,
+      "coverage_above_50": 0.2744,
+      "coverage_above_75": 0.0305,
+      "num_bsps": 164,
+      "min_f1": 0.0503,
+      "max_f1": 0.974,
+      "median_f1": 0.3385,
+      "board_reconstruction": 0.8786,
+      "num_reconstructable_bsps": 163,
+      "fraction_reconstructable": 0.9939,
+      "mean_accuracy": 0.8786,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 57,
+        "fraction_features_used_by_best_matches": 0.0139,
+        "mean_bsps_per_used_feature": 2.8772,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 37,
+        "fraction_shared_features": 0.6491,
+        "num_bsps_with_unique_best_feature": 20,
+        "fraction_bsps_with_unique_best_feature": 0.122,
+        "num_bsps_with_shared_best_feature": 144,
+        "fraction_bsps_with_shared_best_feature": 0.878
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4708,
+          "min_f1": 0.3329,
+          "max_f1": 0.6525,
+          "median_f1": 0.4568
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7045,
+          "min_f1": 0.5362,
+          "max_f1": 0.974,
+          "median_f1": 0.6216
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.536,
+          "min_f1": 0.2092,
+          "max_f1": 0.7243,
+          "median_f1": 0.6745
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5961,
+          "min_f1": 0.5961,
+          "max_f1": 0.5961,
+          "median_f1": 0.5961
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.667,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6666
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0738,
+          "min_f1": 0.0503,
+          "max_f1": 0.1197,
+          "median_f1": 0.0695
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0935,
+          "min_f1": 0.0609,
+          "max_f1": 0.1425,
+          "median_f1": 0.0881
+        }
+      }
+    }
+  },
+  "C14-c2arch-s42-p-annealing-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:07:57.885838",
+    "run_id": "C14-c2arch-s42-p-annealing-exp8-conv2",
+    "checkpoint": "saes\\quarto\\C14-c2arch-s42-p-annealing-exp8-conv2.pt",
+    "architecture": "p-annealing",
+    "experiment": "C14-c2arch-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 459.38,
+      "l0_std": 36.94,
+      "fvu": 0.000334,
+      "mse": 0.044741,
+      "dead_features_pct": 86.6,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3146,
+      "coverage_above_50": 0.2439,
+      "coverage_above_75": 0.0305,
+      "num_bsps": 164,
+      "min_f1": 0.0484,
+      "max_f1": 0.9759,
+      "median_f1": 0.3708,
+      "board_reconstruction": 0.8693,
+      "num_reconstructable_bsps": 155,
+      "fraction_reconstructable": 0.9451,
+      "mean_accuracy": 0.8693,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 28,
+        "fraction_features_used_by_best_matches": 0.0068,
+        "mean_bsps_per_used_feature": 5.8571,
+        "max_bsps_per_feature": 36,
+        "num_shared_features": 21,
+        "fraction_shared_features": 0.75,
+        "num_bsps_with_unique_best_feature": 7,
+        "fraction_bsps_with_unique_best_feature": 0.0427,
+        "num_bsps_with_shared_best_feature": 157,
+        "fraction_bsps_with_shared_best_feature": 0.9573
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4665,
+          "min_f1": 0.3601,
+          "max_f1": 0.6494,
+          "median_f1": 0.4186
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7015,
+          "min_f1": 0.5449,
+          "max_f1": 0.9759,
+          "median_f1": 0.6309
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.6224,
+          "min_f1": 0.319,
+          "max_f1": 0.824,
+          "median_f1": 0.7241
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.6426,
+          "min_f1": 0.6426,
+          "max_f1": 0.6426,
+          "median_f1": 0.6426
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.671,
+          "min_f1": 0.668,
+          "max_f1": 0.6745,
+          "median_f1": 0.6705
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0683,
+          "min_f1": 0.0484,
+          "max_f1": 0.11,
+          "median_f1": 0.0662
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0716,
+          "min_f1": 0.0538,
+          "max_f1": 0.1495,
+          "median_f1": 0.0636
+        }
+      }
+    }
+  },
+  "D03-c2exp16-s42-batchtopk-k32-exp16-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:16:36.449070",
+    "run_id": "D03-c2exp16-s42-batchtopk-k32-exp16-conv2",
+    "checkpoint": "saes\\quarto\\D03-c2exp16-s42-batchtopk-k32-exp16-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "D03-c2exp16-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 12.32,
+      "fvu": 0.017741,
+      "mse": 2.377245,
+      "dead_features_pct": 99.02,
+      "median_feat_freq": 0.0,
+      "coverage": 0.317,
+      "coverage_above_50": 0.2866,
+      "coverage_above_75": 0.0427,
+      "num_bsps": 164,
+      "min_f1": 0.037,
+      "max_f1": 0.8491,
+      "median_f1": 0.4279,
+      "board_reconstruction": 0.8685,
+      "num_reconstructable_bsps": 154,
+      "fraction_reconstructable": 0.939,
+      "mean_accuracy": 0.8685,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 48,
+        "fraction_features_used_by_best_matches": 0.0059,
+        "mean_bsps_per_used_feature": 3.4167,
+        "max_bsps_per_feature": 13,
+        "num_shared_features": 35,
+        "fraction_shared_features": 0.7292,
+        "num_bsps_with_unique_best_feature": 13,
+        "fraction_bsps_with_unique_best_feature": 0.0793,
+        "num_bsps_with_shared_best_feature": 151,
+        "fraction_bsps_with_shared_best_feature": 0.9207
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4873,
+          "min_f1": 0.3714,
+          "max_f1": 0.5423,
+          "median_f1": 0.4881
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7395,
+          "min_f1": 0.6254,
+          "max_f1": 0.8491,
+          "median_f1": 0.7312
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5098,
+          "min_f1": 0.1349,
+          "max_f1": 0.7459,
+          "median_f1": 0.6484
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5735,
+          "min_f1": 0.5735,
+          "max_f1": 0.5735,
+          "median_f1": 0.5735
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6664,
+          "max_f1": 0.6674,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0538,
+          "min_f1": 0.037,
+          "max_f1": 0.0743,
+          "median_f1": 0.0516
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0569,
+          "min_f1": 0.0424,
+          "max_f1": 0.0698,
+          "median_f1": 0.0566
+        }
+      }
+    }
+  },
+  "F02-c2seeds-s44-topk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:23:16.678022",
+    "run_id": "F02-c2seeds-s44-topk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F02-c2seeds-s44-topk-k32-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "F02-c2seeds-s44",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 0.0,
+      "fvu": 0.009924,
+      "mse": 1.329779,
+      "dead_features_pct": 87.87,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3271,
+      "coverage_above_50": 0.2378,
+      "coverage_above_75": 0.0488,
+      "num_bsps": 164,
+      "min_f1": 0.0663,
+      "max_f1": 0.8648,
+      "median_f1": 0.4037,
+      "board_reconstruction": 0.8633,
+      "num_reconstructable_bsps": 139,
+      "fraction_reconstructable": 0.8476,
+      "mean_accuracy": 0.8633,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 66,
+        "fraction_features_used_by_best_matches": 0.0161,
+        "mean_bsps_per_used_feature": 2.4848,
+        "max_bsps_per_feature": 9,
+        "num_shared_features": 35,
+        "fraction_shared_features": 0.5303,
+        "num_bsps_with_unique_best_feature": 31,
+        "fraction_bsps_with_unique_best_feature": 0.189,
+        "num_bsps_with_shared_best_feature": 133,
+        "fraction_bsps_with_shared_best_feature": 0.811
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4695,
+          "min_f1": 0.3916,
+          "max_f1": 0.5602,
+          "median_f1": 0.4735
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7333,
+          "min_f1": 0.6143,
+          "max_f1": 0.8648,
+          "median_f1": 0.7109
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5489,
+          "min_f1": 0.3114,
+          "max_f1": 0.8013,
+          "median_f1": 0.534
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.479,
+          "min_f1": 0.479,
+          "max_f1": 0.479,
+          "median_f1": 0.479
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6437,
+          "min_f1": 0.6419,
+          "max_f1": 0.6464,
+          "median_f1": 0.6427
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.086,
+          "min_f1": 0.0663,
+          "max_f1": 0.1321,
+          "median_f1": 0.0819
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.1032,
+          "min_f1": 0.0786,
+          "max_f1": 0.1546,
+          "median_f1": 0.0963
+        }
+      }
+    }
+  },
+  "F05-c2seeds-s43-batchtopk-k16-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:27:46.273277",
+    "run_id": "F05-c2seeds-s43-batchtopk-k16-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F05-c2seeds-s43-batchtopk-k16-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "F05-c2seeds-s43",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 7.35,
+      "fvu": 0.03306,
+      "mse": 4.429901,
+      "dead_features_pct": 98.88,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3325,
+      "coverage_above_50": 0.3659,
+      "coverage_above_75": 0.061,
+      "num_bsps": 164,
+      "min_f1": 0.0352,
+      "max_f1": 0.8734,
+      "median_f1": 0.4496,
+      "board_reconstruction": 0.8644,
+      "num_reconstructable_bsps": 149,
+      "fraction_reconstructable": 0.9085,
+      "mean_accuracy": 0.8644,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 36,
+        "fraction_features_used_by_best_matches": 0.0088,
+        "mean_bsps_per_used_feature": 4.5556,
+        "max_bsps_per_feature": 9,
+        "num_shared_features": 34,
+        "fraction_shared_features": 0.9444,
+        "num_bsps_with_unique_best_feature": 2,
+        "fraction_bsps_with_unique_best_feature": 0.0122,
+        "num_bsps_with_shared_best_feature": 162,
+        "fraction_bsps_with_shared_best_feature": 0.9878
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.5059,
+          "min_f1": 0.4266,
+          "max_f1": 0.5633,
+          "median_f1": 0.5223
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7939,
+          "min_f1": 0.7042,
+          "max_f1": 0.8734,
+          "median_f1": 0.7532
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5,
+          "min_f1": 0.1296,
+          "max_f1": 0.7239,
+          "median_f1": 0.6464
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5639,
+          "min_f1": 0.5639,
+          "max_f1": 0.5639,
+          "median_f1": 0.5639
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0572,
+          "min_f1": 0.0352,
+          "max_f1": 0.0798,
+          "median_f1": 0.0552
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0675,
+          "min_f1": 0.0481,
+          "max_f1": 0.0946,
+          "median_f1": 0.0664
+        }
+      }
+    }
+  },
+  "F08-c2seeds-s44-batchtopk-k32-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:32:29.190920",
+    "run_id": "F08-c2seeds-s44-batchtopk-k32-exp8-conv2",
+    "checkpoint": "saes\\quarto\\F08-c2seeds-s44-batchtopk-k32-exp8-conv2.pt",
+    "architecture": "batchtopk",
+    "experiment": "F08-c2seeds-s44",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 32.0,
+      "l0_std": 10.63,
+      "fvu": 0.019563,
+      "mse": 2.621389,
+      "dead_features_pct": 98.22,
+      "median_feat_freq": 0.0,
+      "coverage": 0.3178,
+      "coverage_above_50": 0.311,
+      "coverage_above_75": 0.061,
+      "num_bsps": 164,
+      "min_f1": 0.0352,
+      "max_f1": 0.8643,
+      "median_f1": 0.4228,
+      "board_reconstruction": 0.8601,
+      "num_reconstructable_bsps": 144,
+      "fraction_reconstructable": 0.878,
+      "mean_accuracy": 0.8601,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 42,
+        "fraction_features_used_by_best_matches": 0.0103,
+        "mean_bsps_per_used_feature": 3.9048,
+        "max_bsps_per_feature": 15,
+        "num_shared_features": 34,
+        "fraction_shared_features": 0.8095,
+        "num_bsps_with_unique_best_feature": 8,
+        "fraction_bsps_with_unique_best_feature": 0.0488,
+        "num_bsps_with_shared_best_feature": 156,
+        "fraction_bsps_with_shared_best_feature": 0.9512
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.4884,
+          "min_f1": 0.378,
+          "max_f1": 0.5552,
+          "median_f1": 0.496
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.7519,
+          "min_f1": 0.6056,
+          "max_f1": 0.8643,
+          "median_f1": 0.7529
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.5341,
+          "min_f1": 0.1523,
+          "max_f1": 0.791,
+          "median_f1": 0.659
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.5717,
+          "min_f1": 0.5717,
+          "max_f1": 0.5717,
+          "median_f1": 0.5717
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6669,
+          "min_f1": 0.6665,
+          "max_f1": 0.6675,
+          "median_f1": 0.6665
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0506,
+          "min_f1": 0.0352,
+          "max_f1": 0.0741,
+          "median_f1": 0.0497
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0545,
+          "min_f1": 0.0414,
+          "max_f1": 0.0675,
+          "median_f1": 0.0537
+        }
+      }
+    }
+  },
+  "G01-c2random-s42-topk-k16-exp8-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:38:54.850034",
+    "run_id": "G01-c2random-s42-topk-k16-exp8-conv2",
+    "checkpoint": "saes\\quarto\\G01-c2random-s42-topk-k16-exp8-conv2.pt",
+    "architecture": "topk",
+    "experiment": "G01-c2random-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 16.0,
+      "l0_std": 0.0,
+      "fvu": 0.112298,
+      "mse": 0.021619,
+      "dead_features_pct": 35.77,
+      "median_feat_freq": 0.000488,
+      "coverage": 0.163,
+      "coverage_above_50": 0.0,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0607,
+      "max_f1": 0.4183,
+      "median_f1": 0.2226,
+      "board_reconstruction": 0.7837,
+      "num_reconstructable_bsps": 84,
+      "fraction_reconstructable": 0.5122,
+      "mean_accuracy": 0.7837,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 98,
+        "fraction_features_used_by_best_matches": 0.0239,
+        "mean_bsps_per_used_feature": 1.6735,
+        "max_bsps_per_feature": 7,
+        "num_shared_features": 36,
+        "fraction_shared_features": 0.3673,
+        "num_bsps_with_unique_best_feature": 62,
+        "fraction_bsps_with_unique_best_feature": 0.378,
+        "num_bsps_with_shared_best_feature": 102,
+        "fraction_bsps_with_shared_best_feature": 0.622
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.24,
+          "min_f1": 0.2248,
+          "max_f1": 0.2918,
+          "median_f1": 0.2357
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.2458,
+          "min_f1": 0.206,
+          "max_f1": 0.2764,
+          "median_f1": 0.2445
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.217,
+          "min_f1": 0.0607,
+          "max_f1": 0.3901,
+          "median_f1": 0.2001
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.1878,
+          "min_f1": 0.1878,
+          "max_f1": 0.1878,
+          "median_f1": 0.1878
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.3132,
+          "min_f1": 0.2735,
+          "max_f1": 0.4183,
+          "median_f1": 0.2747
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0706,
+          "min_f1": 0.0628,
+          "max_f1": 0.0789,
+          "median_f1": 0.0705
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0702,
+          "min_f1": 0.0644,
+          "max_f1": 0.0771,
+          "median_f1": 0.0691
+        }
+      }
+    }
+  },
+  "G04-c2random-s42-topk-k64-exp16-conv2:gorilla": {
+    "timestamp": "2026-05-10T10:51:17.529551",
+    "run_id": "G04-c2random-s42-topk-k64-exp16-conv2",
+    "checkpoint": "saes\\quarto\\G04-c2random-s42-topk-k64-exp16-conv2.pt",
+    "architecture": "topk",
+    "experiment": "G04-c2random-s42",
+    "game": "quarto",
+    "hook": "conv2",
+    "bsp_set": "gorilla",
+    "tag": "",
+    "metrics": {
+      "l0": 64.0,
+      "l0_std": 0.0,
+      "fvu": 0.022753,
+      "mse": 0.00438,
+      "dead_features_pct": 75.13,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2325,
+      "coverage_above_50": 0.0366,
+      "coverage_above_75": 0.0,
+      "num_bsps": 164,
+      "min_f1": 0.0619,
+      "max_f1": 0.7286,
+      "median_f1": 0.3006,
+      "board_reconstruction": 0.8644,
+      "num_reconstructable_bsps": 149,
+      "fraction_reconstructable": 0.9085,
+      "mean_accuracy": 0.8644,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 126,
+        "fraction_features_used_by_best_matches": 0.0154,
+        "mean_bsps_per_used_feature": 1.3016,
+        "max_bsps_per_feature": 13,
+        "num_shared_features": 20,
+        "fraction_shared_features": 0.1587,
+        "num_bsps_with_unique_best_feature": 106,
+        "fraction_bsps_with_unique_best_feature": 0.6463,
+        "num_bsps_with_shared_best_feature": 58,
+        "fraction_bsps_with_shared_best_feature": 0.3537
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3365,
+          "min_f1": 0.2931,
+          "max_f1": 0.3952,
+          "median_f1": 0.3334
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.4447,
+          "min_f1": 0.4222,
+          "max_f1": 0.5107,
+          "median_f1": 0.4348
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4207,
+          "min_f1": 0.0675,
+          "max_f1": 0.7286,
+          "median_f1": 0.4661
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.4168,
+          "min_f1": 0.4168,
+          "max_f1": 0.4168,
+          "median_f1": 0.4168
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6075,
+          "min_f1": 0.6018,
+          "max_f1": 0.618,
+          "median_f1": 0.6025
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.071,
+          "min_f1": 0.0619,
+          "max_f1": 0.0805,
+          "median_f1": 0.0707
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0703,
+          "min_f1": 0.0634,
+          "max_f1": 0.0777,
+          "median_f1": 0.0693
+        }
+      }
+    }
   }
 }

@@ -4,22 +4,25 @@
   "game": "quarto",
   "num_bsps": 164,
   "categories": {
-    "cell_occupancy": 16,
-    "cell_attribute": 64,
-    "threat_square_2x2": 36,
     "threat_line": 40,
+    "cell_occupancy": 16,
+    "threat_square_2x2": 36,
     "offered_piece": 4,
+    "game_phase": 3,
     "global": 1,
-    "game_phase": 3
+    "cell_attribute": 64
   },
   "filters": {
-    "include_categories": null,
-    "exclude_categories": [
-      "reframed_count",
-      "reframed_completable",
-      "reframed_any_threat",
-      "reframed_global"
-    ]
+    "only_categories": [
+      "cell_occupancy",
+      "cell_attribute",
+      "threat_line",
+      "threat_square_2x2",
+      "offered_piece",
+      "game_phase",
+      "global"
+    ],
+    "exclude_categories": null
   },
   "bsps": [
     {

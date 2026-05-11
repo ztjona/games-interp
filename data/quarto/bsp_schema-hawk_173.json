@@ -4,13 +4,13 @@
   "game": "quarto",
   "num_bsps": 173,
   "categories": {
-    "reframed_completable": 40,
-    "reframed_sq_any_threat": 9,
-    "reframed_global": 2,
     "reframed_any_threat": 10,
-    "reframed_sq_completable": 36,
     "reframed_sq_count": 36,
-    "reframed_count": 40
+    "reframed_count": 40,
+    "reframed_global": 2,
+    "reframed_sq_any_threat": 9,
+    "reframed_sq_completable": 36,
+    "reframed_completable": 40
   },
   "filters": {
     "only_categories": [
