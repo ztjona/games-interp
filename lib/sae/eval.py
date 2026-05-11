@@ -32,8 +32,14 @@ class FeatureBSPMatching:
         precision: (d_dict, num_bsps) float tensor
         recall:    (d_dict, num_bsps) float tensor
         f1:        (d_dict, num_bsps) float tensor
-        best_f1_per_bsp:      (num_bsps,) best F1 for each BSP
-        best_feature_per_bsp: (num_bsps,) index of best feature for each BSP
+        mcc:       (d_dict, num_bsps) float tensor — Matthews correlation coef.
+        best_f1_per_bsp:       (num_bsps,) best F1 for each BSP
+        best_feature_per_bsp:  (num_bsps,) index of best (F1) feature per BSP
+        best_mcc_per_bsp:      (num_bsps,) best MCC for each BSP
+        best_feature_per_bsp_mcc: (num_bsps,) index of best (MCC) feature per BSP
+        base_rates:            (num_bsps,) base rate (positive-class freq) per BSP
+        f1_lift_per_bsp:       (num_bsps,) best_f1 minus trivial-baseline F1, clipped at 0
+        trivial_f1_per_bsp:    (num_bsps,) the "always positive" F1 = 2p/(1+p)
     """
 
     precision: torch.Tensor
@@ -41,13 +47,24 @@ class FeatureBSPMatching:
     f1: torch.Tensor
     best_f1_per_bsp: torch.Tensor
     best_feature_per_bsp: torch.Tensor
+    # Added 2026-05-11. Optional for back-compat with legacy caches.
+    mcc: torch.Tensor | None = None
+    best_mcc_per_bsp: torch.Tensor | None = None
+    best_feature_per_bsp_mcc: torch.Tensor | None = None
+    base_rates: torch.Tensor | None = None
+    f1_lift_per_bsp: torch.Tensor | None = None
+    trivial_f1_per_bsp: torch.Tensor | None = None
 
 
 def match_features_to_bsps(
     h: torch.Tensor,
     bsp_labels: torch.Tensor,
 ) -> FeatureBSPMatching:
-    """Compute precision, recall, F1 between every SAE feature and every BSP.
+    """Compute precision, recall, F1, MCC between every SAE feature and every BSP.
+
+    Also computes per-BSP base rates and the F1 lift over the trivial
+    "always positive" baseline, which is the source of the F1 ≈ 0.667 artifact
+    for high-base-rate BSPs.
 
     Args:
         h:          (N, d_dict) SAE hidden activations (non-negative).
@@ -66,26 +83,51 @@ def match_features_to_bsps(
         # Binarize feature activations
         fires = (h > 0).float()  # (N, d_dict)
         labels = bsp_labels.float()  # (N, num_bsps)
+        N = float(fires.shape[0])
 
         # Pairwise counts via matrix multiplication
         # TP[i,j] = sum over samples where feature i fires AND BSP j is true
         tp = fires.T @ labels  # (d_dict, num_bsps)
         fp = fires.T @ (1.0 - labels)  # (d_dict, num_bsps)
         fn = (1.0 - fires).T @ labels  # (d_dict, num_bsps)
+        tn = N - tp - fp - fn
 
         eps = 1e-8
         precision = tp / (tp + fp + eps)
         recall = tp / (tp + fn + eps)
         f1 = 2.0 * precision * recall / (precision + recall + eps)
 
+        # MCC = (TP*TN - FP*FN) / sqrt((TP+FP)(TP+FN)(TN+FP)(TN+FN))
+        # Numerically: clamp denominator and treat 0 → 0 (constant predictor).
+        mcc_num = tp * tn - fp * fn
+        mcc_den = torch.sqrt(
+            (tp + fp).clamp(min=eps)
+            * (tp + fn).clamp(min=eps)
+            * (tn + fp).clamp(min=eps)
+            * (tn + fn).clamp(min=eps)
+        )
+        mcc = mcc_num / mcc_den
+
         best_f1_per_bsp, best_feature_per_bsp = f1.max(dim=0)
+        best_mcc_per_bsp, best_feature_per_bsp_mcc = mcc.max(dim=0)
+
+        # Base rates and trivial-baseline F1 ("always predict positive")
+        base_rates = labels.mean(dim=0)  # (num_bsps,)
+        trivial_f1 = (2.0 * base_rates) / (1.0 + base_rates + eps)
+        f1_lift = (best_f1_per_bsp - trivial_f1).clamp(min=0.0)
 
     return FeatureBSPMatching(
         precision=precision,
         recall=recall,
         f1=f1,
+        mcc=mcc,
         best_f1_per_bsp=best_f1_per_bsp,
         best_feature_per_bsp=best_feature_per_bsp,
+        best_mcc_per_bsp=best_mcc_per_bsp,
+        best_feature_per_bsp_mcc=best_feature_per_bsp_mcc,
+        base_rates=base_rates,
+        f1_lift_per_bsp=f1_lift,
+        trivial_f1_per_bsp=trivial_f1,
     )
 
 
@@ -95,21 +137,30 @@ def match_features_to_bsps(
 
 
 def compute_coverage(matching: FeatureBSPMatching) -> dict[str, float]:
-    """Compute coverage: mean of best-F1 across BSPs.
+    """Compute coverage: mean of best-F1 across BSPs (plus MCC and F1-lift variants).
 
-    Also reports fraction of BSPs above standard thresholds.
+    Coverage definitions:
+        - coverage:           mean of best-F1 per BSP (literature standard, but
+                              base-rate-sensitive — high-base-rate BSPs score
+                              F1 ≈ 2p/(1+p) trivially).
+        - coverage_mcc:       mean of best-MCC per BSP (base-rate-invariant;
+                              0 for any constant predictor).
+        - coverage_f1_lift:   mean of (best_f1 − trivial_f1)+, where trivial_f1
+                              is the "always predict positive" baseline.
 
     Args:
         matching: Output of match_features_to_bsps().
 
     Returns:
         Dict with keys: coverage, coverage_above_50, coverage_above_75,
+        coverage_mcc, coverage_mcc_above_25, coverage_mcc_above_50,
+        coverage_f1_lift, coverage_f1_lift_above_10,
         num_bsps, min_f1, max_f1, median_f1.
     """
     best_f1 = matching.best_f1_per_bsp
     num_bsps = best_f1.shape[0]
 
-    return {
+    out: dict[str, float] = {
         "coverage": round(best_f1.mean().item(), 4),
         "coverage_above_50": round((best_f1 > 0.50).float().mean().item(), 4),
         "coverage_above_75": round((best_f1 > 0.75).float().mean().item(), 4),
@@ -118,6 +169,40 @@ def compute_coverage(matching: FeatureBSPMatching) -> dict[str, float]:
         "max_f1": round(best_f1.max().item(), 4),
         "median_f1": round(best_f1.median().item(), 4),
     }
+
+    if matching.best_mcc_per_bsp is not None:
+        best_mcc = matching.best_mcc_per_bsp
+        out.update(
+            {
+                "coverage_mcc": round(best_mcc.mean().item(), 4),
+                "coverage_mcc_above_25": round(
+                    (best_mcc > 0.25).float().mean().item(), 4
+                ),
+                "coverage_mcc_above_50": round(
+                    (best_mcc > 0.50).float().mean().item(), 4
+                ),
+                "median_mcc": round(best_mcc.median().item(), 4),
+                "min_mcc": round(best_mcc.min().item(), 4),
+                "max_mcc": round(best_mcc.max().item(), 4),
+            }
+        )
+
+    if matching.f1_lift_per_bsp is not None:
+        lift = matching.f1_lift_per_bsp
+        out.update(
+            {
+                "coverage_f1_lift": round(lift.mean().item(), 4),
+                "coverage_f1_lift_above_10": round(
+                    (lift > 0.10).float().mean().item(), 4
+                ),
+                "coverage_f1_lift_above_25": round(
+                    (lift > 0.25).float().mean().item(), 4
+                ),
+                "median_f1_lift": round(lift.median().item(), 4),
+            }
+        )
+
+    return out
 
 
 def compute_per_category_coverage(
@@ -149,6 +234,9 @@ def compute_per_category_coverage(
         return None
 
     best_f1 = matching.best_f1_per_bsp
+    best_mcc = matching.best_mcc_per_bsp
+    f1_lift = matching.f1_lift_per_bsp
+    base_rates = matching.base_rates
 
     # Group BSP indices by category
     categories: dict[str, list[int]] = {}
@@ -159,13 +247,23 @@ def compute_per_category_coverage(
     result = {}
     for cat, indices in sorted(categories.items()):
         cat_f1 = best_f1[indices]
-        result[cat] = {
+        entry = {
             "count": len(indices),
             "mean_f1": round(cat_f1.mean().item(), 4),
             "min_f1": round(cat_f1.min().item(), 4),
             "max_f1": round(cat_f1.max().item(), 4),
             "median_f1": round(cat_f1.median().item(), 4),
         }
+        if best_mcc is not None:
+            cat_mcc = best_mcc[indices]
+            entry["mean_mcc"] = round(cat_mcc.mean().item(), 4)
+            entry["median_mcc"] = round(cat_mcc.median().item(), 4)
+        if f1_lift is not None:
+            cat_lift = f1_lift[indices]
+            entry["mean_f1_lift"] = round(cat_lift.mean().item(), 4)
+        if base_rates is not None:
+            entry["mean_base_rate"] = round(base_rates[indices].mean().item(), 4)
+        result[cat] = entry
 
     return result
 

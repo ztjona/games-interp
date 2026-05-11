@@ -230,6 +230,18 @@ class TestCoverage:
             "min_f1",
             "max_f1",
             "median_f1",
+            # MCC-based (added when matching has MCC fields populated)
+            "coverage_mcc",
+            "coverage_mcc_above_25",
+            "coverage_mcc_above_50",
+            "median_mcc",
+            "min_mcc",
+            "max_mcc",
+            # F1-lift over trivial base-rate baseline
+            "coverage_f1_lift",
+            "coverage_f1_lift_above_10",
+            "coverage_f1_lift_above_25",
+            "median_f1_lift",
         }
         assert expected_keys == set(cov.keys())
 

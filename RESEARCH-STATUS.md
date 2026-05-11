@@ -67,6 +67,7 @@
 | Linear (fc1, random net) | hawk (173, full reframed) | 0.005 |
 | Best SAE (BatchTopK-k16-fc1) | gorilla | 0.338 |
 | Best SAE (TopK-k64-conv2-exp8) | gorilla | 0.332 |
+| **Best SAE overall (C01 TopK-k16-conv2-exp8, 2026-05-11)** | gorilla | **0.353** |
 | Pre-anakin baseline (TopK-k32-fc1) | gorilla | 0.297 |
 
 ### Phase 1F: Conv2 Linear Probe Results (2026-04-24)
@@ -117,47 +118,134 @@ A power loss between 19:21 and 19:29 on 2026-04-24 left the panel partially comp
 | `B03-conv2-completion-s42-topk-k64-exp2-conv2` | partial (4k/25k, no .pt) | — | **rerun training** |
 | `B04-conv2-completion-s42-vanilla-l1_001-exp4-conv2` | not started | — | **train from scratch** |
 
-### Phase 2A: Conv2 Architecture Sweep (launched 2026-04-29, failed 2026-05-04)
+### Phase 2A: Conv2 Architecture Sweep — COMPLETED (re-run on Deep Brain 3×GPU, 2026-05-11)
 
-**Motivation:** The "architecture doesn't matter" conclusion from Anakin was valid only for fc1. On conv2: only 3 of 6 architectures have ever been tested (topk, jumprelu, gated); only 2 runs were at exp8; the fc1 winner (BatchTopK-k16) has never been run on conv2; and SAE/LP efficiency at conv2 is only 42% vs 84% at fc1. A systematic sweep is warranted.
+**Status:** All 33 runs (Campaigns C/D/F/G) completed successfully on Deep Brain after the timeout fix. 79 total entries now in `eval_registry.json`. The original 2026-05-04 failure was a `run_sweep.py` timeout, not a methodological issue — the same configs re-ran cleanly with `--timeout=86400`.
 
-**Planned campaigns (all failed — no checkpoints saved):**
+**New winner:** `C01-c2arch-s42-topk-k16-exp8-conv2` — gorilla coverage = **0.353**, cov>50 = **0.396**. First time any run cracks 0.35.
 
-| Campaign | Purpose | Configs | Status |
-|----------|---------|---------|--------|
-| C (C01–C14) | conv2-512 all 6 architectures at exp8, seed=42 | 14 | ❌ No checkpoint saved |
-| D (D01–D04) | conv2-512 TopK+BatchTopK at exp16 (larger dicts) | 4 | ❌ No checkpoint saved |
-| F (F01–F10) | Seed stability: seeds 43+44 for 5 leading conv2 archs | 10 | ❌ No checkpoint saved |
-| G (G01–G05) | Random-model controls on conv2-512 | 5 | ❌ No checkpoint saved |
+#### Reporting standard (REQUIRED for every winner claim)
 
-**Execution post-mortem (2026-05-04):** All 33 runs were killed by a hard `timeout=3600s` (1h) in `run_sweep.py`. CPU training on `conv2_512_amalgam_activations.pt` takes 2–7+ hours per run (confirmed from B-series: B01=2.03h, B03=6.08h, B04=7.37h). Partial JSONL metrics exist; no `.pt` checkpoints; no eval results. **Fix applied:** timeout now defaults to 86400s (24h) and is configurable via `--timeout=<sec>`.
+Three rules, enforced as of 2026-05-11:
 
-**Key conclusions from partial logs:**
+1. **Always report three coverage metrics side-by-side** — F1 (literature standard, base-rate-sensitive), MCC (base-rate-invariant; 0 for any constant predictor), F1-lift (best_F1 minus the trivial 2p/(1+p) "always-positive" baseline, clipped at 0). MCC and F1-lift add ~0 cost (same TP/FP/FN/TN counts), and they collapse the trivial-feature artifact that gives `offered_piece` an apparent F1 = 0.667. The eval pipeline writes all three to `eval_registry.json`; `scripts/backfill_eval_metrics.py` retro-fills older entries.
+2. **Always compare against linear-probe ceiling AND random-network control.** The "learned-gap fraction" `(coverage_SAE − coverage_rand_SAE) / (LP_trained − LP_random)` is the cleanest way to claim a SAE recovers *learned* structure rather than the architectural prior (especially important at conv2 where random conv filters already give LP ≈ 0.78 on cell-attribute).
+3. **Always present the per-category breakdown count-weighted by N.** Headline mean drags down through high-N low-F1 categories (76 of 164 gorilla BSPs are threats at ~0.08).
 
-- **Gated (C10/C11) — remove from re-run queue.** L0 ≈ 1050 from step 500 and never moves. This mirrors the completed fc1 gated trajectory: L0 stabilised by step 500 and changed by <3 units over 25,000 steps for both l1_002 and l1_0005 variants. The architecture reaches a fixed equilibrium (~25% activation density) regardless of L1 strength in this regime. More training cannot fix this; a 2-order-of-magnitude stronger penalty would likely destroy coverage instead.
+Template (fill cells with `F1 / MCC / lift`):
 
-- **G series (random controls) — deprioritise but keep.** FVU=0.62 (G02) and 0.34 (G03) after 500–1500 steps reflects lower variance in random-model activations — expected. The trained-vs-random coverage comparison at fc1 is already established via A01/A02. G-series confirms the same sanity-check at conv2 but is lower priority than completing C/D/F.
+| BSP category | N | LP (trained) | LP (random) | baseline | prev best | **NEW** | random-net control | learned-gap frac |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| cell_attribute | 64 | 0.971 | 0.782 | … | … | … | … | … |
+| cell_occupancy | 16 | 1.000 | 0.829 | … | … | … | … | … |
+| game_phase | 3 | 0.936 | 0.685 | … | … | … | … | … |
+| global | 1 | 0.694 | 0.634 | … | … | … | … | … |
+| offered_piece | 4 | 0.789 | 0.718 | … | … | … | … | … |
+| threat_line | 40 | 0.502 | 0.019 | … | … | … | … | … |
+| threat_square_2x2 | 36 | 0.680 | 0.016 | … | … | … | … | … |
+| **overall coverage** | 164 | 0.789 | 0.428 | … | … | … | … | … |
+| **non-threat subset** | 88 | — | — | … | … | … | … | … |
+| **threat-only subset** | 76 | — | — | … | … | … | … | … |
 
-**Re-run commands (with fixed timeout):**
-```bash
-# GPU 1 — Campaign C (skip C10/C11 — gated, known failure)
-python run_sweep.py --configs=configs/followup --tier=C --gpu=1 --eval --skip-existing
-# GPU 2 — Campaign F
-python run_sweep.py --configs=configs/followup --tier=F --gpu=2 --eval --skip-existing
-# GPU 0 — Campaigns D and G
-python run_sweep.py --configs=configs/followup --tier=D,G --gpu=0 --eval --skip-existing
-```
+(Hawk uses the 7 reframed categories: `reframed_count` ×40, `reframed_completable` ×40, `reframed_any_threat` ×10, `reframed_sq_count` ×36, `reframed_sq_completable` ×36, `reframed_sq_any_threat` ×9, `reframed_global` ×2.)
 
-**Key questions still open:**
-1. Does BatchTopK-k16 dominate at conv2 the way it does at fc1?
-2. Does exp16 (d_dict=8192) improve coverage for 512d inputs?
-3. Are threat-recovery results stable across seeds?
+##### Why MCC / F1-lift matter (2026-05-11 backfill)
 
-### Next Steps After Phase 2A Completes
+F1 inflates trivial features: a feature that fires on every sample scores F1 = 2p/(1+p) for base rate p. The first backfilled entries make this concrete:
 
-1. **Hawk_173 SAE evaluation** on the best conv2 checkpoint from Phase 2A. Tests whether threat recovery improves with richer dictionaries.
-2. **Feature reuse / absorption diagnostic** on the best conv2 SAE — uses `best_feature_per_bsp` from the matching cache. Quantifies whether conv2 SAE coverage stalls at ~0.33 due to absorption vs. true information ceiling.
-3. **Conditional:** if unsupervised SAEs still leave large conv2 probe gap, run Guided/anchored SAE pilot at conv2 (Phase 3A/3B in EXPERIMENT-PLAN).
+| Run | F1 | MCC | F1-lift | trained / random F1 ratio | trained / random F1-lift ratio |
+|---|:---:|:---:|:---:|:---:|:---:|
+| anakin-batchtopk-k16-exp8-fc1 | 0.338 | 0.307 | 0.141 | — | — |
+| anakin-topk-k64-exp8-conv2 | 0.332 | 0.291 | 0.133 | — | — |
+| A02 random-net control (conv2) | 0.224 | 0.177 | 0.025 | **1.51×** | **5.32×** |
+
+The F1-lift gap between trained and random networks is ~3.5× more discriminating than the raw-F1 gap. **F1-lift is now the recommended *headline* metric for any SAE-vs-random comparison;** raw F1 is kept for literature comparability; MCC adds an orthogonal information-theoretic view. The trio is cheap to compute simultaneously.
+
+#### Winners table (2026-05-11)
+
+| BSP category | N | baseline topk-k32-fc1 | Phase 1E fc1 (batchtopk-k16) | Phase 1E conv2 (topk-k64-exp8) | **Phase 2A (C01 topk-k16-conv2)** | C07 jumprelu-t32-conv2 | D02 topk-k64-exp16-conv2 | random conv2 (A02) | random C01 (G01) |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
+| cell_attribute | 64 | 0.423 | 0.504 | 0.501 | **0.537** | 0.523 | 0.506 | 0.297 | 0.240 |
+| cell_occupancy | 16 | 0.622 | 0.737 | 0.668 | **0.802** | 0.810 | 0.673 | 0.505 | 0.246 |
+| game_phase | 3 | 0.608 | 0.577 | 0.621 | 0.557 | 0.506 | 0.567 | 0.459 | 0.217 |
+| global | 1 | 0.692 | 0.635 | 0.581 | 0.494 | 0.564 | 0.551 | 0.501 | 0.188 |
+| offered_piece | 4 | 0.650 | 0.598 | 0.666 | 0.631 | 0.667* | 0.666* | 0.667* | 0.313 |
+| threat_line | 40 | 0.074 | 0.074 | 0.079 | 0.076 | 0.053 | 0.078 | 0.069 | 0.071 |
+| threat_square_2x2 | 36 | 0.101 | 0.103 | 0.094 | 0.084 | 0.059 | 0.094 | 0.068 | 0.070 |
+| **overall coverage** | 164 | 0.297 | 0.338 | 0.332 | **0.353** | 0.338 | 0.333 | 0.224 | 0.163 |
+| **non-threat (88)** | 88 | 0.479 | 0.555 | 0.544 | **0.589** | 0.582 | 0.546 | 0.359 | 0.243 |
+| **threat-only (76)** | 76 | 0.087 | 0.087 | 0.086 | 0.080 | 0.056 | 0.086 | 0.068 | 0.070 |
+
+*`offered_piece` ≈ 0.667 is the trivial baseline; only runs strictly below this found real signal.
+
+#### Key conclusions
+
+1. **The three pre-registered Phase 2A questions are answered:**
+   - *Does BatchTopK-k16 dominate at conv2 like at fc1?* **No.** At conv2 TopK-k16 wins (0.353); BatchTopK-k16 trails at 0.322–0.333 across 3 seeds. First clean architecture × hook interaction observed.
+   - *Does exp16 help on conv2?* **No.** D01–D04 are within ±0.005 of their exp8 counterparts. With 80–99 % dead features at exp8, the dictionary is not the bottleneck.
+   - *Are results seed-stable?* **Yes.** σ ≈ 0.005 across the 11 F-campaign runs, matching fc1's σ = 0.004. C01's +0.015 lead over the next conv2 arch is ~3σ and treated as real.
+
+2. **Non-threat gains, no threat gains.** C01 lifts non-threat coverage to 0.589 (= 61 % of conv2 linear-probe ceiling 0.971). Threat-only coverage is 0.080 — indistinguishable from a random network (0.070). **The 33-run sweep moves overall coverage entirely through non-threat categories.** Unsupervised SAEs have a hard ceiling on threats at this hook.
+
+3. **Trained-vs-random gap is real and large.** G-campaign trained-minus-random gaps: topk-k16 +0.190, batchtopk-k16 +0.092, topk-k64-exp16 +0.100. C01's gap is double the others, consistent with a tight L0 budget forcing the SAE to exploit trained-network structure rather than the conv-architecture prior.
+
+4. **TopK's deterministic per-sample budget is load-bearing on conv2.** At k=16-conv2, TopK keeps ~19 % live features; BatchTopK/JumpReLU collapse to 1–2 %. Opposite of the fc1 pattern, where BatchTopK's adaptive allocation was the differentiator.
+
+### Phase 1G: Model Competence Audit (NEW — proposed 2026-05-11, blocks Phase 3)
+
+**Motivation.** The threat-recovery floor at F1 ≈ 0.08 across 33 unsupervised SAEs forces the question: *is the SAE failing, or does the model never compute threats in the first place?*
+
+Two empirical anchors:
+- Conv2 linear probe recovers `threat_line` at F1 = 0.502 (random-conv2 LP = 0.019), so the trained `conv1+conv2` stack *does* compute something that linearly exposes 3-in-a-row patterns. The signal is real and learned, not an architectural prior.
+- That signal then **disappears at fc1** (LP F1 = 0.022). Either fc1 actively compresses threats out, or only a non-threat linear combination is consumed by the Q-head.
+
+If the trained agent does not actually *use* threat information when it decides, no unsupervised SAE can recover features the network does not compute — and the problem becomes a *model* problem, not an interpretability one. A useful consequence-of-success branch: **if the model passes these tests, the threat signal is present-but-compressed, and a small auxiliary "predict-threat-from-fc1" head added during DQN training would preserve threat information through the bottleneck** — promoting interpretability by architectural choice.
+
+**Player-perspective-correct tests** (no new training, just inference on existing positions; CLI in `scripts/model_competence_audit.py`, planned):
+
+| ID | Test | Filter / Population | Trained-model metric | Baselines |
+|---|---|---|---|---|
+| A | **Winning placement** | Positions where the offered piece can complete a 4-in-a-row in at least one empty cell | Fraction of positions where argmax placement is one of the winning cells | Random-among-legal ≈ (#winning) / (#empty); optimal = 1.0 |
+| B | **Losing-piece avoidance** | Positions where the model must select a piece AND at least one "safe" piece is available AND at least one available piece would let the opponent win immediately. **Forced-loss positions (all available pieces losing) are excluded from the denominator.** | Fraction of positions where the model selects a *safe* piece | Random-among-available ≈ (#safe) / (#available); optimal = 1.0 |
+| C | **Offered-piece sensitivity** | 1000 sampled positions, replay the model with each of the 16 possible offered pieces overriding the real one | (a) fraction of positions where argmax placement changes across the 16; (b) same for next-piece argmax | If model ignores the offered piece, both ≈ 0; H7 reconfirmed behaviorally |
+| D | **Q-occupancy gap** | All positions | Mean unmasked `Q[occupied] − Q[empty]` from the placement head | Random-network baseline; trained gap should be large and negative |
+| E | **Phase-stratified Q entropy** | All positions binned by piece-count | Softmax entropy of placement Q-values per phase | Random network entropy ≈ uniform; trained entropy should shift across phases (proxy for `game_phase` use) |
+
+Tests A and B are the threat-detection diagnostics. Test C is the H7 (offered-piece) behavioral re-confirmation. Tests D and E correlate behavior with the other BSP categories (`cell_occupancy`, `game_phase`). The placement head is unmasked at the network level — the legal-cell mask is applied *outside* `forward()` in `models/NN_abstract.predict()`, so no model surgery is required.
+
+**Cross-correlation with SAE coverage.** Once A–E are computed for trained + random networks, the full diagnostic plot is *(per-category SAE coverage of C01) vs (behavioral test score) for trained and random networks*. Strong correlation = SAE coverage is a valid interpretability proxy. Weak correlation = the SAE finds representations that exist but the model does not use.
+
+**Decision branches:**
+- **Tests A/B near random:** model does not compute threats → no SAE can recover them. Pivot threats to anchored/guided SAEs *or* retrain a stronger Quarto agent (auxiliary threat head).
+- **Tests A/B clearly above random:** threats are computed → unsupervised SAEs fail for a structural reason (absorption, sparse heterogeneity). Matryoshka and E2E SAEs are warranted.
+- **Mixed:** informs which guided concepts to anchor.
+
+This phase **must run before launching any new SAE architecture aimed at threats**, otherwise we risk burning weeks tuning an SAE for a signal that isn't there.
+
+### Phase 3A — New Architectures (PLANNED, gated on Phase 1G)
+
+Implementation order, motivated by Phase 2A conclusions:
+
+1. **End-to-end SAE** (Braun et al., 2024). Trains the SAE to preserve downstream Q-head loss rather than raw activation MSE. Directly diagnostic: if threats are present in conv2 but the Q-head ignores them, E2E will *deprioritize* threat features relative to vanilla — quantifying how load-bearing threats actually are. Complements Phase 1G at the SAE level. Implementation cost: moderate (loss + forward hook to `fc2_board`/`fc2_piece`).
+
+2. **Matryoshka SAE** (Bussmann et al., 2024). Nested dictionaries d ⊂ 2d ⊂ 4d ⊂ 8d, sparse at each level. Directly attacks feature absorption / splitting — the suspected cause of the BatchTopK/JumpReLU 99 %-dead pattern at conv2. Best bet for closing the SAE/LP gap on non-threat categories.
+
+3. *Lower priority:* crosscoders (conv2 ↔ fc1 transfer), transcoders (replace fc layer with sparse map). Worth doing after E2E + Matryoshka.
+
+### Other near-term work
+
+- **Hawk_173 evaluation on the C/D/F winners (must run on Deep Brain).** The C/D/F/G checkpoints (33 runs) live only on Deep Brain — `saes/**/*.pt` is gitignored, so local hawk eval fails with FileNotFoundError. Procedure: pull repo on Deep Brain, run the hawk-eval loop there, push the updated `eval_registry.json` and the new `cache/*_matching-hawk.pt` files (the latter are not gitignored). Cheap to add — pure evaluation, ~1 h CPU.
+- **Feature reuse / absorption diagnostic on C01** — uses `best_feature_per_bsp` from the matching cache. Quantifies how often the same feature wins for multiple BSPs at conv2.
+
+### Why the random-net baseline is 0.78 on cell_attribute (added 2026-05-11)
+
+Random conv filters are a fixed nonlinear projection of the input; a downstream linear probe can usually decode any linearly-accessible input attribute through such a projection (this is the *random features / extreme learning machine* regime). Since piece attributes enter as one-hot inputs, they survive random projections almost intact. Consequence: **for cell-level BSPs the relevant baseline is not 0, it is the random-conv2 probe**, and the right "did the SAE learn something" metric is the *learned-gap fraction*
+
+  (cov_SAE − cov_rand_SAE) / (LP_trained − LP_random)
+
+For C01 this is 1.57 on `cell_attribute` (the SAE recovers more than the LP-gap because LP exploits projections the SAE's sparse code cannot) — strong evidence C01 captures learned attribute structure, not the architectural prior. For threat categories the same fraction is ≈ 0.01: nothing learned-specific is recovered.
+
+This reframing changes how we interpret the threat probes: `threat_line` LP F1 = 0.502 is **fully learned** (random conv2 = 0.019), so the trained `conv1+conv2` stack does compute threats; the bottleneck is fc1 (LP F1 = 0.022). This motivates an **architectural fix**: adding a small auxiliary threat-prediction head on fc1 during DQN training (λ ≈ 0.1 weight, 76-dim BCE) would force the bottleneck to preserve threat information. Parked under Phase 4 (interpretability-by-architecture); execute only after Phase 1G confirms the model uses threats.
 
 ### Deprioritized (2026-04-27)
 

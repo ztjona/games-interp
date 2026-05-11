@@ -353,8 +353,25 @@ def cmd_evaluate(args: dict) -> None:
             f1=c["f1"],
             best_f1_per_bsp=c["best_f1_per_bsp"],
             best_feature_per_bsp=c["best_feature_per_bsp"],
+            mcc=c.get("mcc"),
+            best_mcc_per_bsp=c.get("best_mcc_per_bsp"),
+            best_feature_per_bsp_mcc=c.get("best_feature_per_bsp_mcc"),
+            base_rates=c.get("base_rates"),
+            f1_lift_per_bsp=c.get("f1_lift_per_bsp"),
+            trivial_f1_per_bsp=c.get("trivial_f1_per_bsp"),
         )
         log.info("  matching loaded from cache: %s", matching_cache)
+        # Forward-compat: if cache is pre-MCC, augment it now (cheap, no h needed
+        # for f1_lift; MCC needs counts so we skip silently if missing).
+        if matching.f1_lift_per_bsp is None:
+            base_rates = bsp_labels.float().mean(dim=0)
+            trivial_f1 = (2.0 * base_rates) / (1.0 + base_rates + 1e-8)
+            matching.base_rates = base_rates
+            matching.trivial_f1_per_bsp = trivial_f1
+            matching.f1_lift_per_bsp = (matching.best_f1_per_bsp - trivial_f1).clamp(
+                min=0.0
+            )
+            log.info("  legacy cache: derived f1_lift from labels")
     else:
         matching = match_features_to_bsps(h, bsp_labels)
         torch.save(
@@ -364,6 +381,12 @@ def cmd_evaluate(args: dict) -> None:
                 "f1": matching.f1,
                 "best_f1_per_bsp": matching.best_f1_per_bsp,
                 "best_feature_per_bsp": matching.best_feature_per_bsp,
+                "mcc": matching.mcc,
+                "best_mcc_per_bsp": matching.best_mcc_per_bsp,
+                "best_feature_per_bsp_mcc": matching.best_feature_per_bsp_mcc,
+                "base_rates": matching.base_rates,
+                "f1_lift_per_bsp": matching.f1_lift_per_bsp,
+                "trivial_f1_per_bsp": matching.trivial_f1_per_bsp,
             },
             matching_cache,
         )
@@ -430,9 +453,25 @@ def _print_summary(
     log.info("  FVU:                  %.6f", metrics.get("fvu", 0))
     log.info("  L0:                   %.1f", metrics.get("l0", 0))
     log.info("  Dead features:        %.1f%%", metrics.get("dead_features_pct", 0))
-    log.info("  Coverage:             %.4f", metrics.get("coverage", 0))
-    log.info("  Coverage >50%%:        %.4f", metrics.get("coverage_above_50", 0))
-    log.info("  Coverage >75%%:        %.4f", metrics.get("coverage_above_75", 0))
+    log.info("  Coverage (F1):        %.4f", metrics.get("coverage", 0))
+    log.info("  Coverage F1 >50%%:     %.4f", metrics.get("coverage_above_50", 0))
+    log.info("  Coverage F1 >75%%:     %.4f", metrics.get("coverage_above_75", 0))
+    if "coverage_mcc" in metrics:
+        log.info("  Coverage (MCC):       %.4f", metrics["coverage_mcc"])
+        log.info(
+            "  Coverage MCC >25%%:    %.4f",
+            metrics.get("coverage_mcc_above_25", 0),
+        )
+        log.info(
+            "  Coverage MCC >50%%:    %.4f",
+            metrics.get("coverage_mcc_above_50", 0),
+        )
+    if "coverage_f1_lift" in metrics:
+        log.info("  Coverage F1-lift:     %.4f", metrics["coverage_f1_lift"])
+        log.info(
+            "  F1-lift >10%%:         %.4f",
+            metrics.get("coverage_f1_lift_above_10", 0),
+        )
     feature_sharing = metrics.get("feature_sharing", {})
     if feature_sharing:
         log.info(
@@ -457,13 +496,16 @@ def _print_summary(
     per_cat = metrics.get("per_category")
     if per_cat:
         log.info("-" * 60)
-        log.info("  Per-category coverage (mean F1):")
+        log.info("  Per-category coverage (F1 / MCC / F1-lift):")
         for cat, vals in sorted(per_cat.items()):
             log.info(
-                "    %-22s  %.4f  (%d BSPs)",
+                "    %-22s  F1=%.3f  MCC=%.3f  lift=%.3f  (%d BSPs, base=%.3f)",
                 cat,
-                vals["mean_f1"],
-                vals["count"],
+                vals.get("mean_f1", 0.0),
+                vals.get("mean_mcc", 0.0),
+                vals.get("mean_f1_lift", 0.0),
+                vals.get("count", 0),
+                vals.get("mean_base_rate", 0.0),
             )
     log.info("=" * 60)
     log.info("  Saved to eval registry: %s", _registry_path(game))
@@ -500,6 +542,8 @@ def cmd_history(args: dict) -> None:
         ("dead_features_pct", ".0f"),
         ("coverage", ".3f"),
         ("coverage_above_50", ".3f"),
+        ("coverage_mcc", ".3f"),
+        ("coverage_f1_lift", ".3f"),
         ("board_reconstruction", ".3f"),
     ]
 
