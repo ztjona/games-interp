@@ -191,38 +191,31 @@ The F1-lift gap between trained and random networks is ~3.5× more discriminatin
 
 4. **TopK's deterministic per-sample budget is load-bearing on conv2.** At k=16-conv2, TopK keeps ~19 % live features; BatchTopK/JumpReLU collapse to 1–2 %. Opposite of the fc1 pattern, where BatchTopK's adaptive allocation was the differentiator.
 
-### Phase 1G: Model Competence Audit (NEW — proposed 2026-05-11, blocks Phase 3)
+### Phase 1G: Model Competence Audit (RESULTS — executed 2026-05-11, decisive)
 
-**Motivation.** The threat-recovery floor at F1 ≈ 0.08 across 33 unsupervised SAEs forces the question: *is the SAE failing, or does the model never compute threats in the first place?*
+**Run.** `scripts/model_competence_audit.py` with N=5,000 for A/B/C and the full 275,916 positions for D/E; trained and random conv2 models compared. Output: `data/quarto/model_competence_audit.json`.
 
-Two empirical anchors:
-- Conv2 linear probe recovers `threat_line` at F1 = 0.502 (random-conv2 LP = 0.019), so the trained `conv1+conv2` stack *does* compute something that linearly exposes 3-in-a-row patterns. The signal is real and learned, not an architectural prior.
-- That signal then **disappears at fc1** (LP F1 = 0.022). Either fc1 actively compresses threats out, or only a non-threat linear combination is consumed by the Q-head.
+| Test | Trained | Random | Diagnosis |
+|---|---:|---:|---|
+| A: winning-placement acc | **0.700** | 0.223 | Strong — trained model recognises immediate wins ~3× random |
+| B: losing-piece avoidance | 0.405 | 0.433 | **Indistinguishable from random** — model does NOT reason about what it hands the opponent |
+| B: positions excluded (forced loss) | 307 | 607 | — |
+| C: piece-sensitivity (mean distinct frac, 1.0 = fully sensitive) | 0.144 | 0.113 | Placement is almost piece-invariant — H7 reconfirmed behaviorally |
+| D: Q(empty) − Q(occupied) | **−0.472** | −0.001 | Trained head assigns *lower* raw Q to empty cells (only 25.3% positive). Legality is supplied entirely by the external mask in `predict()` |
+| E: entropy / uniform-cap by phase | 2.51/2.57 (early), 1.99/2.21 (mid), 1.31/1.43 (late) | 2.57/2.57, 2.19/2.21, 1.39/1.43 | Modest concentration only at mid-game; late-game still within 8% of uniform |
 
-If the trained agent does not actually *use* threat information when it decides, no unsupervised SAE can recover features the network does not compute — and the problem becomes a *model* problem, not an interpretability one. A useful consequence-of-success branch: **if the model passes these tests, the threat signal is present-but-compressed, and a small auxiliary "predict-threat-from-fc1" head added during DQN training would preserve threat information through the bottleneck** — promoting interpretability by architectural choice.
+**Interpretation.** The trained agent has learned a single asymmetric heuristic — "does this position give me an immediate win?" — and almost nothing else. It does not reason about what piece it gives, does not internalise legality, and barely concentrates probability mass even when one move is forced. This **fully explains the hawk SAE results**: threat-count features exist at moderate F1-lift (~0.12) because the model uses them to detect *its own* winning chances; threat-completability features sit at noise floor (~0.03) because the model never computes "is this piece losing for me to give." There is nothing for an SAE to find on the completability axis.
 
-**Player-perspective-correct tests** (no new training, just inference on existing positions; CLI in `scripts/model_competence_audit.py`, planned):
+**Implications for the research program:**
+1. **Phase 3A E2E SAE is no longer purely architectural.** The legitimate question becomes *"once we project conv2 onto Q-head-relevant directions, what fraction of variance is the immediate-win check vs everything else?"* — E2E is now diagnostic for the asymmetry itself.
+2. **Matryoshka is deprioritised** — it solves feature absorption, but the missing concepts aren't being absorbed, they're never represented.
+3. **Anchored / guided SAEs against `reframed_completable`** would also fail by construction; do not attempt.
+4. **Phase 4 (architectural fix) is promoted from "branch" to "primary path":** the auxiliary "predict-threat-from-fc1" head during DQN training is now the most direct route to a model whose threat representations a generic SAE can recover. The current model is the bottleneck, not the SAE family.
+5. **Re-narrate the dissertation contribution** from "find threat features in Quarto via SAEs" to "characterise the attack-recognition / defence-blindness asymmetry of a DQN-trained Quarto agent through behavioural + SAE evidence." This is a stronger negative result with cleaner experimental closure.
 
-| ID | Test | Filter / Population | Trained-model metric | Baselines |
-|---|---|---|---|---|
-| A | **Winning placement** | Positions where the offered piece can complete a 4-in-a-row in at least one empty cell | Fraction of positions where argmax placement is one of the winning cells | Random-among-legal ≈ (#winning) / (#empty); optimal = 1.0 |
-| B | **Losing-piece avoidance** | Positions where the model must select a piece AND at least one "safe" piece is available AND at least one available piece would let the opponent win immediately. **Forced-loss positions (all available pieces losing) are excluded from the denominator.** | Fraction of positions where the model selects a *safe* piece | Random-among-available ≈ (#safe) / (#available); optimal = 1.0 |
-| C | **Offered-piece sensitivity** | 1000 sampled positions, replay the model with each of the 16 possible offered pieces overriding the real one | (a) fraction of positions where argmax placement changes across the 16; (b) same for next-piece argmax | If model ignores the offered piece, both ≈ 0; H7 reconfirmed behaviorally |
-| D | **Q-occupancy gap** | All positions | Mean unmasked `Q[occupied] − Q[empty]` from the placement head | Random-network baseline; trained gap should be large and negative |
-| E | **Phase-stratified Q entropy** | All positions binned by piece-count | Softmax entropy of placement Q-values per phase | Random network entropy ≈ uniform; trained entropy should shift across phases (proxy for `game_phase` use) |
+**What the tests were** (kept for reproducibility): A: positions where the offered piece can win at least one cell, measure argmax-legal placement; B: positions with ≥1 safe and ≥1 losing piece in storage, measure argmax-legal selection after applying A's placement, exclude forced-loss positions; C: replay each position with all 16 candidate offered pieces, count distinct argmax-legal cells; D: mean `Q[empty] − Q[occupied]` unmasked across all positions; E: softmax entropy of legal-masked Q, bucketed by piece count.
 
-Tests A and B are the threat-detection diagnostics. Test C is the H7 (offered-piece) behavioral re-confirmation. Tests D and E correlate behavior with the other BSP categories (`cell_occupancy`, `game_phase`). The placement head is unmasked at the network level — the legal-cell mask is applied *outside* `forward()` in `models/NN_abstract.predict()`, so no model surgery is required.
-
-**Cross-correlation with SAE coverage.** Once A–E are computed for trained + random networks, the full diagnostic plot is *(per-category SAE coverage of C01) vs (behavioral test score) for trained and random networks*. Strong correlation = SAE coverage is a valid interpretability proxy. Weak correlation = the SAE finds representations that exist but the model does not use.
-
-**Decision branches:**
-- **Tests A/B near random:** model does not compute threats → no SAE can recover them. Pivot threats to anchored/guided SAEs *or* retrain a stronger Quarto agent (auxiliary threat head).
-- **Tests A/B clearly above random:** threats are computed → unsupervised SAEs fail for a structural reason (absorption, sparse heterogeneity). Matryoshka and E2E SAEs are warranted.
-- **Mixed:** informs which guided concepts to anchor.
-
-This phase **must run before launching any new SAE architecture aimed at threats**, otherwise we risk burning weeks tuning an SAE for a signal that isn't there.
-
-### Phase 3A — New Architectures (PLANNED, gated on Phase 1G)
+### Phase 3A — New Architectures (PLANNED, scope reshaped by Phase 1G)
 
 Implementation order, motivated by Phase 2A conclusions:
 

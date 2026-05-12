@@ -38,8 +38,26 @@ Evaluate one SAE (data, BSP labels, and BSP schema auto-resolve from checkpoint 
 ```bash
 python sae_eval.py evaluate saes/quarto/<run_id>.pt          # uses gorilla BSPs by default
 python sae_eval.py evaluate <ckpt> --bsps=hawk --force       # re-eval against a different BSP set
-python sae_eval.py history --arch jumprelu                   # browse past evals
+python sae_eval.py history --arch jumprelu                   # browse past evals (wide table)
 python sae_eval.py compare <run_id_1> <run_id_2>
+```
+
+Query the evaluation registry from the command line (preferred over grepping
+`saes/quarto/eval_registry.json` directly — LLM/agent-friendly, deterministic):
+```bash
+python scripts/registry_query.py top --bsps=gorilla --limit=10           # top by F1-lift
+python scripts/registry_query.py top --bsps=hawk --hook=conv2 --exclude=random
+python scripts/registry_query.py category <run_id> --bsps=gorilla        # per-category
+python scripts/registry_query.py compare <run_a> <run_b> --bsps=gorilla  # side-by-side
+python scripts/registry_query.py bsps                                    # which BSP sets exist
+python scripts/registry_query.py top --bsps=gorilla --json | jq ...      # composable
+```
+
+Audit model competence (game-behavior tests, independent of any SAE — gates
+interpretability claims):
+```bash
+python scripts/model_competence_audit.py --num-positions=5000 --device=cuda
+python scripts/model_competence_audit.py --model=<newer.pt> --random-model=none --output=data/quarto/audit-<tag>.json
 ```
 
 Multi-config / multi-GPU sweep:
