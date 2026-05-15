@@ -1,0 +1,9 @@
+# Quarto champion: Aa_replay (uncoupled CNN, fc1 dim=128).
+# First champion of the project; baseline for all interpretability work.
+name: champAa
+display_name: "Aa_replay (uncoupled CNN, 5000 epochs)"
+game: quarto
+path: models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt
+random_path: models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt
+# Hookable layers (informational): conv1, conv2, fc1, fc2_board, fc2_piece
+# d_act: fc1=128, conv2=32 per cell (512 flattened)

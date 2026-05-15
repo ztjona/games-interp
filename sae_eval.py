@@ -110,11 +110,15 @@ def _resolve_data_path(game: str, hook: str, metadata: dict | None = None) -> Pa
 def _resolve_bsp_paths(game: str, animal: str) -> tuple[Path, Path]:
     """Resolve BSP label and schema paths from animal name via glob.
 
-    Looks for: data/{game}/bsp_labels-{animal}_*.pt
+    Looks for: data/{game}/bsp_labels-{animal}_<count>.pt where ``<count>``
+    starts with a digit. The numeric guard prevents ``gorilla`` from matching
+    ``bsp_labels-gorilla_s4_164.pt`` (a different distribution sharing the
+    same concept menu). Use a distinct animal name (e.g. ``gorillaS4``) when
+    the underlying positions differ.
     """
     data_dir = Path(f"data/{game}")
-    label_matches = sorted(data_dir.glob(f"bsp_labels-{animal}_*.pt"))
-    schema_matches = sorted(data_dir.glob(f"bsp_schema-{animal}_*.json"))
+    label_matches = sorted(data_dir.glob(f"bsp_labels-{animal}_[0-9]*.pt"))
+    schema_matches = sorted(data_dir.glob(f"bsp_schema-{animal}_[0-9]*.json"))
 
     if not label_matches:
         available = sorted(data_dir.glob("bsp_labels-*.pt"))

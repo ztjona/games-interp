@@ -1,0 +1,17 @@
+# champS4 mirror of anakin-batchtopk-k16-exp8-fc1 — fc1 winner (rank 2, F1-lift 0.141)
+# champS4 fc1 has d_act=512 (vs champAa fc1 d_act=128). Using expansion=2 so
+# d_dict = 1024 matches the champAa run's feature budget — like-for-like comparison.
+# Source config: configs/anakin/fc1-batchtopk-k16-exp8.yaml
+experiment: A01-champS4-s42
+architecture: batchtopk
+# game = quarto (NOT quarto_s4) — see C01 config for rationale.
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_s4_activations.pt
+expansion: 2
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16

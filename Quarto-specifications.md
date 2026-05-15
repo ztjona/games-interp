@@ -276,6 +276,64 @@ BSP label sets are named after animals to indicate set size:
 - Reuse the same `{Major}{Minor}-{tag}` only for the same experimental condition; vary `s{seed}` for replicated seeds.
 - Allocate a new `{Major}{Minor}` whenever the condition itself changes (hook, architecture family, data source, or research purpose).
 
+**Deterministic run-id rule (from 2026-05-14 onward):**
+
+The full run_id (= checkpoint stem) is built by the trainer as:
+
+```
+{experiment}-{arch}-{sparsity}-exp{E}-{hook}
+```
+
+where `{sparsity}` is:
+
+| architecture        | sparsity token              |
+|---------------------|-----------------------------|
+| `topk`, `batchtopk` | `k{k}`                      |
+| `vanilla`, `gated`  | `l1_{l1_weight as digits}`  |
+| `jumprelu`          | `t{l0_target as int}`       |
+| `panneal`           | *(omitted)*                 |
+
+This rule lives in `sae_train.build_filename_suffix()`; it is the single
+source of truth. **Do not reconstruct run_ids in shell scripts or notebooks
+by hand** — use the helper:
+
+```bash
+python scripts/run_id.py <config.yaml>               # run_id stem
+python scripts/run_id.py <config.yaml> --checkpoint  # full .pt path
+python scripts/run_id.py <config.yaml> --metrics     # metrics jsonl path
+```
+
+The `experiment:` field is the only free string in the YAML; everything after
+it is derived. Keep `experiment:` short — it is the run_id prefix and gets
+re-used verbatim as the eval-registry key.
+
+**Champion tag (multi-model era, from 2026-05-14):**
+- `champAa` — original Aa_replay uncoupled CNN (fc1=128).
+- `champS4` — unified-aux autoreg CNN (fc1=512). Wins ~60% head-to-head vs champAa.
+- Champion model paths and game modules are registered in `configs/models/champ*.yaml`
+  and consumed by `scripts/model_competence_audit.py --model-config=...`.
+- New artifact suffixes when working with a non-baseline champion:
+  - positions → `positions-amalgam_<tag>_unique.pt` (e.g. `_s4`)
+  - activations → `<hook>_amalgam_<tag>_activations.pt`
+  - SAE `experiment:` field includes `champ<Tag>` (e.g. `C01-champS4-s42`).
+- Aa_replay artifacts are *not* renamed; absence of a `_<tag>` suffix implies champAa.
+
+**One registry, distinct BSP-set names (from 2026-05-14):**
+- All champion SAEs write to a single registry: `saes/quarto/eval_registry.json`.
+  Set `game: quarto` in the SAE YAML even for non-baseline champions; the
+  `data:` field encodes the champion-specific activation source.
+- BSP labels for a new distribution use the original animal name with the
+  champion tag appended in CamelCase (no underscore), e.g. `gorillaS4`,
+  `hawkS4`. This keeps glob resolution unambiguous (`bsp_labels-gorilla_[0-9]*.pt`
+  does not match `bsp_labels-gorillaS4_*.pt`).
+- Registry keys are `run_id:bsp_set`, so the same run_id can appear under
+  `gorilla` and `gorillaS4` without collision — but in practice each run is
+  evaluated only against the BSP set matching its training distribution.
+- Cross-champion comparison via `registry_query.py compare A B --bsps=<setA> --bsps-b=<setB>`.
+- `sae_eval` glob is `bsp_labels-{animal}_[0-9]*.pt` (numeric count suffix
+  required); this prevents `gorilla` from accidentally matching `gorillaS4`
+  or any other future champion-tagged variant.
+
 ## Dataset Catalog
 
 **Current datasets** (as of April 2026):

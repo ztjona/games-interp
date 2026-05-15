@@ -1,0 +1,10 @@
+# Quarto champion: S4 (unified-aux autoreg CNN, fc1 dim=512).
+# Beats Aa_replay ~60% in head-to-head benchmarking.
+name: champS4
+display_name: "S4 unified-aux (Sa_archScan, 5000 epochs)"
+game: quarto_s4
+path: models/quarto/20260514_0815-Sa_archScan(3)0512_ARCH_S4_uniform512_E_5000.pt
+random_path: models/quarto/20260512_1845-Sa_archScan(3)0512_ARCH_S4_uniform512_E_0000.pt
+# Hookable layers (via S4Wrapper, informational):
+#   s4.conv1, s4.conv2, s4.fc1, s4.fc2_place, s4.fc2_select
+# d_act: s4.fc1=512, s4.conv2=32 per cell (512 flattened) — same as champAa for conv2

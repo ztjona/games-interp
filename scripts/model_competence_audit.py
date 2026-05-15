@@ -31,18 +31,25 @@ E. Phase-stratified Q entropy
                               decisive (lower entropy) late game.
 
 Usage:
-    model_competence_audit.py [--model=<path>] [--random-model=<path>]
+    model_competence_audit.py [--model-config=<yaml>]
+                              [--model=<path>] [--random-model=<path>]
+                              [--game=<name>]
                               [--positions=<path>] [--num-positions=<N>]
                               [--device=<dev>] [--output=<path>]
                               [--seed=<int>]
     model_competence_audit.py (-h | --help)
 
 Options:
+    --model-config=<yaml>   Champion model YAML (configs/models/<champ>.yaml).
+                            Provides `path`, `random_path`, and `game`.
+                            Overrides --model / --random-model / --game when given.
     --model=<path>          Trained model checkpoint
                             [default: models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt]
     --random-model=<path>   Random-init checkpoint for control comparison.
                             Pass "none" to skip.
                             [default: models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt]
+    --game=<name>           Game module name (e.g. quarto, quarto_s4).
+                            [default: quarto]
     --positions=<path>      Position dataset
                             [default: data/quarto/positions-amalgam_unique.pt]
     --num-positions=<N>     Random subsample for tests A/B/C (D/E use full
@@ -70,9 +77,40 @@ from tqdm.auto import tqdm
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_DIR))
 
+import yaml  # noqa: E402
 from quartopy import Board, Piece  # noqa: E402
 
-from scripts.games.quarto import load_model  # noqa: E402
+from scripts.games import get_game_module  # noqa: E402
+
+
+def resolve_model_config(args: dict) -> dict:
+    """Resolve the (game, trained_path, random_path, label) tuple.
+
+    If --model-config is given, the YAML is the source of truth and overrides
+    --model / --random-model / --game. Otherwise the CLI defaults are used and
+    the champion is unlabeled.
+    """
+    if args.get("--model-config"):
+        cfg_path = Path(args["--model-config"])
+        cfg = yaml.safe_load(cfg_path.read_text())
+        return {
+            "label": cfg.get("name", cfg_path.stem),
+            "display_name": cfg.get("display_name", cfg.get("name", cfg_path.stem)),
+            "game": cfg["game"],
+            "trained_path": cfg["path"],
+            "random_path": cfg.get("random_path"),
+            "config_path": str(cfg_path),
+        }
+    rand = args["--random-model"]
+    return {
+        "label": "unnamed",
+        "display_name": None,
+        "game": args["--game"],
+        "trained_path": args["--model"],
+        "random_path": None if rand.lower() == "none" else rand,
+        "config_path": None,
+    }
+
 
 # ──────────────────────────────────────────────────────────────────────
 # State reconstruction
@@ -396,6 +434,7 @@ def run_tests_de(
 def audit_model(
     model_path: str,
     label: str,
+    game: str,
     boards_np: np.ndarray,
     pieces_np: np.ndarray,
     boards_t: torch.Tensor,
@@ -406,14 +445,16 @@ def audit_model(
 ) -> dict[str, Any]:
     print(f"\n=== Auditing model: {label} ===")
     print(f"    Path: {model_path}")
+    print(f"    Game: {game}")
     t0 = time.time()
-    model = load_model(model_path, device=device)
+    model = get_game_module(game).load_model(model_path, device=device)
     abc = run_tests_abc(model, boards_np, pieces_np, indices_abc, device, label)
     de = run_tests_de(model, boards_t, pieces_t, metadata, device)
     elapsed = time.time() - t0
     return {
         "model_path": str(model_path),
         "label": label,
+        "game": game,
         "elapsed_seconds": round(elapsed, 1),
         "n_positions_abc": int(len(indices_abc)),
         "n_positions_de": int(boards_t.shape[0]),
@@ -429,6 +470,11 @@ def main() -> None:
     n_abc = int(args["--num-positions"])
     pos_path = Path(args["--positions"])
     out_path = Path(args["--output"])
+
+    mcfg = resolve_model_config(args)
+    print(f"Champion: {mcfg['label']} ({mcfg.get('display_name') or '—'})")
+    print(f"  game={mcfg['game']}  trained={mcfg['trained_path']}")
+    print(f"  random={mcfg['random_path'] or '(skip)'}")
 
     print(f"Loading positions from {pos_path} ...")
     data = torch.load(pos_path, weights_only=False, map_location="cpu")
@@ -447,7 +493,11 @@ def main() -> None:
     print(f"Subsampling {n_abc} positions for tests A/B/C (seed={seed})")
 
     results: dict[str, Any] = {
-        "schema_version": 1,
+        "schema_version": 2,
+        "champion": mcfg["label"],
+        "champion_display_name": mcfg.get("display_name"),
+        "champion_config": mcfg.get("config_path"),
+        "game": mcfg["game"],
         "positions_path": str(pos_path),
         "n_total_positions": int(n_total),
         "n_abc": n_abc,
@@ -457,8 +507,9 @@ def main() -> None:
     }
 
     results["models"]["trained"] = audit_model(
-        args["--model"],
+        mcfg["trained_path"],
         "trained",
+        mcfg["game"],
         boards_np,
         pieces_np,
         boards_t,
@@ -468,10 +519,11 @@ def main() -> None:
         device,
     )
 
-    if args["--random-model"].lower() != "none":
+    if mcfg["random_path"]:
         results["models"]["random"] = audit_model(
-            args["--random-model"],
+            mcfg["random_path"],
             "random",
+            mcfg["game"],
             boards_np,
             pieces_np,
             boards_t,

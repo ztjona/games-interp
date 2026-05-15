@@ -1,0 +1,21 @@
+# champS4 mirror of C01-c2arch-s42 — current overall winner (rank 1, F1-lift 0.155)
+# Source config: configs/followup/C01-conv2-topk-k16-exp8-arch-s42.yaml
+# Hook is s4.conv2 (32 channels × 4×4 cells = 512 flattened); same d_act as champAa conv2.
+experiment: C01-champS4-s42
+architecture: topk
+# game = quarto (NOT quarto_s4) so all champion SAEs share one eval registry
+# at saes/quarto/eval_registry.json. Activations + BSP labels are explicit, so
+# the only thing the game field drives is the output directory.
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

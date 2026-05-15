@@ -1,0 +1,20 @@
+# champS4 mirror of C07-c2arch-s42 — top JumpReLU on conv2 (rank 3, F1-lift 0.139)
+# Source config: configs/followup/C07-conv2-jumprelu-t32-exp8-arch-s42.yaml
+experiment: C07-champS4-s42
+architecture: jumprelu
+# game = quarto (NOT quarto_s4) — see C01 config for rationale.
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 32
+patience: 20
+min_improvement: 0.02
+l0_patience: 5
+l0_min_change: 5.0

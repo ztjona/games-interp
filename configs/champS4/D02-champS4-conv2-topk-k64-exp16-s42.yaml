@@ -1,0 +1,18 @@
+# champS4 mirror of D02-c2exp16-s42 — top exp16 conv2 (rank 5, F1-lift 0.134)
+# Source config: configs/followup/D02-conv2-topk-k64-exp16-s42.yaml
+experiment: D02-champS4-s42
+architecture: topk
+# game = quarto (NOT quarto_s4) — see C01 config for rationale.
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 16
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

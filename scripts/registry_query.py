@@ -10,7 +10,7 @@ Usage:
     registry_query.py top [--game=<g>] [--bsps=<set>] [--metric=<m>] [--limit=<n>] [--include=<pat>] [--exclude=<pat>] [--hook=<h>] [--arch=<a>] [--json]
     registry_query.py get <run_id> [--game=<g>] [--bsps=<set>] [--json]
     registry_query.py category <run_id> [--game=<g>] [--bsps=<set>] [--metric=<m>] [--json]
-    registry_query.py compare <run_id_a> <run_id_b> [--game=<g>] [--bsps=<set>] [--json]
+    registry_query.py compare <run_id_a> <run_id_b> [--game=<g>] [--bsps=<set>] [--bsps-b=<set>] [--json]
     registry_query.py list [--game=<g>] [--bsps=<set>] [--limit=<n>] [--json]
     registry_query.py bsps [--game=<g>] [--json]
     registry_query.py (-h | --help)
@@ -282,13 +282,17 @@ def cmd_category(args: dict[str, Any]) -> None:
 
 def cmd_compare(args: dict[str, Any]) -> None:
     registry = load_registry(args["--game"])
-    runs = entries_for(registry, args["--bsps"])
+    bsps_a = args["--bsps"]
+    bsps_b = args.get("--bsps-b") or bsps_a
+    runs_a = entries_for(registry, bsps_a)
+    runs_b = entries_for(registry, bsps_b) if bsps_b != bsps_a else runs_a
     ra, rb = args["<run_id_a>"], args["<run_id_b>"]
-    for r in (ra, rb):
-        if r not in runs:
-            sys.exit(f"error: '{r}' not found for bsps={args['--bsps']}")
-    ma = runs[ra].get("metrics", {})
-    mb = runs[rb].get("metrics", {})
+    if ra not in runs_a:
+        sys.exit(f"error: '{ra}' not found for bsps={bsps_a}")
+    if rb not in runs_b:
+        sys.exit(f"error: '{rb}' not found for bsps={bsps_b}")
+    ma = runs_a[ra].get("metrics", {})
+    mb = runs_b[rb].get("metrics", {})
     keys = [k for k in HEADLINE_METRICS if k in ma or k in mb]
 
     if args["--json"]:
@@ -297,7 +301,8 @@ def cmd_compare(args: dict[str, Any]) -> None:
                 {
                     "a": ra,
                     "b": rb,
-                    "bsps": args["--bsps"],
+                    "bsps": bsps_a,
+                    "bsps_b": bsps_b,
                     "metrics": {
                         k: {
                             "a": ma.get(k),
@@ -317,9 +322,10 @@ def cmd_compare(args: dict[str, Any]) -> None:
         )
         return
 
-    print(f"# compare on bsps={args['--bsps']}")
-    print(f"  a = {ra}")
-    print(f"  b = {rb}")
+    bsps_label = bsps_a if bsps_a == bsps_b else f"{bsps_a} vs {bsps_b}"
+    print(f"# compare on bsps={bsps_label}")
+    print(f"  a = {ra}  (bsps={bsps_a})")
+    print(f"  b = {rb}  (bsps={bsps_b})")
     print(f"  {'metric':30s} {'a':>10} {'b':>10} {'a - b':>10}")
     for k in keys:
         va, vb = ma.get(k), mb.get(k)
