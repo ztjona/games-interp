@@ -1714,5 +1714,108 @@
       "dead_features_pct": 64.17,
       "median_feat_freq": 0.0
     }
+  },
+  "A01-champS4-s42-batchtopk-k16-exp2-s4.fc1": {
+    "experiment": "A01-champS4-s42",
+    "architecture": "batchtopk",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "timestamp": "2026-05-18T12:15:27.107565",
+    "checkpoint": "saes\\quarto\\A01-champS4-s42-batchtopk-k16-exp2-s4.fc1.pt",
+    "expansion": 2,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.01,
+    "k": 16,
+    "final_metrics": {
+      "l0": 16.0,
+      "l0_std": 5.08,
+      "fvu": 0.057769,
+      "mse": 11.452278,
+      "dead_features_pct": 96.58,
+      "median_feat_freq": 0.0
+    }
+  },
+  "C01-champS4-s42-topk-k16-exp8-s4.conv2": {
+    "experiment": "C01-champS4-s42",
+    "architecture": "topk",
+    "game": "quarto",
+    "hook": "s4.conv2",
+    "timestamp": "2026-05-18T12:21:08.456113",
+    "checkpoint": "saes\\quarto\\C01-champS4-s42-topk-k16-exp8-s4.conv2.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 20,
+    "min_improvement": 0.02,
+    "k": 16,
+    "aux_loss_weight": 0.01,
+    "final_metrics": {
+      "l0": 16.0,
+      "l0_std": 0.02,
+      "fvu": 0.060959,
+      "mse": 4.971914,
+      "dead_features_pct": 42.07,
+      "median_feat_freq": 0.000122
+    }
+  },
+  "C07-champS4-s42-jumprelu-t32-exp8-s4.conv2": {
+    "experiment": "C07-champS4-s42",
+    "architecture": "jumprelu",
+    "game": "quarto",
+    "hook": "s4.conv2",
+    "timestamp": "2026-05-18T12:21:50.653271",
+    "checkpoint": "saes\\quarto\\C07-champS4-s42-jumprelu-t32-exp8-s4.conv2.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 20,
+    "min_improvement": 0.02,
+    "theta_init": 0.001,
+    "l0_target": 32.0,
+    "final_metrics": {
+      "l0": 45.19,
+      "l0_std": 8.03,
+      "fvu": 0.07536,
+      "mse": 6.146452,
+      "dead_features_pct": 95.34,
+      "median_feat_freq": 0.0
+    }
+  },
+  "D02-champS4-s42-topk-k64-exp16-s4.conv2": {
+    "experiment": "D02-champS4-s42",
+    "architecture": "topk",
+    "game": "quarto",
+    "hook": "s4.conv2",
+    "timestamp": "2026-05-18T12:32:43.692168",
+    "checkpoint": "saes\\quarto\\D02-champS4-s42-topk-k64-exp16-s4.conv2.pt",
+    "expansion": 16,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 20,
+    "min_improvement": 0.02,
+    "k": 64,
+    "aux_loss_weight": 0.01,
+    "final_metrics": {
+      "l0": 64.0,
+      "l0_std": 0.0,
+      "fvu": 0.012244,
+      "mse": 0.9986,
+      "dead_features_pct": 91.77,
+      "median_feat_freq": 0.0
+    }
   }
 }

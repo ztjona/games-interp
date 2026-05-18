@@ -1,0 +1,140 @@
+{
+  "schema_version": 2,
+  "champion": "champS4",
+  "champion_display_name": "S4 unified-aux (Sa_archScan, 5000 epochs)",
+  "champion_config": "configs\\models\\champS4.yaml",
+  "game": "quarto_s4",
+  "positions_path": "data\\quarto\\positions-amalgam_unique.pt",
+  "n_total_positions": 275916,
+  "n_abc": 5000,
+  "seed": 42,
+  "device": "cuda",
+  "models": {
+    "trained": {
+      "model_path": "models/quarto/20260514_0815-Sa_archScan(3)0512_ARCH_S4_uniform512_E_5000.pt",
+      "label": "trained",
+      "game": "quarto_s4",
+      "elapsed_seconds": 52.7,
+      "n_positions_abc": 5000,
+      "n_positions_de": 275916,
+      "test_A_winning_placement": {
+        "n_winnable": 1702,
+        "n_correct": 1340,
+        "accuracy": 0.7873090481786134,
+        "chance_baseline": "fraction of empty cells that win (varies); see per-position breakdown if needed"
+      },
+      "test_B_losing_piece_avoidance": {
+        "n_auditable": 1909,
+        "n_avoided": 1184,
+        "accuracy": 0.6202200104766894,
+        "n_forced_loss_skipped": 278
+      },
+      "test_C_offered_piece_sensitivity": {
+        "n_positions": 4990,
+        "mean_distinct_fraction": 0.22815962872576098,
+        "median_distinct_fraction": 0.21428571428571427,
+        "interpretation": "1.0 = every offered piece picks a different cell; low = model ignores the offered piece"
+      },
+      "test_D_q_occupancy_gap": {
+        "n_positions": 275900,
+        "mean_gap": -0.4926483929157257,
+        "median_gap": -0.42121192812919617,
+        "std_gap": 0.46589890122413635,
+        "fraction_positive_gap": 0.11851757764816284,
+        "interpretation": "Q(empty) \u2212 Q(occupied) on the unmasked board head. >0 means the model has learned legality."
+      },
+      "test_E_phase_entropy": {
+        "by_phase": {
+          "all": {
+            "n": 275916,
+            "mean_entropy_nats": 2.248549461364746,
+            "median_entropy_nats": 2.350229263305664,
+            "max_possible_at_uniform": 2.3599398014249826
+          },
+          "early_0_4": {
+            "n": 120608,
+            "mean_entropy_nats": 2.55024790763855,
+            "median_entropy_nats": 2.564242362976074,
+            "max_possible_at_uniform": 2.5694458576971706
+          },
+          "mid_5_10": {
+            "n": 141185,
+            "mean_entropy_nats": 2.090792179107666,
+            "median_entropy_nats": 2.1336634159088135,
+            "max_possible_at_uniform": 2.2108369723908194
+          },
+          "late_11_15": {
+            "n": 14123,
+            "mean_entropy_nats": 1.249165654182434,
+            "median_entropy_nats": 1.3429231643676758,
+            "max_possible_at_uniform": 1.4295123553145421
+          }
+        },
+        "interpretation": "Lower entropy late-game \u2192 more decisive. Random model approaches log(n_legal_cells) uniformly."
+      }
+    },
+    "random": {
+      "model_path": "models/quarto/20260512_1845-Sa_archScan(3)0512_ARCH_S4_uniform512_E_0000.pt",
+      "label": "random",
+      "game": "quarto_s4",
+      "elapsed_seconds": 64.0,
+      "n_positions_abc": 5000,
+      "n_positions_de": 275916,
+      "test_A_winning_placement": {
+        "n_winnable": 1702,
+        "n_correct": 554,
+        "accuracy": 0.3254994124559342,
+        "chance_baseline": "fraction of empty cells that win (varies); see per-position breakdown if needed"
+      },
+      "test_B_losing_piece_avoidance": {
+        "n_auditable": 2238,
+        "n_avoided": 842,
+        "accuracy": 0.3762287756925827,
+        "n_forced_loss_skipped": 622
+      },
+      "test_C_offered_piece_sensitivity": {
+        "n_positions": 4990,
+        "mean_distinct_fraction": 0.10756682251171229,
+        "median_distinct_fraction": 0.09090909090909091,
+        "interpretation": "1.0 = every offered piece picks a different cell; low = model ignores the offered piece"
+      },
+      "test_D_q_occupancy_gap": {
+        "n_positions": 275900,
+        "mean_gap": -0.00032951871980912983,
+        "median_gap": -0.00044064177200198174,
+        "std_gap": 0.01752503588795662,
+        "fraction_positive_gap": 0.490119606256485,
+        "interpretation": "Q(empty) \u2212 Q(occupied) on the unmasked board head. >0 means the model has learned legality."
+      },
+      "test_E_phase_entropy": {
+        "by_phase": {
+          "all": {
+            "n": 275916,
+            "mean_entropy_nats": 2.3155457973480225,
+            "median_entropy_nats": 2.3974807262420654,
+            "max_possible_at_uniform": 2.3599398014249826
+          },
+          "early_0_4": {
+            "n": 120608,
+            "mean_entropy_nats": 2.566807270050049,
+            "median_entropy_nats": 2.564534902572632,
+            "max_possible_at_uniform": 2.5694458576971706
+          },
+          "mid_5_10": {
+            "n": 141185,
+            "mean_entropy_nats": 2.1938693523406982,
+            "median_entropy_nats": 2.1969521045684814,
+            "max_possible_at_uniform": 2.2108369723908194
+          },
+          "late_11_15": {
+            "n": 14123,
+            "mean_entropy_nats": 1.3861920833587646,
+            "median_entropy_nats": 1.3862826824188232,
+            "max_possible_at_uniform": 1.4295123553145421
+          }
+        },
+        "interpretation": "Lower entropy late-game \u2192 more decisive. Random model approaches log(n_legal_cells) uniformly."
+      }
+    }
+  }
+}
