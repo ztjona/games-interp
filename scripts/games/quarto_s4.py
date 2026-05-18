@@ -120,6 +120,7 @@ def load_model(model_path: str | Path, device: str = "cpu") -> nn.Module:
     from models.quarto.CNN_autoreg_sa import QuartoCNNAutoregUnifiedS4
 
     inner = QuartoCNNAutoregUnifiedS4.from_file(str(model_path))
+    inner.device = torch.device(device)  # sync attribute; NN_abstract sets it to cuda on init
     inner.eval()
     inner.to(device)
     wrapper = S4Wrapper(inner)
@@ -426,7 +427,9 @@ def generate_positions(
                 boards.append(board_enc.astype(np.float32))
                 pieces.append(piece_vec.astype(np.float32))
                 metadata.append(meta)
-            turn_count += 1
+                turn_count += 1
+
+            game.cambiar_turno()
 
     return boards, pieces, metadata
 
