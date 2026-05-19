@@ -1,8 +1,16 @@
 """Linear probe baseline: logistic regression on raw activations for BSP classification.
 
 Trains per-BSP L2-regularized logistic regression probes on raw activations and
-reports per-BSP F1, per-category mean F1, and overall coverage. This establishes
-an upper bound for what any SAE can achieve on these activations.
+reports per-BSP F1, MCC and F1-lift, plus per-category and overall coverage
+metrics. Establishes the upper bound any SAE can achieve on these activations.
+
+Output format mirrors ``sae_eval`` so LP vs SAE numbers are directly comparable:
+
+    coverage          mean of per-BSP best F1 (literature standard)
+    coverage_mcc      mean of per-BSP best MCC (base-rate-invariant; 0 for any
+                      constant predictor; collapses the F1 ~= 0.667 artifact)
+    coverage_f1_lift  mean of max(0, F1 - 2p/(1+p)), where p is the population
+                      base rate. Headline metric for trained-vs-random gaps.
 
 Usage:
     linear_probe_baseline.py <activations> <bsp_labels> <bsp_schema> [options]
@@ -24,12 +32,13 @@ Options:
 Examples:
     linear_probe_baseline.py data/quarto/fc1_amalgam_activations.pt data/quarto/bsp_labels-gorilla_164.pt data/quarto/bsp_schema-gorilla_164.json
 
-    linear_probe_baseline.py data/quarto/fc1_amalgam_random_activations.pt data/quarto/bsp_labels-gorilla_164.pt data/quarto/bsp_schema-gorilla_164.json --output data/quarto/linear_probe_random_results.json
+    linear_probe_baseline.py data/quarto/s4.conv2_amalgam_s4_activations.pt data/quarto/bsp_labels-gorillaS4_164.pt data/quarto/bsp_schema-gorillaS4_164.json
 """
 
 from __future__ import annotations
 
 import json
+import math
 import sys
 import time
 from pathlib import Path
@@ -37,7 +46,7 @@ from pathlib import Path
 import numpy as np
 import torch
 from sklearn.linear_model import LogisticRegression
-from sklearn.metrics import f1_score
+from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
@@ -69,6 +78,25 @@ def _default_output_path(act_path: Path, bsp_path: Path, schema: dict) -> Path:
     """
     bsp_set_name = _infer_bsp_set_name(bsp_path, schema)
     return act_path.parent / f"linear_probe_{bsp_set_name}_{act_path.stem}_results.json"
+
+
+def _scores_from_confusion(
+    tn: int, fp: int, fn: int, tp: int
+) -> tuple[float, float]:
+    """Return (F1, MCC) from confusion-matrix counts; matches lib/sae/eval.py."""
+    if tp + fp + fn + tn == 0:
+        return 0.0, 0.0
+    precision = tp / (tp + fp) if (tp + fp) > 0 else 0.0
+    recall = tp / (tp + fn) if (tp + fn) > 0 else 0.0
+    if precision + recall > 0:
+        f1 = 2.0 * precision * recall / (precision + recall)
+    else:
+        f1 = 0.0
+    mcc_den = math.sqrt(
+        max((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn), 0.0)
+    )
+    mcc = (tp * tn - fp * fn) / mcc_den if mcc_den > 0 else 0.0
+    return float(f1), float(mcc)
 
 
 def main():
@@ -116,6 +144,11 @@ def main():
 
     print(f"Activations: {X.shape}, BSPs: {Y.shape}", file=sys.stderr)
 
+    # Population base rate per BSP (used for the trivial-baseline F1).
+    # Using the full Y matches sae_eval's labels.mean(dim=0) convention so that
+    # trivial_f1 is a population property, not a sample of the test split.
+    base_rates = Y.mean(axis=0)
+
     # --- Train/test split ---
     X_train, X_test, Y_train, Y_test = train_test_split(
         X, Y, test_size=test_frac, random_state=seed
@@ -135,7 +168,11 @@ def main():
         y_train_i = Y_train[:, i]
         y_test_i = Y_test[:, i]
 
-        # Skip constant labels (all 0 or all 1)
+        base_rate = float(base_rates[i])
+        trivial_f1 = 2.0 * base_rate / (1.0 + base_rate) if base_rate > 0 else 0.0
+
+        # Constant-label case: a constant predictor scores MCC = 0 and
+        # F1-lift = 0 by definition. F1 stays the literature value.
         if y_train_i.sum() == 0 or y_train_i.sum() == len(y_train_i):
             f1 = 0.0 if y_test_i.sum() == 0 else 1.0
             results_per_bsp.append(
@@ -143,6 +180,10 @@ def main():
                     "bsp_id": bsp_id,
                     "category": category,
                     "f1": round(f1, 4),
+                    "mcc": 0.0,
+                    "f1_lift": 0.0,
+                    "base_rate": round(base_rate, 4),
+                    "trivial_f1": round(trivial_f1, 4),
                     "skipped": True,
                     "train_pos_rate": round(float(y_train_i.mean()), 4),
                 }
@@ -157,13 +198,21 @@ def main():
         )
         clf.fit(X_train, y_train_i)
         y_pred = clf.predict(X_test)
-        f1 = f1_score(y_test_i, y_pred, zero_division=0.0)
+
+        cm = confusion_matrix(y_test_i, y_pred, labels=[0, 1])
+        tn, fp, fn, tp = (int(x) for x in cm.ravel())
+        f1, mcc = _scores_from_confusion(tn, fp, fn, tp)
+        f1_lift = max(0.0, f1 - trivial_f1)
 
         results_per_bsp.append(
             {
                 "bsp_id": bsp_id,
                 "category": category,
-                "f1": round(float(f1), 4),
+                "f1": round(f1, 4),
+                "mcc": round(mcc, 4),
+                "f1_lift": round(f1_lift, 4),
+                "base_rate": round(base_rate, 4),
+                "trivial_f1": round(trivial_f1, 4),
                 "skipped": False,
                 "train_pos_rate": round(float(y_train_i.mean()), 4),
             }
@@ -173,27 +222,33 @@ def main():
     print(f"Done in {total_time:.1f}s", file=sys.stderr)
 
     # --- Aggregate by category ---
-    cat_f1s = {}
-    for r in results_per_bsp:
-        cat = r["category"]
-        if cat not in cat_f1s:
-            cat_f1s[cat] = []
-        cat_f1s[cat].append(r["f1"])
-
-    per_category = {}
+    per_category: dict[str, dict[str, float]] = {}
     for cat in categories:
-        f1s = cat_f1s.get(cat, [])
-        if f1s:
-            arr = np.array(f1s)
-            per_category[cat] = {
-                "count": len(f1s),
-                "mean_f1": round(float(arr.mean()), 4),
-                "min_f1": round(float(arr.min()), 4),
-                "max_f1": round(float(arr.max()), 4),
-                "median_f1": round(float(np.median(arr)), 4),
-            }
+        f1s = np.array([r["f1"] for r in results_per_bsp if r["category"] == cat])
+        if f1s.size == 0:
+            continue
+        mccs = np.array([r["mcc"] for r in results_per_bsp if r["category"] == cat])
+        lifts = np.array(
+            [r["f1_lift"] for r in results_per_bsp if r["category"] == cat]
+        )
+        brs = np.array(
+            [r["base_rate"] for r in results_per_bsp if r["category"] == cat]
+        )
+        per_category[cat] = {
+            "count": int(f1s.size),
+            "mean_f1": round(float(f1s.mean()), 4),
+            "min_f1": round(float(f1s.min()), 4),
+            "max_f1": round(float(f1s.max()), 4),
+            "median_f1": round(float(np.median(f1s)), 4),
+            "mean_mcc": round(float(mccs.mean()), 4),
+            "median_mcc": round(float(np.median(mccs)), 4),
+            "mean_f1_lift": round(float(lifts.mean()), 4),
+            "mean_base_rate": round(float(brs.mean()), 4),
+        }
 
     all_f1s = np.array([r["f1"] for r in results_per_bsp])
+    all_mccs = np.array([r["mcc"] for r in results_per_bsp])
+    all_lifts = np.array([r["f1_lift"] for r in results_per_bsp])
     overall = {
         "coverage": round(float(all_f1s.mean()), 4),
         "coverage_above_50": round(float((all_f1s > 0.50).mean()), 4),
@@ -202,6 +257,16 @@ def main():
         "min_f1": round(float(all_f1s.min()), 4),
         "max_f1": round(float(all_f1s.max()), 4),
         "median_f1": round(float(np.median(all_f1s)), 4),
+        "coverage_mcc": round(float(all_mccs.mean()), 4),
+        "coverage_mcc_above_25": round(float((all_mccs > 0.25).mean()), 4),
+        "coverage_mcc_above_50": round(float((all_mccs > 0.50).mean()), 4),
+        "median_mcc": round(float(np.median(all_mccs)), 4),
+        "min_mcc": round(float(all_mccs.min()), 4),
+        "max_mcc": round(float(all_mccs.max()), 4),
+        "coverage_f1_lift": round(float(all_lifts.mean()), 4),
+        "coverage_f1_lift_above_10": round(float((all_lifts > 0.10).mean()), 4),
+        "coverage_f1_lift_above_25": round(float((all_lifts > 0.25).mean()), 4),
+        "median_f1_lift": round(float(np.median(all_lifts)), 4),
     }
 
     # --- Output ---
@@ -232,21 +297,31 @@ def main():
 
     # --- Print summary ---
     print("\n=== Linear Probe Baseline ===", file=sys.stderr)
-    print(f"Overall coverage (mean F1): {overall['coverage']:.4f}", file=sys.stderr)
     print(
-        f"BSPs above 0.50 F1: {overall['coverage_above_50']:.1%}",
+        f"coverage (F1)       : {overall['coverage']:.4f}  "
+        f"(above50={overall['coverage_above_50']:.1%}, "
+        f"above75={overall['coverage_above_75']:.1%})",
         file=sys.stderr,
     )
     print(
-        f"BSPs above 0.75 F1: {overall['coverage_above_75']:.1%}",
+        f"coverage_mcc        : {overall['coverage_mcc']:.4f}  "
+        f"(above25={overall['coverage_mcc_above_25']:.1%}, "
+        f"above50={overall['coverage_mcc_above_50']:.1%})",
         file=sys.stderr,
     )
-    print(f"\nPer-category breakdown:", file=sys.stderr)
+    print(
+        f"coverage_f1_lift    : {overall['coverage_f1_lift']:.4f}  "
+        f"(above10={overall['coverage_f1_lift_above_10']:.1%}, "
+        f"above25={overall['coverage_f1_lift_above_25']:.1%})",
+        file=sys.stderr,
+    )
+    print("\nPer-category (F1 / MCC / F1-lift):", file=sys.stderr)
     for cat, stats in per_category.items():
         print(
             f"  {cat:25s}  n={stats['count']:3d}  "
-            f"mean_F1={stats['mean_f1']:.4f}  "
-            f"[{stats['min_f1']:.4f}, {stats['max_f1']:.4f}]",
+            f"F1={stats['mean_f1']:.4f}  "
+            f"MCC={stats['mean_mcc']:.4f}  "
+            f"lift={stats['mean_f1_lift']:.4f}",
             file=sys.stderr,
         )
     print(f"\nResults saved to: {output_path}", file=sys.stderr)

@@ -20,15 +20,28 @@ Total unique pieces: 2^4 = 16
 
 ## Model Architecture
 
-**Current model:** `CNN_uncoupled` (in `models/quarto/CNN_uncoupled.py`)
+**Current models (multi-champion era from 2026-05-14):**
+- `CNN_uncoupled` (champAa baseline) — `models/quarto/CNN_uncoupled.py`
+- `Sa_S4` unified-aux autoregressive CNN (champS4) — `models/quarto/Sa_S4.py`,
+  registered via `configs/models/champS4.yaml` and the `quarto_s4` game module.
 
-**Hookable layers:**
+**Hookable layers — champAa (`CNN_uncoupled`):**
 - `fc_in_piece` — (B,16) Piece input embedding
 - `conv1` — (B,16,4,4) Early spatial features
 - `conv2` — (B,32,4,4) Higher-level spatial. **Recommended hook point for threat-focused probes/SAEs after Phase 1F**
 - `fc1` — (B,128) Shared bottleneck before dual heads. Still useful for bottleneck comparisons, but no longer the preferred hook for threat recovery.
 - `fc2_board` — (B,16) Board placement Q-values
 - `fc2_piece` — (B,16) Piece selection Q-values
+
+**Hookable layers — champS4 (`Sa_S4`), accessed via the `quarto_s4` game module:**
+- `s4.conv1` — (B,16,4,4) Early spatial features (same shape as champAa).
+- `s4.conv2` — (B,32,4,4) Higher-level spatial — flatten to `(B, 512)` for SAE
+  training (`collect_activations.py --flatten-position`).
+- `s4.fc1` — (B,**512**) Shared bottleneck (4× wider than champAa's fc1=128).
+  Note: A01-style fc1 SAEs need expansion ≥ 8 to match the per-feature budget
+  of the Aa equivalent at d_act=128, exp=8 (= d_dict=1024); the original
+  champS4 A01 config used exp=2 to match dictionary size and saw 96.6% dead
+  features as a result.
 
 **Note:** Always verify current architecture with:
 ```bash
@@ -216,6 +229,24 @@ python validate_sweep.py
 - BSP label files are position-level (not hook-specific), so Step 4 only needs to run once regardless of how many activation hooks you collect.
 - If you only need B–G campaigns (conv2 only, no A-series), skip Steps 3c/3d.
 
+**champS4 regeneration (after 2026-05-14):** Run `bash commands.sh` from the
+project root. It chains: competence audit (champS4 + champAa re-baseline), S4
+self-play position generation (4 modes), aggregation+dedup → `positions-amalgam_s4_unique.pt`,
+BSP labels under the `gorillaS4`/`hawkS4` names, activation collection at
+`s4.fc1` and `s4.conv2` for both trained and random S4 checkpoints, then the
+Phase 2B mini-sweep over `configs/champS4/*.yaml`. The script is parametrised
+at the top with `CHAMP`, `RAND_S4`, `SEED`, `NUM_GAMES`, `DEVICE`.
+
+**Linear-probe baseline (LP upper bound on what any SAE can recover):** Use
+`scripts/linear_probe_baseline.py` for a single activation × BSP set, or run
+the LP block at the bottom of the user's `commands.sh` for the full champS4
+panel (`{s4.fc1, s4.conv2} × {trained, random} × {gorillaS4, hawkS4}` =
+8 runs). `commands.sh` is the user's working execution file (see CLAUDE.md);
+treat it as transient. Outputs land at
+`data/quarto/linear_probe_<bsp_set>_<act_stem>_results.json` and report all
+three coverage metrics (F1, MCC, F1-lift) in the same schema as `sae_eval`'s
+registry entries, so LP-vs-SAE deltas are directly comparable.
+
 ---
 
 ## Data Collection
@@ -336,13 +367,14 @@ re-used verbatim as the eval-registry key.
 
 ## Dataset Catalog
 
-**Current datasets** (as of April 2026):
+**Current datasets** (as of May 2026):
 
 ### Position Datasets
 
 | Name | Description | Source Files | Model | N Positions | Generation Date |
 |------|-------------|--------------|-------|-------------|-----------------|
 | `amalgam` | Combined all opponent modes, deduplicated | `positions-random_v_random_raw.pt`<br>`positions-model_v_random-Aa_replay_raw.pt`<br>`positions-random_v_model-Aa_replay_raw.pt`<br>`positions-model_v_model-Aa_replay_raw.pt` | Aa_replay (20260227_1103) | 275,916 | 2026-03-03 |
+| `amalgam_s4` | Self-play combined+deduped under the new champion | 4 raw S4 self-play files (`positions-*_raw.pt`) | Sa_archScan S4 (20260514_0815) | (regenerated 2026-05-18) | 2026-05-18 |
 | `copper` | random_v_random only (not yet created) | `positions-random_v_random_raw.pt` | N/A | ~121 | 2026-03-03 |
 | `bronze` | model_v_random only (not yet created) | `positions-model_v_random-Aa_replay_raw.pt` | Aa_replay | ~102K | 2026-03-03 |
 | `iron` | random_v_model only (not yet created) | `positions-random_v_model-Aa_replay_raw.pt` | Aa_replay | ~101K | 2026-03-03 |
@@ -352,9 +384,27 @@ re-used verbatim as the eval-registry key.
 
 | Name | BSP Count | Categories Included | Source Dataset | Generation Date | Purpose |
 |------|-----------|---------------------|----------------|-----------------|---------|
-| `gorilla` | 164 | ALL (cell_occupancy, cell_attribute, threat_line, threat_square_2x2, offered_piece, game_phase, global) | amalgam | TBD | Full coverage evaluation |
-| `hawk_173` | 173 | reframed_count, reframed_completable, reframed_any_threat, reframed_sq_count, reframed_sq_completable, reframed_sq_any_threat, reframed_global | amalgam | 2026-03-31 refresh | Reframed threat evaluation |
+| `gorilla` | 164 | ALL (cell_occupancy, cell_attribute, threat_line, threat_square_2x2, offered_piece, game_phase, global) | amalgam | TBD | Full coverage evaluation (champAa) |
+| `hawk_173` | 173 | reframed_count, reframed_completable, reframed_any_threat, reframed_sq_count, reframed_sq_completable, reframed_sq_any_threat, reframed_global | amalgam | 2026-03-31 refresh | Reframed threat evaluation (champAa) |
+| `gorillaS4` | 164 | Same categories as `gorilla` | amalgam_s4 | 2026-05-18 | Full coverage evaluation (champS4) |
+| `hawkS4` | 173 | Same categories as `hawk_173` | amalgam_s4 | 2026-05-18 | Reframed threat evaluation (champS4) |
 | `fox` | 87 | cell_occupancy, cell_attribute, offered_piece, game_phase | (extractable from gorilla) | N/A | Positional properties only |
+
+### Activation Files
+
+Naming pattern: `<hook>_<positions_tag>{,_random}_activations.pt`.
+
+| Hook | Champion | d_act | File |
+|---|---|---:|---|
+| `fc1` | champAa | 128 | `fc1_amalgam_activations.pt` (trained), `fc1_amalgam_random_activations.pt` |
+| `conv2` (flat) | champAa | 512 | `conv2_512_amalgam_activations.pt`, `conv2_512_amalgam_random_activations.pt` |
+| `s4.fc1` | champS4 | 512 | `s4.fc1_amalgam_s4_activations.pt`, `s4.fc1_amalgam_s4_random_activations.pt` |
+| `s4.conv2` (flat) | champS4 | 512 | `s4.conv2_amalgam_s4_activations.pt`, `s4.conv2_amalgam_s4_random_activations.pt` |
+
+`*_random_activations.pt` files are collected from the epoch-0 random-weight
+checkpoint at the same hook, against the same positions file as their trained
+counterpart. They are required for the random-network control in any headline
+trained-vs-random gap claim.
 
 **Notes:**
 - All position datasets use model **Aa_replay** checkpoint: `20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt`

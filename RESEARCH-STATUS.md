@@ -1,5 +1,12 @@
 # Quarto SAE Research — Quick Reference
 
+## Project State (2026-05-18)
+
+**Active phase:** Phase 2B — champS4 follow-up sweep + diagnostic. Open question:
+why do the four top-Aa configs underperform their champAa twins when re-trained
+on champS4 activations? See "Phase 2B" below for results and the proposed
+LP-diagnostic-first plan.
+
 ## Project State (2026-05-04)
 
 ### Completed Phases
@@ -239,6 +246,98 @@ Random conv filters are a fixed nonlinear projection of the input; a downstream 
 For C01 this is 1.57 on `cell_attribute` (the SAE recovers more than the LP-gap because LP exploits projections the SAE's sparse code cannot) — strong evidence C01 captures learned attribute structure, not the architectural prior. For threat categories the same fraction is ≈ 0.01: nothing learned-specific is recovered.
 
 This reframing changes how we interpret the threat probes: `threat_line` LP F1 = 0.502 is **fully learned** (random conv2 = 0.019), so the trained `conv1+conv2` stack does compute threats; the bottleneck is fc1 (LP F1 = 0.022). This motivates an **architectural fix**: adding a small auxiliary threat-prediction head on fc1 during DQN training (λ ≈ 0.1 weight, 76-dim BCE) would force the bottleneck to preserve threat information. Parked under Phase 4 (interpretability-by-architecture); execute only after Phase 1G confirms the model uses threats.
+
+### Phase 2B: champS4 follow-up sweep (2026-05-18)
+
+A new champion (`champS4`, unified-aux autoregressive CNN, fc1=512) was trained
+on Deep Brain. `commands.sh` re-ran the full pipeline on the new model:
+competence audit, S4-self-play position regeneration, BSP labels against the new
+distribution (`gorillaS4`/`hawkS4`), and the four top-Aa configs as a
+mini-sweep (`A01`, `C01`, `C07`, `D02`).
+
+#### Model competence audit (champS4 plays strictly better than champAa)
+
+| Test | champS4 | champAa | Δ |
+|---|---:|---:|---:|
+| A. Winning-placement acc | **0.787** | 0.700 | +0.087 |
+| B. Losing-piece avoidance | **0.620** | 0.405 | **+0.215** |
+| C. Offered-piece sensitivity (mean distinct frac) | **0.228** | 0.144 | +0.084 |
+| D. Q(empty) − Q(occupied), fraction positive | 0.119 | 0.253 | **−0.134** |
+| E. Late-game (11–15) mean entropy | 1.249 | 1.312 | small decrease |
+
+The unified-aux model finally reasons about *what piece it hands the opponent*
+(test B doubles from 0.40 → 0.62), the first time any Quarto agent in this
+project rises above random on the defense axis. Test D regresses: the unmasked
+board head is even less legality-aware than champAa.
+
+#### SAE sweep results — champS4 SAEs underperform champAa twins
+
+Top by F1-lift on **gorillaS4** (only 4 runs trained; same ranking as champAa
+mini-set: D02 ≈ A01 > C07 > C01):
+
+| run | F1-lift | cov | MCC | FVU | L0 | dead % |
+|---|:---:|:---:|:---:|:---:|:---:|:---:|
+| D02 topk-k64-exp16 conv2 | 0.128 | 0.327 | 0.282 | 0.012 | 64 | 93.1 |
+| A01 batchtopk-k16-exp2 fc1 | 0.125 | 0.324 | 0.292 | 0.058 | 16 | **96.6** |
+| C07 jumprelu-t32-exp8 conv2 | 0.106 | 0.305 | 0.247 | 0.075 | 45 | 95.3 |
+| C01 topk-k16-exp8 conv2 | 0.039 | 0.225 | 0.226 | 0.061 | 16 | 58.0 |
+
+Pairwise vs the corresponding champAa twin (S4 minus Aa, gorilla{S4 vs *}):
+
+| pair | Δ F1-lift | Δ FVU | comment |
+|---|:---:|:---:|---|
+| A01 fc1 batchtopk | −0.016 | +0.049 | small coverage drop, much higher FVU |
+| C01 conv2 topk k16 | **−0.116** | +0.036 | severe collapse (cov>0.5 falls 0.40→0.04) |
+| C07 conv2 jumprelu | −0.033 | +0.049 | L0 drifted up; metrics jsonl has only 7 rows (early-stop) |
+| D02 conv2 topk k64 | −0.006 | +0.008 | essentially matches Aa; best reconstruction (91% reconstructable) |
+
+On **hawkS4** all four cluster at lift 0.058–0.074 vs the champAa anakin-batchtopk
+peak of 0.105 — threats are uniformly harder to recover on the new champion.
+
+#### Open question and diagnostic plan
+
+The headline puzzle: **champS4 plays better but its activations are harder to
+interpret** with the recipes that won on champAa. FVU is 3–6× higher across the
+board, and one config (C01 k=16) collapsed entirely. Possible causes, in
+decreasing order of likelihood:
+
+1. **The S4 activations themselves are less linearly separable.** The four-run
+   spread is consistent with a representation-level shift, not an SAE-recipe
+   issue. Without an LP ceiling on S4 activations we cannot tell whether the
+   gap is "model" or "SAE".
+2. **A01 expansion mismatch.** `A01-champS4` uses `expansion=2` to match the
+   *dictionary size* of the Aa twin (d_dict=1024 from d_act=128×8 = d_act=512×2);
+   but the S4 fc1 has 4× more activation dimensions to compress, which the
+   96.6% dead-features rate is consistent with.
+3. **C07 truncated by patience.** `*_metrics.jsonl` has 7 rows vs the 51 of the
+   other three runs — likely `patience=20 + min_improvement=0.02` triggered on
+   jumprelu's θ warm-up plateau.
+4. **C01 k=16 is too tight for S4 conv2.** Same hyperparameters as the Aa
+   winner but cov>50 collapsed to 4%. Dead-features fell from 81% → 58%, so
+   features stayed alive but carry less concept information.
+
+**Plan (ordered by cost):**
+
+1. **LP baseline on champS4** (cheap; runs on Deep Brain via the LP block in
+   the user's `commands.sh` — see CLAUDE.md note on that file's status).
+   All three coverage metrics computed for `{s4.fc1, s4.conv2} ×
+   {trained, random} × {gorillaS4, hawkS4}` = 8 results. The script's outputs are directly comparable to `eval_registry`
+   entries because the LP script was extended (2026-05-18) to emit
+   `coverage_mcc` and `coverage_f1_lift` alongside `coverage` (F1). If LP on
+   S4 falls in line with LP on Aa, the gap is the SAE recipes; if LP itself
+   drops, the model's representations changed and no SAE recipe will close it.
+2. **Fix C07 patience** (one-line config edit; lower `min_improvement` or
+   raise `patience` for jumprelu only).
+3. **Rerun A01 at expansion=8** (d_dict=4096 — matches the conv2 runs in
+   feature budget; addresses the dead-features rate).
+4. **Only if (1)–(3) leave a residual gap, launch a scoped conv2-S4 sweep**
+   focused on the C01 k=16 collapse region (k ∈ {16, 24, 32}, exp=8;
+   batchtopk variants for cross-check). fc1-S4 explicitly deprioritized
+   beyond step 3, consistent with the existing fc1 deprioritization rule.
+
+Once LP results land, this section gets a head-to-head table mirroring the
+2026-05-11 winners table, with `S4-LP / S4-LP-random / S4-best-SAE / Aa twin`
+columns.
 
 ### Deprioritized (2026-04-27)
 

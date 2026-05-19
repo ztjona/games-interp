@@ -69,3 +69,52 @@
 # The S4 SAE YAMLs deliberately point `data:` at the S4 activation files; the
 # trainer stores that path in checkpoint metadata so `sae_eval` always picks
 # the right activations regardless of the `game` field.
+#
+# Results — first pass (2026-05-18)
+# ---------------------------------
+# Ranked by F1-lift on gorillaS4 (only the 4 mirrored configs were trained):
+#
+#   run                                          F1-lift  cov    MCC    FVU    L0    dead%
+#   D02 topk-k64-exp16  s4.conv2                 0.128    0.327  0.282  0.012  64    93.1
+#   A01 batchtopk-k16-exp2  s4.fc1               0.125    0.324  0.292  0.058  16    96.6
+#   C07 jumprelu-t32-exp8  s4.conv2              0.106    0.305  0.247  0.075  45    95.3
+#   C01 topk-k16-exp8  s4.conv2                  0.039    0.225  0.226  0.061  16    58.0
+#
+# All four trail their champAa twins on F1-lift (-0.006 to -0.116). C01 in
+# particular collapsed: cov_above_50 falls from 0.40 (Aa) to 0.04 (S4) with
+# identical hyperparameters. hawkS4 is uniformly weaker (0.058-0.074 vs Aa
+# peak 0.105).
+#
+# Competence audit gave the opposite signal: champS4 plays *better* (test B
+# losing-piece avoidance 0.62 vs 0.40, test A 0.79 vs 0.70). The model is
+# stronger but its activations are harder to interpret with the recipes that
+# won on Aa.
+#
+# Open question and next steps
+# ----------------------------
+# Before re-launching a sweep, run two cheap diagnostics:
+#
+#   1. Linear-probe baseline on champS4 activations. Invoked from the LP
+#      block at the bottom of the user's `commands.sh` (transient working
+#      file — see CLAUDE.md). It runs 8 LP configs ({s4.fc1, s4.conv2} x
+#      {trained, random} x {gorillaS4, hawkS4}) and reports F1, MCC, F1-lift
+#      in the same schema as `sae_eval` (LP script was extended 2026-05-18).
+#      If LP coverage on S4 falls in line with LP on Aa, the gap is the SAE
+#      recipes; if LP itself drops, no SAE recipe will close it.
+#
+#   2. Fix C07's jumprelu early stop. Its *_metrics.jsonl has 7 rows vs the
+#      other three configs' 51 rows; lower `min_improvement` or extend
+#      `patience` for jumprelu only.
+#
+# Targeted retraining (after the LP results):
+#
+#   3. Rerun A01 at expansion=8 (d_dict=4096) instead of expansion=2. The
+#      current A01-S4 matches dictionary *size* (1024) but not feature *budget
+#      per activation dimension* — fc1 widened from 128 to 512, so exp=2 gives
+#      4x less capacity per dim than the champAa A01. Consistent with the
+#      observed 96.6% dead-features rate.
+#
+#   4. Only if (1)-(3) leave a residual gap, run a scoped conv2-S4 sweep:
+#      topk-k in {16, 24, 32} at exp=8, plus batchtopk variants at the same
+#      k. fc1-S4 stays deprioritized beyond step 3 (per the fc1-only-for-
+#      bottleneck-comparison rule).

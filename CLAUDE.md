@@ -11,6 +11,15 @@ Source-of-truth research docs (read these before changing experimental scope):
 - `Quarto-specifications.md` — game, model architecture, hookable layers, dataset catalog, naming conventions
 - `BSP-schema-summary.md` — full BSP schema for gorilla and hawk sets
 
+**`commands.sh` is a transient user file**, not committed infrastructure.
+The user keeps the *current* pipeline-execution recipe there as one cohesive
+shell script (training + eval + diagnostic blocks) and rewrites it whenever
+the active phase changes. Do **not** treat its contents as canonical: read
+it for context if helpful, but write new permanent infrastructure as a
+proper script under `scripts/` and reference *that* from docs. Don't
+proliferate ad-hoc `*.sh` files alongside it — when in doubt, fold a new
+one-shot block into `commands.sh` and let the user keep curating it.
+
 ## Common commands
 
 Setup:
