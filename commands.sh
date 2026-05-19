@@ -7,8 +7,9 @@
 #   - champTa (Ta_minimaxSelect, depth-2 minimax training) — 13 SAE configs
 #                                                            + LP baseline pass
 #
-# Runs on Deep Brain (3x A6000). Speed Mind lacks the .pt files.
-# Sized for ~2 overnight sessions at ~5h per SAE on 3 GPUs.
+# Runs on Deep Brain (3x A6000, all equal). Speed Mind lacks the .pt files.
+# Actual A6000 timing: ~5-15 min/config (25k batches, early-stop). Full sweep
+# (~25 configs across 3 GPUs) completes in ~3h — one session, not overnight.
 #
 # Prerequisites (one-time, see configs/champTa/README.md):
 #   - models/quarto/20260516_1452-Ta_minimaxSelect(1)0514_DEPTH_2_E_4350.pt   (trained)
@@ -117,49 +118,42 @@ done
 # ============================================================================
 # PART 3 — SAE sweep launchers (3 GPUs, run each in its own terminal)
 # ----------------------------------------------------------------------------
-# Estimated total: ~25 configs at ~5h each / 3 GPUs = ~42h = 2 overnight runs.
-# Use --split for the canonical round-robin partition; the heavy conv2 configs
-# default to GPUs 1 and 2 (GPU 0 is the slower RTX 4000 on this machine).
+# All three A6000s are equal — use even round-robin splits.
+# Observed training time: ~5-15 min/config (25k batches, early-stop on A6000).
+# Estimated wall time: ~25 configs / 3 GPUs × ~12 min avg = ~1.7h training
+#                    + ~5 min/config × 2 BSP sets × 9 configs = ~1.5h eval
+#                    → full sweep + eval in ~3h (single session).
+# --eval --bsps=<primary> runs inline eval after each training job so results
+# appear as training progresses. Hawk-set eval is in the follow-up block.
 # Comment out / uncomment the desired block before running.
 # ============================================================================
 
-# # --- champS4 retarget sweep (12 configs) ---
-# python validate_sweep.py --configs=configs/champS4 --smoke-test
+# # --- champS4 (12 new) then champTa (13 new) — both sweeps, one command ---
+# python validate_sweep.py --configs=configs/champS4 --smoke-test && python validate_sweep.py --configs=configs/champTa --smoke-test
 #
-# # GPU 0 (lighter; fc1 + jumprelu):
-# python run_sweep.py --configs=configs/champS4 --gpu=0 --split=1/3 --skip-existing
-# # GPU 1 (conv2 topk / batchtopk):
-# python run_sweep.py --configs=configs/champS4 --gpu=1 --split=2/3 --skip-existing
-# # GPU 2 (conv2 topk / batchtopk):
-# python run_sweep.py --configs=configs/champS4 --gpu=2 --split=3/3 --skip-existing
+# python run_sweep.py --configs=configs/champS4 --gpu=0 --split=1/3 --eval --bsps=gorillaS4 --skip-existing & python run_sweep.py --configs=configs/champS4 --gpu=1 --split=2/3 --eval --bsps=gorillaS4 --skip-existing & python run_sweep.py --configs=configs/champS4 --gpu=2 --split=3/3 --eval --bsps=gorillaS4 --skip-existing & wait && python run_sweep.py --configs=configs/champTa --gpu=0 --split=1/3 --eval --bsps=gorillaTa --skip-existing & python run_sweep.py --configs=configs/champTa --gpu=1 --split=2/3 --eval --bsps=gorillaTa --skip-existing & python run_sweep.py --configs=configs/champTa --gpu=2 --split=3/3 --eval --bsps=gorillaTa --skip-existing & wait
 
-# # --- champTa sweep (13 configs) ---
-# python validate_sweep.py --configs=configs/champTa --smoke-test
-#
-# python run_sweep.py --configs=configs/champTa --gpu=0 --split=1/3 --skip-existing
-# python run_sweep.py --configs=configs/champTa --gpu=1 --split=2/3 --skip-existing
-# python run_sweep.py --configs=configs/champTa --gpu=2 --split=3/3 --skip-existing
-
-# # --- Evaluation against champion-specific BSP sets (run AFTER training) ---
-# echo "=== Evaluating champS4 sweep against gorillaS4 + hawkS4 ==="
+# # --- Hawk-set eval + final report (run AFTER both sweeps complete) ---
+# # gorillaS4/gorillaTa are already cached from inline --eval above; only hawk needed.
+# echo "=== Evaluating champS4 sweep against hawkS4 ==="
 # for cfg in configs/champS4/{A01v2,E*,F*}-champS4-*.yaml; do
 #     ckpt=$(python scripts/run_id.py "$cfg" --checkpoint)
 #     [ -f "$ckpt" ] || { echo "WARN: $ckpt not found" >&2; continue; }
-#     python sae_eval.py evaluate "$ckpt" --bsps=gorillaS4
 #     python sae_eval.py evaluate "$ckpt" --bsps=hawkS4
 # done
 #
-# echo "=== Evaluating champTa sweep against gorillaTa + hawkTa ==="
+# echo "=== Evaluating champTa sweep against hawkTa ==="
 # for cfg in configs/champTa/*-champTa-*.yaml; do
 #     ckpt=$(python scripts/run_id.py "$cfg" --checkpoint)
 #     [ -f "$ckpt" ] || { echo "WARN: $ckpt not found" >&2; continue; }
-#     python sae_eval.py evaluate "$ckpt" --bsps=gorillaTa
 #     python sae_eval.py evaluate "$ckpt" --bsps=hawkTa
 # done
 #
 # # --- Final report: top runs + cross-champion A/B ---
 # python scripts/registry_query.py top --bsps=gorillaS4 --limit=20
+# python scripts/registry_query.py top --bsps=hawkS4 --limit=20
 # python scripts/registry_query.py top --bsps=gorillaTa --limit=20
+# python scripts/registry_query.py top --bsps=hawkTa --limit=20
 # for id in E01 E02 E03 E04 E05 E06 E07 F01 F02 F03 F04; do
 #     echo "--- $id: champS4 vs champTa ---"
 #     S4=$(python scripts/run_id.py configs/champS4/$id-champS4-*.yaml)
@@ -168,4 +162,4 @@ done
 #         --bsps=gorillaS4 --bsps-b=gorillaTa || true
 # done
 
-echo "=== Phase 2B data + LP done. Uncomment Part 3 blocks for sweep launches. ==="
+echo "=== Phase 2B data + LP done. Uncomment Part 3 blocks to launch sweeps (~3h on 3x A6000). ==="

@@ -1,0 +1,7 @@
+{"step": 500, "loss": 9.965922, "l_reconstruct": 8.902446, "l0": 74.31, "l0_std": 5.19, "fvu": 0.044422, "mse": 8.881523, "dead_features_pct": 95.73, "median_feat_freq": 0.0}
+{"step": 1000, "loss": 6.775678, "l_reconstruct": 6.043451, "l0": 72.57, "l0_std": 5.71, "fvu": 0.030949, "mse": 6.04019, "dead_features_pct": 96.53, "median_feat_freq": 0.0}
+{"step": 1500, "loss": 5.553266, "l_reconstruct": 4.989514, "l0": 71.49, "l0_std": 6.03, "fvu": 0.025494, "mse": 4.978079, "dead_features_pct": 96.31, "median_feat_freq": 0.0}
+{"step": 2000, "loss": 4.886889, "l_reconstruct": 4.391316, "l0": 71.0, "l0_std": 5.66, "fvu": 0.022569, "mse": 4.382542, "dead_features_pct": 96.53, "median_feat_freq": 0.0}
+{"step": 2500, "loss": 4.492266, "l_reconstruct": 4.059882, "l0": 70.54, "l0_std": 5.88, "fvu": 0.020754, "mse": 4.055452, "dead_features_pct": 96.44, "median_feat_freq": 0.0}
+{"step": 3000, "loss": 4.170344, "l_reconstruct": 3.74377, "l0": 70.5, "l0_std": 5.86, "fvu": 0.019059, "mse": 3.738166, "dead_features_pct": 96.26, "median_feat_freq": 0.0}
+{"stop_reason": "early_stopped"}

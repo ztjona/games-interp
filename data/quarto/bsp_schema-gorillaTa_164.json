@@ -1,0 +1,1013 @@
+{
+  "bsp_set_name": "gorilla_164",
+  "animal": "gorilla",
+  "game": "quarto",
+  "num_bsps": 164,
+  "categories": {
+    "cell_occupancy": 16,
+    "game_phase": 3,
+    "offered_piece": 4,
+    "cell_attribute": 64,
+    "global": 1,
+    "threat_square_2x2": 36,
+    "threat_line": 40
+  },
+  "filters": {
+    "only_categories": [
+      "cell_occupancy",
+      "cell_attribute",
+      "threat_line",
+      "threat_square_2x2",
+      "offered_piece",
+      "game_phase",
+      "global"
+    ],
+    "exclude_categories": null
+  },
+  "bsps": [
+    {
+      "id": "cell_0_0_occupied",
+      "description": "Is cell (0,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_1_occupied",
+      "description": "Is cell (0,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_2_occupied",
+      "description": "Is cell (0,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_3_occupied",
+      "description": "Is cell (0,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_0_occupied",
+      "description": "Is cell (1,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_1_occupied",
+      "description": "Is cell (1,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_2_occupied",
+      "description": "Is cell (1,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_1_3_occupied",
+      "description": "Is cell (1,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_0_occupied",
+      "description": "Is cell (2,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_1_occupied",
+      "description": "Is cell (2,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_2_occupied",
+      "description": "Is cell (2,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_2_3_occupied",
+      "description": "Is cell (2,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_0_occupied",
+      "description": "Is cell (3,0) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_1_occupied",
+      "description": "Is cell (3,1) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_2_occupied",
+      "description": "Is cell (3,2) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_3_3_occupied",
+      "description": "Is cell (3,3) occupied?",
+      "type": "binary",
+      "category": "cell_occupancy"
+    },
+    {
+      "id": "cell_0_0_tall",
+      "description": "Piece at (0,0) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_0_black",
+      "description": "Piece at (0,0) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_0_square",
+      "description": "Piece at (0,0) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_0_with_hole",
+      "description": "Piece at (0,0) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_tall",
+      "description": "Piece at (0,1) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_black",
+      "description": "Piece at (0,1) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_square",
+      "description": "Piece at (0,1) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_1_with_hole",
+      "description": "Piece at (0,1) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_tall",
+      "description": "Piece at (0,2) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_black",
+      "description": "Piece at (0,2) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_square",
+      "description": "Piece at (0,2) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_2_with_hole",
+      "description": "Piece at (0,2) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_tall",
+      "description": "Piece at (0,3) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_black",
+      "description": "Piece at (0,3) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_square",
+      "description": "Piece at (0,3) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_0_3_with_hole",
+      "description": "Piece at (0,3) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_tall",
+      "description": "Piece at (1,0) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_black",
+      "description": "Piece at (1,0) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_square",
+      "description": "Piece at (1,0) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_0_with_hole",
+      "description": "Piece at (1,0) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_tall",
+      "description": "Piece at (1,1) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_black",
+      "description": "Piece at (1,1) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_square",
+      "description": "Piece at (1,1) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_1_with_hole",
+      "description": "Piece at (1,1) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_tall",
+      "description": "Piece at (1,2) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_black",
+      "description": "Piece at (1,2) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_square",
+      "description": "Piece at (1,2) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_2_with_hole",
+      "description": "Piece at (1,2) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_tall",
+      "description": "Piece at (1,3) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_black",
+      "description": "Piece at (1,3) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_square",
+      "description": "Piece at (1,3) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_1_3_with_hole",
+      "description": "Piece at (1,3) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_tall",
+      "description": "Piece at (2,0) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_black",
+      "description": "Piece at (2,0) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_square",
+      "description": "Piece at (2,0) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_0_with_hole",
+      "description": "Piece at (2,0) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_tall",
+      "description": "Piece at (2,1) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_black",
+      "description": "Piece at (2,1) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_square",
+      "description": "Piece at (2,1) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_1_with_hole",
+      "description": "Piece at (2,1) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_tall",
+      "description": "Piece at (2,2) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_black",
+      "description": "Piece at (2,2) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_square",
+      "description": "Piece at (2,2) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_2_with_hole",
+      "description": "Piece at (2,2) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_tall",
+      "description": "Piece at (2,3) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_black",
+      "description": "Piece at (2,3) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_square",
+      "description": "Piece at (2,3) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_2_3_with_hole",
+      "description": "Piece at (2,3) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_tall",
+      "description": "Piece at (3,0) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_black",
+      "description": "Piece at (3,0) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_square",
+      "description": "Piece at (3,0) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_0_with_hole",
+      "description": "Piece at (3,0) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_tall",
+      "description": "Piece at (3,1) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_black",
+      "description": "Piece at (3,1) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_square",
+      "description": "Piece at (3,1) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_1_with_hole",
+      "description": "Piece at (3,1) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_tall",
+      "description": "Piece at (3,2) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_black",
+      "description": "Piece at (3,2) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_square",
+      "description": "Piece at (3,2) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_2_with_hole",
+      "description": "Piece at (3,2) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_tall",
+      "description": "Piece at (3,3) is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_black",
+      "description": "Piece at (3,3) is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_square",
+      "description": "Piece at (3,3) is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "cell_3_3_with_hole",
+      "description": "Piece at (3,3) is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "cell_attribute"
+    },
+    {
+      "id": "row_0_threat_tall",
+      "description": "Row 0: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_0_threat_black",
+      "description": "Row 0: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_0_threat_square",
+      "description": "Row 0: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_0_threat_with_hole",
+      "description": "Row 0: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_1_threat_tall",
+      "description": "Row 1: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_1_threat_black",
+      "description": "Row 1: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_1_threat_square",
+      "description": "Row 1: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_1_threat_with_hole",
+      "description": "Row 1: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_2_threat_tall",
+      "description": "Row 2: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_2_threat_black",
+      "description": "Row 2: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_2_threat_square",
+      "description": "Row 2: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_2_threat_with_hole",
+      "description": "Row 2: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_3_threat_tall",
+      "description": "Row 3: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_3_threat_black",
+      "description": "Row 3: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_3_threat_square",
+      "description": "Row 3: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "row_3_threat_with_hole",
+      "description": "Row 3: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_0_threat_tall",
+      "description": "Col 0: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_0_threat_black",
+      "description": "Col 0: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_0_threat_square",
+      "description": "Col 0: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_0_threat_with_hole",
+      "description": "Col 0: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_1_threat_tall",
+      "description": "Col 1: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_1_threat_black",
+      "description": "Col 1: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_1_threat_square",
+      "description": "Col 1: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_1_threat_with_hole",
+      "description": "Col 1: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_2_threat_tall",
+      "description": "Col 2: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_2_threat_black",
+      "description": "Col 2: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_2_threat_square",
+      "description": "Col 2: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_2_threat_with_hole",
+      "description": "Col 2: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_3_threat_tall",
+      "description": "Col 3: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_3_threat_black",
+      "description": "Col 3: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_3_threat_square",
+      "description": "Col 3: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "col_3_threat_with_hole",
+      "description": "Col 3: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_main_threat_tall",
+      "description": "Diag main: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_main_threat_black",
+      "description": "Diag main: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_main_threat_square",
+      "description": "Diag main: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_main_threat_with_hole",
+      "description": "Diag main: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_anti_threat_tall",
+      "description": "Diag anti: 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_anti_threat_black",
+      "description": "Diag anti: 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_anti_threat_square",
+      "description": "Diag anti: 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "diag_anti_threat_with_hole",
+      "description": "Diag anti: 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_line"
+    },
+    {
+      "id": "square_0_0_threat_tall",
+      "description": "2x2 at (0,0): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_0_threat_black",
+      "description": "2x2 at (0,0): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_0_threat_square",
+      "description": "2x2 at (0,0): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_0_threat_with_hole",
+      "description": "2x2 at (0,0): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_1_threat_tall",
+      "description": "2x2 at (0,1): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_1_threat_black",
+      "description": "2x2 at (0,1): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_1_threat_square",
+      "description": "2x2 at (0,1): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_1_threat_with_hole",
+      "description": "2x2 at (0,1): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_2_threat_tall",
+      "description": "2x2 at (0,2): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_2_threat_black",
+      "description": "2x2 at (0,2): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_2_threat_square",
+      "description": "2x2 at (0,2): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_0_2_threat_with_hole",
+      "description": "2x2 at (0,2): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_0_threat_tall",
+      "description": "2x2 at (1,0): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_0_threat_black",
+      "description": "2x2 at (1,0): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_0_threat_square",
+      "description": "2x2 at (1,0): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_0_threat_with_hole",
+      "description": "2x2 at (1,0): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_1_threat_tall",
+      "description": "2x2 at (1,1): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_1_threat_black",
+      "description": "2x2 at (1,1): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_1_threat_square",
+      "description": "2x2 at (1,1): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_1_threat_with_hole",
+      "description": "2x2 at (1,1): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_2_threat_tall",
+      "description": "2x2 at (1,2): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_2_threat_black",
+      "description": "2x2 at (1,2): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_2_threat_square",
+      "description": "2x2 at (1,2): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_1_2_threat_with_hole",
+      "description": "2x2 at (1,2): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_0_threat_tall",
+      "description": "2x2 at (2,0): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_0_threat_black",
+      "description": "2x2 at (2,0): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_0_threat_square",
+      "description": "2x2 at (2,0): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_0_threat_with_hole",
+      "description": "2x2 at (2,0): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_1_threat_tall",
+      "description": "2x2 at (2,1): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_1_threat_black",
+      "description": "2x2 at (2,1): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_1_threat_square",
+      "description": "2x2 at (2,1): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_1_threat_with_hole",
+      "description": "2x2 at (2,1): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_2_threat_tall",
+      "description": "2x2 at (2,2): 3 of 4 are TALL",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_2_threat_black",
+      "description": "2x2 at (2,2): 3 of 4 are BLACK",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_2_threat_square",
+      "description": "2x2 at (2,2): 3 of 4 are SQUARE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "square_2_2_threat_with_hole",
+      "description": "2x2 at (2,2): 3 of 4 are WITH_HOLE",
+      "type": "binary",
+      "category": "threat_square_2x2"
+    },
+    {
+      "id": "offered_tall",
+      "description": "Offered piece is TALL (1) else LITTLE (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "offered_black",
+      "description": "Offered piece is BLACK (1) else WHITE (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "offered_square",
+      "description": "Offered piece is SQUARE (1) else CIRCLE (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "offered_with_hole",
+      "description": "Offered piece is WITH_HOLE (1) else WITHOUT_HOLE (0)",
+      "type": "binary",
+      "category": "offered_piece"
+    },
+    {
+      "id": "game_phase_early",
+      "description": "Early game (0-5 pieces on board)",
+      "type": "binary",
+      "category": "game_phase"
+    },
+    {
+      "id": "game_phase_mid",
+      "description": "Mid game (6-11 pieces on board)",
+      "type": "binary",
+      "category": "game_phase"
+    },
+    {
+      "id": "game_phase_late",
+      "description": "Late game (12-16 pieces on board)",
+      "type": "binary",
+      "category": "game_phase"
+    },
+    {
+      "id": "winning_move_exists",
+      "description": "There is an immediate winning placement",
+      "type": "binary",
+      "category": "global"
+    }
+  ]
+}
