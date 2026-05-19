@@ -10,6 +10,7 @@ Source-of-truth research docs (read these before changing experimental scope):
 - `RESEARCH-STATUS.md` — current phase, hypotheses, winners, open problems, active plan
 - `Quarto-specifications.md` — game, model architecture, hookable layers, dataset catalog, naming conventions
 - `BSP-schema-summary.md` — full BSP schema for gorilla and hawk sets
+- `configs/models/README.md` — checklist for onboarding a new champion (model config, game module, naming tags, verification)
 
 **`commands.sh` is a transient user file**, not committed infrastructure.
 The user keeps the *current* pipeline-execution recipe there as one cohesive
