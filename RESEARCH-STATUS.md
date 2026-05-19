@@ -1,5 +1,15 @@
 # Quarto SAE Research — Quick Reference
 
+## Project State (2026-05-19)
+
+**Active phase:** Phase 2B — champS4 hyperparameter sweep. LP diagnostic landed
+2026-05-19 and inverts the interpretation of the 2026-05-18 SAE results: the
+champS4 SAEs do not underperform because the activations are harder to
+interpret — they're *much easier*. LP F1-lift on champS4 is 2.5–5× the
+champAa value at every hook and BSP set, and SAE/LP efficiency dropped from
+~70% on Aa to ~20% on S4. The sweep is rescoped accordingly (see "Phase 2B
+LP results + revised sweep" below).
+
 ## Project State (2026-05-18)
 
 **Active phase:** Phase 2B — champS4 follow-up sweep + diagnostic. Open question:
@@ -105,7 +115,7 @@ LP-diagnostic-first plan.
 | H5 | Feature shrinkage (L1/ReLU) | ⚠️ PARTIAL — Gated/Vanilla do score lower (Tier 3), but P-Annealing doesn't dominate Tier 1 |
 | H6 | Wrong hook point → conv2 may be better | ✅ SUPPORTED — conv2 runs in Tier 1 with fc1 runs in Tier 2 |
 | H7 | Offered piece is not learned | ✅ CONFIRMED — F1=0.667 is trivial baseline, not real signal |
-| H8 | **NEW:** Threat info is spatially encoded, lost at fc1 bottleneck | ✅ CONFIRMED — conv2 threat probes are high while fc1 stays near-zero |
+| H8 | **NEW:** Threat info is spatially encoded, lost at fc1 bottleneck | ⚠️ CHAMPION-SPECIFIC — confirmed for champAa (`CNN_uncoupled`); OVERTURNED for champS4 (unified-aux preserves threats through fc1, LP hawk-fc1 F1-lift = 0.548) |
 
 ### BSP Sets
 - **gorilla_164:** 7 categories (cell_occupancy, cell_attribute, threat_line, threat_square_2x2, offered_piece, global, game_phase)
@@ -339,10 +349,100 @@ Once LP results land, this section gets a head-to-head table mirroring the
 2026-05-11 winners table, with `S4-LP / S4-LP-random / S4-best-SAE / Aa twin`
 columns.
 
+### Phase 2B LP results + revised sweep (2026-05-19)
+
+LP baselines on champS4 activations (8 configs: `{s4.fc1, s4.conv2} ×
+{trained, random} × {gorillaS4, hawkS4}`) landed via `commands.sh`.
+Headline: **the diagnostic question is decisively answered — the SAE gap is
+a recipe problem, not a model problem.**
+
+#### Headline LP table
+
+| Hook × BSP | LP F1 | LP MCC | LP F1-lift | random-net F1-lift | champAa LP F1 (was) |
+|---|---:|---:|---:|---:|---:|
+| fc1 × gorillaS4 | 0.719 | 0.715 | 0.520 | 0.105 | 0.402 |
+| fc1 × hawkS4 | **0.584** | 0.588 | **0.548** | 0.001 | 0.200 |
+| conv2 × gorillaS4 | **0.877** | 0.875 | **0.678** | 0.206 | 0.789 |
+| conv2 × hawkS4 | **0.750** | 0.751 | **0.715** | 0.053 | — |
+
+champS4 has *more* learned-specific structure than champAa at every hook
+(trained-minus-random gaps are 2–6× larger). Random-net controls drop near
+zero on hawk, so this is unambiguously learned signal.
+
+#### SAE / LP efficiency
+
+| run | SAE F1-lift | LP F1-lift (same hook+BSP) | efficiency |
+|---|---:|---:|---:|
+| A01 fc1 batchtopk-k16 (exp=2) | 0.125 | 0.520 | 24% |
+| D02 conv2 topk-k64-exp16 | 0.128 | 0.678 | 19% |
+| C07 conv2 jumprelu-t32-exp8 | 0.106 | 0.678 | 16% |
+| C01 conv2 topk-k16-exp8 (collapsed) | 0.039 | 0.678 | 6% |
+| *champAa anakin-batchtopk-k16-fc1 (ref)* | 0.141 | ~0.19 | ~74% |
+
+The same SAE budgets recover ~3× less of the available signal on S4. There
+is huge headroom — multiplying current S4 F1-lift by 2.5× would still only
+reach ~50% efficiency.
+
+#### Hypothesis updates
+
+- **H8** (threat info is spatial; lost at fc1) — was confirmed for champAa.
+  **Overturned for champS4**: hawkS4 fc1 LP F1-lift = 0.548 (vs hawk-on-Aa
+  fc1 = ≈0.005). The unified-aux training appears to preserve threat
+  information through the bottleneck. H8 is now a *champion-specific*
+  property of `CNN_uncoupled`, not a Quarto-DQN property.
+- **Completability** — was near-zero on champAa LP at both hooks (≈0.003
+  fc1, 0.027 conv2). On champS4 it is decodable: line completability
+  lift 0.356 (fc1), 0.634 (conv2); square completability 0.523 / 0.732.
+  This matches the competence audit's huge jump on test B (losing-piece
+  avoidance 40% → 62%) — the model needed completability to defend, so
+  it learned it.
+
+#### Policy decisions revisited
+
+- **fc1 deprioritization (2026-04-27)** is *champAa-specific*. On champS4
+  fc1 retains threats and is the cheapest hook with full concept
+  coverage (LP gorilla 0.72 / hawk 0.58). fc1 SAE work on threats is
+  reactivated for champS4.
+- **Phase 4 architectural fix** (auxiliary threat-prediction head on
+  fc1 during DQN training, parked in late April) was motivated by
+  champAa's collapsed fc1 threat signal. champS4 already preserves
+  threats through fc1 implicitly. **Phase 4 is no longer needed** —
+  the unified-aux objective solved the bottleneck problem at training
+  time.
+
+#### Revised sweep (Phase 2B-sweep)
+
+The previous 4-config champS4 mini-set was a "mirror the Aa top runs"
+exercise. With the LP ceiling known, the real sweep starts now. Success
+criterion: SAE F1-lift ≥ 50% of LP F1-lift on the same hook×BSP
+(target ~0.34 on conv2-gorilla, ~0.35 on conv2-hawk, ~0.26 on fc1-gorilla,
+~0.27 on fc1-hawk). All configs use seed=42; the winner gets two seed
+replicates afterward.
+
+| tier | id | hook | arch | k / θ | exp | rationale |
+|---|---|---|---|---:|---:|---|
+| A — targeted fixes | A01-v2-champS4-s42 | s4.fc1 | batchtopk | k=16 | **8** | A01 exp mismatch; LP says exp=2 leaves 75%+ headroom |
+| A | C07-v2-champS4-s42 | s4.conv2 | jumprelu | t=32 | 8 | min_improvement=0.005 (was 0.02); fixes early stop at 7 log steps |
+| B — conv2 k-sweep | E01-champS4-s42 | s4.conv2 | topk | k=32 | 8 | mid-budget; C01 collapse zone |
+| B | E02-champS4-s42 | s4.conv2 | topk | k=48 | 8 | (new k value) |
+| B | E03-champS4-s42 | s4.conv2 | topk | k=96 | 8 | upper budget |
+| B | E04-champS4-s42 | s4.conv2 | batchtopk | k=32 | 8 | arch cross-check |
+| B | E05-champS4-s42 | s4.conv2 | batchtopk | k=64 | 8 | arch cross-check |
+| C — fc1 reactivation | F01-champS4-s42 | s4.fc1 | topk | k=32 | 8 | LP says fc1 gorilla = 0.72 — large untapped target |
+| C | F02-champS4-s42 | s4.fc1 | topk | k=64 | 8 | mid-budget fc1 |
+| C | F03-champS4-s42 | s4.fc1 | batchtopk | k=32 | 8 | direct comparison vs A01-v2 |
+| C | F04-champS4-s42 | s4.fc1 | jumprelu | t=64 | 8 | fc1 arch breadth |
+
+11 new configs; ~5–6 hours on a single A6000. After Tier B/C lands,
+add seed=43,44 replicates of the top run from each (A/B/C). Total budget:
+~14 runs (11 new + 3 seed replicates). Vanilla and gated are *not*
+included — Anakin already showed Tier-3 performance for those, no
+reason to expect S4 reverses that.
+
 ### Deprioritized (2026-04-27)
 
 - **Broad unsupervised arch sweeps on fc1** — Anakin (28 configs, σ=0.004 across seeds) showed this is second-order for fc1. Scope clarified 2026-04-29: this deprioritization is fc1-specific. Conv2 has never had a complete architecture sweep (only topk/jumprelu/gated tested; batchtopk/vanilla/panneal missing) — Campaign C–G fills this gap.
-- **fc1-only threat investigation** — Phase 1F decisively redirected this work to conv2. fc1 is retained only as a bottleneck-comparison reference.
+- **fc1-only threat investigation** — Phase 1F decisively redirected this work to conv2. fc1 is retained only as a bottleneck-comparison reference. **Caveat (2026-05-19):** this rule is `CNN_uncoupled`-specific. On champS4 the fc1 bottleneck preserves threat information (hawk fc1 LP F1-lift = 0.548); fc1 SAE work is reactivated for champS4.
 - **`offered_piece` as a coverage signal** — F1 ≈ 0.667 is the trivial all-positive baseline (P=0.5, R=1.0). Keep it in the per-category breakdown for transparency, but **exclude it from any threat-focused or headline ranking**. Anakin's overall coverage means are inflated by this category for many runs.
 
 ### Follow-up Run Naming (from 2026-04-24 onward)

@@ -118,3 +118,29 @@
 #      topk-k in {16, 24, 32} at exp=8, plus batchtopk variants at the same
 #      k. fc1-S4 stays deprioritized beyond step 3 (per the fc1-only-for-
 #      bottleneck-comparison rule).
+#
+# LP results (2026-05-19) — diagnosis flipped
+# -------------------------------------------
+# The LP baseline came back FAR higher than expected. champS4 activations are
+# more linearly separable than champAa's at every hook+BSP, by a wide margin:
+#
+#   hook x BSP set     LP F1   LP F1-lift   random F1-lift
+#   fc1 x gorillaS4    0.719   0.520        0.105
+#   fc1 x hawkS4       0.584   0.548        0.001
+#   conv2 x gorillaS4  0.877   0.678        0.206
+#   conv2 x hawkS4     0.750   0.715        0.053
+#
+# So the four-run sweep underperformed not because the model is opaque, but
+# because the same SAE budgets recover ~3x less of the available signal
+# (SAE/LP efficiency dropped from ~70% on Aa to ~20% on S4). Two policy
+# updates land here:
+#
+#   - fc1 deprioritization is REVERSED for champS4 (hawk fc1 LP lift 0.548
+#     vs ~0.005 for Aa). Threats are preserved through the bottleneck.
+#   - The Phase 4 architectural-fix proposal (auxiliary threat head) is no
+#     longer needed; champS4's unified-aux training already does that work.
+#
+# The revised sweep is documented in RESEARCH-STATUS.md "Phase 2B LP results +
+# revised sweep" — 11 new configs spanning targeted A01/C07 fixes, a conv2 k
+# sweep (E01-E05), and fc1 reactivation (F01-F04). Target: SAE F1-lift >= 50%
+# of LP F1-lift on the same hook x BSP.
