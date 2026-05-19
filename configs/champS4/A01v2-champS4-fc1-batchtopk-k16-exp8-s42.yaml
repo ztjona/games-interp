@@ -1,0 +1,17 @@
+# A01-v2: fix the exp=2 mistake from the 2026-05-18 sweep.
+# Original A01-champS4 used expansion=2 to match the d_dict=1024 of the champAa
+# A01 (d_act 128 x 8 = d_act 512 x 2). LP results 2026-05-19 show fc1 has LP
+# F1-lift 0.520 (gorillaS4); the original A01 captured only 0.125 (24%) and ran
+# 96.6% dead features. Bump to exp=8 for d_dict=4096 (matches conv2 budget).
+experiment: A01v2-champS4-s42
+architecture: batchtopk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16

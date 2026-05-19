@@ -1,0 +1,14 @@
+# F03: fc1 batchtopk k=32, exp=8. Direct comparison vs A01v2 (k=16) to map
+# the fc1 k-curve.
+experiment: F03-champS4-s42
+architecture: batchtopk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32

@@ -1,0 +1,19 @@
+# E01: conv2 topk k=32, exp=8. Phase 2B-sweep k-curve, midpoint.
+# C01 (k=16) collapsed on champS4 with cov>50 falling 0.40 -> 0.04. LP says
+# conv2 has F1-lift 0.678 (gorillaS4) / 0.715 (hawkS4) available; the curve
+# E01-E04 maps where the SAE budget floor is.
+experiment: E01-champS4-s42
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

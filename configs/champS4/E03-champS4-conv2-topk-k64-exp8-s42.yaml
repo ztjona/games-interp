@@ -1,0 +1,17 @@
+# E03: conv2 topk k=64, exp=8. Pairs with D02 (k=64, exp=16) to test whether
+# the higher expansion helped — D02 was the best champS4 run at F1-lift 0.128.
+experiment: E03-champS4-s42
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

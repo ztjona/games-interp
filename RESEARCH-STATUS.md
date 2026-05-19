@@ -2,13 +2,16 @@
 
 ## Project State (2026-05-19)
 
-**Active phase:** Phase 2B — champS4 hyperparameter sweep. LP diagnostic landed
-2026-05-19 and inverts the interpretation of the 2026-05-18 SAE results: the
-champS4 SAEs do not underperform because the activations are harder to
-interpret — they're *much easier*. LP F1-lift on champS4 is 2.5–5× the
-champAa value at every hook and BSP set, and SAE/LP efficiency dropped from
-~70% on Aa to ~20% on S4. The sweep is rescoped accordingly (see "Phase 2B
-LP results + revised sweep" below).
+**Active phase:** Phase 2B — two-champion hyperparameter sweep at fixed
+architecture (`QuartoCNNAutoregUnifiedS4`). The 2026-05-18 SAE results were
+re-diagnosed via LP on 2026-05-19: champS4 activations are *more* linearly
+separable than champAa's at every hook×BSP, by 2.5–5×, and SAE/LP efficiency
+dropped from ~70% on Aa to ~20% on S4. The sweep is rescoped as a 25-config
+plan (12 champS4 retarget + 13 champTa). A second champion landed the same
+day — `champTa` (Ta_minimaxSelect, depth-2 minimax training, +16.6 percentage
+points head-to-head WR vs champS4) — and shares the architecture, so the
+champS4 vs champTa A/B is a controlled experiment on the training procedure
+(uniform vs minimax). See "Phase 2B LP results + revised sweep" below.
 
 ## Project State (2026-05-18)
 
@@ -116,6 +119,7 @@ LP-diagnostic-first plan.
 | H6 | Wrong hook point → conv2 may be better | ✅ SUPPORTED — conv2 runs in Tier 1 with fc1 runs in Tier 2 |
 | H7 | Offered piece is not learned | ✅ CONFIRMED — F1=0.667 is trivial baseline, not real signal |
 | H8 | **NEW:** Threat info is spatially encoded, lost at fc1 bottleneck | ⚠️ CHAMPION-SPECIFIC — confirmed for champAa (`CNN_uncoupled`); OVERTURNED for champS4 (unified-aux preserves threats through fc1, LP hawk-fc1 F1-lift = 0.548) |
+| H9 | **NEW (2026-05-19, pre-registered):** Oracle distillation (depth-2 minimax) in champTa training distils the oracle's *concepts* into linearly-recoverable features, rather than producing a non-decomposable policy shortcut. Diagnostic: LP-Ta F1-lift on `reframed_completable` and `threat_*` ≥ LP-S4 → concept distillation; if those drop while gameplay improves → shortcut. | OPEN — awaits champTa LP results |
 
 ### BSP Sets
 - **gorilla_164:** 7 categories (cell_occupancy, cell_attribute, threat_line, threat_square_2x2, offered_piece, global, game_phase)
@@ -410,34 +414,89 @@ reach ~50% efficiency.
   the unified-aux objective solved the bottleneck problem at training
   time.
 
-#### Revised sweep (Phase 2B-sweep)
+#### Revised sweep (Phase 2B-sweep, 2026-05-19)
 
 The previous 4-config champS4 mini-set was a "mirror the Aa top runs"
-exercise. With the LP ceiling known, the real sweep starts now. Success
-criterion: SAE F1-lift ≥ 50% of LP F1-lift on the same hook×BSP
-(target ~0.34 on conv2-gorilla, ~0.35 on conv2-hawk, ~0.26 on fc1-gorilla,
-~0.27 on fc1-hawk). All configs use seed=42; the winner gets two seed
-replicates afterward.
+exercise. With the LP ceiling known *and* a second champion (`champTa`)
+available at the same architecture, the real sweep is a **25-config
+two-champion plan** on 3×A6000 (Deep Brain). Success criterion: SAE
+F1-lift ≥ 50% of LP F1-lift on the same hook×BSP. All configs use
+seed=42; **no seed replicates this pass** — Anakin (σ=0.004) and
+Phase 2A (σ≈0.005) established seed stability for TopK/BatchTopK
+training dynamics on `CNN_uncoupled`; the same statistics should
+transfer to the S4 architecture (and to champTa, which shares it). A
+single s43 replicate of the overall winner can be added post-hoc as
+cheap insurance.
 
-| tier | id | hook | arch | k / θ | exp | rationale |
-|---|---|---|---|---:|---:|---|
-| A — targeted fixes | A01-v2-champS4-s42 | s4.fc1 | batchtopk | k=16 | **8** | A01 exp mismatch; LP says exp=2 leaves 75%+ headroom |
-| A | C07-v2-champS4-s42 | s4.conv2 | jumprelu | t=32 | 8 | min_improvement=0.005 (was 0.02); fixes early stop at 7 log steps |
-| B — conv2 k-sweep | E01-champS4-s42 | s4.conv2 | topk | k=32 | 8 | mid-budget; C01 collapse zone |
-| B | E02-champS4-s42 | s4.conv2 | topk | k=48 | 8 | (new k value) |
-| B | E03-champS4-s42 | s4.conv2 | topk | k=96 | 8 | upper budget |
-| B | E04-champS4-s42 | s4.conv2 | batchtopk | k=32 | 8 | arch cross-check |
-| B | E05-champS4-s42 | s4.conv2 | batchtopk | k=64 | 8 | arch cross-check |
-| C — fc1 reactivation | F01-champS4-s42 | s4.fc1 | topk | k=32 | 8 | LP says fc1 gorilla = 0.72 — large untapped target |
-| C | F02-champS4-s42 | s4.fc1 | topk | k=64 | 8 | mid-budget fc1 |
-| C | F03-champS4-s42 | s4.fc1 | batchtopk | k=32 | 8 | direct comparison vs A01-v2 |
-| C | F04-champS4-s42 | s4.fc1 | jumprelu | t=64 | 8 | fc1 arch breadth |
+**Shared E/F IDs across champions** — each E0X / F0X is the same
+recipe on both champions, so `registry_query.py compare A B
+--bsps=gorillaS4 --bsps-b=gorillaTa` works for every pair, isolating
+the effect of training procedure (uniform vs minimax) at fixed
+architecture.
 
-11 new configs; ~5–6 hours on a single A6000. After Tier B/C lands,
-add seed=43,44 replicates of the top run from each (A/B/C). Total budget:
-~14 runs (11 new + 3 seed replicates). Vanilla and gated are *not*
-included — Anakin already showed Tier-3 performance for those, no
-reason to expect S4 reverses that.
+| ID | hook | arch | k / θ | exp | champS4 | champTa | notes |
+|---|---|---|---:|---:|:---:|:---:|---|
+| A01v2 | s4.fc1 | batchtopk | k=16 | **8** | ✓ | (= F00) | champS4 fc1 exp-fix; LP says exp=2 leaves 75%+ headroom |
+| C01 | s4.conv2 | topk | k=16 | 8 | (orig kept) | ✓ | collapse-zone probe — same setting on Ta tests whether minimax avoids the C01 floor |
+| E01 | s4.conv2 | topk | k=32 | 8 | ✓ | ✓ | mid-budget; just above C01 collapse |
+| E02 | s4.conv2 | topk | k=48 | 8 | ✓ | ✓ | curve filler |
+| E03 | s4.conv2 | topk | k=64 | 8 | ✓ | ✓ | direct A/B against D02 (k=64, exp=16) |
+| E04 | s4.conv2 | topk | k=96 | 8 | ✓ | ✓ | upper budget |
+| E05 | s4.conv2 | batchtopk | k=32 | 8 | ✓ | ✓ | arch cross-check |
+| E06 | s4.conv2 | batchtopk | k=64 | 8 | ✓ | ✓ | arch cross-check |
+| E07 | s4.conv2 | jumprelu | t=32 | 8 | ✓ | ✓ | min_improvement=0.005 (was 0.02; fixes C07 7-step early stop) |
+| F00 | s4.fc1 | batchtopk | k=16 | 8 | (= A01v2) | ✓ | champTa starts with correct exp=8 from the start |
+| F01 | s4.fc1 | topk | k=32 | 8 | ✓ | ✓ | LP fc1 gorilla = 0.72 — large untapped target |
+| F02 | s4.fc1 | topk | k=64 | 8 | ✓ | ✓ | mid-budget fc1 |
+| F03 | s4.fc1 | batchtopk | k=32 | 8 | ✓ | ✓ | direct A/B vs A01v2/F00 (k=16) |
+| F04 | s4.fc1 | jumprelu | t=64 | 8 | ✓ | ✓ | fc1 arch breadth; patience fix baked in |
+
+Total: 12 champS4 + 13 champTa = 25 SAE configs. Add the upfront
+champTa LP pass (8 LP runs) for the ceiling. Estimated wall time at
+~5h/SAE on 3 GPUs: **~42 hours ≈ 2 overnight sessions**. Vanilla and
+gated are not included — Anakin already put both in Tier 3; no reason
+to expect either S4 architecture reverses that.
+
+The actual launch recipe lives in `commands.sh` (transient working
+file per CLAUDE.md): Part 1 generates champTa positions / BSP labels /
+activations, Part 2 runs the LP baseline, Part 3 contains the
+commented sweep + eval launchers — uncomment per overnight session.
+
+#### Pre-registered: oracle-distillation concern for champTa
+
+champTa is trained by distilling a **depth-2 minimax oracle** during the
+self-play select step. The oracle perfectly knows immediate threats and
+one-ply lookahead at training time, then disappears at inference. Two
+plausible interpretability outcomes — pre-registered so the LP result
+reads as a decision rather than a post-hoc rationalisation:
+
+1. **Best case — concept distillation.** The cheapest way to match the
+   oracle's policy across many positions is to compute the same
+   intermediate concepts (threat positions, completability). Champ
+   distillation regularises feature emergence; this would mirror what
+   champS4's unified-aux objective already did to threats at fc1 (0.005
+   → 0.548). Expected signature: LP-Ta F1-lift ≥ LP-S4 on every
+   category, biggest gains on `reframed_completable` and `threat_*`.
+2. **Worst case — non-decomposable shortcut.** The network learns to
+   pattern-match board configurations directly to the oracle's chosen
+   move without computing intermediate concepts. Good play, worse
+   interpretability. Expected signature: LP-Ta competence audit at or
+   above champS4 *but* LP F1-lift on completability *drops*; threats
+   may stay flat instead of rising.
+
+`reframed_completable` and `threat_*` are the diagnostic categories
+because they are exactly what depth-2 minimax computes internally to
+choose a move. If those rise → oracle reasoning was distilled. If
+they drop while gameplay improves → the shortcut happened.
+
+**Either result is a publishable scientific finding** and does not
+change the sweep plan. The third outcome (LP-Ta ≈ LP-S4) is a clean
+"transfers" result; the shortcut case is the first concrete evidence
+in this project that *stronger play can decouple from interpretable
+representations* under distillation, which would justify a follow-up
+sub-study comparing pure-RL vs distilled training at fixed
+architecture. Decide which path to pursue *after* the LP lands; do not
+prejudge from the gameplay benchmark alone.
 
 ### Deprioritized (2026-04-27)
 

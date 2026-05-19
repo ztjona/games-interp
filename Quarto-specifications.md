@@ -374,7 +374,8 @@ re-used verbatim as the eval-registry key.
 | Name | Description | Source Files | Model | N Positions | Generation Date |
 |------|-------------|--------------|-------|-------------|-----------------|
 | `amalgam` | Combined all opponent modes, deduplicated | `positions-random_v_random_raw.pt`<br>`positions-model_v_random-Aa_replay_raw.pt`<br>`positions-random_v_model-Aa_replay_raw.pt`<br>`positions-model_v_model-Aa_replay_raw.pt` | Aa_replay (20260227_1103) | 275,916 | 2026-03-03 |
-| `amalgam_s4` | Self-play combined+deduped under the new champion | 4 raw S4 self-play files (`positions-*_raw.pt`) | Sa_archScan S4 (20260514_0815) | (regenerated 2026-05-18) | 2026-05-18 |
+| `amalgam_s4` | Self-play combined+deduped under champS4 | 4 raw S4 self-play files (`positions-*_raw.pt`) | Sa_archScan S4 (20260514_0815) | (regenerated 2026-05-18) | 2026-05-18 |
+| `amalgam_ta` | Self-play combined+deduped under champTa | 4 raw Ta self-play files | Ta_minimaxSelect (20260516_1452) | (planned 2026-05-19) | 2026-05-19 |
 | `copper` | random_v_random only (not yet created) | `positions-random_v_random_raw.pt` | N/A | ~121 | 2026-03-03 |
 | `bronze` | model_v_random only (not yet created) | `positions-model_v_random-Aa_replay_raw.pt` | Aa_replay | ~102K | 2026-03-03 |
 | `iron` | random_v_model only (not yet created) | `positions-random_v_model-Aa_replay_raw.pt` | Aa_replay | ~101K | 2026-03-03 |
@@ -388,6 +389,8 @@ re-used verbatim as the eval-registry key.
 | `hawk_173` | 173 | reframed_count, reframed_completable, reframed_any_threat, reframed_sq_count, reframed_sq_completable, reframed_sq_any_threat, reframed_global | amalgam | 2026-03-31 refresh | Reframed threat evaluation (champAa) |
 | `gorillaS4` | 164 | Same categories as `gorilla` | amalgam_s4 | 2026-05-18 | Full coverage evaluation (champS4) |
 | `hawkS4` | 173 | Same categories as `hawk_173` | amalgam_s4 | 2026-05-18 | Reframed threat evaluation (champS4) |
+| `gorillaTa` | 164 | Same categories as `gorilla` | amalgam_ta | planned 2026-05-19 | Full coverage evaluation (champTa) |
+| `hawkTa` | 173 | Same categories as `hawk_173` | amalgam_ta | planned 2026-05-19 | Reframed threat evaluation (champTa) |
 | `fox` | 87 | cell_occupancy, cell_attribute, offered_piece, game_phase | (extractable from gorilla) | N/A | Positional properties only |
 
 ### Activation Files
@@ -400,6 +403,8 @@ Naming pattern: `<hook>_<positions_tag>{,_random}_activations.pt`.
 | `conv2` (flat) | champAa | 512 | `conv2_512_amalgam_activations.pt`, `conv2_512_amalgam_random_activations.pt` |
 | `s4.fc1` | champS4 | 512 | `s4.fc1_amalgam_s4_activations.pt`, `s4.fc1_amalgam_s4_random_activations.pt` |
 | `s4.conv2` (flat) | champS4 | 512 | `s4.conv2_amalgam_s4_activations.pt`, `s4.conv2_amalgam_s4_random_activations.pt` |
+| `s4.fc1` | champTa | 512 | `s4.fc1_amalgam_ta_activations.pt`, `s4.fc1_amalgam_ta_random_activations.pt` |
+| `s4.conv2` (flat) | champTa | 512 | `s4.conv2_amalgam_ta_activations.pt`, `s4.conv2_amalgam_ta_random_activations.pt` |
 
 `*_random_activations.pt` files are collected from the epoch-0 random-weight
 checkpoint at the same hook, against the same positions file as their trained

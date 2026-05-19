@@ -1,0 +1,13 @@
+# E06: conv2 batchtopk k=64, exp=8. Architecture cross-check vs E03 topk-k64.
+experiment: E06-champS4-s42
+architecture: batchtopk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64

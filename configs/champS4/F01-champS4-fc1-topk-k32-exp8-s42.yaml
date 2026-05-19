@@ -1,0 +1,19 @@
+# F01: fc1 topk k=32, exp=8. fc1 reactivation for champS4 — LP says fc1
+# gorillaS4 F1-lift = 0.520 and fc1 hawkS4 = 0.548, contradicting the
+# 2026-04-27 fc1 deprioritization rule for this champion. H8 (threats
+# lost at fc1) does NOT hold for champS4's unified-aux training.
+experiment: F01-champS4-s42
+architecture: topk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

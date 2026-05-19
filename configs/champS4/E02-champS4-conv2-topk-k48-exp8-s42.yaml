@@ -1,0 +1,16 @@
+# E02: conv2 topk k=48, exp=8. Phase 2B-sweep k-curve.
+experiment: E02-champS4-s42
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_s4_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 48
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

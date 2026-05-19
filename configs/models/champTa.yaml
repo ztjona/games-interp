@@ -1,0 +1,22 @@
+# Quarto champion: Ta_minimaxSelect (unified-aux autoreg CNN, fc1 dim=512).
+# Same architecture as champS4 (QuartoCNNAutoregUnifiedS4); the difference is
+# the training procedure — minimax depth-2 selection during self-play instead
+# of uniform sampling.
+# Benchmark (2026-05-19, hierarchical-SAE/champion-results.jsonl, 500 matches each):
+#   vs Random Baseline   90.8%
+#   vs Loss_BT           82.7%
+#   vs Aa_replay         73.1%
+#   vs ME_endgame        66.2%
+#   vs Sa_archScan(3)/S4 66.6%  <- previous champion
+name: champTa
+display_name: "Ta_minimaxSelect (depth=2, 4350 epochs)"
+game: quarto_s4
+path: models/quarto/20260516_1452-Ta_minimaxSelect(1)0514_DEPTH_2_E_4350.pt
+random_path: models/quarto/20260515_1110-Ta_minimaxSelect(1)0514_DEPTH_2_E_0000.pt
+# Source checkpoints live in the sibling hierarchical-SAE project under
+# CHECKPOINTS/Ta_minimaxSelect(1)0514_DEPTH_2/. Both already copied into
+# models/quarto/ (force-add because models/**/*.pt is gitignored).
+#
+# Hookable layers (via S4Wrapper, informational; identical to champS4):
+#   s4.conv1, s4.conv2, s4.fc1, s4.fc2_place, s4.fc2_select
+# d_act: s4.fc1=512, s4.conv2=32 per cell (512 flattened)

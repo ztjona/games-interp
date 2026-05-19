@@ -1,0 +1,13 @@
+# E05-champTa: conv2 batchtopk k=32 exp=8.
+experiment: E05-champTa-s42
+architecture: batchtopk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_ta_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32

@@ -1,0 +1,16 @@
+# F02-champTa: fc1 topk k=64 exp=8.
+experiment: F02-champTa-s42
+architecture: topk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_ta_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

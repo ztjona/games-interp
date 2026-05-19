@@ -1,0 +1,16 @@
+# F01-champTa: fc1 topk k=32 exp=8. Mirrors F01-champS4 for direct A/B.
+experiment: F01-champTa-s42
+architecture: topk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_ta_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02
