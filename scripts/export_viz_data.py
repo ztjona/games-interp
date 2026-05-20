@@ -5,9 +5,11 @@ picks shipped SAEs, and emits the JSON files documented in
 ``boardSAE-atlas/src/lib/types.ts``:
 
     global_summary.json
-    sae_registry.json
+    sae_registry.json     ── each entry stamped with `champion` + `kind`
     bsps.json
-    coverage_matrix.json
+    coverage_matrix.json  ── includes linear-probe baseline rows
+    coverage_totals.json  ── per-(champion, category) aggregates + baselines
+    champions.json        ── ChampionRegistry (champions, baselines, matchups)
     board_sample.json
     sae_<name>_features.json
     sae_<name>_bsp_alignment.json
@@ -30,7 +32,8 @@ Options:
     --top-k-boards=<n>      Top-activating boards per feature [default: 20].
     --top-k-bsps=<n>        BSPs kept per feature in alignment file [default: 5].
     --board-sample=<n>      Boards in board_sample.json [default: 1000].
-    --max-shipped=<n>       Auto-pick top-N SAEs by coverage [default: 8].
+    --max-shipped=<n>       Auto-pick top-N SAEs by coverage [default: 12].
+    --per-champion=<n>      Top-N shipped SAEs per champion [default: 3].
     --device=<dev>          cuda|cpu|auto [default: auto].
     --skip-features         Only emit catalogues (no per-SAE files).
     --force-encode          Re-encode h even if cache exists.
@@ -38,8 +41,10 @@ Options:
 
 Auto-resolution (when ``=auto``):
     out      ../boardSAE-atlas/public/data/<game>/
-    shipped  top max-shipped SAEs in the eval registry filtered by the
-             chosen BSP set, ranked by coverage descending.
+    shipped  top --per-champion SAEs per champion in the eval registry
+             filtered by the chosen BSP set, ranked by coverage descending.
+             Capped at --max-shipped overall. Falls back to global ranking
+             if any champion has fewer than --per-champion evaluated SAEs.
 
 Examples:
     python scripts/export_viz_data.py --game=quarto
@@ -51,6 +56,7 @@ from __future__ import annotations
 
 import json
 import logging
+import re
 import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -163,7 +169,13 @@ def _count_net_params(game: str, device: str) -> int:
 
 
 def _load_eval_registry(game: str, animal: str) -> dict[str, dict]:
-    """Return ``run_id -> entry`` for SAEs evaluated on ``animal`` BSP set."""
+    """Return ``run_id -> entry`` for SAEs evaluated on the ``animal`` BSP family.
+
+    Champion-specific BSP variants (``gorillaS4``, ``gorillaTa``, ``hawkS4``…)
+    are evaluations of the same logical BSP set against activations from a
+    different champion. They live in the same family and are picked up by a
+    prefix match.
+    """
     path = _eval_registry_path(game)
     if not path.exists():
         log.warning("No eval registry at %s — using training registry only.", path)
@@ -174,7 +186,8 @@ def _load_eval_registry(game: str, animal: str) -> dict[str, dict]:
     for key, entry in raw.items():
         if not isinstance(entry, dict) or "metrics" not in entry:
             continue
-        if entry.get("bsp_set") != animal:
+        bsp_set = entry.get("bsp_set", "")
+        if not bsp_set.startswith(animal):
             continue
         rid = entry.get("run_id", key.split(":", 1)[0])
         prev = out.get(rid)
@@ -207,6 +220,77 @@ def _parse_run_id(run_id: str) -> dict[str, Any]:
         elif tok.startswith("exp") and tok[3:].isdigit():
             info["expansion_factor"] = int(tok[3:])
     return info
+
+
+# ---------------------------------------------------------------------------
+# Champion / kind inference
+#
+# Mirrors src/lib/champions.ts so the frontend heuristic and the exporter
+# agree. Order matters — champS4 / champTa take precedence over the generic
+# Aa-fallback prefixes.
+# ---------------------------------------------------------------------------
+
+DEFAULT_CHAMPION_ID = "Aa"
+
+_CHAMPION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
+    ("S4", re.compile(r"champS4", re.IGNORECASE)),
+    ("Ta", re.compile(r"champTa", re.IGNORECASE)),
+]
+
+_AA_PREFIX_RE = re.compile(
+    r"^(anakin|baseline-topk|hook-sweep|B\d{2}-conv2-completion|C\d{2}-c2|D\d{2}-c2|F\d{2}-c2|A\d{2}-random-control|G\d{2}-c2random)"
+)
+
+_RANDOM_CONTROL_RE = re.compile(r"random-control|c2random", re.IGNORECASE)
+_LINEAR_PROBE_RE = re.compile(r"^lp[-_]", re.IGNORECASE)
+
+
+def _infer_champion(run_id: str) -> str:
+    """Infer champion id from an SAE run id."""
+    for cid, pat in _CHAMPION_PATTERNS:
+        if pat.search(run_id):
+            return cid
+    if _AA_PREFIX_RE.match(run_id):
+        return DEFAULT_CHAMPION_ID
+    return DEFAULT_CHAMPION_ID
+
+
+def _infer_kind(run_id: str) -> str:
+    """Infer SAEEntry.kind from an SAE run id."""
+    if _LINEAR_PROBE_RE.match(run_id):
+        return "linear_probe"
+    if _RANDOM_CONTROL_RE.search(run_id):
+        return "random_control"
+    return "sae"
+
+
+# Architecture / training metadata per champion id. Used when emitting
+# ``champions.json``. Kept here (not in a JSON file) because it's tied to
+# specific checkpoint versions and the source of truth is research-notes.
+_CHAMPION_META: dict[str, dict[str, Any]] = {
+    "Aa": {
+        "label": "champAa",
+        "full_name": "anakin · uniform-replay",
+        "arch": "QuartoCNN (conv-conv-fc-fc)",
+        "training": "uniform-replay",
+        "params": 77168,
+        "notes": "Original anakin checkpoint. Most shipped SAEs are trained on Aa's fc1 or conv2 activations.",
+    },
+    "S4": {
+        "label": "champS4",
+        "full_name": "QuartoCNNAutoregUnifiedS4",
+        "arch": "QuartoCNNAutoregUnifiedS4",
+        "training": "autoregressive (S4)",
+        "notes": "Phase 2B follow-up. Activations are 2.5–5× more linearly separable than Aa's at every hook×BSP.",
+    },
+    "Ta": {
+        "label": "champTa",
+        "full_name": "Ta_minimaxSelect(1) [depth=2, E=4350]",
+        "arch": "QuartoCNNAutoregUnifiedS4",
+        "training": "minimax depth=2 (action selector)",
+        "notes": "+16.6 pp head-to-head WR vs champS4. Same architecture, different training procedure — controlled A/B.",
+    },
+}
 
 
 def _build_sae_entry(
@@ -251,6 +335,8 @@ def _build_sae_entry(
         "l0": metrics.get("l0"),
         "fvu": metrics.get("fvu"),
         "tier": None,
+        "champion": _infer_champion(run_id),
+        "kind": _infer_kind(run_id),
     }
 
 
@@ -586,27 +672,398 @@ def _write_coverage_matrix_file(
     out: Path,
     shipped: list[str],
     eval_registry: dict[str, dict],
+    lp_rows: list[dict] | None = None,
 ) -> None:
+    """Emit ``coverage_matrix.json``.
+
+    Each row is a per-category mean-F1 vector. The ``saes`` list contains
+    shipped SAE names first, followed by synthetic linear-probe entries
+    (one per (champion, hook) combination available).
+    """
     cats: list[str] = []
     for sae_name in shipped:
         per_cat = eval_registry.get(sae_name, {}).get("metrics", {}).get("per_category", {})
         for c in per_cat:
             if c not in cats:
                 cats.append(c)
+    for lp in lp_rows or []:
+        for c in lp.get("per_category", {}):
+            if c not in cats:
+                cats.append(c)
     cats.sort()
 
-    matrix = []
+    saes_out: list[str] = list(shipped)
+    matrix: list[list[float | None]] = []
     for sae_name in shipped:
         per_cat = eval_registry.get(sae_name, {}).get("metrics", {}).get("per_category", {})
-        row = []
-        for c in cats:
-            v = per_cat.get(c, {}).get("mean_f1")
-            row.append(None if v is None else round(float(v), 4))
-        matrix.append(row)
+        matrix.append(
+            [
+                None if (v := per_cat.get(c, {}).get("mean_f1")) is None else round(float(v), 4)
+                for c in cats
+            ]
+        )
+
+    for lp in lp_rows or []:
+        saes_out.append(lp["name"])
+        per_cat = lp.get("per_category", {})
+        matrix.append(
+            [
+                None if (v := per_cat.get(c, {}).get("mean_f1")) is None else round(float(v), 4)
+                for c in cats
+            ]
+        )
 
     out.write_text(
-        json.dumps({"saes": shipped, "categories": cats, "matrix": matrix})
+        json.dumps({"saes": saes_out, "categories": cats, "matrix": matrix})
     )
+
+
+# ---------------------------------------------------------------------------
+# Champions registry + coverage totals + linear-probe baselines
+# ---------------------------------------------------------------------------
+
+# Slug map from raw opponent strings in ``champion-results.jsonl`` to the
+# stable ids used in champions.json. Champions resolve to their short id;
+# everything else becomes a baseline.
+_OPPONENT_SLUGS: dict[str, str] = {
+    "Random Baseline": "random",
+    "Loss_BT": "Loss_BT",
+    "Aa_replay(2)": "Aa_replay2",
+    "ME_endgame(2)": "ME_endgame2",
+    "Sa_archScan(3) [S4]": "Sa_archScan3",
+}
+
+_BASELINE_META: dict[str, dict[str, Any]] = {
+    "random": {"label": "Random Baseline", "training": "uniform random"},
+    "Loss_BT": {"label": "Loss_BT", "training": "loss-based bandit"},
+    "Aa_replay2": {"label": "Aa_replay(2)", "training": "anakin replay"},
+    "ME_endgame2": {"label": "ME_endgame(2)", "training": "endgame solver"},
+    "Sa_archScan3": {"label": "Sa_archScan(3) [S4]", "training": "arch-scan"},
+}
+
+
+def _slug_opponent(name: str) -> str:
+    """Map a raw champion-results.jsonl opponent string to a stable id."""
+    if name in _OPPONENT_SLUGS:
+        return _OPPONENT_SLUGS[name]
+    # Champion strings look like ``Ta_minimaxSelect(1) [depth=2, E=4350]`` —
+    # the leading two chars are the champion id.
+    head = name.split("_", 1)[0]
+    if head in _CHAMPION_META:
+        return head
+    return name
+
+
+def _matchup_timestamp(raw_ts: str | None) -> str | None:
+    """Normalise an isoformat timestamp to Ecuador local (UTC-05)."""
+    if not raw_ts:
+        return None
+    try:
+        dt = datetime.fromisoformat(raw_ts)
+    except ValueError:
+        return raw_ts
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=ECT)
+    return dt.astimezone(ECT).isoformat()
+
+
+def _write_champions_file(out: Path, game: str) -> None:
+    """Emit ``champions.json`` from ``hierarchical-SAE/champion-results.jsonl``.
+
+    Falls back to writing a minimal stub with just the champions if the JSONL
+    file is missing — the frontend then loses head-to-head matchup tables but
+    still renders champion badges + diagrams.
+    """
+    matchups_path = PROJECT_DIR.parent / "hierarchical-SAE" / "champion-results.jsonl"
+
+    champion_ids: list[str] = list(_CHAMPION_META.keys())
+    matchups: list[dict[str, Any]] = []
+    baselines_seen: set[str] = set()
+
+    if matchups_path.exists():
+        seen_pairs: set[tuple[str, str]] = set()
+        with open(matchups_path, "r") as f:
+            for line in f:
+                line = line.strip()
+                if not line:
+                    continue
+                row = json.loads(line)
+                a = _slug_opponent(row["champion"])
+                b = _slug_opponent(row["opponent"])
+                key = tuple(sorted([a, b]))
+                if key in seen_pairs:
+                    continue
+                seen_pairs.add(key)
+                if b not in _CHAMPION_META:
+                    baselines_seen.add(b)
+                matchups.append(
+                    {
+                        "a": a,
+                        "b": b,
+                        "games": int(row["total_games"]),
+                        "a_wins": int(row["total_champion_wins"]),
+                        "b_wins": int(row["total_opponent_wins"]),
+                        "a_win_rate": round(float(row["champion_win_rate"]), 4),
+                        "timestamp": _matchup_timestamp(row.get("timestamp")),
+                    }
+                )
+    else:
+        log.warning(
+            "champion-results.jsonl not found at %s — emitting champions.json with no matchups.",
+            matchups_path,
+        )
+
+    champions: list[dict[str, Any]] = []
+    for cid in champion_ids:
+        meta = _CHAMPION_META[cid]
+        champions.append(
+            {
+                "id": cid,
+                **meta,
+                "diagram": f"diagrams/{game}/champ{cid}.svg",
+            }
+        )
+
+    baselines: list[dict[str, Any]] = []
+    for bid in sorted(baselines_seen):
+        meta = _BASELINE_META.get(bid, {"label": bid, "training": ""})
+        baselines.append({"id": bid, **meta})
+
+    out.write_text(
+        json.dumps(
+            {
+                "generated_at": datetime.now(ECT).isoformat(),
+                "champions": champions,
+                "baselines": baselines,
+                "matchups": matchups,
+            }
+        )
+    )
+
+
+def _write_coverage_totals_file(
+    out: Path,
+    sae_entries: list[dict],
+    eval_registry: dict[str, dict],
+    lp_rows: list[dict] | None,
+) -> None:
+    """Emit pre-aggregated *best* per-category mean-F1 per champion.
+
+    For each (champion, category) cell, picks the maximum of ``mean_f1``
+    across that champion's ``kind == "sae"`` entries — i.e. the
+    best-performing SAE for that category. Random-control and linear-probe
+    rows are exported as per-category maxima too (so the frontend's
+    "Overlay baselines" toggle shows the strongest baseline available).
+    If no metrics are available for a (champion, category) cell, the value
+    is ``None``. The frontend already takes the max client-side from
+    ``coverage_matrix.json``; this file gives paper-build scripts the same
+    aggregation without re-implementing the bucket math.
+    """
+    # Discover the category set (use eval entries for SAEs first, fall back
+    # to LP rows in case no SAEs exist yet for that category).
+    cats: list[str] = []
+    for name, entry in eval_registry.items():
+        for c in entry.get("metrics", {}).get("per_category", {}):
+            if c not in cats:
+                cats.append(c)
+    for lp in lp_rows or []:
+        for c in lp.get("per_category", {}):
+            if c not in cats:
+                cats.append(c)
+    cats.sort()
+
+    champions: list[str] = sorted({e["champion"] for e in sae_entries if e.get("champion")})
+
+    # ── kind=sae buckets keyed by champion ────────────────────────────────
+    sae_vals: dict[str, dict[str, list[float]]] = {cid: {c: [] for c in cats} for cid in champions}
+    random_vals: dict[str, list[float]] = {c: [] for c in cats}
+
+    for entry in sae_entries:
+        if entry.get("kind") not in ("sae", "random_control"):
+            continue
+        per_cat = eval_registry.get(entry["name"], {}).get("metrics", {}).get("per_category", {})
+        if not per_cat:
+            continue
+        bucket = (
+            random_vals
+            if entry.get("kind") == "random_control"
+            else sae_vals.get(entry["champion"], {})
+        )
+        for c in cats:
+            v = per_cat.get(c, {}).get("mean_f1")
+            if v is not None:
+                bucket.setdefault(c, []).append(float(v))
+
+    # ── kind=linear_probe baseline (averaged across champions/hooks) ─────
+    lp_vals: dict[str, list[float]] = {c: [] for c in cats}
+    for lp in lp_rows or []:
+        for c in cats:
+            v = lp.get("per_category", {}).get(c, {}).get("mean_f1")
+            if v is not None:
+                lp_vals.setdefault(c, []).append(float(v))
+
+    def _max(xs: list[float]) -> float | None:
+        return round(max(xs), 4) if xs else None
+
+    out.write_text(
+        json.dumps(
+            {
+                "champions": champions,
+                "categories": cats,
+                "by_champion": {
+                    cid: [_max(sae_vals[cid].get(c, [])) for c in cats] for cid in champions
+                },
+                "random_control": [_max(random_vals.get(c, [])) for c in cats],
+                "linear_probe": [_max(lp_vals.get(c, [])) for c in cats],
+            }
+        )
+    )
+
+
+# Filename patterns for linear-probe result files. Examples:
+#   linear_probe_fc1_amalgam_activations_results.json                    → Aa  fc1
+#   linear_probe_gorilla_164_conv2_512_amalgam_activations_results.json  → Aa  conv2
+#   linear_probe_<animal>_<n>_s4.<hook>_amalgam_s4_activations_results.json → S4
+#   linear_probe_<animal>_<n>_s4.<hook>_amalgam_ta_activations_results.json → Ta
+#   …_random_activations_results.json variants are skipped (those are the
+#   random-init activation source, not a baseline of interest here).
+_LP_FILE_RE = re.compile(
+    r"linear_probe_"
+    r"(?:(?P<animal>[a-z]+)_(?P<n>\d+)_)?"
+    r"(?:(?P<arch>s4)\.)?"
+    r"(?P<hook>fc1|conv2)(?:_(?P<dim>\d+))?"
+    r"_amalgam(?:_(?P<source>s4|ta|random))?_activations_results\.json$"
+)
+
+
+def _discover_linear_probes(game: str, animal: str) -> list[dict[str, Any]]:
+    """Find LP result files matching the chosen animal/BSP set.
+
+    Returns a list of synthetic SAE-row dicts:
+        { name, champion, hook, per_category }
+    where ``per_category`` is the raw per-category block from the LP results.
+    Files for other animals are ignored; the legacy fc1 files (no animal
+    token) are tagged with ``animal == "default"`` and only included when
+    ``animal == "gorilla"`` (the historical default).
+    """
+    out: list[dict[str, Any]] = []
+    for path in sorted(_data_dir(game).glob("linear_probe_*_results.json")):
+        m = _LP_FILE_RE.search(path.name)
+        if not m:
+            continue
+        file_animal = m.group("animal") or "default"
+        if m.group("source") == "random":
+            continue  # random-init activations are not a baseline of interest
+        # Filter: file_animal must match --bsps, with "default" treated as
+        # the legacy gorilla bundle (matches original repo convention).
+        if file_animal != animal and not (file_animal == "default" and animal == "gorilla"):
+            continue
+        arch = m.group("arch")
+        source = m.group("source")
+        if source == "s4":
+            champion = "S4"
+        elif source == "ta":
+            champion = "Ta"
+        elif arch == "s4":
+            champion = "S4"  # s4.<hook> with no _<source>_ tag → S4 source
+        else:
+            champion = "Aa"
+        hook = m.group("hook")
+        try:
+            data = json.loads(path.read_text())
+        except json.JSONDecodeError:
+            log.warning("  skipping unreadable LP file %s", path.name)
+            continue
+        per_category = data.get("per_category") or {}
+        if not per_category:
+            continue
+        name = f"lp_{champion}_{hook}_{animal}"
+        out.append(
+            {
+                "name": name,
+                "champion": champion,
+                "hook": hook,
+                "per_category": per_category,
+                "overall": data.get("overall", {}),
+            }
+        )
+    return out
+
+
+def _write_aux_bsp_set(out_dir: Path, game: str, animal: str) -> bool:
+    """Emit a hawk-style auxiliary bundle ``(bsps|coverage_matrix|coverage_totals)_<animal>.json``.
+
+    Used to ship the alternate BSP set (hawk) alongside the primary one
+    (gorilla) so the Coverage chart's BSP-set picker has data for both.
+    The auxiliary bundle uses ALL eval-registry entries for the alternate
+    BSP family (not just the curated shipped list) so the "best overall SAE
+    per champion" pick has more candidates.
+
+    Returns True if the aux bundle was written, False if the schema/eval
+    data for ``animal`` is missing.
+    """
+    schema_path = _bsp_schema_path(game, animal)
+    if schema_path is None:
+        log.info("Aux BSP set %r: no schema found, skipping.", animal)
+        return False
+
+    aux_eval = _load_eval_registry(game, animal)
+    if not aux_eval:
+        log.info("Aux BSP set %r: no eval entries, skipping.", animal)
+        return False
+
+    with open(schema_path, "r") as f:
+        aux_schema = json.load(f)
+    aux_bsp_ids: list[str] = [b["id"] for b in aux_schema["bsps"]]
+
+    _write_bsps_file(out_dir / f"bsps_{animal}.json", aux_schema, aux_bsp_ids)
+
+    # Synthetic SAE entries for this BSP set: include ALL eval rows, ranked
+    # by coverage descending. Mirrors the structure used by sae_registry but
+    # is written as a chart-only auxiliary file (not loaded by the SAE
+    # Explorer table).
+    aux_entries: list[dict] = []
+    for rid in sorted(aux_eval, key=lambda r: aux_eval[r].get("metrics", {}).get("coverage", 0.0), reverse=True):
+        aux_entries.append(_build_sae_entry(rid, aux_eval.get(rid), None))
+
+    aux_lp = _discover_linear_probes(game, animal)
+    for lp in aux_lp:
+        aux_entries.append(
+            {
+                "name": lp["name"],
+                "arch": "linear_probe",
+                "hook": lp["hook"],
+                "k": None,
+                "expansion_factor": 1,
+                "seed": None,
+                "n_features": 0,
+                "coverage": lp.get("overall", {}).get("coverage"),
+                "dead_frac": None,
+                "l0": None,
+                "fvu": None,
+                "tier": None,
+                "champion": lp["champion"],
+                "kind": "linear_probe",
+            }
+        )
+
+    aux_names = [e["name"] for e in aux_entries if e["kind"] != "linear_probe"]
+    _write_coverage_matrix_file(
+        out_dir / f"coverage_matrix_{animal}.json", aux_names, aux_eval, aux_lp
+    )
+    _write_coverage_totals_file(
+        out_dir / f"coverage_totals_{animal}.json", aux_entries, aux_eval, aux_lp
+    )
+    log.info(
+        "Aux BSP set %r: wrote bsps_%s.json, coverage_matrix_%s.json, coverage_totals_%s.json (%d eval rows, %d LP rows)",
+        animal,
+        animal,
+        animal,
+        animal,
+        len(aux_names),
+        len(aux_lp),
+    )
+    return True
 
 
 def _write_board_sample_file(
@@ -659,14 +1116,42 @@ def main():
 
     # ── Shipped SAE selection ─────────────────────────────────────────────
     shipped_arg = args["--shipped"]
+    max_n = int(args["--max-shipped"] or 12)
+    per_champ = int(args["--per-champion"] or 3)
     if shipped_arg in (None, "auto"):
         ranked = sorted(
             eval_registry.items(),
             key=lambda kv: kv[1].get("metrics", {}).get("coverage", 0.0),
             reverse=True,
         )
-        max_n = int(args["--max-shipped"] or 8)
-        shipped = [rid for rid, _ in ranked[:max_n]]
+        # Group by inferred champion so each one gets ``per_champ`` slots.
+        # Random-control runs share their training champion's slot list
+        # (they're shipped under that champion's quota).
+        by_champ: dict[str, list[str]] = {}
+        for rid, _ in ranked:
+            cid = _infer_champion(rid)
+            by_champ.setdefault(cid, []).append(rid)
+
+        shipped_set: list[str] = []
+        for cid, rids in by_champ.items():
+            shipped_set.extend(rids[:per_champ])
+
+        # Pad with global ranking if we're under max_n (in case a champion
+        # has fewer than per_champ eval entries), preserving overall order.
+        if len(shipped_set) < max_n:
+            for rid, _ in ranked:
+                if rid not in shipped_set:
+                    shipped_set.append(rid)
+                    if len(shipped_set) >= max_n:
+                        break
+
+        # Re-rank the picked set by coverage to keep the curated list
+        # ordered for the frontend.
+        shipped = sorted(
+            shipped_set[:max_n],
+            key=lambda rid: eval_registry.get(rid, {}).get("metrics", {}).get("coverage", 0.0),
+            reverse=True,
+        )
     else:
         shipped = [s.strip() for s in shipped_arg.split(",") if s.strip()]
 
@@ -702,6 +1187,28 @@ def main():
         elif entry["name"] in shipped:
             entry["tier"] = 2
 
+    # ── Linear-probe baselines (synthetic SAE-like rows) ───────────────────
+    lp_rows = _discover_linear_probes(game, animal)
+    for lp in lp_rows:
+        sae_entries.append(
+            {
+                "name": lp["name"],
+                "arch": "linear_probe",
+                "hook": lp["hook"],
+                "k": None,
+                "expansion_factor": 1,
+                "seed": None,
+                "n_features": 0,
+                "coverage": lp.get("overall", {}).get("coverage"),
+                "dead_frac": None,
+                "l0": None,
+                "fvu": None,
+                "tier": None,
+                "champion": lp["champion"],
+                "kind": "linear_probe",
+            }
+        )
+
     (out_dir / "sae_registry.json").write_text(
         json.dumps({"saes": sae_entries, "shipped": shipped})
     )
@@ -723,8 +1230,25 @@ def main():
 
     # Coverage matrix (uses cached per_category in eval registry).
     _write_coverage_matrix_file(
-        out_dir / "coverage_matrix.json", shipped, eval_registry
+        out_dir / "coverage_matrix.json", shipped, eval_registry, lp_rows
     )
+
+    # Pre-aggregated per-(champion, category) means + baselines for the
+    # frontend's category bar chart.
+    _write_coverage_totals_file(
+        out_dir / "coverage_totals.json", sae_entries, eval_registry, lp_rows
+    )
+
+    # Champion registry (architecture, head-to-head matchups).
+    _write_champions_file(out_dir / "champions.json", game)
+
+    # Auxiliary BSP-set bundles (e.g. hawk alongside gorilla) so the
+    # frontend's BSP-set picker on the Coverage chart can switch between
+    # framings. Skipped silently if the alt set has no schema / no evals.
+    for aux_animal in ("gorilla", "hawk"):
+        if aux_animal == animal:
+            continue
+        _write_aux_bsp_set(out_dir, game, aux_animal)
 
     # ── Global summary ─────────────────────────────────────────────────────
     tiers = []
