@@ -7,7 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 PhD research on mechanistic interpretability of board-game neural networks. The current focus is **Quarto** (a CNN DQN); Othello and Tic-tac-toe are planned but not implemented. The core technique is training Sparse Autoencoders (SAEs) on hooked activations and evaluating them against hand-defined ground-truth concepts called **BSPs** (Board State Properties).
 
 Source-of-truth research docs (read these before changing experimental scope):
-- `RESEARCH-STATUS.md` — current phase, hypotheses, winners, open problems, active plan
+- `RESEARCH-STATUS.md` — current phase, hypotheses, winners, open problems, active plan (high-level ledger)
+- `docs/diary/README.md` — index of dated sweep-level entries (per-category tables, AI-assisted interpretation, design notes). The top-level docs link out to these for specifics; add new entries here when a sweep produces more than ~3 rows of numbers
 - `Quarto-specifications.md` — game, model architecture, hookable layers, dataset catalog, naming conventions
 - `BSP-schema-summary.md` — full BSP schema for gorilla and hawk sets
 - `configs/models/README.md` — checklist for onboarding a new champion (model config, game module, naming tags, verification)
