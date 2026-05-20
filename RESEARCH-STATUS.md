@@ -31,11 +31,15 @@ landed alongside.
   wider-expansion SAEs at a new SAE objective, not more breadth at the
   current budget. Design: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).
 
-**Open verification work:** F04-Ta jumprelu hawk winner has ~7 metrics
-rows (likely early-stop), so the +0.028 lift over F01-S4 needs a clean
-rerun with patience disabled before being promoted as a final claim.
-Protocol in [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) §
-"Verification protocols".
+**Verification (closed 2026-05-20):** F04 patience-fix rerun complete on
+both champions. F04-Ta hawkTa lift unchanged at 0.172 (original was
+already converged at early-stop); F04-S4 hawkS4 lift rose 0.144 → 0.152
+and overtakes F01 as the S4 hawk winner. **fc1-on-hawk claim STANDS on
+both champions** — fc1 SAEs beat best conv2 SAEs by +0.082 (Ta) and
++0.071 (S4) on hawk. Patience was binding for S4, not Ta. Matched-F04
+Δ Ta−S4: hawk +0.020 (was +0.036), gorilla +0.079 (was +0.039). See
+[`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) §
+"Verification protocols → F04 patience-fix rerun results".
 
 Full details: [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md).
 
@@ -97,9 +101,16 @@ Full table template and rationale: [`phase-2A.md`](docs/diary/phase-2A.md) § "R
 
 ## Active plan / next steps
 
-1. **F04-Ta verification rerun** (≤ 30 min on Deep Brain) — patience-disabled rerun of jumprelu-t64-fc1 to confirm the +0.028 hawk lift over F01-S4 isn't a truncation artifact. Protocol: [`phase-2B.md`](docs/diary/phase-2B.md) § "Verification protocols".
-2. **Concept-targeted SAE experiments** — five candidate approaches sketched in [`2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md). Recommended ordering: wider exp grid → higher k → anchored hawk SAEs → E2E → matryoshka. Decision gates pre-registered. Implementation in a new session.
-3. **Cell-relative BSP set ("new animal")** — only relevant if per-cell conv2 SAEs (`--flatten-per-cell`) are reactivated. Not on the current path with `--flatten-position`.
+1. ~~**F04-Ta verification rerun**~~ ✅ done 2026-05-20 (results merged above).
+2. **Sweep H — capacity scan** (next, on Deep Brain). Wider expansion on the two winners (F04 fc1 jumprelu-t64, E05 conv2 batchtopk-k32) at `exp ∈ {16, 32, 64}`, both champions × both BSP sets. ~3–6 h. **Decision gate:** does conv2/hawk lift cross 0.13 with more capacity? If yes → capacity was binding; if no → objective needs supervision and step 4 becomes primary.
+3. **Literature review refresh** (after Sweep H lands, before kicking off implementations). Last broad lit scan predates the matryoshka / E2E / BatchTopK family; need a fresh pass on (a) SAE variants 2025–2026, (b) board-game interp work since Karvonen, (c) low-base-rate / rare-concept SAE methods. Output: a `docs/diary/2026-MM-DD_lit-review.md` and a short "what's new since 2026-04" addendum to the design note.
+4. **Matryoshka + Anchored SAE implementations** (parallel engineering tracks, ~1 week each). Both attack the SAE/LP wall via different mechanisms (multi-scale capacity vs concept-supervised loss); their outcomes are diagnostically complementary. Start after lit review so the implementations incorporate any 2025–2026 refinements.
+5. **E2E SAEs** — start when at least one of {matryoshka, anchored} has landed and we know which mechanism is binding. E2E is most diagnostic *against a strong baseline*, not as a first move.
+6. **Reframing audit** (small, in parallel). Two reframings are worth scoping before committing to a new BSP set: (a) **player-relative** offensive/defensive (TigerS4-style: "this piece would let opponent win" vs "I can win with this piece") motivated by champTa's +24 pp loss-avoidance gain; (b) **forced-move / decision-binding** BSPs (is this position binding in the minimax tree?). See `docs/diary/2026-05-20_reframings-audit.md` (TBD).
+7. **Novel SAE variant placeholder** — leave room for a probe-grade variant after Sweep H + lit review. Working candidate: **base-rate-weighted reconstruction loss** (reweight MSE by inverse cell base rate to break the "rare concepts don't move the loss" mechanism). Decide whether to commit only once we know whether matryoshka / anchored / E2E close the gap.
+8. **Cell-relative BSP set ("new animal")** — only relevant if per-cell conv2 SAEs (`--flatten-per-cell`) are reactivated. Not on the current path with `--flatten-position`.
+
+Design rationale and decision gates: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).
 
 ## Deprioritized
 

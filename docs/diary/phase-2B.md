@@ -179,8 +179,12 @@ champTa is trained by distilling a depth-2 minimax oracle during the self-play s
 |---|---|---|---:|---:|---:|---:|---:|
 | champS4 | gorillaS4 | `E05-champS4-s42-batchtopk-k32-exp8-s4.conv2` | 0.2124 | 0.411 | 0.402 | 0.047 | 32 |
 | champTa | gorillaTa | `E05-champTa-s42-batchtopk-k32-exp8-s4.conv2` | **0.2135** | 0.428 | 0.402 | 0.037 | 32 |
-| champS4 | hawkS4    | `F01-champS4-s42-topk-k32-exp8-s4.fc1`        | 0.1445 | 0.180 | 0.206 | 0.016 | 32 |
-| champTa | hawkTa    | `F04-champTa-s42-jumprelu-t64-exp8-s4.fc1`    | **0.1724** | 0.214 | 0.246 | 0.012 | 66 |
+| champS4 | hawkS4    | `F04-champS4-s42-jumprelu-t64-exp8-s4.fc1`    | **0.1520** | 0.188 | 0.217 | 0.012 | 69 |
+| champTa | hawkTa    | `F04-champTa-s42-jumprelu-t64-exp8-s4.fc1`    | **0.1720** | 0.214 | 0.253 | 0.005 | 65 |
+
+> Both hawk winners updated to F04 after the 2026-05-20 patience-fix rerun.
+> Pre-fix S4 hawk leader was `F01-champS4-s42-topk-k32-exp8-s4.fc1` at 0.1445;
+> see "F04 patience-fix rerun results" below.
 
 #### Per-category breakdown — gorilla winners (both `E05 BatchTopK k=32 exp=8 s4.conv2`)
 
@@ -194,19 +198,27 @@ champTa is trained by distilling a depth-2 minimax oracle during the self-play s
 | threat_line | 40 | 0.071 | 0.133 | **0.113** | **0.155** | **+0.042** | **+0.022** |
 | threat_square_2x2 | 36 | 0.073 | 0.140 | **0.123** | **0.171** | **+0.050** | **+0.031** |
 
-#### Per-category breakdown — hawk winners (different per champion)
+#### Per-category breakdown — hawk winners (true matched config, post-patience-fix 2026-05-20)
 
-S4: `F01 topk-k32 fc1`; Ta: `F04 jumprelu-t64 fc1`.
+Both winners are now `F04 jumprelu-t64 fc1`. Numbers are post-patience-fix
+(see "F04 patience-fix rerun results" below).
 
 | Category | n | champS4 F1 | champS4 MCC | champTa F1 | champTa MCC | Δ F1 | Δ MCC |
 |---|---:|---:|---:|---:|---:|---:|---:|
-| reframed_global | 2 | 0.530 | 0.399 | 0.668 | 0.480 | +0.138 | +0.081 |
-| reframed_any_threat | 10 | 0.210 | 0.196 | 0.280 | 0.258 | +0.070 | +0.062 |
-| reframed_sq_any_threat | 9 | 0.221 | 0.218 | 0.347 | 0.321 | +0.126 | +0.103 |
-| reframed_count | 40 | 0.227 | 0.230 | 0.220 | 0.250 | −0.007 | +0.020 |
-| reframed_sq_count | 36 | 0.258 | 0.264 | 0.297 | 0.322 | +0.039 | +0.058 |
-| reframed_completable | 40 | 0.087 | 0.145 | 0.109 | 0.161 | +0.022 | +0.016 |
-| reframed_sq_completable | 36 | 0.115 | 0.178 | 0.165 | 0.228 | +0.050 | +0.050 |
+| reframed_global | 2 | 0.520 | 0.296 | 0.608 | 0.406 | +0.088 | +0.110 |
+| reframed_any_threat | 10 | 0.238 | 0.211 | 0.289 | 0.255 | +0.051 | +0.044 |
+| reframed_sq_any_threat | 9 | 0.240 | 0.214 | 0.352 | 0.334 | +0.112 | +0.120 |
+| reframed_count | 40 | 0.248 | 0.259 | 0.228 | 0.253 | **−0.020** | −0.006 |
+| reframed_sq_count | 36 | 0.280 | 0.292 | 0.314 | 0.337 | +0.034 | +0.045 |
+| reframed_completable | 40 | 0.083 | 0.146 | 0.099 | 0.165 | +0.016 | +0.019 |
+| reframed_sq_completable | 36 | 0.098 | 0.172 | 0.149 | 0.235 | +0.051 | +0.063 |
+
+**H9 read under matched-F04:** Ta beats S4 on 6 of 7 hawk categories;
+amplification is strongest on the 2×2-square family (sq_any_threat,
+sq_completable, sq_count). `reframed_count` flips sign (S4 slightly
+better by 0.020) — the only category where distillation does not
+amplify. Consistent with depth-2 minimax computing per-line completability
+more than line-count statistics.
 
 #### Matched-config A/B (champTa minus champS4 F1-lift)
 
@@ -217,7 +229,8 @@ S4: `F01 topk-k32 fc1`; Ta: `F04 jumprelu-t64 fc1`.
 | F01 topk k32 fc1 | +0.015 | +0.022 |
 | F02 topk k64 fc1 | +0.024 | +0.030 |
 | F03 batchtopk k32 fc1 | +0.057 | +0.072 |
-| F04 jumprelu t64 fc1 | +0.039 | +0.036 |
+| F04 jumprelu t64 fc1 (post patience-fix) | **+0.079** | **+0.020** |
+| F04 jumprelu t64 fc1 (pre patience-fix)  | +0.039 | +0.036 |
 
 #### SAE / LP efficiency for champTa
 
@@ -293,6 +306,43 @@ The hawk winner on champTa is `F04 jumprelu-t64-exp8 s4.fc1` at 0.1724 lift. The
 5. **Sanity check on champS4 side:** rerun F04-champS4 with the same fix. If S4's F04 also moves substantially, the patience knob was the dominant variable, not the training procedure — important for any future jumprelu config.
 
 Total cost: ≤ 30 min on 1 × A6000 for both reruns (jumprelu is fast even at full 25 k). Worth doing before claiming the "fc1 > conv2 on hawk" surprise in any external writeup.
+
+### F04 patience-fix rerun results (2026-05-20) [DIRECT]
+
+Both reruns trained to completion: 51 metrics rows each (= num_batches /
+log_every + 1; no early-stop).
+
+| Run | Original hawk lift | Post-fix hawk lift | Δ |
+|---|---:|---:|---:|
+| F04-champTa-s42-jumprelu-t64-exp8-s4.fc1 | 0.1724 | 0.1720 | −0.0004 |
+| F04-champS4-s42-jumprelu-t64-exp8-s4.fc1 | ≈ 0.136 (derived from old Δ) | 0.1520 | **+0.016** |
+
+**Decision-rule outcome:**
+
+- **F04-Ta hawkTa lift = 0.172 ≥ 0.16 → fc1-on-hawk claim STANDS.** The "~7 metrics rows" on the original was early-stop firing *at* convergence, not before it — jumprelu's loss plateau is real, and the truncated number was the converged number. Risk dismissed.
+- **F04-S4 patience was binding.** F04-S4 hawk lift rose from ≈ 0.136 to 0.152, overtaking F01-S4 (0.1445) as the S4 hawk winner. The pre-registered protocol step 5 — "if S4's F04 also moves substantially, the patience knob was the dominant variable" — fires asymmetrically: dominant for S4, irrelevant for Ta.
+
+**Headline claim hardening:** fc1 SAEs beat conv2 SAEs on hawk on *both* champions independently:
+
+| Champion | best fc1 hawk lift | best conv2 hawk lift | fc1 − conv2 |
+|---|---:|---:|---:|
+| Ta | 0.172 (F04) | 0.090 (E06) | **+0.082** |
+| S4 | 0.152 (F04) | 0.081 (E01) | **+0.071** |
+
+**H9 read under matched-F04 (post-fix):** Ta beats S4 on 6 of 7 hawk
+categories; amplification is strongest on 2×2-square BSPs
+(`reframed_sq_any_threat` +0.112 F1, `reframed_sq_completable` +0.051
+F1). `reframed_count` flips sign (S4 better by 0.020 F1) — the only
+category not amplified. **H9 holds, the amplification pattern is more
+square-focused than line-focused under the matched-F04 lens.** Gorilla
+Δ Ta−S4 widens from +0.039 to +0.079 under the patience-fix; the
+distillation effect on cell-attribute / cell-occupancy categories is
+larger than the original numbers suggested.
+
+**Side effect:** the gorilla matched-F04 Δ Ta−S4 widened from +0.039 to
++0.079 (F04-Ta gorilla = 0.178, F04-S4 gorilla = 0.099). The patience
+knob mattered for the gorilla evaluation on S4 too. Headline gorilla
+winner is unchanged — `E05 batchtopk-k32 conv2` still leads both champions.
 
 ### Concept-targeted SAE direction
 

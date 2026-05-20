@@ -85,6 +85,41 @@ where `h_anchor[k]` is a designated subset of the SAE feature dimension (e.g., t
 
 **Cost.** Moderate-to-high. ~1 week including the eval path that exposes per-scale coverage.
 
+## Update 2026-05-20 — parallelization and revised sequencing
+
+The strict serial ordering below was written to minimise wasted compute,
+not to constrain engineering bandwidth. With three A6000s on Deep Brain
+and F04 verification closed, the actual plan in
+[`../../RESEARCH-STATUS.md`](../../RESEARCH-STATUS.md) § "Active plan"
+is:
+
+1. **Sweep H — capacity scan first** (steps 1 + 2 below folded into one
+   cheap exp ∈ {16, 32, 64} pass on F04 and E05). Either rules out
+   "we were under-resourced" or confirms it.
+2. **Literature review refresh** between Sweep H and implementation work
+   — the 2026-04 design pre-dates the matryoshka / E2E / BatchTopK
+   family's 2025–2026 follow-ups; the implementations should
+   incorporate whatever has landed since.
+3. **Matryoshka + Anchored implementations in parallel** (steps 3 + 5
+   below). They attack different mechanisms (multi-scale capacity vs
+   concept-supervised loss); engineering tracks share zero code so the
+   parallelism is clean. Sequencing them would delay the answer without
+   sharpening it.
+4. **E2E afterwards** (step 4 below). Its signal is strongest as a
+   *contrast* against a known unsupervised or supervised baseline;
+   doing it third — once we know whether capacity or supervision was
+   the binding constraint — lets us pick the right E2E variant to
+   invest in.
+5. **Probe-grade novel variant** as a slot reserved at the end of the
+   cycle. Working candidate: **base-rate-weighted reconstruction loss**
+   (reweight MSE by inverse cell base rate to attack the "rare concepts
+   don't move the loss" mechanism directly). Decide whether to commit
+   only after matryoshka / anchored / E2E have landed.
+
+The decision gates below still apply per-experiment; the ordering table
+captures the *information-cost* logic that motivates running cheap tests
+first when compute is scarce.
+
 ## Recommended ordering (when this work resumes)
 
 | Step | Approach | Decision | Continue / pivot |
