@@ -401,6 +401,16 @@ BSP_SETS: dict[str, list[str]] = {
         "reframed_sq_any_threat",
         "reframed_global",
     ],
+    "tiger": [
+        # Agent-relative threats — see
+        # docs/diary/2026-05-22_reframings-audit-tiger.md
+        "tiger_decision_global",
+        "tiger_offered_completing_attr",
+        "tiger_line_winnable",
+        "tiger_square_winnable",
+        "tiger_pool_winning_count",
+        "tiger_pool_safe_count",
+    ],
 }
 
 
@@ -636,6 +646,121 @@ def get_all_bsp_definitions() -> list[dict]:
         }
     )
 
+    # ── Tiger BSPs (agent-relative; see 2026-05-22_reframings-audit-tiger.md) ──
+
+    # tiger_decision_global (5)
+    bsps.append(
+        {
+            "id": "tiger_win_now_exists",
+            "description": "Current player can win this turn by placing the offered piece somewhere",
+            "type": "binary",
+            "category": "tiger_decision_global",
+        }
+    )
+    bsps.append(
+        {
+            "id": "tiger_opp_winning_offer_exists",
+            "description": "At least one pool piece, if offered, lets the opponent win on their next turn",
+            "type": "binary",
+            "category": "tiger_decision_global",
+        }
+    )
+    bsps.append(
+        {
+            "id": "tiger_lose_next_forced",
+            "description": "Every pool piece, if offered, lets the opponent win — i.e. forced to gift a win",
+            "type": "binary",
+            "category": "tiger_decision_global",
+        }
+    )
+    bsps.append(
+        {
+            "id": "tiger_safe_offer_exists",
+            "description": "At least one pool piece can be offered without giving opponent an immediate win",
+            "type": "binary",
+            "category": "tiger_decision_global",
+        }
+    )
+    bsps.append(
+        {
+            "id": "tiger_every_offer_safe",
+            "description": "Every pool piece is a safe offer (no pool piece gives opponent an immediate win)",
+            "type": "binary",
+            "category": "tiger_decision_global",
+        }
+    )
+
+    # tiger_offered_completing_attr (4) — offered piece is a winning completer for attribute X
+    for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
+        bsps.append(
+            {
+                "id": f"tiger_offered_completes_{suffix}",
+                "description": (
+                    f"Offered piece is {pos_val} AND at least one line/2x2 on the board has "
+                    f"3 cells already matching {pos_val} (offered piece is a winning completer "
+                    f"via the {meta_key} attribute)"
+                ),
+                "type": "binary",
+                "category": "tiger_offered_completing_attr",
+            }
+        )
+
+    # tiger_line_winnable (10) — per-line: placing offered on the empty cell wins this line
+    for line_type, line_idx, _coords in _ALL_LINE_COORDS:
+        bsps.append(
+            {
+                "id": f"tiger_line_{line_type}_{line_idx}_winnable",
+                "description": (
+                    f"{line_type.capitalize()} {line_idx}: line has exactly 1 empty cell AND "
+                    f"placing the offered piece there completes the line (≥1 shared attribute)"
+                ),
+                "type": "binary",
+                "category": "tiger_line_winnable",
+            }
+        )
+
+    # tiger_square_winnable (9) — per 2x2 square
+    for top_r, left_c, _coords in _ALL_SQUARE_COORDS:
+        bsps.append(
+            {
+                "id": f"tiger_square_{top_r}_{left_c}_winnable",
+                "description": (
+                    f"2x2 at ({top_r},{left_c}): exactly 1 empty cell AND placing the "
+                    f"offered piece there completes the square (≥1 shared attribute)"
+                ),
+                "type": "binary",
+                "category": "tiger_square_winnable",
+            }
+        )
+
+    # tiger_pool_winning_count (4) — bucketed count of "poison" pool pieces
+    for bucket in ("ge1", "ge2", "ge4", "all"):
+        bsps.append(
+            {
+                "id": f"tiger_pool_winning_count_{bucket}",
+                "description": (
+                    f"Count of pool pieces that, if offered, let opponent win immediately. "
+                    f"Bucket: {bucket} (≥1 / ≥2 / ≥4 / = pool_size)"
+                ),
+                "type": "binary",
+                "category": "tiger_pool_winning_count",
+            }
+        )
+
+    # tiger_pool_safe_count (4) — bucketed count of safe-to-offer pool pieces
+    for bucket in ("ge1", "ge2", "ge4", "eq0"):
+        bsps.append(
+            {
+                "id": f"tiger_pool_safe_count_{bucket}",
+                "description": (
+                    f"Count of pool pieces that can be safely offered (opponent cannot win). "
+                    f"Bucket: {bucket} (≥1 / ≥2 / ≥4 / = 0, the last being the forced-loss signal)"
+                ),
+                "type": "binary",
+                "category": "tiger_pool_safe_count",
+            }
+        )
+
     return bsps
 
 
@@ -772,6 +897,236 @@ def _compute_single_bsp(
     # Winning move exists
     if bsp_id == "winning_move_exists":
         return _compute_winning_move_exists(cells, offered)
+
+    # ── Tiger BSPs (agent-relative) ───────────────────────────────────────
+    if bsp_id.startswith("tiger_"):
+        return _compute_tiger_bsp(bsp_id, cells, offered)
+
+    return 0.0
+
+
+# ── Tiger BSP helpers (agent-relative — pool reasoning) ──────────────────
+
+# All 16 Quarto pieces as (size, coloration, shape, hole) attribute dicts.
+_ALL_PIECES: tuple[dict[str, str], ...] = tuple(
+    {
+        "size": BINARY_ATTRS["tall"][1 if a else 2],
+        "coloration": BINARY_ATTRS["black"][1 if b else 2],
+        "shape": BINARY_ATTRS["square"][1 if c else 2],
+        "hole": BINARY_ATTRS["with_hole"][1 if d else 2],
+    }
+    for a in (0, 1)
+    for b in (0, 1)
+    for c in (0, 1)
+    for d in (0, 1)
+)
+
+
+def _piece_key(attrs: dict) -> tuple[str, str, str, str]:
+    return (
+        attrs.get("size", ""),
+        attrs.get("coloration", ""),
+        attrs.get("shape", ""),
+        attrs.get("hole", ""),
+    )
+
+
+def _enumerate_pool(cells: dict, offered: dict) -> list[dict]:
+    """Return the unplaced, unoffered pieces — the pool the current player draws from."""
+    placed_keys: set[tuple[str, str, str, str]] = set()
+    for r in range(4):
+        for c in range(4):
+            if cells.get(f"{r}_{c}_occupied", False):
+                placed_keys.add(
+                    (
+                        cells.get(f"{r}_{c}_size", ""),
+                        cells.get(f"{r}_{c}_coloration", ""),
+                        cells.get(f"{r}_{c}_shape", ""),
+                        cells.get(f"{r}_{c}_hole", ""),
+                    )
+                )
+    offered_key = _piece_key(offered) if offered else None
+    pool = []
+    for p in _ALL_PIECES:
+        k = _piece_key(p)
+        if k in placed_keys:
+            continue
+        if offered_key is not None and k == offered_key:
+            continue
+        pool.append(p)
+    return pool
+
+
+def _tiger_pool_stats(cells: dict, offered: dict) -> dict:
+    """Compute and cache pool-relative stats on ``cells`` for reuse across tiger BSPs.
+
+    Stashes under ``cells['_tiger_pool_stats']`` so subsequent tiger BSPs on the
+    same position pay zero pool-enumeration cost. ``cells`` is freshly built per
+    position in ``generate_positions``, so mutation is safe.
+    """
+    cached = cells.get("_tiger_pool_stats")
+    if cached is not None:
+        return cached
+    pool = _enumerate_pool(cells, offered)
+    pool_wins = [
+        bool(_compute_winning_move_exists(cells, p)) for p in pool
+    ]  # True ↔ "offering this piece lets opponent win"
+    stats = {
+        "pool_size": len(pool),
+        "n_winning": sum(pool_wins),
+        "n_safe": sum(1 for w in pool_wins if not w),
+    }
+    cells["_tiger_pool_stats"] = stats
+    return stats
+
+
+def _tiger_line_winnable(line_type: str, line_idx: str, cells: dict, offered: dict) -> float:
+    """Line has exactly 1 empty cell AND placing the offered piece there completes it."""
+    if not offered:
+        return 0.0
+    coords = _parse_line_coords([line_type, line_idx])
+    if coords is None:
+        return 0.0
+    empty_cells = [(r, c) for r, c in coords if not cells.get(f"{r}_{c}_occupied", False)]
+    if len(empty_cells) != 1:
+        return 0.0
+    r, c = empty_cells[0]
+    offered_attrs = {
+        "size": offered.get("size", ""),
+        "coloration": offered.get("coloration", ""),
+        "shape": offered.get("shape", ""),
+        "hole": offered.get("hole", ""),
+    }
+    return 1.0 if _line_would_be_complete(coords, r, c, offered_attrs, cells) else 0.0
+
+
+def _tiger_square_winnable(top_r: int, left_c: int, cells: dict, offered: dict) -> float:
+    """2x2 square has exactly 1 empty cell AND placing the offered piece there completes it."""
+    if not offered:
+        return 0.0
+    coords = [
+        (top_r, left_c),
+        (top_r, left_c + 1),
+        (top_r + 1, left_c),
+        (top_r + 1, left_c + 1),
+    ]
+    empty_cells = [(r, c) for r, c in coords if not cells.get(f"{r}_{c}_occupied", False)]
+    if len(empty_cells) != 1:
+        return 0.0
+    r, c = empty_cells[0]
+    offered_attrs = {
+        "size": offered.get("size", ""),
+        "coloration": offered.get("coloration", ""),
+        "shape": offered.get("shape", ""),
+        "hole": offered.get("hole", ""),
+    }
+    return 1.0 if _square_would_be_complete(coords, r, c, offered_attrs, cells) else 0.0
+
+
+def _tiger_offered_completes(suffix: str, cells: dict, offered: dict) -> float:
+    """Offered piece has attribute X AND at least one line/2x2 has 3 cells matching X."""
+    if not offered or suffix not in BINARY_ATTRS:
+        return 0.0
+    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+    if offered.get(meta_key, "") != pos_val:
+        return 0.0
+    # Look for any line/square with exactly 3 matching + 1 empty
+    for _, _, coords in _ALL_LINE_COORDS:
+        matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        if matching == 3 and empty == 1:
+            return 1.0
+    for _, _, coords in _ALL_SQUARE_COORDS:
+        matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        if matching == 3 and empty == 1:
+            return 1.0
+    return 0.0
+
+
+def _compute_tiger_bsp(bsp_id: str, cells: dict, offered: dict) -> float:
+    """Dispatch for tiger_* BSPs."""
+
+    # tiger_decision_global
+    if bsp_id == "tiger_win_now_exists":
+        return _compute_winning_move_exists(cells, offered)
+
+    if bsp_id in (
+        "tiger_opp_winning_offer_exists",
+        "tiger_lose_next_forced",
+        "tiger_safe_offer_exists",
+        "tiger_every_offer_safe",
+    ):
+        stats = _tiger_pool_stats(cells, offered)
+        if stats["pool_size"] == 0:
+            # No pool → no offering decision to be made (terminal position).
+            return 0.0
+        n_win = stats["n_winning"]
+        n_safe = stats["n_safe"]
+        if bsp_id == "tiger_opp_winning_offer_exists":
+            return 1.0 if n_win >= 1 else 0.0
+        if bsp_id == "tiger_lose_next_forced":
+            return 1.0 if n_win == stats["pool_size"] else 0.0
+        if bsp_id == "tiger_safe_offer_exists":
+            return 1.0 if n_safe >= 1 else 0.0
+        if bsp_id == "tiger_every_offer_safe":
+            return 1.0 if n_safe == stats["pool_size"] else 0.0
+
+    # tiger_pool_winning_count_{ge1,ge2,ge4,all}
+    if bsp_id.startswith("tiger_pool_winning_count_"):
+        bucket = bsp_id[len("tiger_pool_winning_count_") :]
+        stats = _tiger_pool_stats(cells, offered)
+        if stats["pool_size"] == 0:
+            return 0.0
+        n = stats["n_winning"]
+        if bucket == "ge1":
+            return 1.0 if n >= 1 else 0.0
+        if bucket == "ge2":
+            return 1.0 if n >= 2 else 0.0
+        if bucket == "ge4":
+            return 1.0 if n >= 4 else 0.0
+        if bucket == "all":
+            return 1.0 if n == stats["pool_size"] else 0.0
+        return 0.0
+
+    # tiger_pool_safe_count_{ge1,ge2,ge4,eq0}
+    if bsp_id.startswith("tiger_pool_safe_count_"):
+        bucket = bsp_id[len("tiger_pool_safe_count_") :]
+        stats = _tiger_pool_stats(cells, offered)
+        if stats["pool_size"] == 0:
+            return 0.0
+        n = stats["n_safe"]
+        if bucket == "ge1":
+            return 1.0 if n >= 1 else 0.0
+        if bucket == "ge2":
+            return 1.0 if n >= 2 else 0.0
+        if bucket == "ge4":
+            return 1.0 if n >= 4 else 0.0
+        if bucket == "eq0":
+            return 1.0 if n == 0 else 0.0
+        return 0.0
+
+    # tiger_offered_completes_{tall,black,square,with_hole}
+    if bsp_id.startswith("tiger_offered_completes_"):
+        suffix = bsp_id[len("tiger_offered_completes_") :]
+        return _tiger_offered_completes(suffix, cells, offered)
+
+    # tiger_line_{row,col,diag}_{idx}_winnable
+    if bsp_id.startswith("tiger_line_") and bsp_id.endswith("_winnable"):
+        # "tiger_line_row_2_winnable" → parts: ['tiger','line','row','2','winnable']
+        parts = bsp_id.split("_")
+        line_type = parts[2]
+        line_idx = parts[3]
+        return _tiger_line_winnable(line_type, line_idx, cells, offered)
+
+    # tiger_square_{top_r}_{left_c}_winnable
+    if bsp_id.startswith("tiger_square_") and bsp_id.endswith("_winnable"):
+        # "tiger_square_0_1_winnable" → parts: ['tiger','square','0','1','winnable']
+        parts = bsp_id.split("_")
+        try:
+            top_r = int(parts[2])
+            left_c = int(parts[3])
+        except (ValueError, IndexError):
+            return 0.0
+        return _tiger_square_winnable(top_r, left_c, cells, offered)
 
     return 0.0
 

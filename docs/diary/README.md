@@ -64,6 +64,7 @@ without checking it, that is the failure mode this convention exists for.
 | Date | Entry | Topic |
 |---|---|---|
 | 2026-05-19 | [concept-targeted-saes](2026-05-19_concept-targeted-saes.md) | Design only, no implementation. Five candidate approaches (wider exp, higher k, anchored, E2E, matryoshka) to close the 11 % conv2/hawk SAE/LP wall; recommended ordering and pre-registered decision gates. |
+| 2026-05-22 | [reframings-audit-tiger](2026-05-22_reframings-audit-tiger.md) | `tiger` BSP set design + implementation (36 BSPs, 6 categories): agent-relative threats and pool-reasoning. Tests whether the conv2/hawk wall is target-set mismatch vs representation deficit before committing supervised SAE objectives to a fixed BSP set. Pre-registered decision rules. |
 
 ### Supervisor advances
 

@@ -11,7 +11,26 @@
 
 ## Project State
 
-### 2026-05-19 (post-sweep) — current
+### 2026-05-22 (Sweep H closed) — current
+
+**Active phase:** Sweep H capacity scan complete (12 configs, s42). Pre-registered
+decision gate from [`2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md)
+**FAILS**: tripling dictionary expansion from 8 → 64 closed **0 %** of the
+conv2 / hawk gap. Best conv2 / hawk lift is the *baseline* E05-Ta at 0.088 — no
+H run beat it; champS4 fc1 hawk degraded monotonically with expansion
+(0.152 → 0.097). Per the pre-registered rule, concept-targeting is promoted
+to primary direction; *capacity alone* is ruled out on both axes (k in
+Phase 2A Campaign E, exp in Sweep H).
+
+Before committing to anchored / matryoshka / E2E (all of which require a
+fixed BSP target set), a **player-relative reframing (`tiger`)** is being
+scoped to test whether gorilla and hawk are the right BSPs to measure
+against. Design: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
+
+Full sweep tables and interpretation:
+[`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
+
+### 2026-05-19 (post-sweep)
 
 **Active phase:** Phase 2B-sweep complete. 25 SAE configs trained on Deep
 Brain across champS4 (12) and champTa (13) at the shared
@@ -86,9 +105,10 @@ Full details: [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md).
 
 ## BSP Sets
 
-- **gorilla_164** — 7 categories: `cell_occupancy`, `cell_attribute`, `threat_line`, `threat_square_2x2`, `offered_piece`, `global`, `game_phase`. Position-level labels.
-- **hawk_173** — 7 reframed categories (Nanda-style threat reframing): `reframed_count` × 40, `reframed_completable` × 40, `reframed_any_threat` × 10, `reframed_sq_count` × 36, `reframed_sq_completable` × 36, `reframed_sq_any_threat` × 9, `reframed_global` × 2. Position-level labels.
-- Per-champion suffixes (`gorillaS4`, `gorillaTa`, etc.) recompute labels against that champion's self-play position distribution so base rates match the activations.
+- **gorilla_164** — 7 categories: `cell_occupancy`, `cell_attribute`, `threat_line`, `threat_square_2x2`, `offered_piece`, `global`, `game_phase`. State-only. Position-level labels.
+- **hawk_173** — 7 reframed categories (Nanda-style threat reframing): `reframed_count` × 40, `reframed_completable` × 40, `reframed_any_threat` × 10, `reframed_sq_count` × 36, `reframed_sq_completable` × 36, `reframed_sq_any_threat` × 9, `reframed_global` × 2. State-only. Position-level labels.
+- **tiger_36** — 6 agent-relative categories (added 2026-05-22, attacks the "state-only" gap shared by gorilla/hawk): `tiger_decision_global` × 5, `tiger_offered_completing_attr` × 4, `tiger_line_winnable` × 10, `tiger_square_winnable` × 9, `tiger_pool_winning_count` × 4, `tiger_pool_safe_count` × 4. Includes pool-reasoning concepts (count of "poison" / "safe" pieces the player could offer). See [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
+- Per-champion suffixes (`gorillaS4`, `gorillaTa`, `tigerS4`, `tigerTa`, etc.) recompute labels against that champion's self-play position distribution so base rates match the activations. The **schema** file is keyed by basis only (`bsp_schema-gorilla_164.json`, `bsp_schema-tiger_36.json`) because the concept menu is distribution-independent; only the label tensor varies per champion.
 - See [`BSP-schema-summary.md`](BSP-schema-summary.md) for full schema and gorilla ↔ hawk correspondence.
 
 ## Reporting Standard (REQUIRED for every winner claim, adopted 2026-05-11)
@@ -102,12 +122,12 @@ Full table template and rationale: [`phase-2A.md`](docs/diary/phase-2A.md) § "R
 ## Active plan / next steps
 
 1. ~~**F04-Ta verification rerun**~~ ✅ done 2026-05-20 (results merged above).
-2. **Sweep H — capacity scan** (next, on Deep Brain). Wider expansion on the two winners (F04 fc1 jumprelu-t64, E05 conv2 batchtopk-k32) at `exp ∈ {16, 32, 64}`, both champions × both BSP sets. ~3–6 h. **Decision gate:** does conv2/hawk lift cross 0.13 with more capacity? If yes → capacity was binding; if no → objective needs supervision and step 4 becomes primary.
-3. **Literature review refresh** (after Sweep H lands, before kicking off implementations). Last broad lit scan predates the matryoshka / E2E / BatchTopK family; need a fresh pass on (a) SAE variants 2025–2026, (b) board-game interp work since Karvonen, (c) low-base-rate / rare-concept SAE methods. Output: a `docs/diary/2026-MM-DD_lit-review.md` and a short "what's new since 2026-04" addendum to the design note.
-4. **Matryoshka + Anchored SAE implementations** (parallel engineering tracks, ~1 week each). Both attack the SAE/LP wall via different mechanisms (multi-scale capacity vs concept-supervised loss); their outcomes are diagnostically complementary. Start after lit review so the implementations incorporate any 2025–2026 refinements.
-5. **E2E SAEs** — start when at least one of {matryoshka, anchored} has landed and we know which mechanism is binding. E2E is most diagnostic *against a strong baseline*, not as a first move.
-6. **Reframing audit** (small, in parallel). Two reframings are worth scoping before committing to a new BSP set: (a) **player-relative** offensive/defensive (TigerS4-style: "this piece would let opponent win" vs "I can win with this piece") motivated by champTa's +24 pp loss-avoidance gain; (b) **forced-move / decision-binding** BSPs (is this position binding in the minimax tree?). See `docs/diary/2026-05-20_reframings-audit.md` (TBD).
-7. **Novel SAE variant placeholder** — leave room for a probe-grade variant after Sweep H + lit review. Working candidate: **base-rate-weighted reconstruction loss** (reweight MSE by inverse cell base rate to break the "rare concepts don't move the loss" mechanism). Decide whether to commit only once we know whether matryoshka / anchored / E2E close the gap.
+2. ~~**Sweep H — capacity scan**~~ ✅ done 2026-05-22. **Gate FAILS** — best conv2 / hawk lift across the sweep is the *baseline* E05-Ta at 0.088 (threshold was 0.13); fc1 / hawk on S4 actively degraded with more expansion (0.152 → 0.097). Per the pre-registered rule, concept-targeting is now the primary direction; capacity ruled out on both axes (k via Phase 2A, exp via Sweep H). See [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
+3. **Reframing audit — `tiger` BSPs** (next; running before anchored/matryoshka). Agent-relative threat reframing — "can I win now," "every offer I can make lets the opponent win," "is the offered piece a poison" — motivated by champTa's +24 pp loss-avoidance gain. Validates whether gorilla/hawk are the right target sets before committing supervised SAE objectives to them. Design and BSP catalogue: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
+4. **Literature review refresh** (after tiger evals land, before implementation work). Last broad lit scan predates the matryoshka / E2E / BatchTopK family; need a fresh pass on (a) SAE variants 2025–2026, (b) board-game interp work since Karvonen, (c) low-base-rate / rare-concept SAE methods.
+5. **Matryoshka + Anchored SAE implementations** (parallel engineering tracks, ~1 week each). Both attack the SAE/LP wall via different mechanisms (multi-scale capacity vs concept-supervised loss). Start after the lit review **and** after tiger has answered whether the BSP target should be hawk or tiger.
+6. **E2E SAEs** — start when at least one of {matryoshka, anchored} has landed and we know which mechanism is binding. E2E is most diagnostic *against a strong baseline*, not as a first move.
+7. **Novel SAE variant placeholder** — leave room for a probe-grade variant after the cycle above. Working candidate: **base-rate-weighted reconstruction loss** (reweight MSE by inverse cell base rate to break the "rare concepts don't move the loss" mechanism). Decide whether to commit only once matryoshka / anchored / E2E results land.
 8. **Cell-relative BSP set ("new animal")** — only relevant if per-cell conv2 SAEs (`--flatten-per-cell`) are reactivated. Not on the current path with `--flatten-position`.
 
 Design rationale and decision gates: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).

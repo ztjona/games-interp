@@ -348,6 +348,72 @@ winner is unchanged — `E05 batchtopk-k32 conv2` still leads both champions.
 
 Design note: [`2026-05-19_concept-targeted-saes.md`](2026-05-19_concept-targeted-saes.md). Implementation deferred to a new session.
 
+---
+
+## Chapter 4 — Sweep H capacity scan (2026-05-21 / 22) [DIRECT]
+
+Pre-registered test of the [concept-targeted design note](2026-05-19_concept-targeted-saes.md) **step 1–2 gate**: *does pure capacity move conv2 / hawk F1-lift past 0.13?* If yes, "we were under-resourced" and we tune expansion until it saturates; if no, "sparsity is not the binding constraint — the objective needs supervision," and concept-targeting (anchored / matryoshka / E2E) is promoted to the primary direction.
+
+### What ran
+
+12 configs — six per champion (S4, Ta), one seed (s42):
+
+| ID | Hook | Arch | k / t | exp | Baseline counterpart |
+|---|---|---|---|---:|---|
+| H01 | s4.fc1 | jumprelu | t = 64 | 16 | F04 (exp = 8) |
+| H02 | s4.fc1 | jumprelu | t = 64 | 32 | F04 |
+| H03 | s4.fc1 | jumprelu | t = 64 | 64 | F04 |
+| H04 | s4.conv2 | batchtopk | k = 32 | 16 | E05 (exp = 8) |
+| H05 | s4.conv2 | batchtopk | k = 32 | 32 | E05 |
+| H06 | s4.conv2 | batchtopk | k = 32 | 64 | E05 |
+
+Source recipes are the two F04/E05 winners from chapter 3 — best on hawk (fc1) and gorilla (conv2) respectively under matched-F04 reporting. Patience disabled throughout (per the 2026-05-20 verification protocol). All 12 runs trained to 25 k batches; metrics jsonls have the full 51 rows.
+
+### Numbers — gorilla [DIRECT, eval_registry.json]
+
+`coverage_f1_lift` per (recipe × expansion × champion):
+
+| Recipe | exp = 8 (baseline) | exp = 16 | exp = 32 | exp = 64 | Δ (64 − 8) |
+|---|---:|---:|---:|---:|---:|
+| conv2 batchtopk-k32 / S4 | 0.212 | 0.211 | 0.215 | **0.222** | **+0.010** |
+| conv2 batchtopk-k32 / Ta | **0.214** | 0.212 | 0.205 | 0.212 | −0.002 |
+| fc1 jumprelu-t64 / S4 | **0.099** | 0.092 | 0.091 | 0.077 | **−0.022** |
+| fc1 jumprelu-t64 / Ta | **0.177** | 0.167 | 0.169 | 0.171 | −0.006 |
+
+The bolded entry per row is the best of that row. Three of four rows degrade with more expansion; the one positive (S4 conv2) gains 0.010 lift — within seed noise (σ ≈ 0.004 from Anakin sweep).
+
+### Numbers — hawk [DIRECT, eval_registry.json]
+
+| Recipe | exp = 8 (baseline) | exp = 16 | exp = 32 | exp = 64 | Δ (64 − 8) |
+|---|---:|---:|---:|---:|---:|
+| conv2 batchtopk-k32 / S4 | **0.068** | 0.065 | 0.068 | 0.068 | 0.000 |
+| conv2 batchtopk-k32 / Ta | **0.088** | 0.087 | 0.079 | 0.083 | −0.005 |
+| fc1 jumprelu-t64 / S4 | **0.152** | 0.133 | 0.115 | 0.097 | **−0.055** |
+| fc1 jumprelu-t64 / Ta | **0.172** | 0.172 | 0.171 | 0.170 | −0.002 |
+
+### Decision-gate verdict [DIRECT]
+
+- **Gate threshold:** conv2 / hawk lift > 0.13.
+- **Best conv2 / hawk lift across the entire sweep:** 0.088 (E05-Ta, the *baseline* — no H run beat it). On champS4 the best conv2 / hawk is 0.068.
+- **Distance to gate:** 0.042–0.062 lift below threshold. Tripling the dictionary closed **0 %** of the gap.
+- **SAE / LP efficiency (unchanged from chapter 3):** conv2 / hawk sits at ~10 % (S4: 0.068 / 0.715 = 9.5 %; Ta: 0.088 / 0.785 = 11.2 %). The wall is where it was.
+
+**Gate FAILS.** Per the pre-registered rule in [`2026-05-19_concept-targeted-saes.md`](2026-05-19_concept-targeted-saes.md) § "Decision gates": *"Promote concept-targeting to primary direction if step 2 shows no k-driven improvement on conv2/hawk."* Capacity-driven improvement has now been ruled out on both axes (k via Phase 2A Campaign E, exp via Sweep H). The mechanism story narrows from *"capacity vs objective"* to *"objective alone"*.
+
+### Provisional interpretation [AI-REASONED PROVISIONAL ANALYSIS — read sceptically]
+
+Three observations beyond the headline:
+
+1. **fc1 hawk on S4 degrades monotonically with expansion** (0.152 → 0.133 → 0.115 → 0.097). This is the *opposite* of the design note's "more capacity might help" hypothesis. Extra slots actively hurt — consistent with the *reconstruction-loss dominance* mechanism (more dictionary capacity ↔ more slots fighting for the dense-concept mass ↔ less surplus for rare threats), but unexpectedly strong. champTa fc1 hawk stays flat at 0.171–0.172 across expansions; the S4 degradation may be a single-seed artifact, but the *direction* (no improvement) holds for both.
+2. **Dead-feature percentage climbs hard with expansion** — 95.9 % → 98.4 % → 99.3 % → 99.7 % on champS4 fc1; 95.5 % → 97.3 % → 98.6 % → 98.7 % on champS4 conv2. The wider dictionaries are *not allocating* the new slots to anything. The SAE finds essentially the same number of useful features regardless of `d_dict`, suggesting the bottleneck is in *which directions the activation space exposes*, not in *how many features we let the SAE keep*.
+3. **The one mildly positive direction (conv2 / S4 gorilla, +0.010)** is on the dense category set where the SAE was already strongest. It is consistent with "wider expansion helps marginally on already-easy concepts and not at all on the rare ones we care about" — exactly the pattern predicted by base-rate-skewed allocation.
+
+The combined evidence (failed k sweep in Phase 2A Campaign E + failed exp sweep in Sweep H + monotone degradation on the rare category set) is strong enough that the design note's *"objective needs supervision"* branch is now the working hypothesis. Anchored / matryoshka / E2E remain the active candidates; the 2026-05-19 design note's decision logic holds.
+
+### What this *doesn't* yet settle
+
+The H sweep ruled out *capacity* as the binding constraint on the *current BSP framings* (gorilla, hawk). It does **not** rule out the alternative reading: that **gorilla and hawk are the wrong target sets** to expect the model to encode. Both are state-only; neither captures the agent-relative reasoning that champTa's +24 pp loss-avoidance behavioural gain demonstrably exercises. Before committing to anchored / matryoshka / E2E — all of which take a fixed BSP set as the supervision signal — we should validate whether a player-relative reframing (`tiger`) recovers more SAE coverage at the same capacity. See [`2026-05-22_reframings-audit-tiger.md`](2026-05-22_reframings-audit-tiger.md).
+
 ## Pointers
 
 - Run IDs are in `eval_registry.json` keyed as `<run_id>:<bsp_set>`.

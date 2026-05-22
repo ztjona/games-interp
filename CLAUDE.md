@@ -183,7 +183,7 @@ When working with conv hooks, activations may be flattened (`B, C, H, W` → `B*
 These naming rules are project-specific and are required for files to flow through the auto-resolution logic in `sae_eval.py`:
 
 - **Position datasets** use the **metals** theme (`copper, bronze, iron, steel, amalgam`), one metal per opponent-mode mixture. `amalgam` = combined+deduped across all four modes.
-- **BSP sets** use the **animals** theme (`gorilla` = full 164, `hawk_173` = reframed Nanda-style threat set, `fox` = cells/phase only, etc.). An animal name is `{basis}{ChampionSuffix?}`: the **basis** (`gorilla`, `hawk`, `fox`) defines the concept menu; the optional **champion suffix** (`S4`, `Ta`, `Aa`) identifies the position distribution used to compute the labels.
+- **BSP sets** use the **animals** theme (`gorilla` = full 164 state-only concept menu, `hawk_173` = reframed Nanda-style threat counts, `tiger_36` = agent-relative / pool reasoning, `fox` = cells/phase only, etc.). An animal name is `{basis}{ChampionSuffix?}`: the **basis** (`gorilla`, `hawk`, `tiger`, `fox`) defines the concept menu; the optional **champion suffix** (`S4`, `Ta`, `Aa`) identifies the position distribution used to compute the labels. `tiger` differs from gorilla/hawk in axis — see [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
 - Filename patterns:
   - `positions-<metal>_unique.pt` — position dataset.
   - `bsp_labels-<animal>_<count>.pt` — per-distribution label tensor (animal carries the champion suffix).

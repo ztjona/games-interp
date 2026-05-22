@@ -189,7 +189,9 @@ class TestQuartoBSPs:
         """Test that get_all_bsp_definitions returns expected count and structure."""
         bsps = get_all_bsp_definitions()
 
-        assert len(bsps) == 337, "Should have 337 total BSPs (164 gorilla + 173 hawk)"
+        assert len(bsps) == 373, (
+            "Should have 373 total BSPs (164 gorilla + 173 hawk + 36 tiger)"
+        )
 
         # Check all BSPs are binary
         for bsp in bsps:
@@ -219,6 +221,12 @@ class TestQuartoBSPs:
             "reframed_sq_completable": 36,
             "reframed_sq_any_threat": 9,
             "reframed_global": 2,
+            "tiger_decision_global": 5,
+            "tiger_offered_completing_attr": 4,
+            "tiger_line_winnable": 10,
+            "tiger_square_winnable": 9,
+            "tiger_pool_winning_count": 4,
+            "tiger_pool_safe_count": 4,
         }
 
         assert categories == expected_counts, f"Category counts mismatch: {categories}"
@@ -540,6 +548,98 @@ class TestHawkBSPs:
         }
         vec = compute_bsp_vector(meta, ["square_0_0_threat_black"])
         assert vec[0] == 1.0, "Gorilla square threat still detects correctly"
+
+
+class TestTigerBSPs:
+    """Test agent-relative (tiger) BSP computation."""
+
+    def _winnable_board(self):
+        """Row 0 cols 0,1,2 are all TALL (varying other attrs); col 3 empty.
+
+        Offered piece is TALL → placing on (0,3) completes row 0 via TALL.
+        """
+        return {
+            "n_pieces": 3,
+            "cells": {
+                "0_0_occupied": True, "0_0_size": "TALL", "0_0_coloration": "BLACK",
+                "0_0_shape": "SQUARE", "0_0_hole": "WITH_HOLE",
+                "0_1_occupied": True, "0_1_size": "TALL", "0_1_coloration": "WHITE",
+                "0_1_shape": "SQUARE", "0_1_hole": "WITHOUT_HOLE",
+                "0_2_occupied": True, "0_2_size": "TALL", "0_2_coloration": "BLACK",
+                "0_2_shape": "CIRCLE", "0_2_hole": "WITH_HOLE",
+                "0_3_occupied": False,
+            },
+            "offered_piece": {
+                "size": "TALL", "coloration": "WHITE",
+                "shape": "CIRCLE", "hole": "WITHOUT_HOLE",
+            },
+        }
+
+    def test_win_now_and_line_winnable(self):
+        meta = self._winnable_board()
+        vec = compute_bsp_vector(
+            meta, ["tiger_win_now_exists", "tiger_line_row_0_winnable", "tiger_offered_completes_tall"]
+        )
+        assert vec[0] == 1.0, "win_now_exists fires when offered completes a line"
+        assert vec[1] == 1.0, "row_0 is winnable with the offered piece"
+        assert vec[2] == 1.0, "offered piece is the TALL completer"
+
+    def test_line_winnable_only_with_one_empty(self):
+        """Lines with 2 empty cells should not be winnable in one move."""
+        meta = self._winnable_board()
+        # Wipe (0,2) so row 0 has 2 empties → cannot complete in one placement
+        meta["cells"]["0_2_occupied"] = False
+        vec = compute_bsp_vector(meta, ["tiger_line_row_0_winnable", "tiger_win_now_exists"])
+        assert vec[0] == 0.0, "Row with 2 empties not winnable in one move"
+        # win_now may still be true via square completion, but on this board nothing
+        # else is near complete:
+        assert vec[1] == 0.0, "No other line/square near complete"
+
+    def test_pool_safe_on_empty_board(self):
+        meta = {
+            "n_pieces": 0,
+            "cells": {f"{r}_{c}_occupied": False for r in range(4) for c in range(4)},
+            "offered_piece": {
+                "size": "TALL", "coloration": "BLACK",
+                "shape": "SQUARE", "hole": "WITH_HOLE",
+            },
+        }
+        vec = compute_bsp_vector(
+            meta,
+            [
+                "tiger_every_offer_safe",
+                "tiger_pool_winning_count_ge1",
+                "tiger_pool_safe_count_eq0",
+                "tiger_lose_next_forced",
+            ],
+        )
+        assert vec[0] == 1.0, "Empty board: every offer is safe"
+        assert vec[1] == 0.0, "Empty board: no pool piece wins"
+        assert vec[2] == 0.0, "Empty board: not the forced-loss state"
+        assert vec[3] == 0.0, "Empty board: not forced to lose"
+
+    def test_pool_winning_count_buckets(self):
+        """On the row-0 TALL near-completion board, several pool pieces would let opponent win.
+
+        Specifically all 8 pool TALL pieces complete row 0 via TALL (except the offered itself,
+        which is excluded from the pool). 7 TALL pool pieces ≥ 4, so ge1/ge2/ge4 all fire.
+        """
+        meta = self._winnable_board()
+        vec = compute_bsp_vector(
+            meta,
+            [
+                "tiger_pool_winning_count_ge1",
+                "tiger_pool_winning_count_ge2",
+                "tiger_pool_winning_count_ge4",
+                "tiger_pool_winning_count_all",
+                "tiger_opp_winning_offer_exists",
+            ],
+        )
+        assert vec[0] == 1.0
+        assert vec[1] == 1.0
+        assert vec[2] == 1.0
+        assert vec[3] == 0.0, "Not every pool piece is winning (LITTLE pieces are safe here)"
+        assert vec[4] == 1.0
 
 
 if __name__ == "__main__":
