@@ -16,7 +16,12 @@ Arguments:
     <run_ids>       One or more eval registry keys (checkpoint stems)
 
 Options:
-    --bsps=<name>           BSP set animal name (e.g. gorilla, fox) [default: gorilla]
+    --bsps=<name>           BSP set animal name (e.g. gorilla, fox). Comma-
+                            separated for multiple sets in one call
+                            (e.g. ``gorillaS4,hawkS4``); the activation tensor
+                            and per-feature ``h`` are encoded once and reused
+                            across sets. Incompatible with ``--bsp-labels`` /
+                            ``--bsp-schema``. [default: gorilla]
     --data=<path>           Activation data path [default: auto]
     --bsp-labels=<path>     BSP label tensor path [default: auto]
     --bsp-schema=<path>     BSP schema JSON path [default: auto]
@@ -74,6 +79,7 @@ from lib.sae.eval import (
     compute_feature_sharing,
     compute_per_category_coverage,
     compute_board_reconstruction,
+    resolve_schema_path,
 )
 from lib.sae.train import compute_metrics
 
@@ -108,17 +114,17 @@ def _resolve_data_path(game: str, hook: str, metadata: dict | None = None) -> Pa
 
 
 def _resolve_bsp_paths(game: str, animal: str) -> tuple[Path, Path]:
-    """Resolve BSP label and schema paths from animal name via glob.
+    """Resolve BSP label and schema paths from animal name.
 
-    Looks for: data/{game}/bsp_labels-{animal}_<count>.pt where ``<count>``
-    starts with a digit. The numeric guard prevents ``gorilla`` from matching
-    ``bsp_labels-gorilla_s4_164.pt`` (a different distribution sharing the
-    same concept menu). Use a distinct animal name (e.g. ``gorillaS4``) when
-    the underlying positions differ.
+    Labels are per-distribution (e.g. ``bsp_labels-gorillaS4_164.pt``); the
+    schema is per-basis (e.g. ``bsp_schema-gorilla_164.json``) and is shared
+    across champions because the concept menu is distribution-independent.
+    The numeric ``_[0-9]*`` guard on the label glob prevents ``gorilla`` from
+    accidentally matching ``bsp_labels-gorilla_s4_164.pt`` (which shares the
+    same concept menu but a different position distribution).
     """
     data_dir = Path(f"data/{game}")
     label_matches = sorted(data_dir.glob(f"bsp_labels-{animal}_[0-9]*.pt"))
-    schema_matches = sorted(data_dir.glob(f"bsp_schema-{animal}_[0-9]*.json"))
 
     if not label_matches:
         available = sorted(data_dir.glob("bsp_labels-*.pt"))
@@ -128,11 +134,16 @@ def _resolve_bsp_paths(game: str, animal: str) -> tuple[Path, Path]:
             log.error("  Available BSP sets: %s", ", ".join(available_names))
         sys.exit(1)
 
-    if not schema_matches:
-        log.error("BSP schema not found for animal '%s' in data/%s/", animal, game)
+    schema_path = resolve_schema_path(data_dir, animal)
+    if schema_path is None:
+        log.error(
+            "BSP schema not found for animal '%s' in data/%s/ (tried suffixed and basis)",
+            animal,
+            game,
+        )
         sys.exit(1)
 
-    return label_matches[0], schema_matches[0]
+    return label_matches[0], schema_path
 
 
 def _extract_checkpoint_info(metadata: dict) -> dict[str, str]:
@@ -205,9 +216,29 @@ def _register_eval(
 
 
 def cmd_evaluate(args: dict) -> None:
-    """Run Layer 1 evaluation on a checkpoint."""
+    """Run Layer 1 evaluation on a checkpoint, for one or more BSP sets."""
     checkpoint_path = args["<checkpoint>"]
-    animal = args["--bsps"]
+    animals = [a.strip() for a in args["--bsps"].split(",") if a.strip()]
+    if not animals:
+        log.error("--bsps is empty")
+        sys.exit(1)
+    if len(animals) != len(set(animals)):
+        log.error("--bsps contains duplicates: %s", animals)
+        sys.exit(1)
+
+    bsp_label_arg = args["--bsp-labels"]
+    bsp_schema_arg = args["--bsp-schema"]
+    explicit_paths = (bsp_label_arg and bsp_label_arg != "auto") or (
+        bsp_schema_arg and bsp_schema_arg != "auto"
+    )
+    if explicit_paths and len(animals) > 1:
+        log.error(
+            "--bsp-labels / --bsp-schema cannot be combined with multi-bsp "
+            "(--bsps=%s); pass one BSP set at a time when overriding paths.",
+            args["--bsps"],
+        )
+        sys.exit(1)
+
     precision_thresh = float(args["--precision-thresh"])
     batch_size = int(args["--batch-size"])
     tag = args["--tag"]
@@ -221,41 +252,47 @@ def cmd_evaluate(args: dict) -> None:
 
     run_id = Path(checkpoint_path).stem
 
-    # ---- Cache check ----
     # Peek at metadata to find game before deciding on registry
     log.info("Loading checkpoint: %s", checkpoint_path)
     sae, metadata = load_checkpoint(Path(checkpoint_path), device=device)
     info = _extract_checkpoint_info(metadata)
     game, hook = info["game"], info["hook"]
 
+    # ---- Cache check (per animal) ----
     registry = _load_registry(game)
-    cache_key = f"{run_id}:{animal}"
-    if cache_key in registry and not force:
-        cached = registry[cache_key]
-        log.info(
-            "Found cached evaluation for '%s' on '%s' (use --force to recompute)",
-            run_id,
-            animal,
-        )
-        output = {
-            "run_id": run_id,
-            "checkpoint": cached.get("checkpoint", checkpoint_path),
-            "architecture": cached.get("architecture", "?"),
-            "experiment": cached.get("experiment", "?"),
-            "game": game,
-            "hook": cached.get("hook", hook),
-            "bsp_set": cached.get("bsp_set", animal),
-            "cached": True,
-            "metrics": cached.get("metrics", {}),
-        }
-        print(json.dumps(output, indent=2))
-        _print_summary(
-            run_id,
-            cached.get("bsp_set", animal),
-            cached.get("metrics", {}),
-            game,
-            cached=True,
-        )
+    pending: list[str] = []
+    for animal in animals:
+        cache_key = f"{run_id}:{animal}"
+        if cache_key in registry and not force:
+            cached = registry[cache_key]
+            log.info(
+                "Found cached evaluation for '%s' on '%s' (use --force to recompute)",
+                run_id,
+                animal,
+            )
+            output = {
+                "run_id": run_id,
+                "checkpoint": cached.get("checkpoint", checkpoint_path),
+                "architecture": cached.get("architecture", "?"),
+                "experiment": cached.get("experiment", "?"),
+                "game": game,
+                "hook": cached.get("hook", hook),
+                "bsp_set": cached.get("bsp_set", animal),
+                "cached": True,
+                "metrics": cached.get("metrics", {}),
+            }
+            print(json.dumps(output, indent=2))
+            _print_summary(
+                run_id,
+                cached.get("bsp_set", animal),
+                cached.get("metrics", {}),
+                game,
+                cached=True,
+            )
+        else:
+            pending.append(animal)
+
+    if not pending:
         return
 
     log.info(
@@ -267,34 +304,16 @@ def cmd_evaluate(args: dict) -> None:
         sae.d_dict,
     )
 
-    # Resolve paths
+    # Resolve shared activation path
     data_arg = args["--data"]
     if data_arg and data_arg != "auto":
         data_path = Path(data_arg)
     else:
         data_path = _resolve_data_path(game, hook, metadata)
-
-    bsp_label_arg = args["--bsp-labels"]
-    bsp_schema_arg = args["--bsp-schema"]
-    if bsp_label_arg and bsp_label_arg != "auto":
-        bsp_label_path = Path(bsp_label_arg)
-        bsp_schema_path = (
-            Path(bsp_schema_arg)
-            if bsp_schema_arg and bsp_schema_arg != "auto"
-            else None
-        )
-    else:
-        bsp_label_path, bsp_schema_path = _resolve_bsp_paths(game, animal)
-
     log.info("  Activations: %s", data_path)
-    log.info("  BSP labels:  %s", bsp_label_path)
-    if bsp_schema_path:
-        log.info("  BSP schema:  %s", bsp_schema_path)
 
-    # Load data
     activations = load_activation_data(str(data_path), device)
 
-    # Validate activation shape matches SAE input dimension
     act_dim = activations.shape[-1]
     if act_dim != sae.d_input:
         log.error(
@@ -307,19 +326,8 @@ def cmd_evaluate(args: dict) -> None:
             log.error("  Hint: checkpoint was trained on '%s'", metadata["data_path"])
         sys.exit(1)
 
-    bsp_labels = torch.load(bsp_label_path, map_location="cpu", weights_only=True)
-
-    # Load schema for BSP names in output
-    bsp_schema = None
-    if bsp_schema_path and bsp_schema_path.exists():
-        with open(bsp_schema_path, "r") as f:
-            bsp_schema = json.load(f)
-
-    log.info("  Samples: %d, BSPs: %d", activations.shape[0], bsp_labels.shape[1])
-
-    # Set inference mode — BatchTopK must stay in train() for batch-level sparsity
     if isinstance(sae, BatchTopKSAE):
-        sae.train()
+        sae.train()  # BatchTopK needs train() for batch-level sparsity
     else:
         sae.eval()
 
@@ -328,7 +336,7 @@ def cmd_evaluate(args: dict) -> None:
     cache_dir = saes_dir / "cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
 
-    # ── 1. Encode activations → h  (cached to disk) ───────────────────────────────────
+    # ── 1. Encode activations → h  (cached to disk; shared across animals) ──
     h_cache = cache_dir / f"{run_id}_h.pt"
     if h_cache.exists() and not force:
         h = torch.load(h_cache, map_location="cpu", weights_only=True)
@@ -347,93 +355,112 @@ def cmd_evaluate(args: dict) -> None:
         torch.save(h, h_cache)
         log.info("  h cached → %s", h_cache)
 
-    # ── 2. Feature–BSP matching  (cached to disk) ────────────────────────
-    matching_cache = cache_dir / f"{run_id}_matching-{animal}.pt"
-    if matching_cache.exists() and not force:
-        c = torch.load(matching_cache, map_location="cpu", weights_only=False)
-        matching = FeatureBSPMatching(
-            precision=c["precision"],
-            recall=c["recall"],
-            f1=c["f1"],
-            best_f1_per_bsp=c["best_f1_per_bsp"],
-            best_feature_per_bsp=c["best_feature_per_bsp"],
-            mcc=c.get("mcc"),
-            best_mcc_per_bsp=c.get("best_mcc_per_bsp"),
-            best_feature_per_bsp_mcc=c.get("best_feature_per_bsp_mcc"),
-            base_rates=c.get("base_rates"),
-            f1_lift_per_bsp=c.get("f1_lift_per_bsp"),
-            trivial_f1_per_bsp=c.get("trivial_f1_per_bsp"),
-        )
-        log.info("  matching loaded from cache: %s", matching_cache)
-        # Forward-compat: if cache is pre-MCC, augment it now (cheap, no h needed
-        # for f1_lift; MCC needs counts so we skip silently if missing).
-        if matching.f1_lift_per_bsp is None:
-            base_rates = bsp_labels.float().mean(dim=0)
-            trivial_f1 = (2.0 * base_rates) / (1.0 + base_rates + 1e-8)
-            matching.base_rates = base_rates
-            matching.trivial_f1_per_bsp = trivial_f1
-            matching.f1_lift_per_bsp = (matching.best_f1_per_bsp - trivial_f1).clamp(
-                min=0.0
-            )
-            log.info("  legacy cache: derived f1_lift from labels")
-    else:
-        matching = match_features_to_bsps(h, bsp_labels)
-        torch.save(
-            {
-                "precision": matching.precision,
-                "recall": matching.recall,
-                "f1": matching.f1,
-                "best_f1_per_bsp": matching.best_f1_per_bsp,
-                "best_feature_per_bsp": matching.best_feature_per_bsp,
-                "mcc": matching.mcc,
-                "best_mcc_per_bsp": matching.best_mcc_per_bsp,
-                "best_feature_per_bsp_mcc": matching.best_feature_per_bsp_mcc,
-                "base_rates": matching.base_rates,
-                "f1_lift_per_bsp": matching.f1_lift_per_bsp,
-                "trivial_f1_per_bsp": matching.trivial_f1_per_bsp,
-            },
-            matching_cache,
-        )
-        log.info("  matching cached → %s", matching_cache)
-
-    # ── 3. Coverage + board reconstruction + structural metrics ──────────
-    coverage_metrics = compute_coverage(matching)
-    feature_sharing = compute_feature_sharing(matching)
-    per_category = compute_per_category_coverage(matching, bsp_schema)
-    reconstruction = compute_board_reconstruction(
-        matching, h, bsp_labels, precision_threshold=precision_thresh
-    )
     eval_sample = activations[: min(N, batch_size)].to(device)
     structural = compute_metrics(sae, eval_sample)
 
-    metrics = {**structural, **coverage_metrics, **reconstruction}
-    metrics.pop("per_bsp_accuracy", None)
-    metrics["feature_sharing"] = feature_sharing
-    if per_category:
-        metrics["per_category"] = per_category
+    # ── 2-3. Per-animal matching + coverage + register ──────────────────────
+    for animal in pending:
+        if bsp_label_arg and bsp_label_arg != "auto":
+            bsp_label_path = Path(bsp_label_arg)
+            bsp_schema_path = (
+                Path(bsp_schema_arg)
+                if bsp_schema_arg and bsp_schema_arg != "auto"
+                else None
+            )
+        else:
+            bsp_label_path, bsp_schema_path = _resolve_bsp_paths(game, animal)
 
-    # Register
-    _register_eval(run_id, game, checkpoint_path, info, animal, metrics, tag)
+        log.info("[bsps=%s]", animal)
+        log.info("  BSP labels:  %s", bsp_label_path)
+        if bsp_schema_path:
+            log.info("  BSP schema:  %s", bsp_schema_path)
 
-    # Build JSON output
-    output = {
-        "run_id": run_id,
-        "checkpoint": checkpoint_path,
-        "architecture": info["architecture"],
-        "experiment": info["experiment"],
-        "game": game,
-        "hook": hook,
-        "bsp_set": animal,
-        "num_samples": activations.shape[0],
-        "cached": False,
-        "metrics": metrics,
-    }
+        bsp_labels = torch.load(bsp_label_path, map_location="cpu", weights_only=True)
 
-    # Print JSON to stdout (machine-readable)
-    print(json.dumps(output, indent=2))
+        bsp_schema = None
+        if bsp_schema_path and bsp_schema_path.exists():
+            with open(bsp_schema_path, "r") as f:
+                bsp_schema = json.load(f)
 
-    # Human-readable summary to stderr
-    _print_summary(run_id, animal, metrics, game, num_bsps_label=bsp_labels.shape[1])
+        log.info("  Samples: %d, BSPs: %d", activations.shape[0], bsp_labels.shape[1])
+
+        matching_cache = cache_dir / f"{run_id}_matching-{animal}.pt"
+        if matching_cache.exists() and not force:
+            c = torch.load(matching_cache, map_location="cpu", weights_only=False)
+            matching = FeatureBSPMatching(
+                precision=c["precision"],
+                recall=c["recall"],
+                f1=c["f1"],
+                best_f1_per_bsp=c["best_f1_per_bsp"],
+                best_feature_per_bsp=c["best_feature_per_bsp"],
+                mcc=c.get("mcc"),
+                best_mcc_per_bsp=c.get("best_mcc_per_bsp"),
+                best_feature_per_bsp_mcc=c.get("best_feature_per_bsp_mcc"),
+                base_rates=c.get("base_rates"),
+                f1_lift_per_bsp=c.get("f1_lift_per_bsp"),
+                trivial_f1_per_bsp=c.get("trivial_f1_per_bsp"),
+            )
+            log.info("  matching loaded from cache: %s", matching_cache)
+            if matching.f1_lift_per_bsp is None:
+                base_rates = bsp_labels.float().mean(dim=0)
+                trivial_f1 = (2.0 * base_rates) / (1.0 + base_rates + 1e-8)
+                matching.base_rates = base_rates
+                matching.trivial_f1_per_bsp = trivial_f1
+                matching.f1_lift_per_bsp = (
+                    matching.best_f1_per_bsp - trivial_f1
+                ).clamp(min=0.0)
+                log.info("  legacy cache: derived f1_lift from labels")
+        else:
+            matching = match_features_to_bsps(h, bsp_labels)
+            torch.save(
+                {
+                    "precision": matching.precision,
+                    "recall": matching.recall,
+                    "f1": matching.f1,
+                    "best_f1_per_bsp": matching.best_f1_per_bsp,
+                    "best_feature_per_bsp": matching.best_feature_per_bsp,
+                    "mcc": matching.mcc,
+                    "best_mcc_per_bsp": matching.best_mcc_per_bsp,
+                    "best_feature_per_bsp_mcc": matching.best_feature_per_bsp_mcc,
+                    "base_rates": matching.base_rates,
+                    "f1_lift_per_bsp": matching.f1_lift_per_bsp,
+                    "trivial_f1_per_bsp": matching.trivial_f1_per_bsp,
+                },
+                matching_cache,
+            )
+            log.info("  matching cached → %s", matching_cache)
+
+        coverage_metrics = compute_coverage(matching)
+        feature_sharing = compute_feature_sharing(matching)
+        per_category = compute_per_category_coverage(matching, bsp_schema)
+        reconstruction = compute_board_reconstruction(
+            matching, h, bsp_labels, precision_threshold=precision_thresh
+        )
+
+        metrics = {**structural, **coverage_metrics, **reconstruction}
+        metrics.pop("per_bsp_accuracy", None)
+        metrics["feature_sharing"] = feature_sharing
+        if per_category:
+            metrics["per_category"] = per_category
+
+        _register_eval(run_id, game, checkpoint_path, info, animal, metrics, tag)
+
+        output = {
+            "run_id": run_id,
+            "checkpoint": checkpoint_path,
+            "architecture": info["architecture"],
+            "experiment": info["experiment"],
+            "game": game,
+            "hook": hook,
+            "bsp_set": animal,
+            "num_samples": activations.shape[0],
+            "cached": False,
+            "metrics": metrics,
+        }
+        print(json.dumps(output, indent=2))
+        _print_summary(
+            run_id, animal, metrics, game, num_bsps_label=bsp_labels.shape[1]
+        )
 
 
 def _print_summary(

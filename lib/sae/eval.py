@@ -10,13 +10,59 @@ All functions operate on pre-computed tensors and are game-agnostic.
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import torch
 from tqdm import tqdm
 
 log = logging.getLogger(__name__)
+
+
+# ---------------------------------------------------------------------------
+# Animal / BSP-set naming
+# ---------------------------------------------------------------------------
+
+# Per project convention: an animal name is ``{basis}{ChampionSuffix?}`` where
+# basis is all-lowercase (``gorilla``, ``hawk``, ``fox``) and the champion
+# suffix (if any) starts with an uppercase letter (``S4``, ``Ta``, ``Aa``).
+# The BSP schema is identical across distributions of the same basis, so the
+# schema file is keyed by basis alone; only the label tensor differs per
+# champion. See CLAUDE.md § "Domain conventions".
+_ANIMAL_BASIS_RE = re.compile(r"^([a-z]+)([A-Z].*)?$")
+
+
+def animal_to_basis(animal: str) -> str:
+    """Return the basis name of an animal, e.g. ``gorillaS4`` → ``gorilla``.
+
+    If ``animal`` is already a basis (no uppercase suffix) it is returned
+    unchanged. If the name does not match the convention, returns the input
+    unchanged so callers can use it as-is.
+    """
+    m = _ANIMAL_BASIS_RE.match(animal)
+    return m.group(1) if m else animal
+
+
+def resolve_schema_path(data_dir: Path, animal: str) -> Path | None:
+    """Resolve ``bsp_schema-{animal}_*.json``, falling back to the basis.
+
+    Lookup order:
+      1. ``bsp_schema-{animal}_[0-9]*.json`` (legacy per-champion file, if any)
+      2. ``bsp_schema-{basis}_[0-9]*.json``  where basis = animal_to_basis(animal)
+
+    Returns ``None`` if neither exists.
+    """
+    matches = sorted(data_dir.glob(f"bsp_schema-{animal}_[0-9]*.json"))
+    if matches:
+        return matches[0]
+    basis = animal_to_basis(animal)
+    if basis != animal:
+        matches = sorted(data_dir.glob(f"bsp_schema-{basis}_[0-9]*.json"))
+        if matches:
+            return matches[0]
+    return None
 
 
 # ---------------------------------------------------------------------------

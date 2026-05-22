@@ -79,6 +79,7 @@ from lib.sae.architectures import BatchTopKSAE  # noqa: E402
 from lib.sae.eval import (  # noqa: E402
     FeatureBSPMatching,
     match_features_to_bsps,
+    resolve_schema_path,
 )
 
 log = logging.getLogger("export_viz_data")
@@ -118,9 +119,8 @@ def _positions_path(game: str) -> Path:
 
 
 def _bsp_schema_path(game: str, animal: str) -> Path | None:
-    """Return first matching ``bsp_schema-<animal>_*.json`` under ``data/<game>/``."""
-    matches = sorted(_data_dir(game).glob(f"bsp_schema-{animal}_*.json"))
-    return matches[0] if matches else None
+    """Locate ``bsp_schema-<animal>_*.json``, falling back to the basis schema."""
+    return resolve_schema_path(_data_dir(game), animal)
 
 
 def _activations_path(game: str, hook: str) -> Path | None:

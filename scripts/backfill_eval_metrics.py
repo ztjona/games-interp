@@ -50,6 +50,7 @@ from lib.sae.eval import (  # noqa: E402
     compute_coverage,
     compute_per_category_coverage,
     match_features_to_bsps,
+    resolve_schema_path,
 )
 
 logging.basicConfig(level=logging.INFO, format="%(message)s")
@@ -66,7 +67,6 @@ def _resolve_bsp_paths(
 ) -> tuple[Path | None, Path | None]:
     data_dir = ROOT / "data" / game
     label_matches = sorted(data_dir.glob(f"bsp_labels-{animal}_*.pt"))
-    schema_matches = sorted(data_dir.glob(f"bsp_schema-{animal}_*.json"))
 
     # If we know how many BSPs the matching cache holds, prefer the file
     # whose filename count matches exactly.
@@ -85,7 +85,9 @@ def _resolve_bsp_paths(
                     return p
         return paths[-1]
 
-    return _pick(label_matches), _pick(schema_matches)
+    # Schema lookup falls back from per-champion to basis (gorillaS4 → gorilla)
+    schema_path = resolve_schema_path(data_dir, animal)
+    return _pick(label_matches), schema_path
 
 
 def _load_bsp_labels(path: Path) -> torch.Tensor:

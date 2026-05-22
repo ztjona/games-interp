@@ -227,8 +227,26 @@ def main():
         )
         sys.exit(1)
 
+    # Labels are per-distribution → file keyed by the (possibly suffixed)
+    # animal_name. Schema is distribution-independent → file keyed by the
+    # basis only (e.g. ``gorilla``, not ``gorillaS4``); see CLAUDE.md §
+    # "Domain conventions".
+    basis = animal_name
+    if bsp_sets and animal_name not in bsp_sets:
+        # animal looks like {basis}{ChampionSuffix} (e.g. gorillaS4) — strip
+        # the suffix by matching the longest known basis prefix.
+        candidates = [b for b in bsp_sets if animal_name.startswith(b)]
+        if candidates:
+            basis = max(candidates, key=len)
+
     bsp_set_name = f"{animal_name}_{len(selected_bsps)}"
+    schema_basis_name = f"{basis}_{len(selected_bsps)}"
     print(f"\nUsing BSP set name: {bsp_set_name}", file=sys.stderr)
+    if basis != animal_name:
+        print(
+            f"  Schema keyed by basis '{basis}' (champion-independent).",
+            file=sys.stderr,
+        )
 
     # Determine output paths — always bsp_labels-{bsp_set_name}.pt (no hook/opponents in name)
     data_dir = meta_path.parent
@@ -239,7 +257,7 @@ def main():
         output_path = Path(args["--output"])
 
     if args["--schema-out"] == "auto" or args["--schema-out"] is None:
-        schema_path = data_dir / f"bsp_schema-{bsp_set_name}.json"
+        schema_path = data_dir / f"bsp_schema-{schema_basis_name}.json"
     else:
         schema_path = Path(args["--schema-out"])
 
@@ -247,10 +265,11 @@ def main():
     torch.save(torch.from_numpy(bsp_labels), output_path)
     print(f"Saved BSP labels to: {output_path}", file=sys.stderr)
 
-    # Save schema
+    # Save schema (basis-keyed; content is identical across champion
+    # distributions, so overwriting an existing basis schema is a no-op).
     schema_doc = {
-        "bsp_set_name": bsp_set_name,
-        "animal": animal_name,
+        "bsp_set_name": schema_basis_name,
+        "animal": basis,
         "game": game,
         "num_bsps": len(selected_bsps),
         "categories": category_summary,

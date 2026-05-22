@@ -183,8 +183,11 @@ When working with conv hooks, activations may be flattened (`B, C, H, W` → `B*
 These naming rules are project-specific and are required for files to flow through the auto-resolution logic in `sae_eval.py`:
 
 - **Position datasets** use the **metals** theme (`copper, bronze, iron, steel, amalgam`), one metal per opponent-mode mixture. `amalgam` = combined+deduped across all four modes.
-- **BSP sets** use the **animals** theme (`gorilla` = full 164, `hawk_173` = reframed Nanda-style threat set, `fox` = cells/phase only, etc.).
-- Filename patterns: `positions-<metal>_unique.pt`, `bsp_labels-<animal>_<count>.pt`, `bsp_schema-<animal>_<count>.json`.
+- **BSP sets** use the **animals** theme (`gorilla` = full 164, `hawk_173` = reframed Nanda-style threat set, `fox` = cells/phase only, etc.). An animal name is `{basis}{ChampionSuffix?}`: the **basis** (`gorilla`, `hawk`, `fox`) defines the concept menu; the optional **champion suffix** (`S4`, `Ta`, `Aa`) identifies the position distribution used to compute the labels.
+- Filename patterns:
+  - `positions-<metal>_unique.pt` — position dataset.
+  - `bsp_labels-<animal>_<count>.pt` — per-distribution label tensor (animal carries the champion suffix).
+  - `bsp_schema-<basis>_<count>.json` — **basis-only**; the schema is identical across champion distributions. `sae_eval.py` and `export_viz_data.py` fall back from the suffixed lookup to the basis schema automatically.
 - **Follow-up SAE run IDs** (from 2026-04-24): `{Major}{Minor}-{tag}-s{seed}`, e.g. `A01-random-control-s42`. The trainer appends `-{arch}-{hook}` to that stem, so do **not** include arch/hook/expansion in `experiment:`. New `{Major}{Minor}` whenever the *condition* (hook, arch family, data source, purpose) changes; only `s{seed}` varies for replicates. See `configs/followup/README.md` and `Quarto-specifications.md` for the policy.
 - Binary attribute suffixes follow quartopy enum naming: `_tall`, `_black`, `_square`, `_with_hole` (positives only — negative complements are not currently probed; this is a known gap).
 
