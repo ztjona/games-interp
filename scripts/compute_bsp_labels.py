@@ -129,30 +129,50 @@ def main():
                 name_part = output_stem[len("bsp_labels-") :]
                 animal_name = name_part.rsplit("_", 1)[0]
     if animal_name:
-        animal_name = animal_name.strip().lower()
+        animal_name = animal_name.strip()
 
     bsp_sets = getattr(game_mod, "BSP_SETS", {})
 
+    # Resolve basis: animal_name is either {basis} (e.g. 'tiger', 'gorilla') or
+    # {basis}{ChampionSuffix} (e.g. 'tigerS4', 'gorillaTa'). Basis is the
+    # longest BSP_SETS key that is a case-insensitive prefix of animal_name.
+    # Used for the category-filter lookup AND for the schema filename (which is
+    # basis-only by convention; see CLAUDE.md § Domain conventions).
+    basis: str | None = None
+    if animal_name and bsp_sets:
+        lower = animal_name.lower()
+        candidates = [b for b in bsp_sets if lower.startswith(b)]
+        if candidates:
+            basis = max(candidates, key=len)
+
     # Parse category filters. Precedence:
     #   1. --only-categories (explicit) wins.
-    #   2. --name X with X in BSP_SETS auto-resolves to those categories.
+    #   2. --name X resolves to BSP_SETS[basis(X)] when X starts with a known basis.
     #   3. Fallback to all BSPs (legacy), with a stderr warning — see
     #      CLAUDE.md "Things that have bitten" for why this matters.
     include_cats = None
     if args["--only-categories"]:
         include_cats = [c.strip() for c in args["--only-categories"].split(",")]
-        if animal_name and animal_name in bsp_sets and set(include_cats) != set(bsp_sets[animal_name]):
+        if basis and set(include_cats) != set(bsp_sets[basis]):
             print(
-                f"WARNING: --name '{animal_name}' implies categories {bsp_sets[animal_name]} "
-                f"but --only-categories {include_cats} was given. Using --only-categories.",
+                f"WARNING: --name '{animal_name}' (basis '{basis}') implies categories "
+                f"{bsp_sets[basis]} but --only-categories {include_cats} was given. "
+                f"Using --only-categories.",
                 file=sys.stderr,
             )
-    elif animal_name and animal_name in bsp_sets:
-        include_cats = list(bsp_sets[animal_name])
-        print(
-            f"--name '{animal_name}' resolved to {len(include_cats)} categories: {include_cats}",
-            file=sys.stderr,
-        )
+    elif basis:
+        include_cats = list(bsp_sets[basis])
+        if basis == animal_name:
+            print(
+                f"--name '{animal_name}' resolved to {len(include_cats)} categories: {include_cats}",
+                file=sys.stderr,
+            )
+        else:
+            print(
+                f"--name '{animal_name}' resolved via basis '{basis}' to "
+                f"{len(include_cats)} categories: {include_cats}",
+                file=sys.stderr,
+            )
     else:
         known = sorted(bsp_sets.keys())
         print(
@@ -230,21 +250,15 @@ def main():
     # Labels are per-distribution → file keyed by the (possibly suffixed)
     # animal_name. Schema is distribution-independent → file keyed by the
     # basis only (e.g. ``gorilla``, not ``gorillaS4``); see CLAUDE.md §
-    # "Domain conventions".
-    basis = animal_name
-    if bsp_sets and animal_name not in bsp_sets:
-        # animal looks like {basis}{ChampionSuffix} (e.g. gorillaS4) — strip
-        # the suffix by matching the longest known basis prefix.
-        candidates = [b for b in bsp_sets if animal_name.startswith(b)]
-        if candidates:
-            basis = max(candidates, key=len)
-
+    # "Domain conventions". ``basis`` is resolved above; fall back to
+    # animal_name when no known basis matches (legacy / one-off sets).
+    schema_key = basis if basis else animal_name
     bsp_set_name = f"{animal_name}_{len(selected_bsps)}"
-    schema_basis_name = f"{basis}_{len(selected_bsps)}"
+    schema_basis_name = f"{schema_key}_{len(selected_bsps)}"
     print(f"\nUsing BSP set name: {bsp_set_name}", file=sys.stderr)
-    if basis != animal_name:
+    if schema_key != animal_name:
         print(
-            f"  Schema keyed by basis '{basis}' (champion-independent).",
+            f"  Schema keyed by basis '{schema_key}' (champion-independent).",
             file=sys.stderr,
         )
 

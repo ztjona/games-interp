@@ -90,23 +90,25 @@ Either way is informative.
 
    ```bash
    python scripts/compute_bsp_labels.py \
-       data/quarto/positions-amalgam_s4.pt \
+       data/quarto/positions-amalgam_s4_unique.pt \
        --game quarto --name tigerS4
    python scripts/compute_bsp_labels.py \
-       data/quarto/positions-amalgam_ta.pt \
+       data/quarto/positions-amalgam_ta_unique.pt \
        --game quarto --name tigerTa
    ```
 
-   Produces `data/quarto/bsp_labels-tiger{S4,Ta}_<N>.pt` and a basis
-   schema `bsp_schema-tiger_<N>.json`.
+   Produces `data/quarto/bsp_labels-tigerS4_36.pt`, `bsp_labels-tigerTa_36.pt`,
+   and the basis schema `bsp_schema-tiger_36.json` (shared, written once).
+   `--name tigerS4` auto-resolves to the `tiger` category list via the
+   basis-prefix lookup in `BSP_SETS`.
 
 4. Run an **LP baseline** against tiger first:
 
    ```bash
    python scripts/linear_probe_baseline.py \
        data/quarto/s4.fc1_amalgam_s4_activations.pt \
-       data/quarto/bsp_labels-tigerS4_<N>.pt \
-       data/quarto/bsp_schema-tiger_<N>.json
+       data/quarto/bsp_labels-tigerS4_36.pt \
+       data/quarto/bsp_schema-tiger_36.json
    # ...and the conv2 / Ta variants
    ```
 
