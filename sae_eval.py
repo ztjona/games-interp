@@ -180,6 +180,28 @@ def _save_registry(game: str, registry: dict[str, Any]) -> None:
         json.dump(registry, f, indent=2)
 
 
+def _locked_registry_update(game: str, key: str, value: Any) -> None:
+    """Atomic read-modify-write with file locking for parallel safety."""
+    import msvcrt
+    path = _registry_path(game)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    lock_path = path.with_suffix(".lock")
+    with open(lock_path, "w") as lf:
+        msvcrt.locking(lf.fileno(), msvcrt.LK_LOCK, 1)
+        try:
+            registry = {}
+            if path.exists():
+                with open(path, "r") as f:
+                    registry = json.load(f)
+            registry[key] = value
+            tmp = path.with_suffix(".tmp")
+            with open(tmp, "w") as f:
+                json.dump(registry, f, indent=2)
+            tmp.replace(path)
+        finally:
+            msvcrt.locking(lf.fileno(), msvcrt.LK_UNLCK, 1)
+
+
 def _register_eval(
     run_id: str,
     game: str,
@@ -194,8 +216,7 @@ def _register_eval(
     Registry keys use the format ``run_id:bsp_set`` so the same checkpoint can
     be evaluated against multiple BSP sets without overwriting previous results.
     """
-    registry = _load_registry(game)
-    registry[f"{run_id}:{bsp_set}"] = {
+    entry = {
         "timestamp": datetime.now().isoformat(),
         "run_id": run_id,
         "checkpoint": checkpoint_path,
@@ -207,7 +228,7 @@ def _register_eval(
         "tag": tag or "",
         "metrics": metrics,
     }
-    _save_registry(game, registry)
+    _locked_registry_update(game, f"{run_id}:{bsp_set}", entry)
 
 
 # ---------------------------------------------------------------------------

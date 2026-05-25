@@ -11,7 +11,30 @@
 
 ## Project State
 
-### 2026-05-22 (Tiger reframing audit closed) — current
+### 2026-05-25 (Anchored SAE sweep I/J complete) — current
+
+**Active phase:** Anchored SAE sweep on champTa fc1 / tigerTa complete. 24 configs (I01–I04 anchored-jumprelu + J01–J04 anchored-batchtopk, 3 seeds each) trained and evaluated against tigerTa, gorillaTa, and hawkTa.
+
+**Headline result: anchored-jumprelu at lambda_high=1.0 (I04) is the clear winner.** TigerTa F1-lift jumps from 0.158 (unanchored F04 baseline) to 0.255 (+62% relative); MCC from 0.333 to 0.494 (+48%). GorillaTa drops modestly (0.177 -> 0.166, -6%); hawkTa *improves* (0.172 -> 0.184, +7% — tiger/hawk threat overlap).
+
+Anchor slot analysis (`scripts/anchor_analysis.py`) on the best run (I04-lh100-s43):
+- **36/36 anchor slots alive** (vs 19.6% free-slot alive rate)
+- **25/36 anchor slots are the best feature for their assigned BSP**
+- Best categories: offered_completing_attr (F1=0.590, all 4 best), square_winnable (F1=0.405, all 9 best)
+- Weak category: line_winnable (F1=0.220, only 6/10 best) — diagonal lines failed (F1<0.04), consistent with fc1 bottleneck losing spatial info
+- 12/36 polysemantic, but semantically coherent (correlated threat concepts sharing directions)
+- Cross-BSP: anchor features cover 53.7% of gorillaTa BSPs (incidental), only 1.2% of hawkTa
+
+**Anchored-batchtopk (J-series) underperforms** — weak gains on tigerTa, hurts gorilla/hawk at high lambda. The rigid top-k constraint conflicts with anchor pressure.
+
+**Low lambdas (0.03, 0.10) are counterproductive** — not enough steering to overcome the training perturbation.
+
+Infrastructure fixes during this sweep: `run_sweep.py` path prediction for anchored architectures, `--skip-existing` + `--eval` interaction, file-locked registry writes for parallel safety.
+
+Full results diary entry: [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md).
+Anchor analysis JSON: `saes/quarto/analysis/I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1_anchor-tigerTa.json`.
+
+### 2026-05-22 (Tiger reframing audit closed)
 
 **Active phase:** Tiger reframing audit complete. Labels computed for both champions (`bsp_labels-tigerS4_36.pt`, `bsp_labels-tigerTa_36.pt`); 8 LP baselines and 16 SAE re-evaluations (F04, E05, H01–H06 × {S4, Ta}) all landed. **Pre-registered decision rule fires unambiguously: target-set mismatch was contributing.** Tiger conv2/Ta SAE/LP efficiency is **36 %** (vs the 11 % conv2/hawk wall = **+25 pp**); tiger conv2/S4 efficiency is **62 %** (**+51 pp** above the hawk wall). The decision rule output: *anchored / matryoshka should target tiger, not hawk, as the supervision signal.*
 

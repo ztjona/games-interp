@@ -295,23 +295,25 @@ def main():
         # Skip existing
         if args["skip_existing"] and out_path.exists():
             log(f"[{i}/{total}] SKIP {name} -- {out_path} exists")
-            continue
-
-        log(f"[{i}/{total}] TRAIN {name}")
-
-        if args["dry_run"]:
-            log(f"  -> would produce {out_path}")
-            if args["eval"]:
-                log(f"  -> would evaluate with {args['bsps']}")
-            continue
-
-        # Train
-        ok, info, wall = run_training(cfg_path, device, timeout=args["timeout"])
-        if ok:
-            log(f"  [OK] trained in {wall:.0f}s -> {out_path}")
+            if not args["eval"]:
+                continue
+            # fall through to eval
         else:
-            log(f"  [FAIL] FAILED in {wall:.0f}s: {info}")
-            continue  # Skip eval if training failed
+            log(f"[{i}/{total}] TRAIN {name}")
+
+            if args["dry_run"]:
+                log(f"  -> would produce {out_path}")
+                if args["eval"]:
+                    log(f"  -> would evaluate with {args['bsps']}")
+                continue
+
+            # Train
+            ok, info, wall = run_training(cfg_path, device, timeout=args["timeout"])
+            if ok:
+                log(f"  [OK] trained in {wall:.0f}s -> {out_path}")
+            else:
+                log(f"  [FAIL] FAILED in {wall:.0f}s: {info}")
+                continue  # Skip eval if training failed
 
         # Evaluate
         if args["eval"] and out_path.exists():

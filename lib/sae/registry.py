@@ -1,6 +1,7 @@
 """Training experiment registry for SAE runs."""
 
 import json
+import msvcrt
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -18,15 +19,7 @@ def register_training_run(
 ) -> None:
     """Register a completed training run in the experiment registry.
 
-    Args:
-        experiment: Experiment name (e.g., "pilot", "sweep1")
-        architecture: SAE architecture (e.g., "vanilla", "topk")
-        game: Game name (e.g., "quarto")
-        hook: Hook point name (e.g., "fc1")
-        checkpoint_path: Path to saved checkpoint
-        hyperparams: Dict of hyperparameters (expansion, lr, seed, etc.)
-        final_metrics: Dict of final metrics (loss, fvu, l0, dead_features_pct)
-        registry_path: Optional custom registry path (default: saes/{game}/training_registry.json)
+    Uses file locking for parallel-safe read-modify-write.
     """
     if registry_path is None:
         registry_path = f"saes/{game}/training_registry.json"
@@ -34,18 +27,8 @@ def register_training_run(
     registry_file = Path(registry_path)
     registry_file.parent.mkdir(parents=True, exist_ok=True)
 
-    # Load existing registry
-    if registry_file.exists():
-        with open(registry_file, "r") as f:
-            registry = json.load(f)
-    else:
-        registry = {}
-
-    # Create run ID
     run_id = Path(checkpoint_path).stem
-
-    # Add new entry
-    registry[run_id] = {
+    entry = {
         "experiment": experiment,
         "architecture": architecture,
         "game": game,
@@ -56,8 +39,20 @@ def register_training_run(
         "final_metrics": final_metrics,
     }
 
-    # Save registry
-    with open(registry_file, "w") as f:
-        json.dump(registry, f, indent=2)
+    lock_path = registry_file.with_suffix(".lock")
+    with open(lock_path, "w") as lf:
+        msvcrt.locking(lf.fileno(), msvcrt.LK_LOCK, 1)
+        try:
+            registry = {}
+            if registry_file.exists():
+                with open(registry_file, "r") as f:
+                    registry = json.load(f)
+            registry[run_id] = entry
+            tmp = registry_file.with_suffix(".tmp")
+            with open(tmp, "w") as f:
+                json.dump(registry, f, indent=2)
+            tmp.replace(registry_file)
+        finally:
+            msvcrt.locking(lf.fileno(), msvcrt.LK_UNLCK, 1)
 
     print(f"Registered training run: {run_id}")

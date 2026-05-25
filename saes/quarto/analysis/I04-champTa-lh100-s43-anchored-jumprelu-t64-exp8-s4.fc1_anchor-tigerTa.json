@@ -1,0 +1,6302 @@
+{
+  "summary": {
+    "run_id": "I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1",
+    "anchor_bsp_set": "tigerTa",
+    "n_anchors": 36,
+    "d_dict": 4096,
+    "n_samples": 88524,
+    "anchor_config": {
+      "anchor_lambda_high": 1.0,
+      "anchor_lambda_medium": 0.333,
+      "anchor_loss": "bce",
+      "anchor_index_mode": "prefix",
+      "anchor_high_categories": [
+        "tiger_square_winnable",
+        "tiger_offered_completing_attr",
+        "tiger_line_winnable"
+      ],
+      "anchor_tier_counts": {
+        "high": 23,
+        "medium": 13
+      }
+    },
+    "anchor_alive": 36,
+    "anchor_alive_pct": 100.0,
+    "free_alive": 795,
+    "free_alive_pct": 19.6,
+    "anchor_mean_freq": 16.912,
+    "free_mean_freq": 1.473,
+    "best_match_count": 25,
+    "polysemantic_count": 12,
+    "free_beats_anchor_count": 3
+  },
+  "categories": {
+    "tiger_decision_global": {
+      "tier": "medium",
+      "n": 5,
+      "alive": 5,
+      "best_match": 2,
+      "mean_f1": 0.6587,
+      "mean_mcc": 0.5837
+    },
+    "tiger_line_winnable": {
+      "tier": "high",
+      "n": 10,
+      "alive": 10,
+      "best_match": 6,
+      "mean_f1": 0.2202,
+      "mean_mcc": 0.2281
+    },
+    "tiger_offered_completing_attr": {
+      "tier": "high",
+      "n": 4,
+      "alive": 4,
+      "best_match": 4,
+      "mean_f1": 0.59,
+      "mean_mcc": 0.578
+    },
+    "tiger_pool_safe_count": {
+      "tier": "medium",
+      "n": 4,
+      "alive": 4,
+      "best_match": 3,
+      "mean_f1": 0.8672,
+      "mean_mcc": 0.6962
+    },
+    "tiger_pool_winning_count": {
+      "tier": "medium",
+      "n": 4,
+      "alive": 4,
+      "best_match": 1,
+      "mean_f1": 0.817,
+      "mean_mcc": 0.6868
+    },
+    "tiger_square_winnable": {
+      "tier": "high",
+      "n": 9,
+      "alive": 9,
+      "best_match": 9,
+      "mean_f1": 0.4047,
+      "mean_mcc": 0.4103
+    }
+  },
+  "slots": [
+    {
+      "slot": 0,
+      "bsp_id": "tiger_win_now_exists",
+      "category": "tiger_decision_global",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.363224,
+      "f1": 0.799,
+      "precision": 0.8498,
+      "recall": 0.7539,
+      "mcc": 0.6764,
+      "is_best_feature": false,
+      "best_feature_index": 1,
+      "best_feature_f1": 0.8081,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.7679
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.6518
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.3116
+        },
+        {
+          "bsp_index": 8,
+          "bsp_id": "tiger_offered_completes_with_hole",
+          "f1": 0.3071
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.7679
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.7572
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.6839
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.6518
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.3116
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.6518
+        }
+      ]
+    },
+    {
+      "slot": 1,
+      "bsp_id": "tiger_opp_winning_offer_exists",
+      "category": "tiger_decision_global",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.542113,
+      "f1": 0.9004,
+      "precision": 0.9173,
+      "recall": 0.8841,
+      "mcc": 0.7783,
+      "is_best_feature": true,
+      "best_feature_index": 1,
+      "best_feature_f1": 0.9004,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.8081
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.5071
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.5258
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.9004
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.8917
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.784
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.5071
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.5258
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.4419
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.5071
+        }
+      ]
+    },
+    {
+      "slot": 2,
+      "bsp_id": "tiger_lose_next_forced",
+      "category": "tiger_decision_global",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.158228,
+      "f1": 0.7085,
+      "precision": 0.7667,
+      "recall": 0.6585,
+      "mcc": 0.6514,
+      "is_best_feature": false,
+      "best_feature_index": 31,
+      "best_feature_f1": 0.73,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.5153
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.4332
+        },
+        {
+          "bsp_index": 5,
+          "bsp_id": "tiger_offered_completes_tall",
+          "f1": 0.3114
+        },
+        {
+          "bsp_index": 7,
+          "bsp_id": "tiger_offered_completes_square",
+          "f1": 0.303
+        },
+        {
+          "bsp_index": 8,
+          "bsp_id": "tiger_offered_completes_with_hole",
+          "f1": 0.3033
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.4332
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.4211
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.3495
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.7085
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.7085
+        }
+      ]
+    },
+    {
+      "slot": 3,
+      "bsp_id": "tiger_safe_offer_exists",
+      "category": "tiger_decision_global",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.003027,
+      "f1": 0.0074,
+      "precision": 0.9963,
+      "recall": 0.0037,
+      "mcc": 0.0258,
+      "is_best_feature": false,
+      "best_feature_index": 32,
+      "best_feature_f1": 0.9375
+    },
+    {
+      "slot": 4,
+      "bsp_id": "tiger_every_offer_safe",
+      "category": "tiger_decision_global",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.423817,
+      "f1": 0.8781,
+      "precision": 0.8909,
+      "recall": 0.8656,
+      "mcc": 0.7864,
+      "is_best_feature": true,
+      "best_feature_index": 4,
+      "best_feature_f1": 0.8781,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.6845
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.6845
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.7274
+        },
+        {
+          "bsp_index": 34,
+          "bsp_id": "tiger_pool_safe_count_ge4",
+          "f1": 0.8167
+        }
+      ]
+    },
+    {
+      "slot": 5,
+      "bsp_id": "tiger_offered_completes_tall",
+      "category": "tiger_offered_completing_attr",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.05124,
+      "f1": 0.5957,
+      "precision": 0.756,
+      "recall": 0.4915,
+      "mcc": 0.5841,
+      "is_best_feature": true,
+      "best_feature_index": 5,
+      "best_feature_f1": 0.5957
+    },
+    {
+      "slot": 6,
+      "bsp_id": "tiger_offered_completes_black",
+      "category": "tiger_offered_completing_attr",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.051647,
+      "f1": 0.5914,
+      "precision": 0.7515,
+      "recall": 0.4875,
+      "mcc": 0.5792,
+      "is_best_feature": true,
+      "best_feature_index": 6,
+      "best_feature_f1": 0.5914
+    },
+    {
+      "slot": 7,
+      "bsp_id": "tiger_offered_completes_square",
+      "category": "tiger_offered_completing_attr",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.049275,
+      "f1": 0.581,
+      "precision": 0.7547,
+      "recall": 0.4723,
+      "mcc": 0.5714,
+      "is_best_feature": true,
+      "best_feature_index": 7,
+      "best_feature_f1": 0.581
+    },
+    {
+      "slot": 8,
+      "bsp_id": "tiger_offered_completes_with_hole",
+      "category": "tiger_offered_completing_attr",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.054313,
+      "f1": 0.5919,
+      "precision": 0.7436,
+      "recall": 0.4917,
+      "mcc": 0.5773,
+      "is_best_feature": true,
+      "best_feature_index": 8,
+      "best_feature_f1": 0.5919
+    },
+    {
+      "slot": 9,
+      "bsp_id": "tiger_line_row_0_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.018775,
+      "f1": 0.252,
+      "precision": 0.4356,
+      "recall": 0.1772,
+      "mcc": 0.2568,
+      "is_best_feature": true,
+      "best_feature_index": 9,
+      "best_feature_f1": 0.252
+    },
+    {
+      "slot": 10,
+      "bsp_id": "tiger_line_row_1_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.01708,
+      "f1": 0.2824,
+      "precision": 0.4987,
+      "recall": 0.197,
+      "mcc": 0.2952,
+      "is_best_feature": true,
+      "best_feature_index": 10,
+      "best_feature_f1": 0.2824
+    },
+    {
+      "slot": 11,
+      "bsp_id": "tiger_line_row_2_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.017498,
+      "f1": 0.3031,
+      "precision": 0.5261,
+      "recall": 0.2129,
+      "mcc": 0.3168,
+      "is_best_feature": true,
+      "best_feature_index": 11,
+      "best_feature_f1": 0.3031
+    },
+    {
+      "slot": 12,
+      "bsp_id": "tiger_line_row_3_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.017679,
+      "f1": 0.2543,
+      "precision": 0.4626,
+      "recall": 0.1754,
+      "mcc": 0.2647,
+      "is_best_feature": true,
+      "best_feature_index": 12,
+      "best_feature_f1": 0.2543
+    },
+    {
+      "slot": 13,
+      "bsp_id": "tiger_line_col_0_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.01708,
+      "f1": 0.2319,
+      "precision": 0.4332,
+      "recall": 0.1584,
+      "mcc": 0.2414,
+      "is_best_feature": false,
+      "best_feature_index": 2452,
+      "best_feature_f1": 0.2572
+    },
+    {
+      "slot": 14,
+      "bsp_id": "tiger_line_col_1_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.018684,
+      "f1": 0.3005,
+      "precision": 0.5024,
+      "recall": 0.2144,
+      "mcc": 0.3093,
+      "is_best_feature": true,
+      "best_feature_index": 14,
+      "best_feature_f1": 0.3005
+    },
+    {
+      "slot": 15,
+      "bsp_id": "tiger_line_col_2_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.018933,
+      "f1": 0.3026,
+      "precision": 0.5054,
+      "recall": 0.216,
+      "mcc": 0.3113,
+      "is_best_feature": true,
+      "best_feature_index": 15,
+      "best_feature_f1": 0.3026
+    },
+    {
+      "slot": 16,
+      "bsp_id": "tiger_line_col_3_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.017227,
+      "f1": 0.2108,
+      "precision": 0.3889,
+      "recall": 0.1446,
+      "mcc": 0.2157,
+      "is_best_feature": false,
+      "best_feature_index": 2512,
+      "best_feature_f1": 0.241
+    },
+    {
+      "slot": 17,
+      "bsp_id": "tiger_line_diag_main_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.00706,
+      "f1": 0.0402,
+      "precision": 0.152,
+      "recall": 0.0232,
+      "mcc": 0.0424,
+      "is_best_feature": false,
+      "best_feature_index": 537,
+      "best_feature_f1": 0.2229
+    },
+    {
+      "slot": 18,
+      "bsp_id": "tiger_line_diag_anti_winnable",
+      "category": "tiger_line_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.004677,
+      "f1": 0.0241,
+      "precision": 0.1304,
+      "recall": 0.0133,
+      "mcc": 0.0277,
+      "is_best_feature": false,
+      "best_feature_index": 31,
+      "best_feature_f1": 0.2167
+    },
+    {
+      "slot": 19,
+      "bsp_id": "tiger_square_0_0_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.022288,
+      "f1": 0.4164,
+      "precision": 0.6001,
+      "recall": 0.3188,
+      "mcc": 0.4203,
+      "is_best_feature": true,
+      "best_feature_index": 19,
+      "best_feature_f1": 0.4164
+    },
+    {
+      "slot": 20,
+      "bsp_id": "tiger_square_0_1_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.022356,
+      "f1": 0.4231,
+      "precision": 0.6089,
+      "recall": 0.3242,
+      "mcc": 0.4274,
+      "is_best_feature": true,
+      "best_feature_index": 20,
+      "best_feature_f1": 0.4231
+    },
+    {
+      "slot": 21,
+      "bsp_id": "tiger_square_0_2_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.021746,
+      "f1": 0.4009,
+      "precision": 0.5943,
+      "recall": 0.3025,
+      "mcc": 0.4066,
+      "is_best_feature": true,
+      "best_feature_index": 21,
+      "best_feature_f1": 0.4009
+    },
+    {
+      "slot": 22,
+      "bsp_id": "tiger_square_1_0_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.020864,
+      "f1": 0.3926,
+      "precision": 0.5912,
+      "recall": 0.2939,
+      "mcc": 0.3998,
+      "is_best_feature": true,
+      "best_feature_index": 22,
+      "best_feature_f1": 0.3926
+    },
+    {
+      "slot": 23,
+      "bsp_id": "tiger_square_1_1_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.021847,
+      "f1": 0.4405,
+      "precision": 0.62,
+      "recall": 0.3416,
+      "mcc": 0.4444,
+      "is_best_feature": true,
+      "best_feature_index": 23,
+      "best_feature_f1": 0.4405
+    },
+    {
+      "slot": 24,
+      "bsp_id": "tiger_square_1_2_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.022288,
+      "f1": 0.4277,
+      "precision": 0.6133,
+      "recall": 0.3284,
+      "mcc": 0.4321,
+      "is_best_feature": true,
+      "best_feature_index": 24,
+      "best_feature_f1": 0.4277
+    },
+    {
+      "slot": 25,
+      "bsp_id": "tiger_square_2_0_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.019599,
+      "f1": 0.3503,
+      "precision": 0.562,
+      "recall": 0.2544,
+      "mcc": 0.3604,
+      "is_best_feature": true,
+      "best_feature_index": 25,
+      "best_feature_f1": 0.3503
+    },
+    {
+      "slot": 26,
+      "bsp_id": "tiger_square_2_1_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.02213,
+      "f1": 0.4289,
+      "precision": 0.6126,
+      "recall": 0.3299,
+      "mcc": 0.4331,
+      "is_best_feature": true,
+      "best_feature_index": 26,
+      "best_feature_f1": 0.4289
+    },
+    {
+      "slot": 27,
+      "bsp_id": "tiger_square_2_2_winnable",
+      "category": "tiger_square_winnable",
+      "tier": "high",
+      "alive": true,
+      "firing_rate": 0.020559,
+      "f1": 0.362,
+      "precision": 0.5577,
+      "recall": 0.268,
+      "mcc": 0.3686,
+      "is_best_feature": true,
+      "best_feature_index": 27,
+      "best_feature_f1": 0.362
+    },
+    {
+      "slot": 28,
+      "bsp_id": "tiger_pool_winning_count_ge1",
+      "category": "tiger_pool_winning_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.541808,
+      "f1": 0.8995,
+      "precision": 0.9167,
+      "recall": 0.883,
+      "mcc": 0.7765,
+      "is_best_feature": false,
+      "best_feature_index": 1,
+      "best_feature_f1": 0.9004,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.8073
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.8995
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.5072
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.5255
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.8909
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.7835
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.5072
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.5255
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.4416
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.5072
+        }
+      ]
+    },
+    {
+      "slot": 29,
+      "bsp_id": "tiger_pool_winning_count_ge2",
+      "category": "tiger_pool_winning_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.527202,
+      "f1": 0.8827,
+      "precision": 0.905,
+      "recall": 0.8615,
+      "mcc": 0.746,
+      "is_best_feature": false,
+      "best_feature_index": 1,
+      "best_feature_f1": 0.8917,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.8039
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.8915
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.5169
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.5098
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.8915
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.7784
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.5169
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.5098
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.4245
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.5169
+        }
+      ]
+    },
+    {
+      "slot": 30,
+      "bsp_id": "tiger_pool_winning_count_ge4",
+      "category": "tiger_pool_winning_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.457447,
+      "f1": 0.7558,
+      "precision": 0.7443,
+      "recall": 0.7675,
+      "mcc": 0.5558,
+      "is_best_feature": false,
+      "best_feature_index": 1,
+      "best_feature_f1": 0.784,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.7811
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.8455
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.5413
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.4456
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.8455
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.8403
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.5413
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.4456
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.3584
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.5413
+        }
+      ]
+    },
+    {
+      "slot": 31,
+      "bsp_id": "tiger_pool_winning_count_all",
+      "category": "tiger_pool_winning_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.184233,
+      "f1": 0.73,
+      "precision": 0.73,
+      "recall": 0.7301,
+      "mcc": 0.6691,
+      "is_best_feature": true,
+      "best_feature_index": 31,
+      "best_feature_f1": 0.73,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.5691
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.4874
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.73
+        },
+        {
+          "bsp_index": 5,
+          "bsp_id": "tiger_offered_completes_tall",
+          "f1": 0.3186
+        },
+        {
+          "bsp_index": 7,
+          "bsp_id": "tiger_offered_completes_square",
+          "f1": 0.3104
+        },
+        {
+          "bsp_index": 8,
+          "bsp_id": "tiger_offered_completes_with_hole",
+          "f1": 0.3132
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.4874
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.4756
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.4069
+        },
+        {
+          "bsp_index": 35,
+          "bsp_id": "tiger_pool_safe_count_eq0",
+          "f1": 0.73
+        }
+      ]
+    },
+    {
+      "slot": 32,
+      "bsp_id": "tiger_pool_safe_count_ge1",
+      "category": "tiger_pool_safe_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.813079,
+      "f1": 0.9375,
+      "precision": 0.9383,
+      "recall": 0.9367,
+      "mcc": 0.6645,
+      "is_best_feature": true,
+      "best_feature_index": 32,
+      "best_feature_f1": 0.9375,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.3909
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.5495
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.9375
+        },
+        {
+          "bsp_index": 4,
+          "bsp_id": "tiger_every_offer_safe",
+          "f1": 0.6966
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.5495
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.5498
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.4997
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.9232
+        },
+        {
+          "bsp_index": 34,
+          "bsp_id": "tiger_pool_safe_count_ge4",
+          "f1": 0.8424
+        }
+      ]
+    },
+    {
+      "slot": 33,
+      "bsp_id": "tiger_pool_safe_count_ge2",
+      "category": "tiger_pool_safe_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.773158,
+      "f1": 0.9295,
+      "precision": 0.9099,
+      "recall": 0.95,
+      "mcc": 0.7133,
+      "is_best_feature": true,
+      "best_feature_index": 33,
+      "best_feature_f1": 0.9295,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.3473
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.5067
+        },
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.9328
+        },
+        {
+          "bsp_index": 4,
+          "bsp_id": "tiger_every_offer_safe",
+          "f1": 0.719
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.5067
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.5074
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.4586
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.9328
+        },
+        {
+          "bsp_index": 34,
+          "bsp_id": "tiger_pool_safe_count_ge4",
+          "f1": 0.8628
+        }
+      ]
+    },
+    {
+      "slot": 34,
+      "bsp_id": "tiger_pool_safe_count_ge4",
+      "category": "tiger_pool_safe_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.598053,
+      "f1": 0.9053,
+      "precision": 0.9042,
+      "recall": 0.9065,
+      "mcc": 0.7649,
+      "is_best_feature": true,
+      "best_feature_index": 34,
+      "best_feature_f1": 0.9053,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 3,
+          "bsp_id": "tiger_safe_offer_exists",
+          "f1": 0.8431
+        },
+        {
+          "bsp_index": 4,
+          "bsp_id": "tiger_every_offer_safe",
+          "f1": 0.8239
+        },
+        {
+          "bsp_index": 32,
+          "bsp_id": "tiger_pool_safe_count_ge1",
+          "f1": 0.8431
+        },
+        {
+          "bsp_index": 33,
+          "bsp_id": "tiger_pool_safe_count_ge2",
+          "f1": 0.8782
+        }
+      ]
+    },
+    {
+      "slot": 35,
+      "bsp_id": "tiger_pool_safe_count_eq0",
+      "category": "tiger_pool_safe_count",
+      "tier": "medium",
+      "alive": true,
+      "firing_rate": 0.148073,
+      "f1": 0.6964,
+      "precision": 0.7814,
+      "recall": 0.628,
+      "mcc": 0.6422,
+      "is_best_feature": false,
+      "best_feature_index": 31,
+      "best_feature_f1": 0.73,
+      "cross_bsp_matches": [
+        {
+          "bsp_index": 0,
+          "bsp_id": "tiger_win_now_exists",
+          "f1": 0.4925
+        },
+        {
+          "bsp_index": 1,
+          "bsp_id": "tiger_opp_winning_offer_exists",
+          "f1": 0.4109
+        },
+        {
+          "bsp_index": 2,
+          "bsp_id": "tiger_lose_next_forced",
+          "f1": 0.6964
+        },
+        {
+          "bsp_index": 5,
+          "bsp_id": "tiger_offered_completes_tall",
+          "f1": 0.3052
+        },
+        {
+          "bsp_index": 7,
+          "bsp_id": "tiger_offered_completes_square",
+          "f1": 0.3026
+        },
+        {
+          "bsp_index": 28,
+          "bsp_id": "tiger_pool_winning_count_ge1",
+          "f1": 0.4109
+        },
+        {
+          "bsp_index": 29,
+          "bsp_id": "tiger_pool_winning_count_ge2",
+          "f1": 0.3987
+        },
+        {
+          "bsp_index": 30,
+          "bsp_id": "tiger_pool_winning_count_ge4",
+          "f1": 0.3261
+        },
+        {
+          "bsp_index": 31,
+          "bsp_id": "tiger_pool_winning_count_all",
+          "f1": 0.6964
+        }
+      ]
+    }
+  ],
+  "cross_bsp_analysis": {
+    "gorillaTa": {
+      "n_bsps": 164,
+      "anchor_hits_above_03": 711,
+      "cross_bsps_covered": 88,
+      "cross_bsps_covered_pct": 53.7,
+      "hits": [
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.5594
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.5608
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.5657
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.5663
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.5634
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.5734
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.5668
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.5594
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.5676
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.5636
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.5683
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.5607
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.5644
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.5705
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.5591
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.5562
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.3769
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.3695
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.3793
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 19,
+          "cross_bsp_id": "cell_0_0_with_hole",
+          "f1": 0.3717
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.3681
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3742
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3744
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3728
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3781
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3739
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3806
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.3841
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3807
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.3701
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3795
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3846
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3836
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3773
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.3814
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3731
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3796
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3896
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3693
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 39,
+          "cross_bsp_id": "cell_1_1_with_hole",
+          "f1": 0.3705
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3756
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3785
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3823
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.3864
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3744
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3709
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3738
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.365
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3821
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3749
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3813
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.3749
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.3808
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 53,
+          "cross_bsp_id": "cell_2_1_black",
+          "f1": 0.3755
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.3779
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.3701
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3803
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.3872
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 58,
+          "cross_bsp_id": "cell_2_2_square",
+          "f1": 0.3736
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.3839
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3729
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3736
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.3731
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.375
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3859
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.3842
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.3742
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3765
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3793
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.3734
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.3799
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3826
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3751
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3699
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3786
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3801
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 76,
+          "cross_bsp_id": "cell_3_3_tall",
+          "f1": 0.3677
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.3709
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.369
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 79,
+          "cross_bsp_id": "cell_3_3_with_hole",
+          "f1": 0.3768
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.4162
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.4205
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.4143
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.4267
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.7699
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.799
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.6014
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.6017
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.6042
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.6044
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.5989
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.6056
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.6033
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.5972
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.606
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.604
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.6016
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.5989
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.6054
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.6062
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.5985
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.6038
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.3817
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.3755
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.3886
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 19,
+          "cross_bsp_id": "cell_0_0_with_hole",
+          "f1": 0.3797
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.3727
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3767
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.377
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3749
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3826
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3792
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3816
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.383
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3792
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.3704
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3791
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3854
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3867
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3753
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.3782
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3781
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3732
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3833
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3706
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 39,
+          "cross_bsp_id": "cell_1_1_with_hole",
+          "f1": 0.3661
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3759
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3759
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3784
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.384
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3767
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3747
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.3712
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3845
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3705
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3806
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.3817
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.3808
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 53,
+          "cross_bsp_id": "cell_2_1_black",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.3767
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.3724
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3786
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.3839
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 58,
+          "cross_bsp_id": "cell_2_2_square",
+          "f1": 0.3698
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3779
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3718
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.377
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3764
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3862
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.386
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.3736
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.38
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3775
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.3797
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.3793
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3806
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3748
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3751
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3775
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3784
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 76,
+          "cross_bsp_id": "cell_3_3_tall",
+          "f1": 0.3747
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.3815
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.3778
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 79,
+          "cross_bsp_id": "cell_3_3_with_hole",
+          "f1": 0.3819
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.5141
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.5154
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.5139
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.5205
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.8887
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.8081
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.3982
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.4008
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.4042
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.4017
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.4033
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.4025
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.3936
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.4046
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.4123
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.3978
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.3914
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.4044
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.4024
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.4023
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.4032
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.3964
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.3126
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.3031
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.309
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.304
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.306
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3087
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3102
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3129
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3115
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3214
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.3166
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3136
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.303
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3051
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3188
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3137
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3089
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.3167
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3159
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3073
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3097
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3023
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3012
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3017
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3049
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.3059
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3143
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3081
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3107
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.3096
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3209
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3118
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3178
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.311
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.3024
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.3069
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.3069
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3023
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.3039
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.3039
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3098
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3072
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.3102
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3125
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3216
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.316
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.305
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3229
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3068
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.3013
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.304
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3117
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3129
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3099
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3123
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3086
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.308
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.3001
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.3787
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 162,
+          "cross_bsp_id": "game_phase_late",
+          "f1": 0.3946
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.5153
+        },
+        {
+          "anchor_slot": 4,
+          "anchor_bsp": "tiger_every_offer_safe",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.4645
+        },
+        {
+          "anchor_slot": 4,
+          "anchor_bsp": "tiger_every_offer_safe",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.4633
+        },
+        {
+          "anchor_slot": 4,
+          "anchor_bsp": "tiger_every_offer_safe",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.4646
+        },
+        {
+          "anchor_slot": 4,
+          "anchor_bsp": "tiger_every_offer_safe",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.4575
+        },
+        {
+          "anchor_slot": 4,
+          "anchor_bsp": "tiger_every_offer_safe",
+          "cross_bsp_index": 160,
+          "cross_bsp_id": "game_phase_early",
+          "f1": 0.9059
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.6012
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.6026
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.6054
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.6034
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.5974
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.6047
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.6036
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.5975
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.6051
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.6024
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.6032
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.5993
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.6056
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.6071
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.5992
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.6033
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.38
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.3758
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.3869
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 19,
+          "cross_bsp_id": "cell_0_0_with_hole",
+          "f1": 0.3801
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.3732
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3766
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3774
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.375
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3828
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3797
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3823
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.3836
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3766
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.3685
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3781
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3855
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3851
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3746
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.378
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3762
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3744
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3829
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3715
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 39,
+          "cross_bsp_id": "cell_1_1_with_hole",
+          "f1": 0.365
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3773
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3763
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3781
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.383
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3761
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3769
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3748
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.371
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.383
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3693
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3805
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.3818
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.3786
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 53,
+          "cross_bsp_id": "cell_2_1_black",
+          "f1": 0.3735
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.3771
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.3718
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3802
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.3853
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 58,
+          "cross_bsp_id": "cell_2_2_square",
+          "f1": 0.371
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.3768
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3784
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3722
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.3762
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3756
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3861
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.3874
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.3731
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3802
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3807
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.3814
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.3787
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3827
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3756
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3762
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3764
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3789
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 76,
+          "cross_bsp_id": "cell_3_3_tall",
+          "f1": 0.3737
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.3814
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.3779
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 79,
+          "cross_bsp_id": "cell_3_3_with_hole",
+          "f1": 0.3806
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.5133
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.5161
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.5142
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.5202
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.8888
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.8073
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.5967
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.5978
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.6007
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.6028
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.5944
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.6069
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.6041
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.5933
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.6033
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.6065
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.6054
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.5962
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.6022
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.6049
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.5978
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.5985
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.3822
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.3745
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.3881
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 19,
+          "cross_bsp_id": "cell_0_0_with_hole",
+          "f1": 0.3797
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.373
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3743
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3757
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3811
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3773
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3797
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.383
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3772
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.3705
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3815
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3877
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3851
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3752
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.3785
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3757
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3762
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3847
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3728
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 39,
+          "cross_bsp_id": "cell_1_1_with_hole",
+          "f1": 0.3649
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3785
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3801
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3819
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.3878
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3757
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.3705
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3832
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3709
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3786
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.3813
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.384
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 53,
+          "cross_bsp_id": "cell_2_1_black",
+          "f1": 0.3769
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.3801
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.376
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3833
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.387
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 58,
+          "cross_bsp_id": "cell_2_2_square",
+          "f1": 0.3717
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.3778
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.377
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3706
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.3756
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3764
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3855
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.3882
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.3741
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3801
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3814
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.3808
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.3806
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3826
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3792
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3765
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3788
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3798
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 76,
+          "cross_bsp_id": "cell_3_3_tall",
+          "f1": 0.3742
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.38
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.374
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 79,
+          "cross_bsp_id": "cell_3_3_with_hole",
+          "f1": 0.38
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.5063
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.5087
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.5071
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.5113
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.885
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.8039
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.5717
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.57
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.5754
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.5822
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.5691
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.5903
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.585
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.5671
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.5797
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.5866
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.5854
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.5692
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.5804
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.5847
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.5663
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.5742
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.3725
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.367
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.3768
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 19,
+          "cross_bsp_id": "cell_0_0_with_hole",
+          "f1": 0.3701
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.3631
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3593
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3666
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3654
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3748
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3695
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3758
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.3761
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3698
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.3639
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3745
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3792
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3754
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3674
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.3685
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3666
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3791
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3802
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3718
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 39,
+          "cross_bsp_id": "cell_1_1_with_hole",
+          "f1": 0.3646
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3778
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3782
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3768
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.3845
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3679
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3675
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3693
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.3586
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3774
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3642
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3724
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.3717
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.3835
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 53,
+          "cross_bsp_id": "cell_2_1_black",
+          "f1": 0.3709
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.3813
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.3744
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3752
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.3809
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 58,
+          "cross_bsp_id": "cell_2_2_square",
+          "f1": 0.3708
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.3731
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3673
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3615
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.3652
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3686
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3792
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.3857
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.3682
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3737
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3757
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.3751
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.3787
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3767
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3686
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3613
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3677
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3699
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 76,
+          "cross_bsp_id": "cell_3_3_tall",
+          "f1": 0.3643
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.3707
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.3661
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 79,
+          "cross_bsp_id": "cell_3_3_with_hole",
+          "f1": 0.3769
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.4721
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.4756
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.4677
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.4724
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.8577
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.7811
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.4324
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.4365
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.4373
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.4362
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.4344
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.4377
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.4333
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.4379
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.4452
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.4279
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.4309
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.4387
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.4345
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.4385
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.4367
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.4304
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.3306
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 17,
+          "cross_bsp_id": "cell_0_0_black",
+          "f1": 0.3194
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 18,
+          "cross_bsp_id": "cell_0_0_square",
+          "f1": 0.326
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 19,
+          "cross_bsp_id": "cell_0_0_with_hole",
+          "f1": 0.3191
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 20,
+          "cross_bsp_id": "cell_0_1_tall",
+          "f1": 0.3279
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3247
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3283
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3288
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3313
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3288
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3352
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.3335
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.3341
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 29,
+          "cross_bsp_id": "cell_0_3_black",
+          "f1": 0.3225
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 30,
+          "cross_bsp_id": "cell_0_3_square",
+          "f1": 0.3256
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3394
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3269
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 33,
+          "cross_bsp_id": "cell_1_0_black",
+          "f1": 0.3251
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.334
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3308
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3232
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 37,
+          "cross_bsp_id": "cell_1_1_black",
+          "f1": 0.3302
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 38,
+          "cross_bsp_id": "cell_1_1_square",
+          "f1": 0.3198
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 39,
+          "cross_bsp_id": "cell_1_1_with_hole",
+          "f1": 0.3113
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 40,
+          "cross_bsp_id": "cell_1_2_tall",
+          "f1": 0.3231
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 41,
+          "cross_bsp_id": "cell_1_2_black",
+          "f1": 0.3259
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 42,
+          "cross_bsp_id": "cell_1_2_square",
+          "f1": 0.3267
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 43,
+          "cross_bsp_id": "cell_1_2_with_hole",
+          "f1": 0.3252
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3327
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 45,
+          "cross_bsp_id": "cell_1_3_black",
+          "f1": 0.3246
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3294
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.3252
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3351
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3251
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3334
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 51,
+          "cross_bsp_id": "cell_2_0_with_hole",
+          "f1": 0.3266
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 52,
+          "cross_bsp_id": "cell_2_1_tall",
+          "f1": 0.3178
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 53,
+          "cross_bsp_id": "cell_2_1_black",
+          "f1": 0.3139
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 54,
+          "cross_bsp_id": "cell_2_1_square",
+          "f1": 0.325
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 55,
+          "cross_bsp_id": "cell_2_1_with_hole",
+          "f1": 0.3167
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 56,
+          "cross_bsp_id": "cell_2_2_tall",
+          "f1": 0.3259
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 57,
+          "cross_bsp_id": "cell_2_2_black",
+          "f1": 0.3263
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 58,
+          "cross_bsp_id": "cell_2_2_square",
+          "f1": 0.3133
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 59,
+          "cross_bsp_id": "cell_2_2_with_hole",
+          "f1": 0.325
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3319
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3288
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.3274
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3327
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3358
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.3319
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 66,
+          "cross_bsp_id": "cell_3_0_square",
+          "f1": 0.3191
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3372
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3251
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 69,
+          "cross_bsp_id": "cell_3_1_black",
+          "f1": 0.323
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 70,
+          "cross_bsp_id": "cell_3_1_square",
+          "f1": 0.3238
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.334
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3295
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3312
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3313
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3309
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 76,
+          "cross_bsp_id": "cell_3_3_tall",
+          "f1": 0.3142
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.3312
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 78,
+          "cross_bsp_id": "cell_3_3_square",
+          "f1": 0.3217
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 79,
+          "cross_bsp_id": "cell_3_3_with_hole",
+          "f1": 0.3199
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.4428
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 162,
+          "cross_bsp_id": "game_phase_late",
+          "f1": 0.349
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.5691
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.4181
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.422
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.4222
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.4214
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.4206
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.3984
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.4081
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.4153
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.4151
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.4035
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.3984
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.4201
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.4173
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.4265
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.4202
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.4304
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.6228
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.6163
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.624
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.6269
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 160,
+          "cross_bsp_id": "game_phase_early",
+          "f1": 0.7511
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.5043
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.3909
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.3951
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.3993
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.4016
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.3979
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.3971
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.3721
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.3804
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.3964
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.3915
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.3835
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.3758
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.3932
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.3971
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.3994
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.3947
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.41
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.6065
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.61
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.6074
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.6057
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 160,
+          "cross_bsp_id": "game_phase_early",
+          "f1": 0.7749
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.4564
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.3473
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.304
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.3103
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.308
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.3015
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.3046
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.3068
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.3002
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.3023
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.3024
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.3031
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.3065
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.3189
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 156,
+          "cross_bsp_id": "offered_tall",
+          "f1": 0.5482
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 157,
+          "cross_bsp_id": "offered_black",
+          "f1": 0.5452
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 158,
+          "cross_bsp_id": "offered_square",
+          "f1": 0.5499
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 159,
+          "cross_bsp_id": "offered_with_hole",
+          "f1": 0.541
+        },
+        {
+          "anchor_slot": 34,
+          "anchor_bsp": "tiger_pool_safe_count_ge4",
+          "cross_bsp_index": 160,
+          "cross_bsp_id": "game_phase_early",
+          "f1": 0.8901
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 0,
+          "cross_bsp_id": "cell_0_0_occupied",
+          "f1": 0.3829
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 1,
+          "cross_bsp_id": "cell_0_1_occupied",
+          "f1": 0.387
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 2,
+          "cross_bsp_id": "cell_0_2_occupied",
+          "f1": 0.391
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 3,
+          "cross_bsp_id": "cell_0_3_occupied",
+          "f1": 0.3885
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 4,
+          "cross_bsp_id": "cell_1_0_occupied",
+          "f1": 0.3875
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 5,
+          "cross_bsp_id": "cell_1_1_occupied",
+          "f1": 0.385
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 6,
+          "cross_bsp_id": "cell_1_2_occupied",
+          "f1": 0.3785
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 7,
+          "cross_bsp_id": "cell_1_3_occupied",
+          "f1": 0.3897
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 8,
+          "cross_bsp_id": "cell_2_0_occupied",
+          "f1": 0.393
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 9,
+          "cross_bsp_id": "cell_2_1_occupied",
+          "f1": 0.3801
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 10,
+          "cross_bsp_id": "cell_2_2_occupied",
+          "f1": 0.3777
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 11,
+          "cross_bsp_id": "cell_2_3_occupied",
+          "f1": 0.3911
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 12,
+          "cross_bsp_id": "cell_3_0_occupied",
+          "f1": 0.3888
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 13,
+          "cross_bsp_id": "cell_3_1_occupied",
+          "f1": 0.3863
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 14,
+          "cross_bsp_id": "cell_3_2_occupied",
+          "f1": 0.3868
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 15,
+          "cross_bsp_id": "cell_3_3_occupied",
+          "f1": 0.3835
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 16,
+          "cross_bsp_id": "cell_0_0_tall",
+          "f1": 0.302
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 21,
+          "cross_bsp_id": "cell_0_1_black",
+          "f1": 0.3012
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 22,
+          "cross_bsp_id": "cell_0_1_square",
+          "f1": 0.3023
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 23,
+          "cross_bsp_id": "cell_0_1_with_hole",
+          "f1": 0.3021
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 24,
+          "cross_bsp_id": "cell_0_2_tall",
+          "f1": 0.3072
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 25,
+          "cross_bsp_id": "cell_0_2_black",
+          "f1": 0.3063
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 26,
+          "cross_bsp_id": "cell_0_2_square",
+          "f1": 0.3148
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 27,
+          "cross_bsp_id": "cell_0_2_with_hole",
+          "f1": 0.3071
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 28,
+          "cross_bsp_id": "cell_0_3_tall",
+          "f1": 0.305
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 31,
+          "cross_bsp_id": "cell_0_3_with_hole",
+          "f1": 0.3129
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 32,
+          "cross_bsp_id": "cell_1_0_tall",
+          "f1": 0.3025
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 34,
+          "cross_bsp_id": "cell_1_0_square",
+          "f1": 0.3077
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 35,
+          "cross_bsp_id": "cell_1_0_with_hole",
+          "f1": 0.3046
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 36,
+          "cross_bsp_id": "cell_1_1_tall",
+          "f1": 0.3011
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 44,
+          "cross_bsp_id": "cell_1_3_tall",
+          "f1": 0.3056
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 46,
+          "cross_bsp_id": "cell_1_3_square",
+          "f1": 0.3034
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 47,
+          "cross_bsp_id": "cell_1_3_with_hole",
+          "f1": 0.3004
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 48,
+          "cross_bsp_id": "cell_2_0_tall",
+          "f1": 0.3143
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 49,
+          "cross_bsp_id": "cell_2_0_black",
+          "f1": 0.3001
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 50,
+          "cross_bsp_id": "cell_2_0_square",
+          "f1": 0.3068
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 60,
+          "cross_bsp_id": "cell_2_3_tall",
+          "f1": 0.3019
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 61,
+          "cross_bsp_id": "cell_2_3_black",
+          "f1": 0.3003
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 62,
+          "cross_bsp_id": "cell_2_3_square",
+          "f1": 0.303
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 63,
+          "cross_bsp_id": "cell_2_3_with_hole",
+          "f1": 0.3087
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 64,
+          "cross_bsp_id": "cell_3_0_tall",
+          "f1": 0.3115
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 65,
+          "cross_bsp_id": "cell_3_0_black",
+          "f1": 0.3067
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 67,
+          "cross_bsp_id": "cell_3_0_with_hole",
+          "f1": 0.3158
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 68,
+          "cross_bsp_id": "cell_3_1_tall",
+          "f1": 0.3013
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 71,
+          "cross_bsp_id": "cell_3_1_with_hole",
+          "f1": 0.3004
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 72,
+          "cross_bsp_id": "cell_3_2_tall",
+          "f1": 0.3016
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 73,
+          "cross_bsp_id": "cell_3_2_black",
+          "f1": 0.3002
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 74,
+          "cross_bsp_id": "cell_3_2_square",
+          "f1": 0.3057
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 75,
+          "cross_bsp_id": "cell_3_2_with_hole",
+          "f1": 0.3023
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 77,
+          "cross_bsp_id": "cell_3_3_black",
+          "f1": 0.3015
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 161,
+          "cross_bsp_id": "game_phase_mid",
+          "f1": 0.3523
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 162,
+          "cross_bsp_id": "game_phase_late",
+          "f1": 0.4154
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 163,
+          "cross_bsp_id": "winning_move_exists",
+          "f1": 0.4925
+        }
+      ]
+    },
+    "hawkTa": {
+      "n_bsps": 173,
+      "anchor_hits_above_03": 19,
+      "cross_bsps_covered": 2,
+      "cross_bsps_covered_pct": 1.2,
+      "hits": [
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.7787
+        },
+        {
+          "anchor_slot": 0,
+          "anchor_bsp": "tiger_win_now_exists",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.6551
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.8299
+        },
+        {
+          "anchor_slot": 1,
+          "anchor_bsp": "tiger_opp_winning_offer_exists",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.6075
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.4988
+        },
+        {
+          "anchor_slot": 2,
+          "anchor_bsp": "tiger_lose_next_forced",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.4977
+        },
+        {
+          "anchor_slot": 8,
+          "anchor_bsp": "tiger_offered_completes_with_hole",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.3013
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.8287
+        },
+        {
+          "anchor_slot": 28,
+          "anchor_bsp": "tiger_pool_winning_count_ge1",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.6068
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.828
+        },
+        {
+          "anchor_slot": 29,
+          "anchor_bsp": "tiger_pool_winning_count_ge2",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.6084
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.8013
+        },
+        {
+          "anchor_slot": 30,
+          "anchor_bsp": "tiger_pool_winning_count_ge4",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.6032
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.5514
+        },
+        {
+          "anchor_slot": 31,
+          "anchor_bsp": "tiger_pool_winning_count_all",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.5367
+        },
+        {
+          "anchor_slot": 32,
+          "anchor_bsp": "tiger_pool_safe_count_ge1",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.4288
+        },
+        {
+          "anchor_slot": 33,
+          "anchor_bsp": "tiger_pool_safe_count_ge2",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.3863
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 171,
+          "cross_bsp_id": "board_threat_exists",
+          "f1": 0.4765
+        },
+        {
+          "anchor_slot": 35,
+          "anchor_bsp": "tiger_pool_safe_count_eq0",
+          "cross_bsp_index": 172,
+          "cross_bsp_id": "board_completable_exists",
+          "f1": 0.4814
+        }
+      ]
+    }
+  }
+}

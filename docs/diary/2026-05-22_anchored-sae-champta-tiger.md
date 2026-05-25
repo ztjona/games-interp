@@ -1,6 +1,6 @@
 # Plan — Anchored SAE on champTa fc1 → tigerTa
 
-Status: **plan, no implementation yet.** Triggered by [2026-05-22_reframings-audit-tiger.md](2026-05-22_reframings-audit-tiger.md) §"Results" — tiger SAE/LP efficiency exceeds hawk by +25 pp (conv2/Ta) to +51 pp (conv2/S4), firing the pre-registered decision rule "anchored / matryoshka should target tiger, not hawk."
+Status: **executed.** Results: [2026-05-25_anchored-sweep-ij-results.md](2026-05-25_anchored-sweep-ij-results.md). Pre-registered decision gate **PASS** — recipe locked, I04 anchored-jumprelu lh=1.0 is the winner (+62% F1-lift vs baseline). Triggered by [2026-05-22_reframings-audit-tiger.md](2026-05-22_reframings-audit-tiger.md) §"Results" — tiger SAE/LP efficiency exceeds hawk by +25 pp (conv2/Ta) to +51 pp (conv2/S4), firing the pre-registered decision rule "anchored / matryoshka should target tiger, not hawk."
 
 Parent: [`../../RESEARCH-STATUS.md`](../../RESEARCH-STATUS.md) §"Active plan" step 4 (was step 5; promoted after tiger evals landed).
 Sibling design note: [2026-05-19_concept-targeted-saes.md](2026-05-19_concept-targeted-saes.md) §3 (Anchored / guided SAEs — original five-candidate design).

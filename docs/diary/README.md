@@ -65,7 +65,8 @@ without checking it, that is the failure mode this convention exists for.
 |---|---|---|
 | 2026-05-19 | [concept-targeted-saes](2026-05-19_concept-targeted-saes.md) | Design only, no implementation. Five candidate approaches (wider exp, higher k, anchored, E2E, matryoshka) to close the 11 % conv2/hawk SAE/LP wall; recommended ordering and pre-registered decision gates. |
 | 2026-05-22 | [reframings-audit-tiger](2026-05-22_reframings-audit-tiger.md) | `tiger` BSP set design + implementation + **results** (36 BSPs, 6 categories): agent-relative threats and pool-reasoning. Pre-registered decision rule **fired** \u2014 tiger SAE/LP efficiency exceeds hawk by +25 to +51 pp; supervised SAE pivot now targets tiger, not hawk. |
-| 2026-05-22 | [anchored-sae-champta-tiger](2026-05-22_anchored-sae-champta-tiger.md) | Plan (no implementation yet) for the next supervised-SAE experiment: anchored jumprelu / batchtopk on champTa fc1, anchored against `tigerTa` BSPs. Anchor topology, \u03bb sweep, pre-registered decision gates, implementation work items, open questions for the lit review. |
+| 2026-05-22 | [anchored-sae-champta-tiger](2026-05-22_anchored-sae-champta-tiger.md) | Plan (**executed**) for anchored jumprelu / batchtopk on champTa fc1, anchored against `tigerTa` BSPs. Anchor topology, lambda sweep, pre-registered decision gates. |
+| 2026-05-25 | [anchored-sweep-ij-results](2026-05-25_anchored-sweep-ij-results.md) | **Results** of I/J anchored sweep (24 configs). Winner: I04 anchored-jumprelu lh=1.0 (+62% F1-lift). Decision gate PASS. Per-slot anchor analysis, cross-BSP coverage, J-series negative result, reporting standard for future anchored experiments. |
 
 ### Supervisor advances
 

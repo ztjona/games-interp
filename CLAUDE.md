@@ -88,6 +88,14 @@ python scripts/export_viz_data.py --game quarto                  # JSON bundles 
 python scripts/export_onnx.py --game quarto                      # ONNX encoders → public/models/quarto/
 ```
 
+Anchor slot analysis (for anchored SAE runs — reads cached matching data):
+```bash
+python scripts/anchor_analysis.py saes/quarto/<anchored_checkpoint>.pt           # auto-detects anchor BSP set + cross-BSP sets
+python scripts/anchor_analysis.py --run-id=<stem> --bsps=tigerTa                 # explicit BSP set
+python scripts/anchor_analysis.py saes/quarto/<ckpt>.pt --cross-bsps=gorillaTa   # specific cross-BSP
+```
+Output: `saes/quarto/analysis/{run_id}_anchor-{bsp_set}.json` (per-slot F1/P/R/MCC, category summary, polysemanticity, cross-BSP coverage).
+
 Linear-probe baseline (upper bound for any SAE on the same activations):
 ```bash
 python scripts/linear_probe_baseline.py \
@@ -166,6 +174,8 @@ Single source of truth for: model loading (`QuartoCNN.from_file`), the four oppo
 - `data/<game>/bsp_schema-<animal>_<count>.json` — BSP definitions
 - `saes/<game>/{run_id}.pt` + `{run_id}_metrics.jsonl` + `training_registry.json` + `eval_registry.json`
 - `eval_registry.json` keys use the format `run_id:bsp_set` (e.g. `A01-random-control-s42-batchtopk-k16-exp8-fc1:gorilla`) so the same checkpoint can be evaluated against multiple BSP sets without collision. Legacy entries with plain `run_id` keys are still read correctly.
+- `saes/<game>/cache/{run_id}_h.pt`, `{run_id}_matching-{animal}.pt` — eval caches (encoded activations, per-feature matching)
+- `saes/<game>/analysis/{run_id}_anchor-{animal}.json` — anchor slot analysis output (per-slot metrics, category summary, cross-BSP)
 - `saes/*.pt` checkpoints are gitignored by default; force-add key ones with `git add -f`. `*.jsonl` metrics and `*_registry.json` files are tracked.
 
 ### Quarto model — hookable layers
