@@ -27,7 +27,7 @@ _PROJECT_ROOT = Path(__file__).resolve().parent
 if str(_PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(_PROJECT_ROOT))
 
-# ── Checks ────────────────────────────────────────────────────────────────
+# -- Checks ----------------------------------------------------------------
 
 PASS = "\033[92mPASS\033[0m"
 FAIL = "\033[91mFAIL\033[0m"
@@ -50,7 +50,7 @@ def section(title: str):
     print(f"{'='*60}")
 
 
-# ── 1. Python & packages ─────────────────────────────────────────────────
+# -- 1. Python & packages -------------------------------------------------
 
 
 def check_packages():
@@ -73,7 +73,7 @@ def check_packages():
             check(f"import {module}", False, f"pip install {pkg}")
 
 
-# ── 2. Torch & GPU ───────────────────────────────────────────────────────
+# -- 2. Torch & GPU -------------------------------------------------------
 
 
 def check_gpu(device_arg: str) -> str:
@@ -119,7 +119,7 @@ def check_gpu(device_arg: str) -> str:
     return device
 
 
-# ── 3. Project structure ─────────────────────────────────────────────────
+# -- 3. Project structure -------------------------------------------------
 
 
 def check_project_files():
@@ -149,13 +149,13 @@ def check_project_files():
         p = _PROJECT_ROOT / fpath
         ok = p.exists()
         size = f"{p.stat().st_size / 1e3:.0f} KB" if ok else "MISSING"
-        check(fpath.split("/")[-1], ok, f"{desc} — {size}")
+        check(fpath.split("/")[-1], ok, f"{desc} -- {size}")
 
     for fpath, desc in critical_files.items():
         p = _PROJECT_ROOT / fpath
         ok = p.exists()
         size = f"{p.stat().st_size / 1e6:.1f} MB" if ok else "MISSING"
-        check(f"{fpath}", ok, f"{desc} — {size}")
+        check(f"{fpath}", ok, f"{desc} -- {size}")
 
     # Check for hawk BSP files (optional but expected)
     hawk_files = list((_PROJECT_ROOT / "data" / "quarto").glob("bsp_labels-hawk_*.pt"))
@@ -164,14 +164,14 @@ def check_project_files():
             check(
                 f"{hf.name}",
                 True,
-                f"Hawk BSP — {hf.stat().st_size / 1e6:.1f} MB",
+                f"Hawk BSP -- {hf.stat().st_size / 1e6:.1f} MB",
                 critical=False,
             )
     else:
         check(
             "Hawk BSP labels",
             False,
-            "Not found — hawk eval will be skipped",
+            "Not found -- hawk eval will be skipped",
             critical=False,
         )
 
@@ -190,7 +190,7 @@ def check_project_files():
     check("saes/quarto/ writable", True)
 
 
-# ── 3b. Data scale (catch smoke-test-sized files) ────────────────────────
+# -- 3b. Data scale (catch smoke-test-sized files) ------------------------
 
 
 MIN_AMALGAM_POSITIONS = 100_000
@@ -211,7 +211,7 @@ def check_data_scale():
         check(
             "positions-amalgam_unique.pt",
             False,
-            "MISSING — run generate_positions.py + deduplicate_positions.py first",
+            "MISSING -- run generate_positions.py + deduplicate_positions.py first",
         )
         return
 
@@ -239,7 +239,7 @@ def check_data_scale():
         f"got {n_positions:,} rows (num_games per source: {num_games_str}). "
         + (
             "A small count typically means an upstream step ran with --num-games 1; "
-            "1 Quarto game ≈ 16 positions. Re-run generate_positions.py with "
+            "1 Quarto game ~ 16 positions. Re-run generate_positions.py with "
             "--num-games 10000 across all 4 opponent modes."
             if n_positions < MIN_AMALGAM_POSITIONS
             else "OK"
@@ -277,7 +277,7 @@ def check_data_scale():
         )
 
 
-# ── 4. SAE library integrity ─────────────────────────────────────────────
+# -- 4. SAE library integrity ---------------------------------------------
 
 
 def check_sae_library(device: str):
@@ -291,7 +291,7 @@ def check_sae_library(device: str):
         ", ".join(ARCHITECTURES.keys()),
     )
 
-    # Load a small slice of data to test — prefer conv2, fall back to fc1
+    # Load a small slice of data to test -- prefer conv2, fall back to fc1
     candidates = [
         ("data/quarto/conv2_512_amalgam_activations.pt", "conv2"),
         ("data/quarto/fc1_amalgam_activations.pt", "fc1"),
@@ -307,7 +307,7 @@ def check_sae_library(device: str):
         check(
             "Load activations for smoke test",
             False,
-            "No activation file found — run collect_activations.py first",
+            "No activation file found -- run collect_activations.py first",
         )
         return
 
@@ -351,7 +351,7 @@ def check_sae_library(device: str):
             check(f"  {name}: forward + loss", False, str(e))
 
 
-# ── 5. Config validation ─────────────────────────────────────────────────
+# -- 5. Config validation -------------------------------------------------
 
 
 def check_configs(config_dir: Path):
@@ -359,7 +359,7 @@ def check_configs(config_dir: Path):
     import yaml
 
     if not config_dir.exists():
-        check(str(config_dir), False, "MISSING — create configs first")
+        check(str(config_dir), False, "MISSING -- create configs first")
         return []
 
     configs = sorted(config_dir.glob("*.yaml"))
@@ -454,7 +454,7 @@ def _build_suffix(cfg: dict) -> str:
     return "-".join(parts)
 
 
-# ── 6. Smoke test ─────────────────────────────────────────────────────────
+# -- 6. Smoke test ---------------------------------------------------------
 
 
 def smoke_test(device: str, valid_configs: list):
@@ -519,14 +519,14 @@ def smoke_test(device: str, valid_configs: list):
             check(
                 f"  {cfg_path.stem}",
                 True,
-                f"10 steps in {elapsed:.1f}s → est. {est_hours:.1f}h for {total_batches} steps | "
+                f"10 steps in {elapsed:.1f}s -> est. {est_hours:.1f}h for {total_batches} steps | "
                 f"FVU={fm['fvu']:.4f}, L0={fm['l0']:.1f}, dead={fm['dead_features_pct']:.0f}%",
             )
         except Exception as e:
             check(f"  {cfg_path.stem}", False, f"{e}\n{traceback.format_exc()}")
 
 
-# ── 7. Evaluation dry-run ─────────────────────────────────────────────────
+# -- 7. Evaluation dry-run -------------------------------------------------
 
 
 def check_eval_pipeline(device: str):
@@ -591,12 +591,12 @@ def check_eval_pipeline(device: str):
         check("sae_eval.py --help", False, str(e))
 
 
-# ── Main ──────────────────────────────────────────────────────────────────
+# -- Main ------------------------------------------------------------------
 
 
 def main():
     print("\n" + "=" * 60)
-    print("  SAE Sweep — Pre-flight Validation")
+    print("  SAE Sweep -- Pre-flight Validation")
     print("=" * 60)
 
     # Parse args
@@ -621,7 +621,7 @@ def main():
     if do_smoke and valid_configs:
         smoke_test(device, valid_configs)
     elif do_smoke:
-        section("6. Smoke Test — SKIPPED (no valid configs)")
+        section("6. Smoke Test -- SKIPPED (no valid configs)")
 
     check_eval_pipeline(device)
 
@@ -635,7 +635,7 @@ def main():
     )
 
     if n_fail > 0:
-        print("  CRITICAL FAILURES — fix before running sweep!\n")
+        print("  CRITICAL FAILURES -- fix before running sweep!\n")
         for status, name, detail in results:
             if FAIL in status:
                 print(f"    {FAIL} {name}: {detail}")

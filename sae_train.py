@@ -61,6 +61,7 @@ Examples:
 """
 
 import sys
+import json
 from pathlib import Path
 
 import yaml
@@ -131,7 +132,95 @@ def get_arch_kwargs(arch: str, args: dict) -> dict:
         kwargs["p_start"] = float(args["--p-start"])
         kwargs["p_end"] = float(args["--p-end"])
 
+    elif arch in ("anchored-jumprelu", "anchored-batchtopk"):
+        # Base-architecture hyperparameters
+        if arch == "anchored-jumprelu":
+            kwargs["theta_init"] = float(args["--jump-threshold"])
+            kwargs["l0_target"] = float(args["--l0-target"])
+        else:  # anchored-batchtopk
+            kwargs["k"] = int(args["--k"])
+        # Anchor mapping is built later in main() once labels + schema are loaded;
+        # placeholders here are filled in by main() before SAE instantiation.
+
     return kwargs
+
+
+def _build_anchor_kwargs(config: dict | None, num_anchor_cols: int) -> tuple[dict, dict]:
+    """Resolve anchored-SAE mapping from a YAML config + label tensor + schema.
+
+    Anchored variants are YAML-only (no CLI flags) to keep the docopt
+    surface clean.  The raw ``config`` dict is read directly so list values
+    (``anchor_high_categories``) survive without being stringified.
+
+    Returns:
+        (anchor_kwargs, anchor_meta)
+        anchor_kwargs feeds the SAE constructor (lists, not tensors, so the
+        same dict can be serialized into the JSON training registry).
+        anchor_meta carries the file paths and λ tier breakdown for
+        bookkeeping / filename suffix.
+    """
+    if config is None:
+        raise ValueError(
+            "Anchored architectures are YAML-only; pass --config=<file>."
+        )
+
+    schema_path = config.get("anchor_schema")
+    if not schema_path:
+        raise ValueError("Anchored YAML config requires 'anchor_schema'")
+    with open(schema_path, "r") as f:
+        schema = json.load(f)
+    bsps = schema.get("bsps", schema) if isinstance(schema, dict) else schema
+    if num_anchor_cols != len(bsps):
+        raise ValueError(
+            f"Anchor label tensor has {num_anchor_cols} columns but schema "
+            f"lists {len(bsps)} BSPs — schema/label mismatch."
+        )
+
+    mode = config.get("anchor_index_mode", "prefix")
+    if mode != "prefix":
+        raise NotImplementedError(
+            f"anchor_index_mode='{mode}' not implemented; only 'prefix' is supported."
+        )
+    anchor_feature_idx = list(range(num_anchor_cols))
+    anchor_bsp_idx = list(range(num_anchor_cols))
+
+    if "anchor_lambda_high" not in config or "anchor_lambda_medium" not in config:
+        raise ValueError(
+            "Anchored YAML config requires 'anchor_lambda_high' and "
+            "'anchor_lambda_medium'."
+        )
+    lam_high = float(config["anchor_lambda_high"])
+    lam_med = float(config["anchor_lambda_medium"])
+    high_cats = list(config.get("anchor_high_categories") or [])
+    high_cats_set = set(high_cats)
+
+    anchor_lambda_per_feature: list[float] = []
+    tier_counts = {"high": 0, "medium": 0}
+    for bsp in bsps:
+        cat = bsp.get("category", "")
+        if cat in high_cats_set:
+            anchor_lambda_per_feature.append(lam_high)
+            tier_counts["high"] += 1
+        else:
+            anchor_lambda_per_feature.append(lam_med)
+            tier_counts["medium"] += 1
+
+    anchor_kwargs = {
+        "anchor_feature_idx": anchor_feature_idx,
+        "anchor_bsp_idx": anchor_bsp_idx,
+        "anchor_lambda_per_feature": anchor_lambda_per_feature,
+    }
+    anchor_meta = {
+        "anchor_bsps": config.get("anchor_bsps"),
+        "anchor_schema": schema_path,
+        "anchor_index_mode": mode,
+        "anchor_lambda_high": lam_high,
+        "anchor_lambda_medium": lam_med,
+        "anchor_high_categories": high_cats,
+        "anchor_tier_counts": tier_counts,
+        "anchor_loss": config.get("anchor_loss", "bce"),
+    }
+    return anchor_kwargs, anchor_meta
 
 
 def build_filename_suffix(arch: str, arch_kwargs: dict, expansion: int) -> str:
@@ -147,6 +236,10 @@ def build_filename_suffix(arch: str, arch_kwargs: dict, expansion: int) -> str:
         parts.append(f"l1_{l1_str}")
     elif arch == "jumprelu":
         parts.append(f"t{int(arch_kwargs['l0_target'])}")
+    elif arch == "anchored-jumprelu":
+        parts.append(f"t{int(arch_kwargs['l0_target'])}")
+    elif arch == "anchored-batchtopk":
+        parts.append(f"k{arch_kwargs['k']}")
 
     parts.append(f"exp{expansion}")
 
@@ -214,7 +307,43 @@ def main():
 
     # Get architecture-specific kwargs
     arch_kwargs = get_arch_kwargs(arch, args)
-    print(f"Architecture kwargs: {arch_kwargs}")
+
+    # Anchored variants: load labels + schema and build per-feature λ vector
+    anchor_labels: torch.Tensor | None = None
+    anchor_meta: dict = {}
+    if arch in ("anchored-jumprelu", "anchored-batchtopk"):
+        anchor_labels_path = (config or {}).get("anchor_bsps")
+        if not anchor_labels_path:
+            print("Error: anchored YAML config requires 'anchor_bsps' (label tensor path).")
+            sys.exit(1)
+        print(f"Anchor labels: {anchor_labels_path}")
+        anchor_labels = torch.load(
+            anchor_labels_path, map_location=device, weights_only=True
+        )
+        if anchor_labels.ndim != 2:
+            print(
+                f"Error: anchor_bsps must be 2D (N, num_bsps); got {tuple(anchor_labels.shape)}"
+            )
+            sys.exit(1)
+        if anchor_labels.shape[0] != data.shape[0]:
+            print(
+                f"Error: anchor label row count ({anchor_labels.shape[0]}) "
+                f"does not match activation count ({data.shape[0]})."
+            )
+            sys.exit(1)
+        anchor_kwargs, anchor_meta = _build_anchor_kwargs(
+            config, num_anchor_cols=anchor_labels.shape[1]
+        )
+        arch_kwargs = {**arch_kwargs, **anchor_kwargs}
+        print(
+            f"Anchor map: {anchor_meta['anchor_tier_counts']['high']} high-tier x "
+            f"lambda={anchor_meta['anchor_lambda_high']} + "
+            f"{anchor_meta['anchor_tier_counts']['medium']} medium-tier x "
+            f"lambda={anchor_meta['anchor_lambda_medium']} "
+            f"(loss={anchor_meta['anchor_loss']}, mode={anchor_meta['anchor_index_mode']})"
+        )
+
+    print(f"Architecture kwargs: { {k: (f'<list len={len(v)}>' if isinstance(v, list) and len(v) > 10 else v) for k, v in arch_kwargs.items()} }")
 
     # Create SAE
     sae = ARCHITECTURES[arch](
@@ -248,6 +377,7 @@ def main():
             min_improvement=min_improvement,
             l0_patience=l0_patience,
             l0_min_change=l0_min_change,
+            anchor_labels=anchor_labels,
         )
     except KeyboardInterrupt:
         print(
@@ -285,6 +415,8 @@ def main():
         },
         "final_metrics": results["final_metrics"],
     }
+    if anchor_meta:
+        metadata["anchor"] = anchor_meta
 
     # Save checkpoint
     save_checkpoint(sae, checkpoint_path, metadata)

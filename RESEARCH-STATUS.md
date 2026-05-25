@@ -11,9 +11,24 @@
 
 ## Project State
 
-### 2026-05-22 (Sweep H closed) — current
+### 2026-05-22 (Tiger reframing audit closed) — current
 
-**Active phase:** Sweep H capacity scan complete (12 configs, s42). Pre-registered
+**Active phase:** Tiger reframing audit complete. Labels computed for both champions (`bsp_labels-tigerS4_36.pt`, `bsp_labels-tigerTa_36.pt`); 8 LP baselines and 16 SAE re-evaluations (F04, E05, H01–H06 × {S4, Ta}) all landed. **Pre-registered decision rule fires unambiguously: target-set mismatch was contributing.** Tiger conv2/Ta SAE/LP efficiency is **36 %** (vs the 11 % conv2/hawk wall = **+25 pp**); tiger conv2/S4 efficiency is **62 %** (**+51 pp** above the hawk wall). The decision rule output: *anchored / matryoshka should target tiger, not hawk, as the supervision signal.*
+
+Secondary findings from the same batch:
+
+- **fc1 > conv2 for tiger on both champions** — opposite of hawk/gorilla on Ta. Agent-relative concepts live at the fc1 bottleneck where the model integrates board + offered piece + pool. Strengthens the post-champAa revision of H8.
+- **Sweep H null reproduces on tiger** — expansion ladder (H01–H06) flat-to-negative on tigerTa F1-lift vs baseline F04/E05. Capacity alone does not buy tiger coverage either; concept-targeting remains the binding lever.
+- **Real feature absorption on champTa** — F04-Ta fc1: max 6 BSPs/feature on tiger; E05-Ta conv2 reaches max ≈ 10. The older champAa-era "missing concepts aren't being absorbed, they're never represented" deprioritization of matryoshka does **not** carry over — re-activated on the champion family.
+
+Next concrete move (queued for the session after the lit-review refresh):
+**anchored SAE on champTa fc1 → tigerTa** — the cell with the largest absolute LP headroom (0.143 F1-lift gap) and the cleanest decision gate. Detailed plan: [`docs/diary/2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
+
+Results table and per-category breakdowns: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md) §"Results".
+
+### 2026-05-22 (Sweep H closed)
+
+Sweep H capacity scan complete (12 configs, s42). Pre-registered
 decision gate from [`2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md)
 **FAILS**: tripling dictionary expansion from 8 → 64 closed **0 %** of the
 conv2 / hawk gap. Best conv2 / hawk lift is the *baseline* E05-Ta at 0.088 — no
@@ -21,11 +36,6 @@ H run beat it; champS4 fc1 hawk degraded monotonically with expansion
 (0.152 → 0.097). Per the pre-registered rule, concept-targeting is promoted
 to primary direction; *capacity alone* is ruled out on both axes (k in
 Phase 2A Campaign E, exp in Sweep H).
-
-Before committing to anchored / matryoshka / E2E (all of which require a
-fixed BSP target set), a **player-relative reframing (`tiger`)** is being
-scoped to test whether gorilla and hawk are the right BSPs to measure
-against. Design: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
 
 Full sweep tables and interpretation:
 [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
@@ -88,6 +98,14 @@ Full details: [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md).
 | Best SAE (C01 topk-k16-exp8 conv2) | Aa | conv2 | gorilla | **0.353** | — |
 | Best SAE (E05 batchtopk-k32 conv2) | **Ta** | conv2 | gorillaTa | 0.428 | **0.214** |
 | Best SAE (F04 jumprelu-t64 fc1) | **Ta** | fc1 | hawkTa | 0.214 | **0.172** |
+| Linear probe (trained) | **Ta** | fc1 | tigerTa | **0.591** | **0.301** |
+| Linear probe (trained) | **Ta** | conv2 | tigerTa | 0.463 | 0.175 |
+| Linear probe (trained) | S4 | fc1 | tigerS4 | 0.440 | 0.179 |
+| Linear probe (trained) | S4 | conv2 | tigerS4 | 0.335 | 0.098 |
+| Best SAE (F04 jumprelu-t64 fc1) | **Ta** | fc1 | tigerTa | 0.449 | **0.158** |
+| Best SAE (E05 batchtopk-k32 conv2) | **Ta** | conv2 | tigerTa | 0.353 | 0.063 |
+
+† S4-fc1 LP rerun at `max_iter=5000` (closed 2026-05-22 PM) confirmed the headline numbers stand: F1=0.4402, MCC=0.3797, F1-lift=0.1789 vs the `max_iter=1000` original of 0.440/0.380/0.179. The 5 unconverged-warning BSPs were cosmetically not-converged but functionally at their optimum.
 
 ## Hypotheses Status
 
@@ -95,7 +113,8 @@ Full details: [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md).
 |---|---|---|
 | H1 | fc1 encodes cell-level BSPs linearly but not threats *(on champAa)* | ✅ CONFIRMED across 28 SAE configs |
 | H1b | Threats accessible in reframed basis | ⚠️ PARTIAL — count encoding 14× better but still F1 = 0.315 on Aa; reframed_count F1-lift 0.18–0.25 on Ta |
-| H2 | Feature absorption | OPEN |
+| H1c | Target-set mismatch contributes to the SAE/LP wall | ✅ CONFIRMED (2026-05-22). Tiger SAE/LP efficiency exceeds hawk by +25 pp (conv2/Ta) to +51 pp (conv2/S4). Agent-relative framing recovers a meaningful chunk of the wall; supervision pivot now targets tiger. |
+| H2 | Feature absorption | ⚠️ PARTIAL (2026-05-22) — F04-Ta fc1 max 6 BSPs/feature on tiger; E05-Ta conv2 max ≈ 10. Champion-era SAEs do show absorption (contradicting the older champAa-era "never represented" claim). Matryoshka re-activated on champTa. |
 | H3 | Concept heterogeneity → architecture-dependent failures | ❌ WEAKENED — most architectures perform similarly |
 | H5 | Feature shrinkage (L1 / ReLU) | ⚠️ PARTIAL — Gated / Vanilla in Tier 3, P-Annealing not Tier 1 |
 | H6 | Wrong hook point — conv2 may be better | ✅ SUPPORTED on Aa; partially **inverted on Ta for hawk** (fc1 SAEs > conv2 SAEs on rare threats; see phase-2B.md Claim 4) |
@@ -121,16 +140,18 @@ Full table template and rationale: [`phase-2A.md`](docs/diary/phase-2A.md) § "R
 
 ## Active plan / next steps
 
-1. ~~**F04-Ta verification rerun**~~ ✅ done 2026-05-20 (results merged above).
-2. ~~**Sweep H — capacity scan**~~ ✅ done 2026-05-22. **Gate FAILS** — best conv2 / hawk lift across the sweep is the *baseline* E05-Ta at 0.088 (threshold was 0.13); fc1 / hawk on S4 actively degraded with more expansion (0.152 → 0.097). Per the pre-registered rule, concept-targeting is now the primary direction; capacity ruled out on both axes (k via Phase 2A, exp via Sweep H). See [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
-3. **Reframing audit — `tiger` BSPs** (next; running before anchored/matryoshka). Agent-relative threat reframing — "can I win now," "every offer I can make lets the opponent win," "is the offered piece a poison" — motivated by champTa's +24 pp loss-avoidance gain. Validates whether gorilla/hawk are the right target sets before committing supervised SAE objectives to them. Design and BSP catalogue: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
-4. **Literature review refresh** (after tiger evals land, before implementation work). Last broad lit scan predates the matryoshka / E2E / BatchTopK family; need a fresh pass on (a) SAE variants 2025–2026, (b) board-game interp work since Karvonen, (c) low-base-rate / rare-concept SAE methods.
-5. **Matryoshka + Anchored SAE implementations** (parallel engineering tracks, ~1 week each). Both attack the SAE/LP wall via different mechanisms (multi-scale capacity vs concept-supervised loss). Start after the lit review **and** after tiger has answered whether the BSP target should be hawk or tiger.
-6. **E2E SAEs** — start when at least one of {matryoshka, anchored} has landed and we know which mechanism is binding. E2E is most diagnostic *against a strong baseline*, not as a first move.
-7. **Novel SAE variant placeholder** — leave room for a probe-grade variant after the cycle above. Working candidate: **base-rate-weighted reconstruction loss** (reweight MSE by inverse cell base rate to break the "rare concepts don't move the loss" mechanism). Decide whether to commit only once matryoshka / anchored / E2E results land.
-8. **Cell-relative BSP set ("new animal")** — only relevant if per-cell conv2 SAEs (`--flatten-per-cell`) are reactivated. Not on the current path with `--flatten-position`.
+1. ~~**F04-Ta verification rerun**~~ ✅ done 2026-05-20.
+2. ~~**Sweep H — capacity scan**~~ ✅ done 2026-05-22. Gate FAILS; concept-targeting promoted. See [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
+3. ~~**Reframing audit — `tiger` BSPs**~~ ✅ done 2026-05-22. **Target-set mismatch contributing**; tiger SAE/LP efficiency exceeds hawk by +25 to +51 pp depending on cell. Anchored / matryoshka pivot now targets *tiger*. Results: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md) §"Results".
+4. **Literature review refresh** (PI-owned, in progress; finishes before next session). Last broad scan predates matryoshka / E2E / BatchTopK family follow-ups; needs fresh pass on (a) SAE variants 2025–2026 — especially anchored / supervised forms, (b) board-game interp work since Karvonen, (c) low-base-rate / rare-concept SAE methods.
+5. **Anchored SAE on champTa fc1 → tigerTa** (next implementation, after step 4). Largest LP headroom of any cell (F1-lift 0.301 vs SAE 0.158), tiger validated as the supervision target. Two architectures (anchored-jumprelu, anchored-batchtopk) × four λ values × three seeds = 24 runs. Detailed plan: [`docs/diary/2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
+6. **Matryoshka SAE** (parallel engineering track, starts when step 5 has results to compare against). Re-activated on champTa after the 2026-05-22 feature-sharing evidence (max 6–10 BSPs/feature) showed real absorption — contradicting the champAa-era deprioritization. Targets the overall SAE/LP efficiency gap on dense categories; should be evaluated against tiger primarily, gorilla/hawk secondarily.
+7. **E2E SAEs** — start when at least one of {anchored, matryoshka} has landed. E2E is most diagnostic *against a strong baseline*, not as a first move; per the 2026-05-19 design note the contrast is what makes the result informative.
+8. ~~**S4-fc1 LP `max_iter=5000` rerun**~~ ✅ done 2026-05-22 PM. Headline 0.179 lift stands (rerun: 0.1789); 5 unconverged-warning BSPs were at their functional optimum.
+9. **Novel SAE variant placeholder** — base-rate-weighted reconstruction loss, deferred until after anchored / matryoshka / E2E results land.
+10. **Cell-relative BSP set ("new animal")** — only relevant if per-cell conv2 SAEs (`--flatten-per-cell`) are reactivated. Not on the current path.
 
-Design rationale and decision gates: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).
+Design rationale: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md). Next-experiment design: [`docs/diary/2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
 
 ## Deprioritized
 
@@ -138,8 +159,8 @@ Design rationale and decision gates: [`docs/diary/2026-05-19_concept-targeted-sa
 - **fc1-only threat investigation on champAa** — Phase 1F redirected this work to conv2. fc1 retained only as bottleneck-comparison reference for the Aa champion.
 - **`offered_piece` as a coverage signal** — F1 ≈ 0.667 is the trivial all-positive baseline. Keep it in per-category breakdowns for transparency; exclude from headline / threat-focused rankings.
 - **Phase 4 (auxiliary threat-prediction head during DQN training)** — retired 2026-05-19. Motivated by champAa's collapsed fc1 threat signal; the unified-aux objective and minimax distillation solved the bottleneck problem at training time instead.
-- **Anchored / guided SAEs on champAa** — would have failed by construction (champAa doesn't compute completability). **Re-enabled for champTa** where completability is decodable; see [`2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).
-- **Matryoshka on champAa** — deprioritised 2026-05-11 (missing concepts aren't being absorbed, they're never represented). Re-evaluate on champTa once anchored / E2E results land.
+- **Anchored / guided SAEs on champAa** — would have failed by construction (champAa doesn't compute completability). **Re-enabled for champTa** with `tigerTa` as the supervision target (2026-05-22 decision-rule outcome — *not* hawk); see [`2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
+- **Matryoshka on champAa** — deprioritised 2026-05-11 (missing concepts aren't being absorbed, they're never represented). **Re-activated on champTa** (2026-05-22) after tiger evals showed real absorption (max 6–10 BSPs/feature).
 
 ## Follow-up Run Naming (from 2026-04-24 onward)
 

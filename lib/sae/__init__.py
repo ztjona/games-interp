@@ -2,6 +2,8 @@
 
 from .architectures import (
     ARCHITECTURES,
+    AnchoredBatchTopKSAE,
+    AnchoredJumpReLUSAE,
     BaseSAE,
     BatchTopKSAE,
     GatedSAE,
@@ -39,6 +41,8 @@ __all__ = [
     "GatedSAE",
     "JumpReLUSAE",
     "PAnnealingSAE",
+    "AnchoredJumpReLUSAE",
+    "AnchoredBatchTopKSAE",
     "ARCHITECTURES",
     # Evaluation
     "FeatureBSPMatching",

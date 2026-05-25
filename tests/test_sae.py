@@ -61,6 +61,12 @@ def _make(arch: str, **kw) -> torch.Tensor:
     return ARCHITECTURES[arch](**defaults, **kw)
 
 
+# Architectures swept by the generic parametrized tests below.  Anchored
+# variants need extra constructor kwargs (anchor_feature_idx etc.) and are
+# exercised separately in TestAnchoredSAE; exclude them here.
+BASE_ARCHS = [a for a in ARCHITECTURES.keys() if not a.startswith("anchored-")]
+
+
 # ===========================================================================
 # 1. Sparsity contracts
 # ===========================================================================
@@ -129,7 +135,7 @@ class TestSparsityContracts:
 
 class TestNonNegativeActivations:
 
-    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    @pytest.mark.parametrize("arch", BASE_ARCHS)
     def test_h_non_negative(self, arch):
         sae = _make(arch)
         sae.eval()
@@ -193,7 +199,7 @@ class TestBatchTopKCalibration:
 
 class TestCheckpointRoundTrip:
 
-    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    @pytest.mark.parametrize("arch", BASE_ARCHS)
     def test_save_load_identical_reconstruction(self, arch, tmp_path):
         sae = _make(arch)
         sae.eval()
@@ -225,7 +231,7 @@ class TestCheckpointRoundTrip:
 
 class TestTrainingSanity:
 
-    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    @pytest.mark.parametrize("arch", BASE_ARCHS)
     def test_loss_decreases(self, arch):
         """Loss averaged over the last quarter of training must be below the first quarter.
 
@@ -248,7 +254,7 @@ class TestTrainingSanity:
             f"First-quarter avg={first_avg:.4f}, last-quarter avg={last_avg:.4f}"
         )
 
-    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    @pytest.mark.parametrize("arch", BASE_ARCHS)
     def test_fvu_decreases_after_training(self, arch):
         """FVU after training must be strictly lower than FVU of the untrained SAE.
 
@@ -279,7 +285,7 @@ class TestTrainingSanity:
             f"Before={fvu_before:.4f}, After={fvu_after:.4f}"
         )
 
-    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    @pytest.mark.parametrize("arch", BASE_ARCHS)
     def test_not_all_features_dead_after_training(self, arch):
         sae = _make(arch)
         results = train_sae(
@@ -471,7 +477,7 @@ class TestMetricsCompleteness:
         """Median feature frequency must be in [0, 1]."""
         from lib.sae.train import compute_metrics
 
-        for arch in ARCHITECTURES:
+        for arch in BASE_ARCHS:
             sae = _make(arch)
             metrics = compute_metrics(sae, _batch())
             mff = metrics["median_feat_freq"]
@@ -479,7 +485,7 @@ class TestMetricsCompleteness:
                 0.0 <= mff <= 1.0
             ), f"{arch}: median_feat_freq={mff} is outside [0, 1]"
 
-    @pytest.mark.parametrize("arch", list(ARCHITECTURES.keys()))
+    @pytest.mark.parametrize("arch", BASE_ARCHS)
     def test_all_metrics_keys_present(self, arch):
         """Every architecture must return the full set of expected metric keys."""
         from lib.sae.train import compute_metrics
@@ -547,3 +553,137 @@ class TestEarlyStopping:
         )
         assert "early_stopped" in results
         assert "final_step" in results
+
+
+# ===========================================================================
+# 9. Anchored SAEs (supervised BCE penalty on a subset of features)
+# ===========================================================================
+
+
+from lib.sae import AnchoredBatchTopKSAE, AnchoredJumpReLUSAE  # noqa: E402
+
+
+_NUM_ANCHORED = 4  # use prefix-index mapping: features [0..3] anchor BSPs [0..3]
+
+
+def _make_anchored(arch: str, lam: float = 0.1, **kw):
+    """Build an anchored SAE with prefix-index mapping and uniform λ."""
+    feat = list(range(_NUM_ANCHORED))
+    bsp = list(range(_NUM_ANCHORED))
+    lam_vec = [lam] * _NUM_ANCHORED
+    defaults = dict(
+        d_input=D_INPUT,
+        d_dict=D_DICT,
+        anchor_feature_idx=feat,
+        anchor_bsp_idx=bsp,
+        anchor_lambda_per_feature=lam_vec,
+        device=DEVICE,
+    )
+    if arch == "anchored-batchtopk":
+        defaults["k"] = K
+    return ARCHITECTURES[arch](**defaults, **kw)
+
+
+def _random_labels(n: int = BATCH, c: int = _NUM_ANCHORED) -> torch.Tensor:
+    torch.manual_seed(123)
+    return (torch.rand(n, c) > 0.5).float()
+
+
+class TestAnchoredSAE:
+
+    def test_lambda_zero_matches_base_loss(self):
+        """λ=0 ⇒ anchored compute_loss == base compute_loss (same seed init)."""
+        torch.manual_seed(7)
+        base = _make("jumprelu", theta_init=0.01, l0_target=8.0)
+        torch.manual_seed(7)
+        anchored = _make_anchored(
+            "anchored-jumprelu", lam=0.0, theta_init=0.01, l0_target=8.0
+        )
+        x = _batch()
+        anchored.set_batch_labels(_random_labels())
+        rb = base(x)
+        ra = anchored(x)
+        lb = base.compute_loss(rb)["loss"]
+        la = anchored.compute_loss(ra)["loss"]
+        assert torch.allclose(lb, la, atol=1e-6), (
+            f"With λ=0 anchored loss must equal base loss; got base={lb.item()} "
+            f"anchored={la.item()}"
+        )
+
+    def test_bce_numerical_correctness(self):
+        """l_anchor matches a hand-computed BCE-with-logits on the toy slice."""
+        torch.manual_seed(11)
+        sae = _make_anchored("anchored-jumprelu", lam=1.0, theta_init=0.01, l0_target=8.0)
+        x = _batch()
+        labels = _random_labels()
+        sae.set_batch_labels(labels)
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        # Reproduce by hand:
+        with torch.no_grad():
+            z = (x - sae.b_dec) @ sae.W_enc + sae.b_enc
+            z_anchor = z[:, : _NUM_ANCHORED]
+            y_anchor = labels[:, : _NUM_ANCHORED]
+            bce = torch.nn.functional.binary_cross_entropy_with_logits(
+                z_anchor, y_anchor, reduction="none"
+            )
+            expected = bce.sum(dim=-1).mean()  # λ=1 per feature
+        assert torch.allclose(losses["l_anchor"], expected, atol=1e-6), (
+            f"l_anchor={losses['l_anchor'].item()} vs expected={expected.item()}"
+        )
+
+    def test_prefix_mapping_uses_first_n_features(self):
+        """anchor_feature_idx and anchor_bsp_idx are exactly [0..N-1]."""
+        sae = _make_anchored("anchored-batchtopk", lam=0.1)
+        assert sae.anchor_feature_idx.tolist() == list(range(_NUM_ANCHORED))
+        assert sae.anchor_bsp_idx.tolist() == list(range(_NUM_ANCHORED))
+        assert sae.anchor_lambda_per_feature.shape == (_NUM_ANCHORED,)
+
+    def test_save_load_preserves_anchor_buffers(self):
+        """save/load round-trip preserves anchor_* buffers and reproduces loss."""
+        torch.manual_seed(3)
+        sae = _make_anchored("anchored-jumprelu", lam=0.25, theta_init=0.01, l0_target=8.0)
+        x = _batch()
+        labels = _random_labels()
+        sae.set_batch_labels(labels)
+        result = sae(x)
+        loss_before = sae.compute_loss(result)["l_anchor"].clone()
+
+        with tempfile.TemporaryDirectory() as td:
+            path = Path(td) / "anchored.pt"
+            save_checkpoint(
+                sae,
+                path,
+                metadata={
+                    "architecture": "anchored-jumprelu",
+                    "constructor_kwargs": {
+                        "anchor_feature_idx": list(range(_NUM_ANCHORED)),
+                        "anchor_bsp_idx": list(range(_NUM_ANCHORED)),
+                        "anchor_lambda_per_feature": [0.25] * _NUM_ANCHORED,
+                        "theta_init": 0.01,
+                        "l0_target": 8.0,
+                    },
+                },
+            )
+            sae2, _ = load_checkpoint(path, device=DEVICE)
+
+        assert torch.equal(sae2.anchor_feature_idx, sae.anchor_feature_idx)
+        assert torch.equal(sae2.anchor_bsp_idx, sae.anchor_bsp_idx)
+        assert torch.allclose(sae2.anchor_lambda_per_feature, sae.anchor_lambda_per_feature)
+        sae2.set_batch_labels(labels)
+        loss_after = sae2.compute_loss(sae2(x))["l_anchor"]
+        assert torch.allclose(loss_before, loss_after, atol=1e-6)
+
+    def test_labels_consumed_each_call(self):
+        """set_batch_labels is one-shot: omitting it next call gives l_anchor=0."""
+        torch.manual_seed(5)
+        sae = _make_anchored("anchored-jumprelu", lam=1.0, theta_init=0.01, l0_target=8.0)
+        x = _batch()
+        sae.set_batch_labels(_random_labels())
+        losses_with = sae.compute_loss(sae(x))
+        assert losses_with["l_anchor"].item() > 0
+        # No new labels set â€” l_anchor must be exactly zero, not stale reuse.
+        losses_without = sae.compute_loss(sae(x))
+        assert losses_without["l_anchor"].item() == 0.0
+
+

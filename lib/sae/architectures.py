@@ -514,6 +514,140 @@ class PAnnealingSAE(BaseSAE):
 
 
 # ---------------------------------------------------------------------------
+# 7. Anchored SAEs (supervised BCE penalty on a subset of features)
+# ---------------------------------------------------------------------------
+
+
+class _AnchorMixin:
+    """Mixin that adds a per-batch BCE-on-pre-activation anchor loss.
+
+    A pre-specified subset of dictionary slots ("anchored features") is
+    trained to fire in alignment with a corresponding subset of binary BSP
+    labels.  Loss form: BCE_with_logits on the encoder pre-activation
+    ``z = (x - b_dec) @ W_enc + b_enc`` for each anchored slot vs its bound
+    BSP label.  This routes a smooth gradient through W_enc / b_enc so the
+    anchored columns behave like a tiny logistic probe embedded in the SAE.
+
+    The mapping is fixed at construction time:
+        anchor_feature_idx[k]  →  dictionary slot anchored by anchor k
+        anchor_bsp_idx[k]      →  column of the label tensor used as target
+        anchor_lambda_per_feature[k] → per-anchor weight
+
+    Per-batch labels are injected by the training loop via
+    :meth:`set_batch_labels` immediately before ``sae(batch)``; the labels
+    are consumed (cleared to ``None``) during ``compute_loss``.  When no
+    labels are set (e.g. during eval), the anchor term is 0.
+    """
+
+    def _init_anchor(
+        self,
+        anchor_feature_idx,
+        anchor_bsp_idx,
+        anchor_lambda_per_feature,
+        device: str,
+    ) -> None:
+        feat = torch.as_tensor(anchor_feature_idx, dtype=torch.long, device=device)
+        bsp = torch.as_tensor(anchor_bsp_idx, dtype=torch.long, device=device)
+        lam = torch.as_tensor(
+            anchor_lambda_per_feature, dtype=torch.float32, device=device
+        )
+        if not (feat.shape == bsp.shape == lam.shape):
+            raise ValueError(
+                "anchor_feature_idx, anchor_bsp_idx, anchor_lambda_per_feature "
+                f"must have matching shape; got {feat.shape}, {bsp.shape}, {lam.shape}"
+            )
+        # Buffers (not parameters): travel with state_dict / device moves.
+        self.register_buffer("anchor_feature_idx", feat)
+        self.register_buffer("anchor_bsp_idx", bsp)
+        self.register_buffer("anchor_lambda_per_feature", lam)
+        self._batch_labels: torch.Tensor | None = None
+
+    def set_batch_labels(self, labels: torch.Tensor | None) -> None:
+        """Stash the current batch's anchor labels (full label matrix slice).
+
+        ``labels`` shape: (B, num_anchor_columns); the column for each anchor
+        is selected internally via ``anchor_bsp_idx``.
+        """
+        self._batch_labels = labels
+
+    def _anchor_loss(self, x: torch.Tensor) -> torch.Tensor:
+        if self._batch_labels is None or self.anchor_lambda_per_feature.numel() == 0:
+            return torch.zeros((), device=x.device)
+        # Recompute z to keep the autograd path clean and not piggyback on
+        # any architecture-specific stash (which may be cleared, masked, or
+        # absent depending on the variant).
+        z = (x - self.b_dec) @ self.W_enc + self.b_enc
+        z_anchor = z[:, self.anchor_feature_idx]  # (B, num_anchored)
+        y = self._batch_labels.to(device=z_anchor.device, dtype=z_anchor.dtype)
+        y_anchor = y[:, self.anchor_bsp_idx]  # (B, num_anchored)
+        bce = F.binary_cross_entropy_with_logits(
+            z_anchor, y_anchor, reduction="none"
+        )  # (B, num_anchored)
+        weighted = (bce * self.anchor_lambda_per_feature.unsqueeze(0)).sum(dim=-1).mean()
+        # Consume labels so a missing set_batch_labels() in the next call
+        # raises the explicit "no labels" path rather than silently reusing.
+        self._batch_labels = None
+        return weighted
+
+
+class AnchoredJumpReLUSAE(_AnchorMixin, JumpReLUSAE):
+    """JumpReLU SAE with a supervised BCE anchor loss on a subset of features."""
+
+    def __init__(
+        self,
+        d_input: int,
+        d_dict: int,
+        anchor_feature_idx,
+        anchor_bsp_idx,
+        anchor_lambda_per_feature,
+        theta_init: float = 0.001,
+        bandwidth: float = 0.001,
+        l0_target: float = 50.0,
+        l0_weight: float = 1e-2,
+        device: str = "cuda",
+    ):
+        JumpReLUSAE.__init__(
+            self, d_input, d_dict, theta_init, bandwidth, l0_target, l0_weight, device
+        )
+        self._init_anchor(
+            anchor_feature_idx, anchor_bsp_idx, anchor_lambda_per_feature, device
+        )
+
+    def compute_loss(self, result: dict) -> dict[str, torch.Tensor]:
+        losses = super().compute_loss(result)
+        l_anchor = self._anchor_loss(result["x"])
+        losses["loss"] = losses["loss"] + l_anchor
+        losses["l_anchor"] = l_anchor.detach()
+        return losses
+
+
+class AnchoredBatchTopKSAE(_AnchorMixin, BatchTopKSAE):
+    """BatchTopK SAE with a supervised BCE anchor loss on a subset of features."""
+
+    def __init__(
+        self,
+        d_input: int,
+        d_dict: int,
+        anchor_feature_idx,
+        anchor_bsp_idx,
+        anchor_lambda_per_feature,
+        k: int = 64,
+        device: str = "cuda",
+    ):
+        BatchTopKSAE.__init__(self, d_input, d_dict, k, device)
+        self._init_anchor(
+            anchor_feature_idx, anchor_bsp_idx, anchor_lambda_per_feature, device
+        )
+
+    def compute_loss(self, result: dict) -> dict[str, torch.Tensor]:
+        losses = super().compute_loss(result)
+        l_anchor = self._anchor_loss(result["x"])
+        losses["loss"] = losses["loss"] + l_anchor
+        losses["l_anchor"] = l_anchor.detach()
+        return losses
+
+
+# ---------------------------------------------------------------------------
 # Registry
 # ---------------------------------------------------------------------------
 
@@ -524,4 +658,6 @@ ARCHITECTURES: dict[str, type[BaseSAE]] = {
     "gated": GatedSAE,
     "jumprelu": JumpReLUSAE,
     "p-annealing": PAnnealingSAE,
+    "anchored-jumprelu": AnchoredJumpReLUSAE,
+    "anchored-batchtopk": AnchoredBatchTopKSAE,
 }

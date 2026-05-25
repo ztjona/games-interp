@@ -38,7 +38,7 @@ Examples:
 Notes:
     - Configs are sorted alphabetically and assigned to splits round-robin.
     - GPU 0 (RTX 4000) gets conv2 configs first (heavier), P4000s get fc1 first.
-    - Failures are logged and skipped — the sweep continues.
+    - Failures are logged and skipped -- the sweep continues.
     - Progress is logged to logs/sweep_{gpu}_{timestamp}.log
     - --skip-existing checks for a .pt checkpoint file. JSONL-only partial runs
       (no .pt saved) will NOT be skipped and will re-run from scratch, which is
@@ -158,8 +158,10 @@ def get_output_path(cfg: dict) -> Path:
         l1 = cfg.get("l1_weight", cfg.get("gated_l1", 0))
         l1_str = str(l1).replace("0.", "").replace(".", "")
         parts.append(f"l1_{l1_str}")
-    elif arch == "jumprelu":
+    elif arch in ("jumprelu", "anchored-jumprelu"):
         parts.append(f"t{int(cfg['l0_target'])}")
+    elif arch == "anchored-batchtopk":
+        parts.append(f"k{cfg['k']}")
     parts.append(f"exp{cfg['expansion']}")
     suffix = "-".join(parts)
 
@@ -275,7 +277,7 @@ def main():
 
     # Print plan
     total = len(configs)
-    log(f"Anakin Sweep — GPU {args['gpu']}, {total} configs")
+    log(f"Anakin Sweep -- GPU {args['gpu']}, {total} configs")
     if args["split"]:
         log(f"  Split: {args['split']}")
     if args["eval"]:
@@ -292,7 +294,7 @@ def main():
 
         # Skip existing
         if args["skip_existing"] and out_path.exists():
-            log(f"[{i}/{total}] SKIP {name} — {out_path} exists")
+            log(f"[{i}/{total}] SKIP {name} -- {out_path} exists")
             continue
 
         log(f"[{i}/{total}] TRAIN {name}")
@@ -300,15 +302,15 @@ def main():
         if args["dry_run"]:
             log(f"  -> would produce {out_path}")
             if args["eval"]:
-                log(f"  → would evaluate with {args['bsps']}")
+                log(f"  -> would evaluate with {args['bsps']}")
             continue
 
         # Train
         ok, info, wall = run_training(cfg_path, device, timeout=args["timeout"])
         if ok:
-            log(f"  ✓ trained in {wall:.0f}s → {out_path}")
+            log(f"  [OK] trained in {wall:.0f}s -> {out_path}")
         else:
-            log(f"  ✗ FAILED in {wall:.0f}s: {info}")
+            log(f"  [FAIL] FAILED in {wall:.0f}s: {info}")
             continue  # Skip eval if training failed
 
         # Evaluate
@@ -317,9 +319,9 @@ def main():
                 str(out_path), args["bsps"], device
             )
             if ok_eval:
-                log(f"  ✓ evaluated in {wall_eval:.0f}s")
+                log(f"  [OK] evaluated in {wall_eval:.0f}s")
             else:
-                log(f"  ✗ eval FAILED in {wall_eval:.0f}s: {info_eval}")
+                log(f"  [FAIL] eval FAILED in {wall_eval:.0f}s: {info_eval}")
 
     log("")
     log(f"Sweep complete. Log saved to {log_path}")

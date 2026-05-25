@@ -1,0 +1,243 @@
+{
+  "bsp_set_name": "tiger_36",
+  "animal": "tiger",
+  "game": "quarto",
+  "num_bsps": 36,
+  "categories": {
+    "tiger_pool_safe_count": 4,
+    "tiger_decision_global": 5,
+    "tiger_pool_winning_count": 4,
+    "tiger_line_winnable": 10,
+    "tiger_offered_completing_attr": 4,
+    "tiger_square_winnable": 9
+  },
+  "filters": {
+    "only_categories": [
+      "tiger_decision_global",
+      "tiger_offered_completing_attr",
+      "tiger_line_winnable",
+      "tiger_square_winnable",
+      "tiger_pool_winning_count",
+      "tiger_pool_safe_count"
+    ],
+    "exclude_categories": null
+  },
+  "bsps": [
+    {
+      "id": "tiger_win_now_exists",
+      "description": "Current player can win this turn by placing the offered piece somewhere",
+      "type": "binary",
+      "category": "tiger_decision_global"
+    },
+    {
+      "id": "tiger_opp_winning_offer_exists",
+      "description": "At least one pool piece, if offered, lets the opponent win on their next turn",
+      "type": "binary",
+      "category": "tiger_decision_global"
+    },
+    {
+      "id": "tiger_lose_next_forced",
+      "description": "Every pool piece, if offered, lets the opponent win \u2014 i.e. forced to gift a win",
+      "type": "binary",
+      "category": "tiger_decision_global"
+    },
+    {
+      "id": "tiger_safe_offer_exists",
+      "description": "At least one pool piece can be offered without giving opponent an immediate win",
+      "type": "binary",
+      "category": "tiger_decision_global"
+    },
+    {
+      "id": "tiger_every_offer_safe",
+      "description": "Every pool piece is a safe offer (no pool piece gives opponent an immediate win)",
+      "type": "binary",
+      "category": "tiger_decision_global"
+    },
+    {
+      "id": "tiger_offered_completes_tall",
+      "description": "Offered piece is TALL AND at least one line/2x2 on the board has 3 cells already matching TALL (offered piece is a winning completer via the size attribute)",
+      "type": "binary",
+      "category": "tiger_offered_completing_attr"
+    },
+    {
+      "id": "tiger_offered_completes_black",
+      "description": "Offered piece is BLACK AND at least one line/2x2 on the board has 3 cells already matching BLACK (offered piece is a winning completer via the coloration attribute)",
+      "type": "binary",
+      "category": "tiger_offered_completing_attr"
+    },
+    {
+      "id": "tiger_offered_completes_square",
+      "description": "Offered piece is SQUARE AND at least one line/2x2 on the board has 3 cells already matching SQUARE (offered piece is a winning completer via the shape attribute)",
+      "type": "binary",
+      "category": "tiger_offered_completing_attr"
+    },
+    {
+      "id": "tiger_offered_completes_with_hole",
+      "description": "Offered piece is WITH_HOLE AND at least one line/2x2 on the board has 3 cells already matching WITH_HOLE (offered piece is a winning completer via the hole attribute)",
+      "type": "binary",
+      "category": "tiger_offered_completing_attr"
+    },
+    {
+      "id": "tiger_line_row_0_winnable",
+      "description": "Row 0: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_row_1_winnable",
+      "description": "Row 1: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_row_2_winnable",
+      "description": "Row 2: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_row_3_winnable",
+      "description": "Row 3: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_col_0_winnable",
+      "description": "Col 0: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_col_1_winnable",
+      "description": "Col 1: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_col_2_winnable",
+      "description": "Col 2: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_col_3_winnable",
+      "description": "Col 3: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_diag_main_winnable",
+      "description": "Diag main: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_line_diag_anti_winnable",
+      "description": "Diag anti: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_line_winnable"
+    },
+    {
+      "id": "tiger_square_0_0_winnable",
+      "description": "2x2 at (0,0): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_0_1_winnable",
+      "description": "2x2 at (0,1): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_0_2_winnable",
+      "description": "2x2 at (0,2): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_1_0_winnable",
+      "description": "2x2 at (1,0): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_1_1_winnable",
+      "description": "2x2 at (1,1): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_1_2_winnable",
+      "description": "2x2 at (1,2): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_2_0_winnable",
+      "description": "2x2 at (2,0): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_2_1_winnable",
+      "description": "2x2 at (2,1): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_square_2_2_winnable",
+      "description": "2x2 at (2,2): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "type": "binary",
+      "category": "tiger_square_winnable"
+    },
+    {
+      "id": "tiger_pool_winning_count_ge1",
+      "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: ge1 (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "type": "binary",
+      "category": "tiger_pool_winning_count"
+    },
+    {
+      "id": "tiger_pool_winning_count_ge2",
+      "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: ge2 (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "type": "binary",
+      "category": "tiger_pool_winning_count"
+    },
+    {
+      "id": "tiger_pool_winning_count_ge4",
+      "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: ge4 (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "type": "binary",
+      "category": "tiger_pool_winning_count"
+    },
+    {
+      "id": "tiger_pool_winning_count_all",
+      "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: all (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "type": "binary",
+      "category": "tiger_pool_winning_count"
+    },
+    {
+      "id": "tiger_pool_safe_count_ge1",
+      "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: ge1 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "type": "binary",
+      "category": "tiger_pool_safe_count"
+    },
+    {
+      "id": "tiger_pool_safe_count_ge2",
+      "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: ge2 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "type": "binary",
+      "category": "tiger_pool_safe_count"
+    },
+    {
+      "id": "tiger_pool_safe_count_ge4",
+      "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: ge4 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "type": "binary",
+      "category": "tiger_pool_safe_count"
+    },
+    {
+      "id": "tiger_pool_safe_count_eq0",
+      "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: eq0 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "type": "binary",
+      "category": "tiger_pool_safe_count"
+    }
+  ]
+}

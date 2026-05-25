@@ -145,3 +145,52 @@ Either way is informative.
 - **Defining tiger as an extension of hawk** (gorilla → hawk → tiger as a chain of reframings). They attack different axes; chaining would conflate "rare-concept reframing" with "agent-relative reframing" and we'd lose the diagnostic separation.
 - **Computing tiger labels for champAa.** champAa lacks the loss-avoidance behaviour (attack-recognition / defence-blindness asymmetry per Phase 1G); tigerAa would be theoretically computable but the diagnostic interest is on the champions that *do* show the behaviour.
 - **Per-cell tiger.** Same reason as the per-cell hawk concern (CLAUDE.md § Things that have bitten): not on the current `--flatten-position` path.
+
+---
+
+## Results (closed 2026-05-22 PM) [DIRECT — from `saes/quarto/eval_registry.json`]
+
+Labels: `bsp_labels-tigerS4_36.pt` (275 916 × 36, base-rates 0.028 – 0.887, 0 degenerate columns), `bsp_labels-tigerTa_36.pt` (88 524 × 36, base-rates 0.040 – 0.814, 0 degenerate columns). Sanity-check passed; tiger is a real signal axis.
+
+### Headline table (F1-lift, count-weighted across 36 BSPs)
+
+| Champion | Hook | LP-trained (F1 / MCC / lift) | Best SAE | LP-random (F1 / MCC / lift) | SAE/LP efficiency (lift) |
+|---|---|---|---|---|---:|
+| S4 | fc1   | 0.440 / 0.380 / **0.179**   | F04 — 0.376 / 0.201 / **0.112** | 0.258 / 0.178 / 0.038 | **62.5 %** |
+| S4 | conv2 | 0.335 / 0.262 / **0.098**   | E05 — 0.325 / 0.161 / **0.061** | 0.271 / 0.197 / 0.046 | **62.2 %** |
+| **Ta** | fc1   | 0.591 / 0.537 / **0.301** | **F04 — 0.449 / 0.333 / 0.158** | 0.278 / 0.206 / 0.048 | **52.5 %** |
+| **Ta** | conv2 | 0.463 / 0.405 / **0.175** | E05 — 0.353 / 0.165 / 0.063 | 0.293 / 0.230 / 0.058 | **36.0 %** |
+
+S4-fc1 LP was rerun at `max_iter=5000` to address 5 cosmetically-unconverged BSPs from the original `max_iter=1000` pass; the rerun returned 0.4402 / 0.3797 / 0.1789 (vs original 0.440 / 0.380 / 0.179) — numbers unchanged in the third decimal. The headline ceiling stands.
+
+### Decision-rule outcome — **target-set mismatch was contributing**
+
+Comparison anchor: phase-2B's "11 % conv2/hawk SAE/LP wall" (champTa). Tiger conv2/Ta sits at **36 %** efficiency, **+25 pp above** the hawk wall. Tiger conv2/S4 sits at **62 %**, **+51 pp above**. Both cells clear the pre-registered `+0.10` threshold by a wide margin.
+
+Per the decision rule (this entry, §"Decision rule"):
+
+> tiger SAE / LP efficiency *higher* than hawk by > 0.10 → Target-set mismatch was contributing; agent-relative framing recovers some of the wall. **Anchored / matryoshka should target tiger, not hawk, as the supervision signal.**
+
+The two compatible mechanisms predicted in §"Why" of the 2026-05-19 concept-targeted design note remain in play; what tiger settles is *which target set* to anchor / matryoshka against, not whether to do them.
+
+### Sub-claims supported by the per-category breakdown
+
+- **fc1 > conv2 for tiger on both champions** (opposite of hawk on Ta, where conv2 > fc1). Agent-relative concepts live at fc1 — the bottleneck where the model integrates board + offered-piece + pool into a decision. This matches the H8-revised picture: unified-aux fc1 carries decision-relevant information.
+- **Champion ordering Ta > S4 holds for tiger lift** (Δ +0.046 fc1, +0.077 conv2), consistent with H9 — minimax distillation transfers agent-relative competence, not just threat detection.
+- **Sweep H null reproduces on tiger.** Expansion ladder (`H01`/`H02`/`H03` exp ∈ {16, 32, 64} on fc1; `H04`/`H05`/`H06` on conv2) is flat-to-negative on tigerTa F1-lift relative to the F04/E05 baselines. Capacity alone does not buy tiger coverage either.
+- **F04-Ta-fc1 per-category lifts** (tigerTa): `tiger_square_winnable` **0.220**, `tiger_offered_completing_attr` **0.195**, `tiger_line_winnable` **0.147**, pool-count categories ≤ 0.124. The rare per-cell concepts move the headline; the pool-count categories sit at high F1 (≥ 0.71) but low lift because base rates are high. Pre-registered prediction #1 (decision-global + offered-disposition are well-covered) **lands**; prediction #2 (pool-reasoning shows the largest SAE/LP gap) is **mixed** — pool-safe-count has the largest gap, pool-winning-count does not.
+
+### Feature-sharing observation (motivates matryoshka, separately)
+
+F04-champTa-fc1 on tigerTa: `mean_bsps_per_feature = 1.44`, `max_bsps_per_feature = 6`. The conv2 winners go higher (E05-Ta conv2 max ≈ 10). Real feature absorption exists in the current champion-era SAEs — this contradicts the older champAa-based deprioritization of matryoshka ("missing concepts aren't being absorbed, they're never represented"). On champTa, *some* are being absorbed. Matryoshka stays on the active list, but anchored is the cheaper first move.
+
+### Implication for next session
+
+**Anchored SAE on `champTa fc1 → tigerTa`** is the highest-prior next step:
+
+- Largest LP headroom in any cell where we have an LP win (F1-lift 0.301 vs SAE 0.158 → 0.143 absolute gap to close).
+- Per-cell concept categories (`tiger_line_winnable` 10 BSPs, `tiger_square_winnable` 9 BSPs, `tiger_offered_completing_attr` 4 BSPs) match the candidate anchor-feature-count budget (23 anchored slots out of 1 024 = 2.2 % of the dictionary).
+- Implementation cost is the lowest of the three supervised candidates (~2 days; see [2026-05-19_concept-targeted-saes.md](2026-05-19_concept-targeted-saes.md) §3).
+- Diagnostic is sharp: if anchored features approach LP F1 on these 23 BSPs at λ_anchor ≪ 1, the wall was allocation; if they plateau well below LP, the activation space lacks sparse linear directions for those concepts and we revisit hook choice.
+
+Detailed plan: [2026-05-22_anchored-sae-champta-tiger.md](2026-05-22_anchored-sae-champta-tiger.md).

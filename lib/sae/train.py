@@ -103,6 +103,27 @@ def iter_batches(data: torch.Tensor, batch_size: int, shuffle: bool = True):
 # ---------------------------------------------------------------------------
 
 
+def _shuffled_batches(
+    data: torch.Tensor,
+    batch_size: int,
+    anchor_labels: torch.Tensor | None,
+):
+    """Yield (batch_x, batch_anchor_labels_or_None) using a fresh random perm.
+
+    Used in place of :func:`iter_batches` when anchored SAEs require per-batch
+    label slices aligned with the shuffled activations.
+    """
+    N = data.shape[0]
+    perm = torch.randperm(N, device=data.device)
+    for i in range(0, N, batch_size):
+        idx = perm[i : i + batch_size]
+        batch = data[idx]
+        if anchor_labels is None:
+            yield batch, None
+        else:
+            yield batch, anchor_labels[idx.to(anchor_labels.device)]
+
+
 def train_sae(
     sae: BaseSAE,
     data: torch.Tensor,
@@ -116,6 +137,7 @@ def train_sae(
     min_improvement: float = 0.01,
     l0_patience: int = 0,
     l0_min_change: float = 5.0,
+    anchor_labels: torch.Tensor | None = None,
 ) -> dict[str, Any]:
     """Train an SAE on pre-collected activation data.
 
@@ -133,11 +155,27 @@ def train_sae(
                      enable for TopK/BatchTopK — their L0 is always exactly k.
         l0_min_change: Minimum absolute L0 change per window to reset the L0
                        plateau counter.  Default 5.0 units.
+        anchor_labels: Optional (N, num_anchor_cols) tensor aligned with ``data``
+                       row order.  When provided, the trainer slices the matching
+                       rows for each batch and pushes them onto ``sae`` via
+                       ``sae.set_batch_labels()`` before the forward pass.  Used
+                       by ``AnchoredJumpReLUSAE`` / ``AnchoredBatchTopKSAE``.
 
     Returns:
         dict with keys: final_step, num_epochs, wall_time_seconds,
                         final_metrics, metrics_log, early_stopped
     """
+    if anchor_labels is not None:
+        if anchor_labels.shape[0] != data.shape[0]:
+            raise ValueError(
+                f"anchor_labels row count ({anchor_labels.shape[0]}) must match "
+                f"data row count ({data.shape[0]})"
+            )
+        if not hasattr(sae, "set_batch_labels"):
+            raise ValueError(
+                f"anchor_labels provided but {type(sae).__name__} has no "
+                "set_batch_labels() method; use an Anchored* architecture."
+            )
     torch.manual_seed(seed)
 
     optimizer = torch.optim.Adam(sae.parameters(), lr=lr)
@@ -171,15 +209,20 @@ def train_sae(
     )
 
     # Progress bar
-    pbar = tqdm(total=num_batches, desc="Training", unit="step")
+    pbar = tqdm(total=num_batches, desc="Training", unit="step", disable=None)
 
     stop_reason: str | None = None
     try:
         while step < num_batches:
             epoch += 1
-            for batch in iter_batches(data, batch_size, shuffle=True):
+            for batch, batch_labels in _shuffled_batches(
+                data, batch_size, anchor_labels
+            ):
                 if step >= num_batches:
                     break
+
+                if batch_labels is not None:
+                    sae.set_batch_labels(batch_labels)  # type: ignore[attr-defined]
 
                 result = sae(batch)
                 losses = sae.compute_loss(result)

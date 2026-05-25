@@ -443,6 +443,92 @@ def cmd_evaluate(args: dict) -> None:
         if per_category:
             metrics["per_category"] = per_category
 
+        # Anchored diagonal: per-anchor F1/MCC/lift on the (feature, bsp)
+        # pair that was supervised at training time.  Read constructor_kwargs
+        # from the checkpoint metadata to know which slots are anchored.
+        ctor_kwargs = metadata.get("constructor_kwargs", {}) or {}
+        anchor_feature_idx = ctor_kwargs.get("anchor_feature_idx")
+        anchor_bsp_idx = ctor_kwargs.get("anchor_bsp_idx")
+        if anchor_feature_idx is not None and anchor_bsp_idx is not None:
+            anchor_meta = metadata.get("anchor", {}) or {}
+            afi = torch.as_tensor(anchor_feature_idx, dtype=torch.long)
+            abi = torch.as_tensor(anchor_bsp_idx, dtype=torch.long)
+            num_anchored = int(afi.numel())
+            num_bsps_eval = matching.f1.shape[1]
+            in_range = abi < num_bsps_eval
+            n_skipped = int((~in_range).sum().item())
+            if n_skipped:
+                log.warning(
+                    "Anchored diagonal: %d/%d anchor BSP indices fall outside "
+                    "the current eval BSP set (%s, n=%d) and will be skipped.",
+                    n_skipped, num_anchored, animal, num_bsps_eval,
+                )
+            afi_e = afi[in_range]
+            abi_e = abi[in_range]
+            if afi_e.numel() > 0:
+                diag_f1 = matching.f1[afi_e, abi_e]
+                diag_mcc = (
+                    matching.mcc[afi_e, abi_e]
+                    if matching.mcc is not None
+                    else torch.zeros_like(diag_f1)
+                )
+                if matching.trivial_f1_per_bsp is not None:
+                    diag_lift = (
+                        diag_f1 - matching.trivial_f1_per_bsp[abi_e]
+                    ).clamp(min=0.0)
+                else:
+                    diag_lift = torch.zeros_like(diag_f1)
+                anchored_diagonal: dict[str, Any] = {
+                    "num_anchored": num_anchored,
+                    "num_evaluated": int(afi_e.numel()),
+                    "mean_f1": float(diag_f1.mean()),
+                    "mean_mcc": float(diag_mcc.mean()),
+                    "mean_f1_lift": float(diag_lift.mean()),
+                    "per_anchor_f1": diag_f1.tolist(),
+                    "per_anchor_mcc": diag_mcc.tolist(),
+                    "per_anchor_f1_lift": diag_lift.tolist(),
+                    "anchor_feature_idx": afi_e.tolist(),
+                    "anchor_bsp_idx": abi_e.tolist(),
+                }
+                # Tier breakdown (high vs medium) using anchor_meta + schema
+                high_cats = set(anchor_meta.get("anchor_high_categories") or [])
+                if high_cats and bsp_schema is not None:
+                    bsps_list = (
+                        bsp_schema.get("bsps", bsp_schema)
+                        if isinstance(bsp_schema, dict)
+                        else bsp_schema
+                    )
+                    high_mask = torch.tensor(
+                        [
+                            (
+                                bsps_list[int(j)].get("category", "") in high_cats
+                                if int(j) < len(bsps_list)
+                                else False
+                            )
+                            for j in abi_e.tolist()
+                        ],
+                        dtype=torch.bool,
+                    )
+                    med_mask = ~high_mask
+                    tier: dict[str, dict[str, float]] = {}
+                    if high_mask.any():
+                        tier["high"] = {
+                            "n": int(high_mask.sum().item()),
+                            "mean_f1": float(diag_f1[high_mask].mean()),
+                            "mean_mcc": float(diag_mcc[high_mask].mean()),
+                            "mean_f1_lift": float(diag_lift[high_mask].mean()),
+                        }
+                    if med_mask.any():
+                        tier["medium"] = {
+                            "n": int(med_mask.sum().item()),
+                            "mean_f1": float(diag_f1[med_mask].mean()),
+                            "mean_mcc": float(diag_mcc[med_mask].mean()),
+                            "mean_f1_lift": float(diag_lift[med_mask].mean()),
+                        }
+                    if tier:
+                        anchored_diagonal["per_tier"] = tier
+                metrics["anchored_diagonal"] = anchored_diagonal
+
         _register_eval(run_id, game, checkpoint_path, info, animal, metrics, tag)
 
         output = {
