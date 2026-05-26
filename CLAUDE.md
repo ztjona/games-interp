@@ -99,6 +99,16 @@ python scripts/anchor_analysis.py saes/quarto/<ckpt>.pt --cross-bsps=gorillaTa  
 ```
 Output: `saes/quarto/analysis/{run_id}_anchor-{bsp_set}.json` (per-slot F1/P/R/MCC, category summary, polysemanticity, cross-BSP coverage).
 
+Unified cross-champion dataset (for fair cross-champion comparison in reports):
+```bash
+python scripts/unify_positions.py --dry-run                         # preview what would be merged
+python scripts/unify_positions.py --skip-activations                # merge + BSP labels only
+python scripts/unify_positions.py --device cuda                     # full pipeline (slow)
+# Then evaluate SAEs against the unified pool:
+python sae_eval.py evaluate saes/quarto/<ckpt>.pt --bsps=gorilla<N>k \
+    --data=data/quarto/<hook>_amalgam_all_<tag>_activations.pt --force
+```
+
 Linear-probe baseline (upper bound for any SAE on the same activations):
 ```bash
 python scripts/linear_probe_baseline.py \
@@ -197,7 +207,7 @@ Multi-champion era (from 2026-05-14). Each champion has its own YAML at `configs
 These naming rules are project-specific and are required for files to flow through the auto-resolution logic in `sae_eval.py`:
 
 - **Position datasets** use the **metals** theme (`copper, bronze, iron, steel, amalgam`), one metal per opponent-mode mixture. `amalgam` = combined+deduped across all four modes.
-- **BSP sets** use the **animals** theme (`gorilla` = full 164 state-only concept menu, `hawk_173` = reframed Nanda-style threat counts, `tiger_36` = agent-relative / pool reasoning, `fox` = cells/phase only, etc.). An animal name is `{basis}{ChampionSuffix?}`: the **basis** (`gorilla`, `hawk`, `tiger`, `fox`) defines the concept menu; the optional **champion suffix** (`S4`, `Ta`, `Aa`) identifies the position distribution used to compute the labels. `tiger` differs from gorilla/hawk in axis — see [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
+- **BSP sets** use the **animals** theme (`gorilla` = full 164 state-only concept menu, `hawk_173` = reframed Nanda-style threat counts, `tiger_36` = agent-relative / pool reasoning, `fox` = cells/phase only, etc.). An animal name is `{basis}{Suffix?}`: the **basis** (`gorilla`, `hawk`, `tiger`, `fox`) defines the concept menu; the optional **suffix** identifies the position distribution. Champion suffixes (`S4`, `Ta`, `Aa`) denote per-champion distributions; a **numeric suffix** like `156k` denotes the unified cross-champion pool of that many thousand positions (built by `scripts/unify_positions.py`). `tiger` differs from gorilla/hawk in axis — see [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
 - Filename patterns:
   - `positions-<metal>_unique.pt` — position dataset.
   - `bsp_labels-<animal>_<count>.pt` — per-distribution label tensor (animal carries the champion suffix).

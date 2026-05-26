@@ -272,6 +272,11 @@ re-used verbatim as the eval-registry key.
   `gorilla` and `gorillaS4` without collision — but in practice each run is
   evaluated only against the BSP set matching its training distribution.
 - Cross-champion comparison via `registry_query.py compare A B --bsps=<setA> --bsps-b=<setB>`.
+- **Unified cross-champion pool**: `scripts/unify_positions.py` merges all
+  per-champion amalgams into `positions-amalgam_all_unique.pt`. The BSP set
+  suffix encodes the position count in thousands (e.g. `gorilla156k`),
+  making the evaluation basis self-documenting. Used for reporting only;
+  day-to-day work stays on champion-specific data.
 - `sae_eval` glob is `bsp_labels-{animal}_[0-9]*.pt` (numeric count suffix
   required); this prevents `gorilla` from accidentally matching `gorillaS4`
   or any other future champion-tagged variant.
@@ -280,9 +285,9 @@ re-used verbatim as the eval-registry key.
 
 **Authoritative sources, not duplicated here.** Per-champion specs live in [`configs/models/champ*.yaml`](configs/models/); per-instance files are on the filesystem:
 
-- Position datasets: `data/quarto/positions-amalgam_<tag>_unique.pt` (current champions: `s4`, `ta`, `ve`; champAa is un-tagged: `positions-amalgam_unique.pt`).
-- BSP labels: `data/quarto/bsp_labels-<animal>_<count>.pt` (e.g. `gorillaVe_164`, `hawkTa_173`, `tigerS4_36`). Schema: `data/quarto/bsp_schema-<basis>_<count>.json` (basis-only — same schema for all champions in a basis).
-- Activations: `data/quarto/<hook>_amalgam_<tag>{,_random}_activations.pt`. Trained-vs-random pairs are required for any headline gap claim.
+- Position datasets: `data/quarto/positions-amalgam_<tag>_unique.pt` (current champions: `s4`, `ta`, `ve`; champAa is un-tagged: `positions-amalgam_unique.pt`). Unified cross-champion pool: `positions-amalgam_all_unique.pt`.
+- BSP labels: `data/quarto/bsp_labels-<animal>_<count>.pt` (e.g. `gorillaVe_164`, `hawkTa_173`, `tigerS4_36`). Unified pool labels use a numeric suffix: `gorilla{N}k_164` (N = thousands of positions). Schema: `data/quarto/bsp_schema-<basis>_<count>.json` (basis-only — same schema for all champions in a basis).
+- Activations: `data/quarto/<hook>_amalgam_<tag>{,_random}_activations.pt`. Unified pool: `<hook>_amalgam_all_<tag>{,_random}_activations.pt`. Trained-vs-random pairs are required for any headline gap claim.
 
 List what's currently on disk with `ls data/quarto/positions-amalgam_*_unique.pt`, `ls data/quarto/bsp_labels-*.pt`, `ls data/quarto/*_activations.pt`. To add a new champion, follow [`configs/models/README.md`](configs/models/README.md).
 

@@ -1,15 +1,15 @@
 {
   "bsp_set_name": "tiger_36",
   "animal": "tiger",
-  "game": "quarto",
+  "game": "quarto_s4",
   "num_bsps": 36,
   "categories": {
-    "tiger_pool_safe_count": 4,
-    "tiger_decision_global": 5,
-    "tiger_pool_winning_count": 4,
-    "tiger_line_winnable": 10,
     "tiger_offered_completing_attr": 4,
-    "tiger_square_winnable": 9
+    "tiger_pool_winning_count": 4,
+    "tiger_decision_global": 5,
+    "tiger_line_winnable": 10,
+    "tiger_square_winnable": 9,
+    "tiger_pool_safe_count": 4
   },
   "filters": {
     "only_categories": [

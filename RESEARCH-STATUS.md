@@ -11,7 +11,11 @@
 
 ## Project State
 
-### 2026-05-25 (champVe onboarded) — current
+### 2026-05-26 (unified cross-champion position dataset) — current
+
+Per-champion position distributions bias evaluations toward each champion's visited states. New tool `scripts/unify_positions.py` merges all champion amalgams into a single deduplicated pool; BSP set suffix encodes position count (e.g. `gorilla156k`) so the evaluation basis is always clear. Day-to-day sweeps keep champion-specific data; unified pool used only for cross-champion reporting. Design: [`docs/diary/2026-05-26_unified-position-dataset.md`](docs/diary/2026-05-26_unified-position-dataset.md).
+
+### 2026-05-25 (champVe onboarded)
 
 **New champion landed:** `champVe` = `Ve_oracleAblation(4) [DISABLE_NEVER, E=10000]`. Same architecture as champS4 / champTa (`QuartoCNNAutoregUnifiedS4`); the variable vs champTa is the minimax-oracle SELECT distillation schedule (oracle never disabled) plus 2.3x more training (10k vs 4350 epochs). Head-to-head vs champTa: **59.4%** (500 games each direction); vs champS4: 73.7%; vs Aa_replay: 80.9% (`hierarchical-SAE/champion-results.jsonl`).
 
