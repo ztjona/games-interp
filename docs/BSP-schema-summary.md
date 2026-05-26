@@ -2,11 +2,15 @@
 
 **Source:** `scripts/games/quarto.py` → `get_all_bsp_definitions()` returns 337 BSPs as a *menu* (the union of all defined sets), not a usable evaluation target.
 
-> **Use one BSP set at a time.** Gorilla (164) and Hawk (173) are **alternative bases** for the same threat concepts — see "Gorilla ↔ Hawk Correspondence" below. Evaluating an SAE against the 337-union conflates raw and reframed signals and produces a meaningless coverage number. Always run `compute_bsp_labels.py --name gorilla` and `--name hawk` separately; `BSP_SETS` in `quarto.py` makes this resolution automatic. The two named sets canonical files on disk are `bsp_labels-gorilla_164.pt` and `bsp_labels-hawk_173.pt`. A `*_337.pt` file is a sign the filter step was skipped.
+> **Use one BSP set at a time.** Gorilla (164), Hawk (173), and Tiger (36) are **alternative bases** for the same underlying threat concepts. Evaluating an SAE against the 337-union conflates raw and reframed signals and produces a meaningless coverage number. Always run `compute_bsp_labels.py --name <basis>` separately per set; `BSP_SETS` in `quarto.py` resolves the right filter. Canonical files: `bsp_labels-gorilla_164.pt`, `bsp_labels-hawk_173.pt`, `bsp_labels-tiger_36.pt`. A `*_337.pt` file is a sign the filter step was skipped.
+
+> **Tiger basis (36 BSPs)** — agent-relative / pool-reasoning reframing introduced 2026-05-22. Differs from gorilla/hawk in *axis* (not just naming), so it does not appear in the gorilla ↔ hawk correspondence table below. Full definitions and rationale: [`diary/2026-05-22_reframings-audit-tiger.md`](diary/2026-05-22_reframings-audit-tiger.md). Schema file: `bsp_schema-tiger_36.json` (basis-only; champion suffix only applies to the *labels* file).
 
 ## Gorilla Set (164 BSPs) — Raw Game Properties
 
 Probes for the ground-truth game state as defined by the rules.
+
+*Linear-probe F1 columns below are 2026-03-31 baselines on champAa fc1; reference values, not current SAE coverage. See `eval_registry.json` for live numbers.*
 
 | Category | Count | Formula | Description | Linear Probe F1 (trained / random) |
 |----------|------:|---------|-------------|-------------------------------------|
@@ -162,14 +166,6 @@ board_completable_exists     →  (singleton, includes lines + squares)
 
 ---
 
-## Verification Status (2026-03-31)
+## Verification
 
-- [x] 26/26 unit tests passing (`tests/test_bsp_logic.py`)
-- [x] Gorilla: 164 BSPs, 7 categories — fully tested
-- [x] Hawk lines: 90 BSPs, 3 categories — fully tested
-- [x] Hawk squares: 81 BSPs, 3 categories — fully tested (NEW)
-- [x] Hawk global: 2 BSPs — updated to include 2×2 squares, tested
-- [x] Gorilla square threat dispatch not broken by hawk additions (regression test)
-- [x] Hawk labels recomputed (`bsp_labels-hawk_173.pt` on disk)
-- [x] fc1 linear probes re-run on updated hawk_173
-- [ ] Conv2 linear probes not yet run on hawk_173
+BSP logic is guarded by `tests/test_bsp_logic.py` — run `pytest tests/test_bsp_logic.py` after any change to `scripts/games/quarto.py::get_all_bsp_definitions()`.

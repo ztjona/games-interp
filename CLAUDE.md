@@ -6,21 +6,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 PhD research on mechanistic interpretability of board-game neural networks. The current focus is **Quarto** (a CNN DQN); Othello and Tic-tac-toe are planned but not implemented. The core technique is training Sparse Autoencoders (SAEs) on hooked activations and evaluating them against hand-defined ground-truth concepts called **BSPs** (Board State Properties).
 
-Source-of-truth research docs (read these before changing experimental scope):
-- `RESEARCH-STATUS.md` — current phase, hypotheses, winners, open problems, active plan (high-level ledger)
-- `docs/diary/README.md` — index of dated sweep-level entries (per-category tables, AI-assisted interpretation, design notes). The top-level docs link out to these for specifics; add new entries here when a sweep produces more than ~3 rows of numbers
-- `Quarto-specifications.md` — game, model architecture, hookable layers, dataset catalog, naming conventions
-- `BSP-schema-summary.md` — full BSP schema for gorilla and hawk sets
-- `configs/models/README.md` — checklist for onboarding a new champion (model config, game module, naming tags, verification)
+## Documentation contract
 
-**`commands.sh` is a transient user file**, not committed infrastructure.
-The user keeps the *current* pipeline-execution recipe there as one cohesive
-shell script (training + eval + diagnostic blocks) and rewrites it whenever
-the active phase changes. Do **not** treat its contents as canonical: read
-it for context if helpful, but write new permanent infrastructure as a
-proper script under `scripts/` and reference *that* from docs. Don't
-proliferate ad-hoc `*.sh` files alongside it — when in doubt, fold a new
-one-shot block into `commands.sh` and let the user keep curating it.
+The repo has a strict layered doc structure. **Before writing to any of these, read the file's header to confirm it accepts your content. Never duplicate content across files — link instead.**
+
+| File | Role | What goes in | Pruning |
+|---|---|---|---|
+| `RESEARCH-STATUS.md` | High-level ledger: current phase, key metrics, hypothesis status, active plan, deprioritized list. | One-line "Project State" bullet per phase change; link to diary for detail. | **Yes** — collapse older entries to one-liners under "Earlier states" once their diary link exists. Cap at ~200 lines. |
+| `docs/diary/YYYY-MM-DD_*.md` | Dated entries with full tables, AI-reasoned interpretation, design notes. | New file when a sweep produces >~3 rows or a pivot needs rationale. Tag interpretation paragraphs `[AI-REASONED PROVISIONAL ANALYSIS]`. | **No** — frozen after creation. |
+| `docs/diary/phase-N.md` | Running ledger for a multi-entry phase. | Append chapters with date stamps inside. | Start a new phase file once the current one exceeds ~400 lines. |
+| `docs/diary/advances-supervisor/` | One file per supervisor cycle; self-contained snapshot. | One per month, frozen after the meeting. | **No**. |
+| `Quarto-specifications.md` | Stable game/model/data reference: rules, hooks, naming conventions, run-id rule. | Only when a *convention* changes. | Do **not** add per-champion or per-dataset instance tables — those live in `configs/models/*.yaml` and on the filesystem. Drop "resolved issues" sections; git history is the audit trail. |
+| `docs/BSP-schema-summary.md` | BSP schema reference (gorilla/hawk/tiger correspondence). | Only when basis sets change. | Stable. |
+| `CLAUDE.md` (this file) | Agent operating manual: commands, architecture, conventions, recurring bite-marks. | Recurring failure modes that are *general-purpose* (not one-off results). | Drop bite-marks once the fix is in code + a test guards it. |
+| `configs/models/champ*.yaml` | Source of truth for a champion (paths, benchmarks, hooks). | One per champion. | **No**. |
+| `commands.sh` | Transient pipeline recipe maintained by the user. **Not** committed infrastructure. | User-managed. Fold one-shot blocks here; do not proliferate ad-hoc `*.sh` files. | User rewrites per phase. |
+| `README.md` | Project orientation (~80 lines) for new readers. | Project description + pointers into the docs above. | Strip stale results; they live in the diary. |
+
+**Default rule when in doubt:** add a one-line bullet to `RESEARCH-STATUS.md` and a dated diary file. Anything longer or more specific goes in the diary.
 
 ## Common commands
 
@@ -178,15 +181,16 @@ Single source of truth for: model loading (`QuartoCNN.from_file`), the four oppo
 - `saes/<game>/analysis/{run_id}_anchor-{animal}.json` — anchor slot analysis output (per-slot metrics, category summary, cross-BSP)
 - `saes/*.pt` checkpoints are gitignored by default; force-add key ones with `git add -f`. `*.jsonl` metrics and `*_registry.json` files are tracked.
 
-### Quarto model — hookable layers
+### Quarto models — hookable layers
 
-`models/quarto/CNN_uncoupled.py` defines `QuartoCNN`. Layer name → activation shape:
-- `conv1` → (B, 16, 4, 4)
-- `conv2` → (B, 32, 4, 4) — **preferred hook for threat-related work** (Phase 1F result: threat info is linearly accessible here, mostly lost by fc1)
-- `fc1` → (B, 128) — bottleneck before dual heads, still the default hook in legacy configs
-- `fc2_board` (B, 16), `fc2_piece` (B, 16) — Q-value heads
+Multi-champion era (from 2026-05-14). Each champion has its own YAML at `configs/models/champ<Tag>.yaml` and its own game module at `scripts/games/quarto{,_s4}.py`. Activation file naming is `<hook>_amalgam_<tag>_activations.pt` (champAa is the un-tagged baseline).
 
-When working with conv hooks, activations may be flattened (`B, C, H, W` → `B*H*W, C`) via `--flatten` in `collect_activations.py`.
+| Champion | Game module | Class | fc1 width | Notes |
+|---|---|---|---:|---|
+| champAa | `quarto` | `QuartoCNN` (`CNN_uncoupled.py`) | 128 | Original DQN baseline. Hooks: `conv1`, `conv2`, `fc1`, `fc2_board`, `fc2_piece`. |
+| champS4 / Ta / Ve | `quarto_s4` | `QuartoCNNAutoregUnifiedS4` (`Sa_S4.py`) | 512 | Unified-aux autoreg family. Hooks: `s4.conv1`, `s4.conv2`, `s4.fc1`, `s4.fc2_place`, `s4.fc2_select`. |
+
+`conv2` activations are flattened `(B,C,H,W) → (B, C*H*W)` via `collect_activations.py --flatten-position` for SAE training.
 
 ## Domain conventions
 
@@ -203,21 +207,22 @@ These naming rules are project-specific and are required for files to flow throu
 
 ## Things that have bitten this project before
 
-- **BSP set filtering — `*_337.pt` is a bug, not a set** (noted 2026-05-07). `get_all_bsp_definitions()` returns the union of gorilla (164) + hawk (173) = 337 BSPs as a *menu*. Gorilla and hawk are **alternative bases** for the same threat concepts (see `BSP-schema-summary.md` "Gorilla ↔ Hawk Correspondence"); a 337-eval pools redundant signals and produces a meaningless coverage number. Always evaluate gorilla and hawk separately. `compute_bsp_labels.py --name gorilla|hawk` now auto-resolves to the right `--only-categories` via `quarto.BSP_SETS`; calling it without `--name` matching a known set or `--only-categories` falls back to all 337 BSPs and prints a warning. If you encounter a `bsp_labels-*_337.pt` on disk, it was generated before this auto-resolution existed (pre-2026-05-07) — re-run with `--name gorilla` and `--name hawk` to produce the canonical 164/173 files. Columns of an existing `_337` file are gorilla[0:164] then hawk[164:337] in stable order if you need to salvage rather than recompute.
-- **BatchTopK eval mode**: must run in **train mode** (batch-level sparsity). Inference mode uses calibrated thresholds and collapses L0 at eval time. `sae_eval.py` handles this — preserve that behavior if you touch evaluation.
-- **BatchTopK `_thresholds_calibrated` does not survive save/load**. The flag is a plain Python attribute, not a registered buffer, so it is *not* in `state_dict()` and resets to `False` on every `load_checkpoint()`. To detect whether a loaded BatchTopK was calibrated, check the buffer instead: `torch.any(sae._threshold_estimate != 0)`. The buffer *is* persisted, and `train_sae()` calibrates it as the last step of training, so any SAE produced via the normal pipeline is fine. `export_onnx.py` uses the buffer-based check.
-- **Decoder normalization**: `normalize_decoder()` must run after every optimizer step; without it, the L1 penalty trivially shrinks `h` instead of producing sparsity.
-- **`offered_piece` BSPs** sit at the trivial-baseline F1 ≈ 0.667 (P=0.5, R=1.0). Any run reporting that exact number found *no* discriminative features, not real signal. Keep it in per-category breakdowns for transparency, but **exclude it from headline / threat-focused rankings** (deprioritized 2026-04-27). The MCC and F1-lift columns added 2026-05-11 collapse to 0 for these trivial features — use them in headline tables and the artifact disappears.
-- **Three coverage metrics, always together** (rule from 2026-05-11): every eval writes `coverage` (F1, literature standard), `coverage_mcc` (Matthews correlation; base-rate-invariant), and `coverage_f1_lift` (F1 minus the 2p/(1+p) trivial-baseline, clipped at 0). All three are derivable from the same TP/FP/FN/TN matrices, so the extra cost is negligible. `scripts/backfill_eval_metrics.py --game=quarto` retro-fills older registry entries from existing `_matching-*.pt` and `_h.pt` caches under `saes/<game>/cache/`. F1-lift is the recommended *headline* metric for trained-vs-random comparisons (the gap is ~3.5× more discriminating than raw F1).
-- **No new broad unsupervised arch sweeps on fc1** (deprioritized 2026-04-27; scope narrowed 2026-04-29). Anakin's σ=0.004 settles this *for fc1*: within the well-tuned fc1 middle ground, additional variants yield <0.01 coverage gains. This does NOT apply to conv2: batchtopk, vanilla, and p-annealing have never been run on conv2; SAE/LP efficiency on conv2 is only 42% vs 84% on fc1; and the fc1 winner (BatchTopK-k16) has never been tested on conv2. A full architecture sweep on conv2 is justified (Campaigns C–G, launched 2026-04-29). New fc1 sweeps should focus on Guided/anchored/E2E variants.
-- **fc1 is for bottleneck comparison only** (deprioritized 2026-04-27). Phase 1F redirected threat work to conv2; do not start new fc1-only threat investigations.
-- **Per-cell conv2 SAEs require cell-relative BSPs** (noted 2026-04-29). Training SAEs on per-cell activations (conv2_amalgam_activations.pt, shape [N×16, 32]) and evaluating against position-level BSPs is semantically invalid: a perfect cell-specific feature has 1/16 recall (it fires for 1 of 16 cells per position, but the BSP label is 1 for all 16), capping F1 at 0.118. Per-cell SAEs need a new BSP set where labels are computed relative to the cell being processed (e.g., "is THIS cell occupied by a tall piece?"), not the position.
-- **Deduplicate AFTER aggregating** raw position files, not before — early-game positions repeat heavily across opponent modes, and per-file dedup leaves cross-file duplicates.
-- **`mode_2x2=True`** is required when generating positions for current work. Pre-2026-03-27 data lived under `legacy_mode2x2_false/` and is provenance-only; do not mix.
-- **`sae_eval.py` re-eval skipping**: the registry check uses `run_id:bsp_set` as the key. If you evaluate the same checkpoint against a *different* BSP set without `--force`, the gorilla (or prior) result is in the registry under a different key, so the new eval will run correctly. If you somehow have the old plain-`run_id` key style already cached for a run, the new bsp_set eval will proceed (no collision). Always pass `--force` if you need to recompute an existing `run_id:bsp_set` pair.
-- **docopt quirks**: avoid `--` prefix collisions and line continuations inside docstrings, they break parsing silently.
-- **Multi-GPU sweep**: GPU 0 (RTX 4000) is significantly slower than the P4000s on this machine — `run_sweep.py --split` should keep heavy conv2 configs off GPU 0.
-- **NEVER use non-ASCII characters in Python source, shell scripts, log messages, print statements, or CLI status output** (rule from 2026-05-22, learned the hard way *twice* in one day). The host runs Windows with a `cp1252` console codepage; any of `λ → × ✓ ✗ ≥ ≤ ─ ⏳ …` or smart quotes in a `print()` / `log.info()` / f-string will raise `UnicodeEncodeError` mid-run and **silently kill long sweeps under `nohup`**. This bit `sae_train.py`, `validate_sweep.py`, and `run_sweep.py` on the anchored-SAE launch. **Use ASCII substitutes everywhere code can print**: `lambda` not `λ`, `x` not `×`, `->` not `→`, `[OK]`/`[FAIL]` not `✓`/`✗`, `>=`/`<=` not `≥`/`≤`, plain `-` not `─`. Markdown docs (this file, diary entries) may keep unicode for readability; **executable code may not**. When in doubt, `grep -nP '[^\x00-\x7F]' file.py` before committing. If you absolutely must emit unicode, set `PYTHONIOENCODING=utf-8` in the launch environment — but prefer ASCII source so the script is portable.
+Keep this list focused on **recurring, general-purpose failure modes**. One-off
+results or scope decisions belong in `RESEARCH-STATUS.md` ("Deprioritized") or
+the diary; drop an entry here once a test guards the fix.
+
+- **BSP set filtering — `*_337.pt` is a bug, not a set**. `get_all_bsp_definitions()` returns gorilla (164) + hawk (173) = 337 BSPs as a *menu*; gorilla and hawk are alternative bases for the same threat concepts. Always evaluate them separately. `compute_bsp_labels.py --name gorilla|hawk|tiger` auto-resolves the right `--only-categories`. If you find a `bsp_labels-*_337.pt` on disk, recompute with explicit `--name`.
+- **BatchTopK eval must run in train mode** (batch-level sparsity). Inference mode uses calibrated thresholds and collapses L0 at eval time. `sae_eval.py` handles this — preserve the behavior if you touch evaluation.
+- **BatchTopK `_thresholds_calibrated` does not survive save/load** (plain attribute, not a buffer). Detect calibration via the buffer instead: `torch.any(sae._threshold_estimate != 0)`. Used by `export_onnx.py`.
+- **Decoder normalization** must run after every optimizer step. Without it, the L1 penalty trivially shrinks `h` instead of producing sparsity.
+- **`offered_piece` F1 ≈ 0.667 is the trivial baseline** (P=0.5, R=1.0), not signal. The MCC and F1-lift columns collapse to 0 for this — use them in headline tables and the artefact disappears.
+- **Three coverage metrics, always together**: every eval writes `coverage` (F1), `coverage_mcc`, and `coverage_f1_lift` (F1 − `2p/(1+p)`, clipped at 0). F1-lift is the recommended headline. `scripts/backfill_eval_metrics.py --game=quarto` retro-fills older entries.
+- **Deduplicate AFTER aggregating** raw position files. Early-game positions repeat heavily across opponent modes; per-file dedup leaves cross-file duplicates.
+- **`sae_eval.py` re-eval skipping** uses `run_id:bsp_set` as the registry key. Evaluating the same checkpoint against a *different* BSP set without `--force` works (no key collision). Use `--force` only to recompute an existing pair.
+- **docopt quirks**: avoid `--` prefix collisions and line continuations inside docstrings — they break parsing silently.
+- **Multi-GPU sweep on the local box**: GPU 0 (RTX 4000) is significantly slower than the P4000s. Use `run_sweep.py --split` to keep heavy conv2 configs off GPU 0. (Deep Brain's three A6000s are equal.)
+- **NEVER use non-ASCII characters in Python source, shell scripts, or anything that gets printed**. The host runs Windows with `cp1252`; characters like `λ → × ✓ ≥ ─ …` or smart quotes raise `UnicodeEncodeError` mid-run and silently kill long sweeps under `nohup`. Use ASCII substitutes (`lambda`, `->`, `[OK]`, `>=`, `-`). Markdown docs may keep unicode; executable code may not. Audit with `grep -nP '[^\x00-\x7F]' file.py`.
+- **`mode_2x2=True`** is required when generating positions for current work. Pre-2026-03-27 data under `legacy_mode2x2_false/` is provenance-only; do not mix.
 
 ## Style
 

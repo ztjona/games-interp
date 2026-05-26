@@ -11,96 +11,32 @@
 
 ## Project State
 
-### 2026-05-25 (Anchored SAE sweep I/J complete) — current
+### 2026-05-25 (champVe onboarded) — current
 
-**Active phase:** Anchored SAE sweep on champTa fc1 / tigerTa complete. 24 configs (I01–I04 anchored-jumprelu + J01–J04 anchored-batchtopk, 3 seeds each) trained and evaluated against tigerTa, gorillaTa, and hawkTa.
+**New champion landed:** `champVe` = `Ve_oracleAblation(4) [DISABLE_NEVER, E=10000]`. Same architecture as champS4 / champTa (`QuartoCNNAutoregUnifiedS4`); the variable vs champTa is the minimax-oracle SELECT distillation schedule (oracle never disabled) plus 2.3x more training (10k vs 4350 epochs). Head-to-head vs champTa: **59.4%** (500 games each direction); vs champS4: 73.7%; vs Aa_replay: 80.9% (`hierarchical-SAE/champion-results.jsonl`).
 
-**Headline result: anchored-jumprelu at lambda_high=1.0 (I04) is the clear winner.** TigerTa F1-lift jumps from 0.158 (unanchored F04 baseline) to 0.255 (+62% relative); MCC from 0.333 to 0.494 (+48%). GorillaTa drops modestly (0.177 -> 0.166, -6%); hawkTa *improves* (0.172 -> 0.184, +7% — tiger/hawk threat overlap).
+Onboarding artifacts in place:
+- Model config: [`configs/models/champVe.yaml`](configs/models/champVe.yaml). Checkpoints copied into `models/quarto/` (force-add).
+- SAE sweep configs: [`configs/champVe/`](configs/champVe/) -- 43 YAMLs total: 19 non-anchored (C01, E01-E07, F00-F04, H01-H06) + 24 anchored (I01-I04 anchored-jumprelu + J01-J04 anchored-batchtopk, 3 seeds each), mirroring the full champTa set for direct twin compares.
+- Viz exporter ([`scripts/export_viz_data.py`](scripts/export_viz_data.py)) registers the `Ve` champion id.
+- Pipeline recipe in [`commands.sh`](commands.sh): audit -> positions (4 modes, seed=42) -> dedup -> BSP labels (gorillaVe, hawkVe, tigerVe) -> activations (s4.fc1 + s4.conv2, trained + random) -> LP baselines -> SAE sweep (C/E/F/H gorillaVe primary, hawkVe second pass; I/J tigerVe primary, gorillaVe/hawkVe regression) -> registry read-out + twin compares vs champTa.
 
-Anchor slot analysis (`scripts/anchor_analysis.py`) on the best run (I04-lh100-s43):
-- **36/36 anchor slots alive** (vs 19.6% free-slot alive rate)
-- **25/36 anchor slots are the best feature for their assigned BSP**
-- Best categories: offered_completing_attr (F1=0.590, all 4 best), square_winnable (F1=0.405, all 9 best)
-- Weak category: line_winnable (F1=0.220, only 6/10 best) — diagonal lines failed (F1<0.04), consistent with fc1 bottleneck losing spatial info
-- 12/36 polysemantic, but semantically coherent (correlated threat concepts sharing directions)
-- Cross-BSP: anchor features cover 53.7% of gorillaTa BSPs (incidental), only 1.2% of hawkTa
+Data still pending — none of the `*_ve_*` files exist on disk yet; run `bash commands.sh` to materialize the full pipeline.
 
-**Anchored-batchtopk (J-series) underperforms** — weak gains on tigerTa, hurts gorilla/hawk at high lambda. The rigid top-k constraint conflicts with anchor pressure.
+### 2026-05-25 (Anchored SAE sweep I/J complete)
 
-**Low lambdas (0.03, 0.10) are counterproductive** — not enough steering to overcome the training perturbation.
+24 configs on champTa fc1 / tigerTa. **Winner: I04 anchored-jumprelu, lambda_high=1.0** — tigerTa F1-lift 0.158 → 0.255 (+62%), MCC 0.333 → 0.494. 36/36 anchor slots alive; 25/36 are the best feature for their assigned BSP. Anchored-batchtopk (J-series) underperforms; low lambdas (0.03, 0.10) are counterproductive. Decision gate PASS.
 
-Infrastructure fixes during this sweep: `run_sweep.py` path prediction for anchored architectures, `--skip-existing` + `--eval` interaction, file-locked registry writes for parallel safety.
-
-Full results diary entry: [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md).
-Anchor analysis JSON: `saes/quarto/analysis/I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1_anchor-tigerTa.json`.
-
-### 2026-05-22 (Tiger reframing audit closed)
-
-**Active phase:** Tiger reframing audit complete. Labels computed for both champions (`bsp_labels-tigerS4_36.pt`, `bsp_labels-tigerTa_36.pt`); 8 LP baselines and 16 SAE re-evaluations (F04, E05, H01–H06 × {S4, Ta}) all landed. **Pre-registered decision rule fires unambiguously: target-set mismatch was contributing.** Tiger conv2/Ta SAE/LP efficiency is **36 %** (vs the 11 % conv2/hawk wall = **+25 pp**); tiger conv2/S4 efficiency is **62 %** (**+51 pp** above the hawk wall). The decision rule output: *anchored / matryoshka should target tiger, not hawk, as the supervision signal.*
-
-Secondary findings from the same batch:
-
-- **fc1 > conv2 for tiger on both champions** — opposite of hawk/gorilla on Ta. Agent-relative concepts live at the fc1 bottleneck where the model integrates board + offered piece + pool. Strengthens the post-champAa revision of H8.
-- **Sweep H null reproduces on tiger** — expansion ladder (H01–H06) flat-to-negative on tigerTa F1-lift vs baseline F04/E05. Capacity alone does not buy tiger coverage either; concept-targeting remains the binding lever.
-- **Real feature absorption on champTa** — F04-Ta fc1: max 6 BSPs/feature on tiger; E05-Ta conv2 reaches max ≈ 10. The older champAa-era "missing concepts aren't being absorbed, they're never represented" deprioritization of matryoshka does **not** carry over — re-activated on the champion family.
-
-Next concrete move (queued for the session after the lit-review refresh):
-**anchored SAE on champTa fc1 → tigerTa** — the cell with the largest absolute LP headroom (0.143 F1-lift gap) and the cleanest decision gate. Detailed plan: [`docs/diary/2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
-
-Results table and per-category breakdowns: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md) §"Results".
-
-### 2026-05-22 (Sweep H closed)
-
-Sweep H capacity scan complete (12 configs, s42). Pre-registered
-decision gate from [`2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md)
-**FAILS**: tripling dictionary expansion from 8 → 64 closed **0 %** of the
-conv2 / hawk gap. Best conv2 / hawk lift is the *baseline* E05-Ta at 0.088 — no
-H run beat it; champS4 fc1 hawk degraded monotonically with expansion
-(0.152 → 0.097). Per the pre-registered rule, concept-targeting is promoted
-to primary direction; *capacity alone* is ruled out on both axes (k in
-Phase 2A Campaign E, exp in Sweep H).
-
-Full sweep tables and interpretation:
-[`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
-
-### 2026-05-19 (post-sweep)
-
-**Active phase:** Phase 2B-sweep complete. 25 SAE configs trained on Deep
-Brain across champS4 (12) and champTa (13) at the shared
-`QuartoCNNAutoregUnifiedS4` architecture; 8-run LP baseline on champTa
-landed alongside.
-
-- **champTa is strictly better than champS4** on every behavioral test
-  (winning placement +8 pp, loss avoidance +24 pp) and at every LP cell
-  (F1-lift Δ +0.030 to +0.112; biggest gain on fc1 / hawk).
-- **H9 (concept distillation) ✅ CONFIRMED.** Depth-2 minimax distillation
-  amplifies threat structure rather than producing a shortcut: every
-  diagnostic hawk category rises on champTa relative to champS4.
-- **Architecture winner transfers:** `E05 BatchTopK k=32 exp=8 s4.conv2`
-  is the gorilla winner on both champions; both hawk winners are at fc1.
-- **Sweep success criterion (SAE ≥ 50 % of LP F1-lift) FAILS** at every
-  cell; conv2 / hawk sits at 11 %. Next direction is concept-targeted /
-  wider-expansion SAEs at a new SAE objective, not more breadth at the
-  current budget. Design: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).
-
-**Verification (closed 2026-05-20):** F04 patience-fix rerun complete on
-both champions. F04-Ta hawkTa lift unchanged at 0.172 (original was
-already converged at early-stop); F04-S4 hawkS4 lift rose 0.144 → 0.152
-and overtakes F01 as the S4 hawk winner. **fc1-on-hawk claim STANDS on
-both champions** — fc1 SAEs beat best conv2 SAEs by +0.082 (Ta) and
-+0.071 (S4) on hawk. Patience was binding for S4, not Ta. Matched-F04
-Δ Ta−S4: hawk +0.020 (was +0.036), gorilla +0.079 (was +0.039). See
-[`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) §
-"Verification protocols → F04 patience-fix rerun results".
-
-Full details: [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md).
+Full results: [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md). Anchor analysis JSON: `saes/quarto/analysis/I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1_anchor-tigerTa.json`.
 
 ### Earlier states (compact)
 
-- **2026-05-19 (pre-sweep)** — champS4 LP baseline diagnostic done; champTa champion just landed (+16.6 pp WR vs champS4); rescoped to 25-config two-champion sweep. → see [`phase-2B.md`](docs/diary/phase-2B.md) ch. 2.
-- **2026-05-18** — champS4 mini-sweep (4 configs) underperformed champAa twins; diagnostic LP-first plan written. → see [`phase-2B.md`](docs/diary/phase-2B.md) ch. 1.
-- **2026-05-11** — Phase 2A complete on Deep Brain (33 conv2 arch configs, C01 winner at 0.353). Reporting standard adopted (F1 + MCC + F1-lift). Phase 1G competence audit revealed champAa's "attack-recognition / defence-blindness" asymmetry. → see [`phase-2A.md`](docs/diary/phase-2A.md) and [`phase-1.md`](docs/diary/phase-1.md) § Phase 1G.
-- **2026-05-04** — Phases 0–1F complete on champAa. Data pipeline, Anakin SAE-architecture sweep, conv2 LP. → see [`phase-1.md`](docs/diary/phase-1.md).
+- **2026-05-22 (Tiger reframing audit closed)** — pre-registered decision rule fires: tiger SAE/LP efficiency exceeds hawk by +25 pp (conv2/Ta) to +51 pp (conv2/S4). Supervision pivot now targets tiger, not hawk. Secondary: fc1 > conv2 for tiger; Sweep H null reproduces on tiger; real feature absorption on champTa (max 6–10 BSPs/feature). → see [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
+- **2026-05-22 (Sweep H closed)** — capacity scan (12 configs) closes 0% of the conv2/hawk gap; concept-targeting promoted to primary direction. → see [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
+- **2026-05-19 (post-sweep)** — Phase 2B-sweep complete (25 configs across champS4/champTa). H9 (concept distillation) **CONFIRMED**; champTa strictly better than champS4 at every cell. Best architecture transfers: E05 BatchTopK k=32 exp=8 conv2 is the gorilla winner on both. Sweep success criterion (SAE ≥ 50% of LP F1-lift) **FAILS** at every cell. F04 patience-fix verification (2026-05-20): fc1-on-hawk claim STANDS on both champions. → see [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) and [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md).
+- **2026-05-18** — champS4 mini-sweep (4 configs) underperformed champAa twins; diagnostic LP-first plan. → see [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 1.
+- **2026-05-11** — Phase 2A complete on Deep Brain (33 conv2 arch configs, C01 winner at 0.353). Reporting standard adopted (F1 + MCC + F1-lift). Phase 1G competence audit revealed champAa's "attack-recognition / defence-blindness" asymmetry. → see [`docs/diary/phase-2A.md`](docs/diary/phase-2A.md) and [`docs/diary/phase-1.md`](docs/diary/phase-1.md) § Phase 1G.
+- **2026-05-04** — Phases 0–1F complete on champAa. Data pipeline, Anakin SAE-architecture sweep, conv2 LP. → see [`docs/diary/phase-1.md`](docs/diary/phase-1.md).
 
 ## Key Metrics Summary
 
@@ -151,7 +87,7 @@ Full details: [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md).
 - **hawk_173** — 7 reframed categories (Nanda-style threat reframing): `reframed_count` × 40, `reframed_completable` × 40, `reframed_any_threat` × 10, `reframed_sq_count` × 36, `reframed_sq_completable` × 36, `reframed_sq_any_threat` × 9, `reframed_global` × 2. State-only. Position-level labels.
 - **tiger_36** — 6 agent-relative categories (added 2026-05-22, attacks the "state-only" gap shared by gorilla/hawk): `tiger_decision_global` × 5, `tiger_offered_completing_attr` × 4, `tiger_line_winnable` × 10, `tiger_square_winnable` × 9, `tiger_pool_winning_count` × 4, `tiger_pool_safe_count` × 4. Includes pool-reasoning concepts (count of "poison" / "safe" pieces the player could offer). See [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
 - Per-champion suffixes (`gorillaS4`, `gorillaTa`, `tigerS4`, `tigerTa`, etc.) recompute labels against that champion's self-play position distribution so base rates match the activations. The **schema** file is keyed by basis only (`bsp_schema-gorilla_164.json`, `bsp_schema-tiger_36.json`) because the concept menu is distribution-independent; only the label tensor varies per champion.
-- See [`BSP-schema-summary.md`](BSP-schema-summary.md) for full schema and gorilla ↔ hawk correspondence.
+- See [`docs/BSP-schema-summary.md`](docs/BSP-schema-summary.md) for full schema and gorilla ↔ hawk correspondence.
 
 ## Reporting Standard (REQUIRED for every winner claim, adopted 2026-05-11)
 

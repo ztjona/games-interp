@@ -152,100 +152,11 @@ python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
     --categories cell_occupancy,cell_attribute,offered_piece,game_phase
 ```
 
-## Common BSP Sets
+## Bootstrap and regeneration
 
-| Animal Name | Count | Categories Included |
-|-------------|-------|---------------------|
-| `gorilla` | 164 | ALL (complete set) |
-| `hawk` | 173 | Reframed line + square threat/count BSPs + global |
-| `elephant` | 80 | cell_occupancy + cell_attribute (no threats) |
-| `cheetah` | 56 | cell_occupancy + threat_line (no attributes) |
-| `penguin` | 128 | ALL except threat_square_2x2 |
+Dataset and activation files are gitignored — regenerate from positions. The current pipeline recipe lives in [`commands.sh`](commands.sh) (transient, rewritten per phase). For the historical champAa bootstrap, see [`docs/diary/phase-1.md`](docs/diary/phase-1.md). For a new champion onboarding checklist, see [`configs/models/README.md`](configs/models/README.md).
 
-*Note: Animal names are chosen by user when creating BSP sets.*
-
-## New Machine Bootstrap
-
-To regenerate all datasets from scratch on a new machine (when `.pt` files are not available via network share or cloud sync):
-
-SAE checkpoints and model weights are tracked in git (force-added with `git add -f`). Only the large dataset files (activation tensors, BSP labels) need regenerating — model weights are already in the repo.
-
-**Model weights**
-- `models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt` — **trained** Aa_replay model (C/D/F campaigns)
-- `models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt` — **epoch-0 random weights** (G-series random controls only)
-
-**Full regeneration sequence (~45–90 min on a GPU):**
-```bash
-MODEL="models/quarto/20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt"
-RANDOM_MODEL="models/quarto/20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt"
-
-# 1. Generate raw positions (all 4 opponent modes; ~20 min)
-for mode in random_v_random model_v_random random_v_model model_v_model; do
-    python scripts/generate_positions.py --game quarto --opponents $mode \
-        --model $MODEL --num-games 10000 --seed 42
-done
-
-# 2. Deduplicate AFTER aggregating (not before)
-python scripts/deduplicate_positions.py \
-    data/quarto/positions-random_v_random_raw.pt \
-    data/quarto/positions-model_v_random-Aa_replay_raw.pt \
-    data/quarto/positions-random_v_model-Aa_replay_raw.pt \
-    data/quarto/positions-model_v_model-Aa_replay_raw.pt \
-    --output data/quarto/positions-amalgam_unique.pt
-
-# 3a. Collect conv2 activations — trained model (~10 min)
-# --flatten-position: (B,C,H,W) -> (B, C*H*W); required for conv hooks so SAE sees 2D data
-python scripts/collect_activations.py $MODEL --hook conv2 --game quarto \
-    --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/conv2_512_amalgam_activations.pt --device cuda --flatten-position
-
-# 3b. Collect conv2 activations — random-weight model (G-series controls)
-python scripts/collect_activations.py $RANDOM_MODEL --hook conv2 --game quarto \
-    --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/conv2_512_amalgam_random_activations.pt --device cuda --flatten-position
-
-# 3c. Collect fc1 activations — trained model (A-series; no --flatten-position for fc layers)
-python scripts/collect_activations.py $MODEL --hook fc1 --game quarto \
-    --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/fc1_amalgam_activations.pt --device cuda
-
-# 3d. Collect fc1 activations — random-weight model (A01 random control)
-python scripts/collect_activations.py $RANDOM_MODEL --hook fc1 --game quarto \
-    --positions-file data/quarto/positions-amalgam_unique.pt \
-    --output data/quarto/fc1_amalgam_random_activations.pt --device cuda
-
-# 4. Compute BSP labels (position-level; shared across all hooks)
-python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
-    --game quarto --name gorilla
-python scripts/compute_bsp_labels.py data/quarto/positions-amalgam_unique.pt \
-    --game quarto --name hawk
-
-# 5. Verify everything is in place
-python validate_sweep.py
-```
-
-**Notes:**
-- Steps 3a/3b and 3c/3d can run in parallel on different GPUs.
-- BSP label files are position-level (not hook-specific), so Step 4 only needs to run once regardless of how many activation hooks you collect.
-- If you only need B–G campaigns (conv2 only, no A-series), skip Steps 3c/3d.
-
-**champS4 regeneration (after 2026-05-14):** Run `bash commands.sh` from the
-project root. It chains: competence audit (champS4 + champAa re-baseline), S4
-self-play position generation (4 modes), aggregation+dedup → `positions-amalgam_s4_unique.pt`,
-BSP labels under the `gorillaS4`/`hawkS4` names, activation collection at
-`s4.fc1` and `s4.conv2` for both trained and random S4 checkpoints, then the
-Phase 2B mini-sweep over `configs/champS4/*.yaml`. The script is parametrised
-at the top with `CHAMP`, `RAND_S4`, `SEED`, `NUM_GAMES`, `DEVICE`.
-
-**Linear-probe baseline (LP upper bound on what any SAE can recover):** Use
-`scripts/linear_probe_baseline.py` for a single activation × BSP set, or run
-the LP block at the bottom of the user's `commands.sh` for the full champS4
-panel (`{s4.fc1, s4.conv2} × {trained, random} × {gorillaS4, hawkS4}` =
-8 runs). `commands.sh` is the user's working execution file (see CLAUDE.md);
-treat it as transient. Outputs land at
-`data/quarto/linear_probe_<bsp_set>_<act_stem>_results.json` and report all
-three coverage metrics (F1, MCC, F1-lift) in the same schema as `sae_eval`'s
-registry entries, so LP-vs-SAE deltas are directly comparable.
+Linear-probe baseline (upper bound on what any SAE can recover) is `scripts/linear_probe_baseline.py`; outputs land at `data/quarto/linear_probe_<bsp_set>_<act_stem>_results.json` with the same F1 / MCC / F1-lift schema as `sae_eval`.
 
 ---
 
@@ -365,58 +276,15 @@ re-used verbatim as the eval-registry key.
   required); this prevents `gorilla` from accidentally matching `gorillaS4`
   or any other future champion-tagged variant.
 
-## Dataset Catalog
+## Dataset and artifact catalog
 
-**Current datasets** (as of May 2026):
+**Authoritative sources, not duplicated here.** Per-champion specs live in [`configs/models/champ*.yaml`](configs/models/); per-instance files are on the filesystem:
 
-### Position Datasets
+- Position datasets: `data/quarto/positions-amalgam_<tag>_unique.pt` (current champions: `s4`, `ta`, `ve`; champAa is un-tagged: `positions-amalgam_unique.pt`).
+- BSP labels: `data/quarto/bsp_labels-<animal>_<count>.pt` (e.g. `gorillaVe_164`, `hawkTa_173`, `tigerS4_36`). Schema: `data/quarto/bsp_schema-<basis>_<count>.json` (basis-only — same schema for all champions in a basis).
+- Activations: `data/quarto/<hook>_amalgam_<tag>{,_random}_activations.pt`. Trained-vs-random pairs are required for any headline gap claim.
 
-| Name | Description | Source Files | Model | N Positions | Generation Date |
-|------|-------------|--------------|-------|-------------|-----------------|
-| `amalgam` | Combined all opponent modes, deduplicated | `positions-random_v_random_raw.pt`<br>`positions-model_v_random-Aa_replay_raw.pt`<br>`positions-random_v_model-Aa_replay_raw.pt`<br>`positions-model_v_model-Aa_replay_raw.pt` | Aa_replay (20260227_1103) | 275,916 | 2026-03-03 |
-| `amalgam_s4` | Self-play combined+deduped under champS4 | 4 raw S4 self-play files (`positions-*_raw.pt`) | Sa_archScan S4 (20260514_0815) | (regenerated 2026-05-18) | 2026-05-18 |
-| `amalgam_ta` | Self-play combined+deduped under champTa | 4 raw Ta self-play files | Ta_minimaxSelect (20260516_1452) | (planned 2026-05-19) | 2026-05-19 |
-| `copper` | random_v_random only (not yet created) | `positions-random_v_random_raw.pt` | N/A | ~121 | 2026-03-03 |
-| `bronze` | model_v_random only (not yet created) | `positions-model_v_random-Aa_replay_raw.pt` | Aa_replay | ~102K | 2026-03-03 |
-| `iron` | random_v_model only (not yet created) | `positions-random_v_model-Aa_replay_raw.pt` | Aa_replay | ~101K | 2026-03-03 |
-| `steel` | model_v_model only (not yet created) | `positions-model_v_model-Aa_replay_raw.pt` | Aa_replay | ~94K | 2026-03-03 |
-
-### BSP Label Sets
-
-| Name | BSP Count | Categories Included | Source Dataset | Generation Date | Purpose |
-|------|-----------|---------------------|----------------|-----------------|---------|
-| `gorilla` | 164 | ALL (cell_occupancy, cell_attribute, threat_line, threat_square_2x2, offered_piece, game_phase, global) | amalgam | TBD | Full coverage evaluation (champAa) |
-| `hawk_173` | 173 | reframed_count, reframed_completable, reframed_any_threat, reframed_sq_count, reframed_sq_completable, reframed_sq_any_threat, reframed_global | amalgam | 2026-03-31 refresh | Reframed threat evaluation (champAa) |
-| `gorillaS4` | 164 | Same categories as `gorilla` | amalgam_s4 | 2026-05-18 | Full coverage evaluation (champS4) |
-| `hawkS4` | 173 | Same categories as `hawk_173` | amalgam_s4 | 2026-05-18 | Reframed threat evaluation (champS4) |
-| `gorillaTa` | 164 | Same categories as `gorilla` | amalgam_ta | planned 2026-05-19 | Full coverage evaluation (champTa) |
-| `hawkTa` | 173 | Same categories as `hawk_173` | amalgam_ta | planned 2026-05-19 | Reframed threat evaluation (champTa) |
-| `fox` | 87 | cell_occupancy, cell_attribute, offered_piece, game_phase | (extractable from gorilla) | N/A | Positional properties only |
-
-### Activation Files
-
-Naming pattern: `<hook>_<positions_tag>{,_random}_activations.pt`.
-
-| Hook | Champion | d_act | File |
-|---|---|---:|---|
-| `fc1` | champAa | 128 | `fc1_amalgam_activations.pt` (trained), `fc1_amalgam_random_activations.pt` |
-| `conv2` (flat) | champAa | 512 | `conv2_512_amalgam_activations.pt`, `conv2_512_amalgam_random_activations.pt` |
-| `s4.fc1` | champS4 | 512 | `s4.fc1_amalgam_s4_activations.pt`, `s4.fc1_amalgam_s4_random_activations.pt` |
-| `s4.conv2` (flat) | champS4 | 512 | `s4.conv2_amalgam_s4_activations.pt`, `s4.conv2_amalgam_s4_random_activations.pt` |
-| `s4.fc1` | champTa | 512 | `s4.fc1_amalgam_ta_activations.pt`, `s4.fc1_amalgam_ta_random_activations.pt` |
-| `s4.conv2` (flat) | champTa | 512 | `s4.conv2_amalgam_ta_activations.pt`, `s4.conv2_amalgam_ta_random_activations.pt` |
-
-`*_random_activations.pt` files are collected from the epoch-0 random-weight
-checkpoint at the same hook, against the same positions file as their trained
-counterpart. They are required for the random-network control in any headline
-trained-vs-random gap claim.
-
-**Notes:**
-- All position datasets use model **Aa_replay** checkpoint: `20260227_1103-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_5000.pt`
-- Random baseline model (epoch 0, untrained): `20260226_1420-Aa_replay(2)0226_NUM_EPOCHs_BUFFER_8_E_0000.pt`
-- Raw files preserved for reference; unique files created via deduplication
-- Position counts are approximate before deduplication
-- BSP labels computed from position metadata, independent of boards/pieces tensors
+List what's currently on disk with `ls data/quarto/positions-amalgam_*_unique.pt`, `ls data/quarto/bsp_labels-*.pt`, `ls data/quarto/*_activations.pt`. To add a new champion, follow [`configs/models/README.md`](configs/models/README.md).
 
 ## Deduplication Workflow
 
@@ -436,48 +304,15 @@ python scripts/deduplicate_positions.py \
     --output data/quarto/positions-combined_unique.pt
 ```
 
-## Validation Status
+## Position file format
 
-**BSP computation:** ✅ Fully tested and complete (March 2026)
-- Empty board, binary attributes, cell occupancy
-- Row, column, diagonal threats (3 of 4 detection)
-- 2×2 square threats (3 of 4 detection)
-- Offered piece attributes, game phases
-- **Winning move detection** (line and 2×2 completions)
-- All 164 BSPs validated with known game states
-
-**Deduplication utility:** ✅ Fully tested
-- Single-file deduplication (75% unique in test)
-- Multi-file aggregation (66.7% unique with cross-file duplicates)
-- Stats output verified
-
-**Position file format:** ✅ Confirmed
 ```python
 {
     "boards": torch.Tensor,      # (N, 16, 4, 4)
     "pieces": torch.Tensor,      # (N, 16)
     "metadata": list[dict],      # N metadata dicts
-    "provenance": dict,          # Source info
+    "provenance": dict,          # Source info (seed, model, mode, date)
 }
 ```
 
-## Known Issues / TODOs
-
-*(None currently)*
-
-## Resolved Issues
-
-1. **Diagonal BSP naming** ✅ RESOLVED (2026-03-27) — Renamed `diag_0` → `diag_main`, `diag_1` → `diag_anti`
-
-1. **Piece encoding documentation** ✅ RESOLVED (2026-03-27) — See Piece Index Mapping table above.
-
-2. **mode_2x2 in position generation** ✅ RESOLVED (2026-03-27)
-   - `generate_positions` had `mode_2x2=False`; fixed to `True`
-   - Legacy data moved to `data/quarto/legacy_mode2x2_false/`
-   - Legacy SAEs moved to `saes/quarto/legacy_mode2x2_false/`
-
-3. **BSP naming convention aligned to quartopy** ✅ RESOLVED (2026-03-28)
-   - Old convention used arbitrary names: `size_tall`, `coloration_dark`, `shape_square`, `hole_hollow`
-   - New convention uses quartopy enum values directly: `tall`, `black`, `square`, `with_hole`
-   - BSP IDs changed: e.g. `cell_0_0_size_tall` → `cell_0_0_tall`, `offered_coloration_dark` → `offered_black`
-   - **Requires regeneration:** BSP labels, linear probes, SAE evaluations with BSPs
+BSP computation and the dedup utility are covered by `tests/test_bsp_logic.py` and `tests/test_sae_eval.py`.
