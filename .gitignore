@@ -17,7 +17,7 @@ env/
 # PyTorch large data files (regeneratable or too large to track)
 data/**/*.pt
 data/**/*.pth
-models/**/*.pt
+# models/**/*.pt
 models/**/*.pth
 *.ckpt
 # SAE checkpoints (saes/**/*.pt) are also large and NOT tracked by default.

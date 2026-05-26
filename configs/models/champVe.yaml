@@ -1,0 +1,27 @@
+# Quarto champion: Ve_oracleAblation(4) DISABLE_NEVER 10k.
+# Same architecture as champS4 / champTa (QuartoCNNAutoregUnifiedS4, fc1=512);
+# training procedure is minimax-oracle SELECT distillation (depth=2) with the
+# oracle never disabled (DISABLE_NEVER) and trained for 10,000 epochs.
+# Series-V is the oracle-ablation family of Ta_minimaxSelect: Ta only used the
+# oracle for SELECT during training and would otherwise revert to MC targets;
+# Ve keeps the oracle on indefinitely and trains 2.3x longer.
+#
+# Benchmark (2026-05-24, hierarchical-SAE/champion-results.jsonl, 500 matches each):
+#   vs Random Baseline           94.3%
+#   vs Loss_BT                   88.3%
+#   vs Aa_replay(2)              80.9%
+#   vs ME_endgame(2)             72.9%
+#   vs Sa_archScan(3) [S4]       73.7%
+#   vs Ta_minimaxSelect(1) [Ta]  59.4%   <- previous champion
+name: champVe
+display_name: "Ve_oracleAblation(4) [DISABLE_NEVER, E=10000]"
+game: quarto_s4
+path: models/quarto/20260524_1904-Ve_oracleAblation(4)0522_DISABLE_NEVER_10k_E_10000.pt
+random_path: models/quarto/20260522_1832-Ve_oracleAblation(4)0522_DISABLE_NEVER_10k_E_0000.pt
+# Source checkpoints live in the sibling hierarchical-SAE project under
+# CHECKPOINTS/Ve_oracleAblation(4)0522_DISABLE_NEVER_10k/. Both already copied
+# into models/quarto/ (force-add because models/**/*.pt is gitignored).
+#
+# Hookable layers (via S4Wrapper, informational; identical to champS4/champTa):
+#   s4.conv1, s4.conv2, s4.fc1, s4.fc2_place, s4.fc2_select
+# d_act: s4.fc1=512, s4.conv2=32 per cell (512 flattened)

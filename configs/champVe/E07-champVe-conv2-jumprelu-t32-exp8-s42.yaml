@@ -1,0 +1,22 @@
+# E07-champVe: conv2 jumprelu t=32 exp=8 with the patience fix.
+# Original C07-champS4 stopped after 7 log steps because patience=20 +
+# min_improvement=0.02 triggered on the jumprelu theta warm-up plateau.
+# This rerun drops min_improvement to 0.005 so the FVU curve has room
+# to descend.
+experiment: E07-champVe-s42
+architecture: jumprelu
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_ve_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 32
+patience: 20
+min_improvement: 0.005
+l0_patience: 5
+l0_min_change: 5.0

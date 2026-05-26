@@ -156,6 +156,7 @@ def _count_net_params(game: str, device: str) -> int:
         return 0
     try:
         from games.quarto import load_model  # type: ignore[import-not-found]
+
         net = load_model(path, device=device)
         return int(sum(p.numel() for p in net.parameters()))
     except Exception as exc:  # pragma: no cover — best-effort
@@ -235,6 +236,7 @@ DEFAULT_CHAMPION_ID = "Aa"
 _CHAMPION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("S4", re.compile(r"champS4", re.IGNORECASE)),
     ("Ta", re.compile(r"champTa", re.IGNORECASE)),
+    ("Ve", re.compile(r"champVe", re.IGNORECASE)),
 ]
 
 _AA_PREFIX_RE = re.compile(
@@ -289,6 +291,13 @@ _CHAMPION_META: dict[str, dict[str, Any]] = {
         "arch": "QuartoCNNAutoregUnifiedS4",
         "training": "minimax depth=2 (action selector)",
         "notes": "+16.6 pp head-to-head WR vs champS4. Same architecture, different training procedure — controlled A/B.",
+    },
+    "Ve": {
+        "label": "champVe",
+        "full_name": "Ve_oracleAblation(4) [DISABLE_NEVER, E=10000]",
+        "arch": "QuartoCNNAutoregUnifiedS4",
+        "training": "minimax depth=2 (action selector), oracle never disabled, 10k epochs",
+        "notes": "+9.4 pp head-to-head WR vs champTa. Same architecture as champS4/champTa — controlled A/B on oracle-ablation knob and training length.",
     },
 }
 
@@ -580,9 +589,7 @@ def _write_top_boards_file(
             bottom_entries: list[dict] = []
             non_fire_h_idx = torch.nonzero(col == 0, as_tuple=False).flatten()
             if non_fire_h_idx.numel() > 0:
-                non_fire_boards = (
-                    np.unique(non_fire_h_idx.numpy() // max(factor, 1))
-                )
+                non_fire_boards = np.unique(non_fire_h_idx.numpy() // max(factor, 1))
                 lbl_np = label_vec.numpy().astype(int)
                 pos_boards = non_fire_boards[lbl_np[non_fire_boards] == 1]
                 neg_boards = non_fire_boards[lbl_np[non_fire_boards] == 0]
@@ -593,11 +600,13 @@ def _write_top_boards_file(
                     target_neg = min(k - target_pos, len(neg_boards))
                 chosen_pos = (
                     rng.choice(pos_boards, size=target_pos, replace=False)
-                    if target_pos > 0 else np.array([], dtype=int)
+                    if target_pos > 0
+                    else np.array([], dtype=int)
                 )
                 chosen_neg = (
                     rng.choice(neg_boards, size=target_neg, replace=False)
-                    if target_neg > 0 else np.array([], dtype=int)
+                    if target_neg > 0
+                    else np.array([], dtype=int)
                 )
                 chosen = np.concatenate([chosen_pos, chosen_neg])
                 seen_bot: set[int] = set()
@@ -606,12 +615,14 @@ def _write_top_boards_file(
                     if bi in seen_bot:
                         continue
                     seen_bot.add(bi)
-                    bottom_entries.append({
-                        "b": _board_tensor_to_string(boards[bi]),
-                        "o": _piece_tensor_to_id(pieces[bi]),
-                        "a": 0.0,
-                        "t": int(label_vec[bi].item()),
-                    })
+                    bottom_entries.append(
+                        {
+                            "b": _board_tensor_to_string(boards[bi]),
+                            "o": _piece_tensor_to_id(pieces[bi]),
+                            "a": 0.0,
+                            "t": int(label_vec[bi].item()),
+                        }
+                    )
             if bottom_entries:
                 feat_record["bottom"] = bottom_entries
 
@@ -682,7 +693,9 @@ def _write_coverage_matrix_file(
     """
     cats: list[str] = []
     for sae_name in shipped:
-        per_cat = eval_registry.get(sae_name, {}).get("metrics", {}).get("per_category", {})
+        per_cat = (
+            eval_registry.get(sae_name, {}).get("metrics", {}).get("per_category", {})
+        )
         for c in per_cat:
             if c not in cats:
                 cats.append(c)
@@ -695,10 +708,16 @@ def _write_coverage_matrix_file(
     saes_out: list[str] = list(shipped)
     matrix: list[list[float | None]] = []
     for sae_name in shipped:
-        per_cat = eval_registry.get(sae_name, {}).get("metrics", {}).get("per_category", {})
+        per_cat = (
+            eval_registry.get(sae_name, {}).get("metrics", {}).get("per_category", {})
+        )
         matrix.append(
             [
-                None if (v := per_cat.get(c, {}).get("mean_f1")) is None else round(float(v), 4)
+                (
+                    None
+                    if (v := per_cat.get(c, {}).get("mean_f1")) is None
+                    else round(float(v), 4)
+                )
                 for c in cats
             ]
         )
@@ -708,14 +727,16 @@ def _write_coverage_matrix_file(
         per_cat = lp.get("per_category", {})
         matrix.append(
             [
-                None if (v := per_cat.get(c, {}).get("mean_f1")) is None else round(float(v), 4)
+                (
+                    None
+                    if (v := per_cat.get(c, {}).get("mean_f1")) is None
+                    else round(float(v), 4)
+                )
                 for c in cats
             ]
         )
 
-    out.write_text(
-        json.dumps({"saes": saes_out, "categories": cats, "matrix": matrix})
-    )
+    out.write_text(json.dumps({"saes": saes_out, "categories": cats, "matrix": matrix}))
 
 
 # ---------------------------------------------------------------------------
@@ -872,16 +893,24 @@ def _write_coverage_totals_file(
                 cats.append(c)
     cats.sort()
 
-    champions: list[str] = sorted({e["champion"] for e in sae_entries if e.get("champion")})
+    champions: list[str] = sorted(
+        {e["champion"] for e in sae_entries if e.get("champion")}
+    )
 
     # ── kind=sae buckets keyed by champion ────────────────────────────────
-    sae_vals: dict[str, dict[str, list[float]]] = {cid: {c: [] for c in cats} for cid in champions}
+    sae_vals: dict[str, dict[str, list[float]]] = {
+        cid: {c: [] for c in cats} for cid in champions
+    }
     random_vals: dict[str, list[float]] = {c: [] for c in cats}
 
     for entry in sae_entries:
         if entry.get("kind") not in ("sae", "random_control"):
             continue
-        per_cat = eval_registry.get(entry["name"], {}).get("metrics", {}).get("per_category", {})
+        per_cat = (
+            eval_registry.get(entry["name"], {})
+            .get("metrics", {})
+            .get("per_category", {})
+        )
         if not per_cat:
             continue
         bucket = (
@@ -911,7 +940,8 @@ def _write_coverage_totals_file(
                 "champions": champions,
                 "categories": cats,
                 "by_champion": {
-                    cid: [_max(sae_vals[cid].get(c, [])) for c in cats] for cid in champions
+                    cid: [_max(sae_vals[cid].get(c, [])) for c in cats]
+                    for cid in champions
                 },
                 "random_control": [_max(random_vals.get(c, [])) for c in cats],
                 "linear_probe": [_max(lp_vals.get(c, [])) for c in cats],
@@ -956,7 +986,9 @@ def _discover_linear_probes(game: str, animal: str) -> list[dict[str, Any]]:
             continue  # random-init activations are not a baseline of interest
         # Filter: file_animal must match --bsps, with "default" treated as
         # the legacy gorilla bundle (matches original repo convention).
-        if file_animal != animal and not (file_animal == "default" and animal == "gorilla"):
+        if file_animal != animal and not (
+            file_animal == "default" and animal == "gorilla"
+        ):
             continue
         arch = m.group("arch")
         source = m.group("source")
@@ -1023,7 +1055,11 @@ def _write_aux_bsp_set(out_dir: Path, game: str, animal: str) -> bool:
     # is written as a chart-only auxiliary file (not loaded by the SAE
     # Explorer table).
     aux_entries: list[dict] = []
-    for rid in sorted(aux_eval, key=lambda r: aux_eval[r].get("metrics", {}).get("coverage", 0.0), reverse=True):
+    for rid in sorted(
+        aux_eval,
+        key=lambda r: aux_eval[r].get("metrics", {}).get("coverage", 0.0),
+        reverse=True,
+    ):
         aux_entries.append(_build_sae_entry(rid, aux_eval.get(rid), None))
 
     aux_lp = _discover_linear_probes(game, animal)
@@ -1106,9 +1142,7 @@ def main():
     device = _resolve_device(args["--device"])
 
     out_arg = args["--out"]
-    out_dir = (
-        _default_out_dir(game) if out_arg in (None, "auto") else Path(out_arg)
-    )
+    out_dir = _default_out_dir(game) if out_arg in (None, "auto") else Path(out_arg)
     out_dir.mkdir(parents=True, exist_ok=True)
 
     eval_registry = _load_eval_registry(game, animal)
@@ -1149,7 +1183,9 @@ def main():
         # ordered for the frontend.
         shipped = sorted(
             shipped_set[:max_n],
-            key=lambda rid: eval_registry.get(rid, {}).get("metrics", {}).get("coverage", 0.0),
+            key=lambda rid: eval_registry.get(rid, {})
+            .get("metrics", {})
+            .get("coverage", 0.0),
             reverse=True,
         )
     else:

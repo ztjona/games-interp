@@ -1,0 +1,19 @@
+# F04-champVe: fc1 jumprelu t=64 exp=8. Patience DISABLED for verification rerun
+# (2026-05-20) — see phase-2B.md § "F04-Ta hawk win — patience-fix rerun".
+experiment: F04-champVe-s42
+architecture: jumprelu
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_ve_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64
+patience: 0
+min_improvement: 0.001
+l0_patience: 0
+l0_min_change: 5.0
