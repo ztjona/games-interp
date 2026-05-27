@@ -11,29 +11,17 @@
 
 ## Project State
 
-### 2026-05-26 (unified cross-champion position dataset) — current
+### 2026-05-26 (champVe full sweep complete) -- current
+
+**110 evals across gorillaVe, hawkVe, tigerVe.** Anchored I04 lh=1.0 recipe transfers perfectly from Ta to Ve: tigerVe F1-lift **0.255** (vs tigerTa 0.257); SAE/LP efficiency 85.6% on both champions. Lambda ordering and J-series failure mode reproduce. Ve LP improves on state concepts (gorilla conv2 lift 0.762 vs Ta 0.708, +0.054) but NOT on strategic tiger concepts (fc1 flat, conv2 -0.039). Non-anchored conv2 SAEs harder to train on Ve. Full results: [`docs/diary/2026-05-26_champVe-results.md`](docs/diary/2026-05-26_champVe-results.md).
+
+### 2026-05-26 (unified cross-champion position dataset)
 
 Per-champion position distributions bias evaluations toward each champion's visited states. New tool `scripts/unify_positions.py` merges all champion amalgams into a single deduplicated pool; BSP set suffix encodes position count (e.g. `gorilla156k`) so the evaluation basis is always clear. Day-to-day sweeps keep champion-specific data; unified pool used only for cross-champion reporting. Design: [`docs/diary/2026-05-26_unified-position-dataset.md`](docs/diary/2026-05-26_unified-position-dataset.md).
 
-### 2026-05-25 (champVe onboarded)
-
-**New champion landed:** `champVe` = `Ve_oracleAblation(4) [DISABLE_NEVER, E=10000]`. Same architecture as champS4 / champTa (`QuartoCNNAutoregUnifiedS4`); the variable vs champTa is the minimax-oracle SELECT distillation schedule (oracle never disabled) plus 2.3x more training (10k vs 4350 epochs). Head-to-head vs champTa: **59.4%** (500 games each direction); vs champS4: 73.7%; vs Aa_replay: 80.9% (`hierarchical-SAE/champion-results.jsonl`).
-
-Onboarding artifacts in place:
-- Model config: [`configs/models/champVe.yaml`](configs/models/champVe.yaml). Checkpoints copied into `models/quarto/` (force-add).
-- SAE sweep configs: [`configs/champVe/`](configs/champVe/) -- 43 YAMLs total: 19 non-anchored (C01, E01-E07, F00-F04, H01-H06) + 24 anchored (I01-I04 anchored-jumprelu + J01-J04 anchored-batchtopk, 3 seeds each), mirroring the full champTa set for direct twin compares.
-- Viz exporter ([`scripts/export_viz_data.py`](scripts/export_viz_data.py)) registers the `Ve` champion id.
-- Pipeline recipe in [`commands.sh`](commands.sh): audit -> positions (4 modes, seed=42) -> dedup -> BSP labels (gorillaVe, hawkVe, tigerVe) -> activations (s4.fc1 + s4.conv2, trained + random) -> LP baselines -> SAE sweep (C/E/F/H gorillaVe primary, hawkVe second pass; I/J tigerVe primary, gorillaVe/hawkVe regression) -> registry read-out + twin compares vs champTa.
-
-Data still pending — none of the `*_ve_*` files exist on disk yet; run `bash commands.sh` to materialize the full pipeline.
-
-### 2026-05-25 (Anchored SAE sweep I/J complete)
-
-24 configs on champTa fc1 / tigerTa. **Winner: I04 anchored-jumprelu, lambda_high=1.0** — tigerTa F1-lift 0.158 → 0.255 (+62%), MCC 0.333 → 0.494. 36/36 anchor slots alive; 25/36 are the best feature for their assigned BSP. Anchored-batchtopk (J-series) underperforms; low lambdas (0.03, 0.10) are counterproductive. Decision gate PASS.
-
-Full results: [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md). Anchor analysis JSON: `saes/quarto/analysis/I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1_anchor-tigerTa.json`.
-
 ### Earlier states (compact)
+
+- **2026-05-25 (Anchored sweep I/J on champTa)** -- I04 anchored-jumprelu lh=1.0 wins tigerTa (+62% F1-lift vs baseline), recipe confirmed on champVe (see above). --> see [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md).
 
 - **2026-05-22 (Tiger reframing audit closed)** — pre-registered decision rule fires: tiger SAE/LP efficiency exceeds hawk by +25 pp (conv2/Ta) to +51 pp (conv2/S4). Supervision pivot now targets tiger, not hawk. Secondary: fc1 > conv2 for tiger; Sweep H null reproduces on tiger; real feature absorption on champTa (max 6–10 BSPs/feature). → see [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md).
 - **2026-05-22 (Sweep H closed)** — capacity scan (12 configs) closes 0% of the conv2/hawk gap; concept-targeting promoted to primary direction. → see [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
@@ -67,6 +55,15 @@ Full results: [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/
 | Linear probe (trained) | S4 | conv2 | tigerS4 | 0.335 | 0.098 |
 | Best SAE (F04 jumprelu-t64 fc1) | **Ta** | fc1 | tigerTa | 0.449 | **0.158** |
 | Best SAE (E05 batchtopk-k32 conv2) | **Ta** | conv2 | tigerTa | 0.353 | 0.063 |
+| Linear probe (trained) | **Ve** | fc1 | gorillaVe | 0.802 | 0.605 |
+| Linear probe (trained) | **Ve** | conv2 | gorillaVe | **0.959** | **0.762** |
+| Linear probe (trained) | **Ve** | fc1 | hawkVe | 0.692 | 0.662 |
+| Linear probe (trained) | **Ve** | conv2 | hawkVe | 0.851 | **0.822** |
+| Linear probe (trained) | **Ve** | fc1 | tigerVe | 0.549 | 0.298 |
+| Linear probe (trained) | **Ve** | conv2 | tigerVe | 0.385 | 0.136 |
+| Best SAE (I03 anch-jrelu lh030 fc1) | **Ve** | fc1 | gorillaVe | 0.391 | **0.195** |
+| Best SAE (E01 topk-k32 conv2) | **Ve** | conv2 | gorillaVe | 0.389 | 0.192 |
+| Best SAE (I04 anch-jrelu lh100 fc1) | **Ve** | fc1 | tigerVe | 0.506 | **0.255** |
 
 † S4-fc1 LP rerun at `max_iter=5000` (closed 2026-05-22 PM) confirmed the headline numbers stand: F1=0.4402, MCC=0.3797, F1-lift=0.1789 vs the `max_iter=1000` original of 0.440/0.380/0.179. The 5 unconverged-warning BSPs were cosmetically not-converged but functionally at their optimum.
 
@@ -83,7 +80,7 @@ Full results: [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/
 | H6 | Wrong hook point — conv2 may be better | ✅ SUPPORTED on Aa; partially **inverted on Ta for hawk** (fc1 SAEs > conv2 SAEs on rare threats; see phase-2B.md Claim 4) |
 | H7 | Offered piece is not learned | ✅ CONFIRMED — F1 = 0.667 is trivial baseline |
 | H8 | Threat info is spatially encoded, lost at fc1 bottleneck | ⚠️ CHAMPION-SPECIFIC — confirmed for champAa, overturned for champS4 / champTa. Unified-aux family preserves threats through fc1; minimax distillation amplifies them. |
-| H9 | Oracle distillation distils *concepts* (vs non-decomposable shortcut) | ✅ CONFIRMED (2026-05-19). All four hawk diagnostic cells rise on Ta; biggest at fc1 / hawk (+0.112 lift). See [phase-2B.md](docs/diary/phase-2B.md) ch. 3. |
+| H9 | Oracle distillation distils *concepts* (vs non-decomposable shortcut) | ✅ CONFIRMED (2026-05-19). Extended on Ve (2026-05-26): DISABLE_NEVER deepens state encoding (gorilla conv2 LP +0.054 vs Ta) but does NOT boost strategic/tiger concepts (fc1 flat, conv2 -0.039). Concept distillation has a ceiling on agent-relative BSPs. See [phase-2B.md](docs/diary/phase-2B.md) ch. 3 and [champVe-results.md](docs/diary/2026-05-26_champVe-results.md). |
 
 ## BSP Sets
 
