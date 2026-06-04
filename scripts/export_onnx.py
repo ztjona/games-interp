@@ -112,7 +112,7 @@ def _load_eval_registry(game: str, animal: str) -> dict[str, dict]:
     raw = json.loads(path.read_text())
     out: dict[str, dict] = {}
     for key, entry in raw.items():
-        if not isinstance(entry, dict) or entry.get("bsp_set") != animal:
+        if not isinstance(entry, dict) or not entry.get("bsp_set", "").startswith(animal):
             continue
         rid = entry.get("run_id", key.split(":", 1)[0])
         prev = out.get(rid)
@@ -150,9 +150,15 @@ def _load_game_net(game: str, net_path: Path, device: str) -> nn.Module:
         raise NotImplementedError(
             f"Game net loader for '{game}' not implemented yet."
         )
-    from games.quarto import load_model  # type: ignore[import-not-found]
+    try:
+        from games.quarto import load_model  # type: ignore[import-not-found]
 
-    return load_model(net_path, device=device)
+        return load_model(net_path, device=device)
+    except RuntimeError:
+        from games.quarto_s4 import load_model as load_model_s4  # type: ignore[import-not-found]
+
+        log.info("  QuartoCNN load failed; loading as S4.")
+        return load_model_s4(net_path, device=device)
 
 
 # ---------------------------------------------------------------------------

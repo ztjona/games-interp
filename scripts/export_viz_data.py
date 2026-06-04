@@ -14,6 +14,7 @@ picks shipped SAEs, and emits the JSON files documented in
     sae_<name>_features.json
     sae_<name>_bsp_alignment.json
     sae_<name>_top_boards.json
+    sae_<name>_positions.json  ── 2D embedding of decoder directions (feature map)
 
 Per-SAE files reuse the caches that ``sae_eval.py`` writes
 (``saes/<game>/cache/<name>_h.pt`` and ``<name>_matching-<animal>.pt``).
@@ -31,6 +32,7 @@ Options:
     --bsps=<animal>         BSP set animal name [default: gorilla].
     --top-k-boards=<n>      Top-activating boards per feature [default: 20].
     --top-k-bsps=<n>        BSPs kept per feature in alignment file [default: 5].
+    --positions-method=<m>  Feature-map embedding: auto|umap|pca [default: auto].
     --board-sample=<n>      Boards in board_sample.json [default: 1000].
     --max-shipped=<n>       Auto-pick top-N SAEs by coverage [default: 12].
     --per-champion=<n>      Top-N shipped SAEs per champion [default: 3].
@@ -54,6 +56,7 @@ Examples:
 
 from __future__ import annotations
 
+import importlib.util
 import json
 import logging
 import re
@@ -159,8 +162,15 @@ def _count_net_params(game: str, device: str) -> int:
 
         net = load_model(path, device=device)
         return int(sum(p.numel() for p in net.parameters()))
-    except Exception as exc:  # pragma: no cover — best-effort
-        log.warning("Could not count params from %s (%s) — params=0.", path, exc)
+    except Exception:
+        pass
+    try:
+        from games.quarto_s4 import load_model as load_model_s4  # type: ignore[import-not-found]
+
+        net = load_model_s4(path, device=device)
+        return int(sum(p.numel() for p in net.parameters()))
+    except Exception as exc:  # pragma: no cover -- best-effort
+        log.warning("Could not count params from %s (%s) -- params=0.", path, exc)
         return 0
 
 
@@ -501,6 +511,94 @@ def _write_alignment_file(
                 }
             )
     out.write_text(json.dumps({"sae": sae_name, "rows": rows}))
+
+
+def _project_2d(
+    dirs: np.ndarray, method: str, seed: int = 42
+) -> tuple[np.ndarray, str]:
+    """Project (n, d) feature directions to (n, 2).
+
+    Returns (coords, method_used). Prefers UMAP (cosine metric — directions,
+    not magnitudes, are what matter) when installed, else falls back to PCA
+    from scikit-learn (always available per requirements.txt). Tiny dictionaries
+    (n <= 2) get a trivial 1-D layout since neither embedder is meaningful.
+    """
+    n = dirs.shape[0]
+    if n == 0:
+        return np.zeros((0, 2), dtype=np.float32), "none"
+    if n <= 2:
+        xy = np.zeros((n, 2), dtype=np.float32)
+        xy[:, 0] = np.arange(n, dtype=np.float32)
+        return xy, "trivial"
+
+    want = method
+    if want == "auto":
+        want = "umap" if importlib.util.find_spec("umap") else "pca"
+
+    if want == "umap":
+        try:
+            import umap  # type: ignore
+
+            reducer = umap.UMAP(
+                n_components=2,
+                n_neighbors=min(15, n - 1),
+                min_dist=0.1,
+                metric="cosine",
+                random_state=seed,
+            )
+            xy = reducer.fit_transform(dirs)
+            return np.asarray(xy, dtype=np.float32), "umap"
+        except Exception as e:  # pragma: no cover - optional dep / numerical
+            log.warning("  UMAP failed (%s); falling back to PCA.", e)
+
+    from sklearn.decomposition import PCA
+
+    xy = PCA(n_components=2).fit_transform(dirs)
+    return np.asarray(xy, dtype=np.float32), "pca"
+
+
+def _write_positions_file(
+    out: Path,
+    sae_name: str,
+    sae: Any,
+    h: torch.Tensor,
+    method: str,
+) -> None:
+    """2D embedding of decoder directions for the SAE-detail feature map.
+
+    Each *alive* feature i is one point; its coords come from a 2D embedding of
+    the decoder row ``W_dec[i]`` (the direction the feature writes into
+    activation space). Dead features are omitted (their direction is unused).
+    The frontend colors points by each feature's top-aligned BSP category,
+    joined by index against ``sae_<name>_features.json``.
+
+    Compact schema (parallel arrays):
+        {"sae", "method", "i": [...], "x": [...], "y": [...]}
+    """
+    w_dec = getattr(sae, "W_dec", None)
+    if w_dec is None:
+        log.warning("  %s has no W_dec — skipping positions.", sae_name)
+        return
+    dirs_all = w_dec.detach().cpu().float().numpy()  # (d_dict, d_input)
+    fc = (h > 0).float().sum(dim=0).cpu().numpy()  # (d_dict,)
+    alive = np.where(fc > 0)[0]
+    if alive.size == 0:
+        out.write_text(
+            json.dumps({"sae": sae_name, "method": "none", "i": [], "x": [], "y": []})
+        )
+        return
+    coords, used = _project_2d(dirs_all[alive], method)
+    out.write_text(
+        json.dumps(
+            {
+                "sae": sae_name,
+                "method": used,
+                "i": [int(v) for v in alive],
+                "x": [round(float(v), 4) for v in coords[:, 0]],
+                "y": [round(float(v), 4) for v in coords[:, 1]],
+            }
+        )
+    )
 
 
 def _write_top_boards_file(
@@ -962,7 +1060,7 @@ _LP_FILE_RE = re.compile(
     r"(?:(?P<animal>[a-z]+)_(?P<n>\d+)_)?"
     r"(?:(?P<arch>s4)\.)?"
     r"(?P<hook>fc1|conv2)(?:_(?P<dim>\d+))?"
-    r"_amalgam(?:_(?P<source>s4|ta|random))?_activations_results\.json$"
+    r"_amalgam(?:_(?P<source>s4|ta|ve|random))?_activations_results\.json$"
 )
 
 
@@ -996,6 +1094,8 @@ def _discover_linear_probes(game: str, animal: str) -> list[dict[str, Any]]:
             champion = "S4"
         elif source == "ta":
             champion = "Ta"
+        elif source == "ve":
+            champion = "Ve"
         elif arch == "s4":
             champion = "S4"  # s4.<hook> with no _<source>_ tag → S4 source
         else:
@@ -1281,7 +1381,7 @@ def main():
     # Auxiliary BSP-set bundles (e.g. hawk alongside gorilla) so the
     # frontend's BSP-set picker on the Coverage chart can switch between
     # framings. Skipped silently if the alt set has no schema / no evals.
-    for aux_animal in ("gorilla", "hawk"):
+    for aux_animal in ("gorilla", "hawk", "tiger"):
         if aux_animal == animal:
             continue
         _write_aux_bsp_set(out_dir, game, aux_animal)
@@ -1404,6 +1504,13 @@ def main():
             bsp_labels,
             bsp_ids,
             int(args["--top-k-boards"]),
+        )
+        _write_positions_file(
+            out_dir / f"sae_{sae_name}_positions.json",
+            sae_name,
+            sae,
+            h,
+            args["--positions-method"],
         )
 
     log.info("Done. Wrote bundle to %s", out_dir)
