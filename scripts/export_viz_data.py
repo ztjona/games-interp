@@ -28,6 +28,8 @@ Usage:
 Options:
     --game=<name>           Game id (quarto | othello | tictactoe).
     --out=<dir>             Output dir [default: auto]
+    --matchups=<path>       champion-results.jsonl file, or the folder holding
+                            it, for head-to-head tables [default: auto].
     --shipped=<list>        Comma-separated SAE names [default: auto]
     --bsps=<animal>         BSP set animal name [default: gorilla].
     --top-k-boards=<n>      Top-activating boards per feature [default: 20].
@@ -43,6 +45,7 @@ Options:
 
 Auto-resolution (when ``=auto``):
     out      ../boardSAE-atlas/public/data/<game>/
+    matchups ../Quartopy-trainer/champion-results.jsonl
     shipped  top --per-champion SAEs per champion in the eval registry
              filtered by the chosen BSP set, ranked by coverage descending.
              Capped at --max-shipped overall. Falls back to global ranking
@@ -886,20 +889,32 @@ def _matchup_timestamp(raw_ts: str | None) -> str | None:
     return dt.astimezone(ECT).isoformat()
 
 
-def _write_champions_file(out: Path, game: str) -> None:
-    """Emit ``champions.json`` from ``hierarchical-SAE/champion-results.jsonl``.
+def _write_champions_file(out: Path, game: str, matchups_path: Path) -> None:
+    """Emit ``champions.json`` from a champion-results.jsonl file.
 
-    Falls back to writing a minimal stub with just the champions if the JSONL
-    file is missing — the frontend then loses head-to-head matchup tables but
-    still renders champion badges + diagrams.
+    ``matchups_path`` is the head-to-head results JSONL (default
+    ``Quartopy-trainer/champion-results.jsonl``). Falls back to a minimal stub
+    with just the champions if that file is missing, empty, or has no usable
+    rows -- the frontend then loses head-to-head matchup tables but still
+    renders champion badges + diagrams.
     """
-    matchups_path = PROJECT_DIR.parent / "hierarchical-SAE" / "champion-results.jsonl"
-
     champion_ids: list[str] = list(_CHAMPION_META.keys())
     matchups: list[dict[str, Any]] = []
     baselines_seen: set[str] = set()
 
-    if matchups_path.exists():
+    if not matchups_path.exists():
+        log.warning(
+            "champion-results.jsonl NOT FOUND at %s -- "
+            "champions.json will ship with no head-to-head matchups.",
+            matchups_path,
+        )
+    elif matchups_path.stat().st_size == 0:
+        log.warning(
+            "champion-results.jsonl at %s is EMPTY (0 bytes) -- "
+            "champions.json will ship with no head-to-head matchups.",
+            matchups_path,
+        )
+    else:
         seen_pairs: set[tuple[str, str]] = set()
         with open(matchups_path, "r") as f:
             for line in f:
@@ -926,11 +941,12 @@ def _write_champions_file(out: Path, game: str) -> None:
                         "timestamp": _matchup_timestamp(row.get("timestamp")),
                     }
                 )
-    else:
-        log.warning(
-            "champion-results.jsonl not found at %s — emitting champions.json with no matchups.",
-            matchups_path,
-        )
+        if not matchups:
+            log.warning(
+                "champion-results.jsonl at %s has no usable matchup rows -- "
+                "champions.json will ship with no head-to-head matchups.",
+                matchups_path,
+            )
 
     champions: list[dict[str, Any]] = []
     for cid in champion_ids:
@@ -1245,6 +1261,14 @@ def main():
     out_dir = _default_out_dir(game) if out_arg in (None, "auto") else Path(out_arg)
     out_dir.mkdir(parents=True, exist_ok=True)
 
+    matchups_arg = args["--matchups"]
+    if matchups_arg in (None, "auto"):
+        matchups_path = PROJECT_DIR.parent / "Quartopy-trainer" / "champion-results.jsonl"
+    else:
+        matchups_path = Path(matchups_arg)
+        if matchups_path.is_dir():
+            matchups_path = matchups_path / "champion-results.jsonl"
+
     eval_registry = _load_eval_registry(game, animal)
     train_registry = _load_training_registry(game)
 
@@ -1376,7 +1400,7 @@ def main():
     )
 
     # Champion registry (architecture, head-to-head matchups).
-    _write_champions_file(out_dir / "champions.json", game)
+    _write_champions_file(out_dir / "champions.json", game, matchups_path)
 
     # Auxiliary BSP-set bundles (e.g. hawk alongside gorilla) so the
     # frontend's BSP-set picker on the Coverage chart can switch between
