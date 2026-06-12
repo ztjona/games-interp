@@ -30,6 +30,8 @@ Options:
     --out=<dir>             Output dir [default: auto]
     --matchups=<path>       champion-results.jsonl file, or the folder holding
                             it, for head-to-head tables [default: auto].
+    --positions=<path>      Positions .pt the per-SAE files map onto; must match
+                            the pool the SAE h was encoded on [default: auto].
     --shipped=<list>        Comma-separated SAE names [default: auto]
     --bsps=<animal>         BSP set animal name [default: gorilla].
     --top-k-boards=<n>      Top-activating boards per feature [default: 20].
@@ -46,6 +48,7 @@ Options:
 Auto-resolution (when ``=auto``):
     out      ../boardSAE-atlas/public/data/<game>/
     matchups ../Quartopy-trainer/champion-results.jsonl
+    positions data/<game>/positions-amalgam_unique.pt
     shipped  top --per-champion SAEs per champion in the eval registry
              filtered by the chosen BSP set, ranked by coverage descending.
              Capped at --max-shipped overall. Falls back to global ranking
@@ -1269,6 +1272,11 @@ def main():
         if matchups_path.is_dir():
             matchups_path = matchups_path / "champion-results.jsonl"
 
+    positions_arg = args["--positions"]
+    pos_path = (
+        _positions_path(game) if positions_arg in (None, "auto") else Path(positions_arg)
+    )
+
     eval_registry = _load_eval_registry(game, animal)
     train_registry = _load_training_registry(game)
 
@@ -1374,7 +1382,6 @@ def main():
     )
 
     # Positions for board_sample + (later) top_boards.
-    pos_path = _positions_path(game)
     if not pos_path.exists():
         log.error("Positions file missing: %s", pos_path)
         sys.exit(1)
