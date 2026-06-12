@@ -57,7 +57,8 @@ without checking it, that is the failure mode this convention exists for.
 |---|---|---|
 | 1 (A–G) | [phase-1.md](phase-1.md) | Initial SAE family work on champAa: Anakin sweep (28 configs), conv2 LP, competence audit, H1/H6/H7/H8 establishment. |
 | 2A | [phase-2A.md](phase-2A.md) | Conv2 architecture sweep on champAa (33 runs, Deep Brain 3× GPU, 2026-05-11). C01 winner; reporting standard (MCC + F1-lift) adopted. |
-| 2B | [phase-2B.md](phase-2B.md) | Two-champion era (champS4 / champTa) at shared `QuartoCNNAutoregUnifiedS4` architecture. Three chapters: champS4 mini-sweep (2026-05-18), LP rescoping (2026-05-19 AM), 25-config matched sweep + H9 distillation result (2026-05-19 PM). |
+| 2B | [phase-2B.md](phase-2B.md) | Two-champion era (champS4 / champTa), CLOSED 2026-06-09. Five chapters: champS4 mini-sweep, LP rescoping, 25-config sweep + H9, Sweep H capacity null, close-out folding in the executed "2C" arc (tiger → anchored I/J → champVe). |
+| 3 | [phase-3.md](phase-3.md) | OPEN (2026-06-09). Geometric concept structure: H10, dilution diagnostic, α/β allocation regime, geometry-aware SAE variants, causal patching. |
 
 ### Design notes
 
@@ -67,6 +68,7 @@ without checking it, that is the failure mode this convention exists for.
 | 2026-05-22 | [reframings-audit-tiger](2026-05-22_reframings-audit-tiger.md) | `tiger` BSP set design + implementation + **results** (36 BSPs, 6 categories): agent-relative threats and pool-reasoning. Pre-registered decision rule **fired** \u2014 tiger SAE/LP efficiency exceeds hawk by +25 to +51 pp; supervised SAE pivot now targets tiger, not hawk. |
 | 2026-05-22 | [anchored-sae-champta-tiger](2026-05-22_anchored-sae-champta-tiger.md) | Plan (**executed**) for anchored jumprelu / batchtopk on champTa fc1, anchored against `tigerTa` BSPs. Anchor topology, lambda sweep, pre-registered decision gates. |
 | 2026-05-25 | [anchored-sweep-ij-results](2026-05-25_anchored-sweep-ij-results.md) | **Results** of I/J anchored sweep (24 configs). Winner: I04 anchored-jumprelu lh=1.0 (+62% F1-lift). Decision gate PASS. Per-slot anchor analysis, cross-BSP coverage, J-series negative result, reporting standard for future anchored experiments. |
+| 2026-06-09 | [geometric-pivot](2026-06-09_geometric-pivot.md) | Phase 3 founding design note. H10 (the SAE/LP wall is geometric), evidence from 5 newly-ingested papers + 2026-06-08 synthesis, pre-registered plan 3A–3D with gates G-3A / G-3C, thesis-risk framing. |
 
 ### Supervisor advances
 

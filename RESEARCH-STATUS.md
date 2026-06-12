@@ -11,15 +11,14 @@
 
 ## Project State
 
-### 2026-05-26 (champVe full sweep complete) -- current
+### 2026-06-09 (Phase 3 opened: geometric concept structure) -- current
 
-**110 evals across gorillaVe, hawkVe, tigerVe.** Anchored I04 lh=1.0 recipe transfers perfectly from Ta to Ve: tigerVe F1-lift **0.255** (vs tigerTa 0.257); SAE/LP efficiency 85.6% on both champions. Lambda ordering and J-series failure mode reproduce. Ve LP improves on state concepts (gorilla conv2 lift 0.762 vs Ta 0.708, +0.054) but NOT on strategic tiger concepts (fc1 flat, conv2 -0.039). Non-anchored conv2 SAEs harder to train on Ve. Full results: [`docs/diary/2026-05-26_champVe-results.md`](docs/diary/2026-05-26_champVe-results.md).
-
-### 2026-05-26 (unified cross-champion position dataset)
-
-Per-champion position distributions bias evaluations toward each champion's visited states. New tool `scripts/unify_positions.py` merges all champion amalgams into a single deduplicated pool; BSP set suffix encodes position count (e.g. `gorilla156k`) so the evaluation basis is always clear. Day-to-day sweeps keep champion-specific data; unified pool used only for cross-champion reporting. Design: [`docs/diary/2026-05-26_unified-position-dataset.md`](docs/diary/2026-05-26_unified-position-dataset.md).
+**Phases 1–2B closed; Phase 3 open.** champVe pipeline re-verified (43/43/24 registry entries match configs). New founding hypothesis **H10**: the residual SAE/LP wall is *geometric* — conjunctive threat concepts occupy multi-dimensional structure that flat dictionary atoms dilute/tile (threat_line SAE F1 0.07–0.23 vs LP 0.55–0.89, while additive concepts are captured); absorption = hierarchy co-linearity; Sweep H null = pathological capacity-allocation regime. Triggered by the 2026-06-08 paper-DB synthesis + 5 papers ingested 2026-06-09 (Engels multi-dim features, Park polytopes/hierarchy, H-SAE, Brill–Michaud SAE scaling, Jiang origins-of-linearity). Plan 3A–3D with pre-registered gates: diagnostic → ground-truth geometry (α/β measurable here, not in LLMs) → geometry-aware SAE variants → causal patching. Rationale: [`docs/diary/2026-06-09_geometric-pivot.md`](docs/diary/2026-06-09_geometric-pivot.md). Ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md).
 
 ### Earlier states (compact)
+
+- **2026-05-26 (champVe full sweep)** — 110 evals; anchored I04 recipe transfers Ta→Ve (tigerVe lift 0.255, SAE/LP 85.6% on both); H9 ceiling: DISABLE_NEVER deepens state encoding (gorilla conv2 LP lift +0.054) but not tiger concepts. → [`docs/diary/2026-05-26_champVe-results.md`](docs/diary/2026-05-26_champVe-results.md).
+- **2026-05-26 (unified cross-champion dataset)** — `scripts/unify_positions.py`; numeric BSP suffixes (`gorilla156k`); unified pool for cross-champion reporting only. → [`docs/diary/2026-05-26_unified-position-dataset.md`](docs/diary/2026-05-26_unified-position-dataset.md).
 
 - **2026-05-25 (Anchored sweep I/J on champTa)** -- I04 anchored-jumprelu lh=1.0 wins tigerTa (+62% F1-lift vs baseline), recipe confirmed on champVe (see above). --> see [`docs/diary/2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md).
 
@@ -81,6 +80,7 @@ Per-champion position distributions bias evaluations toward each champion's visi
 | H7 | Offered piece is not learned | ✅ CONFIRMED — F1 = 0.667 is trivial baseline |
 | H8 | Threat info is spatially encoded, lost at fc1 bottleneck | ⚠️ CHAMPION-SPECIFIC — confirmed for champAa, overturned for champS4 / champTa. Unified-aux family preserves threats through fc1; minimax distillation amplifies them. |
 | H9 | Oracle distillation distils *concepts* (vs non-decomposable shortcut) | ✅ CONFIRMED (2026-05-19). Extended on Ve (2026-05-26): DISABLE_NEVER deepens state encoding (gorilla conv2 LP +0.054 vs Ta) but does NOT boost strategic/tiger concepts (fc1 flat, conv2 -0.039). Concept distillation has a ceiling on agent-relative BSPs. See [phase-2B.md](docs/diary/phase-2B.md) ch. 3 and [champVe-results.md](docs/diary/2026-05-26_champVe-results.md). |
+| H10 | SAE/LP wall is *geometric*: conjunctive concepts occupy multi-dim structure that flat atoms dilute/tile; absorption = hierarchy co-linearity; Sweep H null = allocation regime | 🔬 OPEN (2026-06-09) — Phase 3 founding hypothesis. Diagnostic 3A distinguishes diluted/tiled/absent. See [2026-06-09_geometric-pivot.md](docs/diary/2026-06-09_geometric-pivot.md). |
 
 ## BSP Sets
 
@@ -98,20 +98,17 @@ Per-champion position distributions bias evaluations toward each champion's visi
 
 Full table template and rationale: [`phase-2A.md`](docs/diary/phase-2A.md) § "Reporting standard".
 
-## Active plan / next steps
+## Active plan / next steps (Phase 3)
 
-1. ~~**F04-Ta verification rerun**~~ ✅ done 2026-05-20.
-2. ~~**Sweep H — capacity scan**~~ ✅ done 2026-05-22. Gate FAILS; concept-targeting promoted. See [`docs/diary/phase-2B.md`](docs/diary/phase-2B.md) ch. 4.
-3. ~~**Reframing audit — `tiger` BSPs**~~ ✅ done 2026-05-22. **Target-set mismatch contributing**; tiger SAE/LP efficiency exceeds hawk by +25 to +51 pp depending on cell. Anchored / matryoshka pivot now targets *tiger*. Results: [`docs/diary/2026-05-22_reframings-audit-tiger.md`](docs/diary/2026-05-22_reframings-audit-tiger.md) §"Results".
-4. **Literature review refresh** (PI-owned, in progress; finishes before next session). Last broad scan predates matryoshka / E2E / BatchTopK family follow-ups; needs fresh pass on (a) SAE variants 2025–2026 — especially anchored / supervised forms, (b) board-game interp work since Karvonen, (c) low-base-rate / rare-concept SAE methods.
-5. **Anchored SAE on champTa fc1 → tigerTa** (next implementation, after step 4). Largest LP headroom of any cell (F1-lift 0.301 vs SAE 0.158), tiger validated as the supervision target. Two architectures (anchored-jumprelu, anchored-batchtopk) × four λ values × three seeds = 24 runs. Detailed plan: [`docs/diary/2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
-6. **Matryoshka SAE** (parallel engineering track, starts when step 5 has results to compare against). Re-activated on champTa after the 2026-05-22 feature-sharing evidence (max 6–10 BSPs/feature) showed real absorption — contradicting the champAa-era deprioritization. Targets the overall SAE/LP efficiency gap on dense categories; should be evaluated against tiger primarily, gorilla/hawk secondarily.
-7. **E2E SAEs** — start when at least one of {anchored, matryoshka} has landed. E2E is most diagnostic *against a strong baseline*, not as a first move; per the 2026-05-19 design note the contrast is what makes the result informative.
-8. ~~**S4-fc1 LP `max_iter=5000` rerun**~~ ✅ done 2026-05-22 PM. Headline 0.179 lift stands (rerun: 0.1789); 5 unconverged-warning BSPs were at their functional optimum.
-9. **Novel SAE variant placeholder** — base-rate-weighted reconstruction loss, deferred until after anchored / matryoshka / E2E results land.
-10. **Cell-relative BSP set ("new animal")** — only relevant if per-cell conv2 SAEs (`--flatten-per-cell`) are reactivated. Not on the current path.
+Method, evidence, and pre-registered gates: [`docs/diary/2026-06-09_geometric-pivot.md`](docs/diary/2026-06-09_geometric-pivot.md). Running ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md).
 
-Design rationale: [`docs/diary/2026-05-19_concept-targeted-saes.md`](docs/diary/2026-05-19_concept-targeted-saes.md). Next-experiment design: [`docs/diary/2026-05-22_anchored-sae-champta-tiger.md`](docs/diary/2026-05-22_anchored-sae-champta-tiger.md).
+1. **3A — Dilution diagnostic** on existing champVe/champTa SAE caches: Ising-coupling communities (not decoder cosine), restricted-R², irreducibility indices. Verdict per threat group: diluted / tiled / absent. Gate G-3A decides whether 3C proceeds.
+2. **3B — Ground-truth geometry** (runs regardless): measure the Brill–Michaud allocation regime (α from BSP base rates, β from per-concept latent-allocation curves over the existing H01–H06 width sweep); Park polytope/hierarchy-orthogonality checks on `game_phase`, `offered_piece`, threat families.
+3. **3C — Geometry-aware SAE variants** (gated on G-3A): (i) hierarchical anchoring (child-minus-parent targets; extends `_AnchorMixin`), (ii) H-SAE-vs-matryoshka head-to-head (absorbs the old matryoshka track; per-expert TopK_j, not TopK₁), (iii) bilinear/quadratic slots for conjunctions. Gate G-3C: beat I04 tigerVe 0.255 or close ≥50% of the threat SAE/LP gap, 3 seeds, random control unchanged.
+4. **3D — Causal subspace patching** (Engels recipe → Quarto move-change rate) on the best 3C variant + baseline-SAE communities.
+5. **Paper-DB re-synthesis** — the 2026-06-08 synthesis predates the 5 papers ingested 2026-06-09.
+
+Resolved from the previous plan (2026-06-09): anchored champTa→tiger ✅ executed (I04 winner, [`2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md)); literature refresh ✅ (synthesis + 5 papers); matryoshka → folded into 3C-ii; E2E SAEs → parked behind gate G-3A; base-rate-weighted reconstruction loss → subsumed by 3B; cell-relative BSP set → still parked (unchanged).
 
 ## Deprioritized
 

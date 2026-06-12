@@ -1,5 +1,7 @@
 # Phase 1 — SAE family, hooks, and the competence wall (2026-Q1/Q2)
 
+Status: CLOSED. Successor: [`phase-2A.md`](phase-2A.md).
+
 Phase 1 ran on `champAa` (legacy `CNN_uncoupled`) and answered three
 empirical questions:
 

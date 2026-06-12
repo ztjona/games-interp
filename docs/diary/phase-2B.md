@@ -1,4 +1,4 @@
-# Phase 2B — Two champions, matched architecture (2026-05-18 → 2026-05-19)
+# Phase 2B — Two champions, matched architecture (2026-05-18 → 2026-06-09, CLOSED)
 
 A new model family (`QuartoCNNAutoregUnifiedS4`) landed two champions in
 quick succession:
@@ -17,6 +17,11 @@ Phase 2B unfolded in three chapters:
 1. **2026-05-18 — champS4 mini-sweep** (4 configs, mirror of champAa top runs). Surprise result: champS4 SAEs *underperform* champAa twins. Diagnostic plan written.
 2. **2026-05-19 morning — LP baseline on champS4** + rescoped 25-config sweep plan. champS4 activations are *more* separable than champAa, but SAE/LP efficiency collapses from ~70 % to ~20 %.
 3. **2026-05-19 afternoon — champTa LP + full 25-config sweep** completes on Deep Brain. champTa wins matched-config every time; oracle-distillation hypothesis confirmed.
+
+Two more chapters were appended after the fact:
+
+4. **2026-05-21/22 — Sweep H capacity scan.** Gate FAILS; concept-targeting promoted.
+5. **2026-06-09 — Close-out.** Resolves the executed-in-place "Phase 2C" arc (tiger audit → anchored I/J → champVe) and hands off to [`phase-3.md`](phase-3.md).
 
 ---
 
@@ -413,6 +418,54 @@ The combined evidence (failed k sweep in Phase 2A Campaign E + failed exp sweep 
 ### What this *doesn't* yet settle
 
 The H sweep ruled out *capacity* as the binding constraint on the *current BSP framings* (gorilla, hawk). It does **not** rule out the alternative reading: that **gorilla and hawk are the wrong target sets** to expect the model to encode. Both are state-only; neither captures the agent-relative reasoning that champTa's +24 pp loss-avoidance behavioural gain demonstrably exercises. Before committing to anchored / matryoshka / E2E — all of which take a fixed BSP set as the supervision signal — we should validate whether a player-relative reframing (`tiger`) recovers more SAE coverage at the same capacity. See [`2026-05-22_reframings-audit-tiger.md`](2026-05-22_reframings-audit-tiger.md).
+
+## Chapter 5 — Close-out (2026-06-09)
+
+The "Phase 2C — concept-targeted SAEs" plan from the
+[2026-05 supervisor advance](advances-supervisor/2026-05.md) was executed
+between 2026-05-22 and 2026-05-26 without its own ledger; its results live
+in dated entries. This chapter folds that arc into the 2B record and
+closes the phase.
+
+### The executed 2C arc [DIRECT — see linked entries]
+
+| Date | Entry | Outcome |
+|---|---|---|
+| 2026-05-22 | [reframings-audit-tiger](2026-05-22_reframings-audit-tiger.md) | Pre-registered rule **fired**: tiger SAE/LP efficiency exceeds hawk by +25–51 pp. Supervision target switched hawk → tiger. |
+| 2026-05-22 | [anchored-sae-champta-tiger](2026-05-22_anchored-sae-champta-tiger.md) | Anchored jumprelu/batchtopk design, λ sweep, gates. |
+| 2026-05-25 | [anchored-sweep-ij-results](2026-05-25_anchored-sweep-ij-results.md) | **I04 anchored-jumprelu λ_h=1.0 wins** (+62 % F1-lift vs F04 on tigerTa). Gate PASS. J-series (anchored-batchtopk) consistently inferior. |
+| 2026-05-26 | [champVe-results](2026-05-26_champVe-results.md) | Recipe transfers: tigerVe lift 0.255 (vs tigerTa 0.257); SAE/LP 85.6 % on both champions. λ ordering and J failure reproduce. H9 ceiling found: DISABLE_NEVER deepens state encoding, not strategic/tiger concepts. |
+| 2026-05-26 | [unified-position-dataset](2026-05-26_unified-position-dataset.md) | `unify_positions.py` for cross-champion reporting (gorilla156k-style suffixes). |
+| 2026-06-09 | — | champVe pipeline (`commands.sh`) re-verified: 43/43/24 registry entries on gorillaVe/hawkVe/tigerVe match config counts; results stand as documented. |
+
+### Phase verdict [DIRECT unless noted]
+
+What 2B (+2C) established:
+
+1. **H9 confirmed with a ceiling.** Minimax distillation distils
+   decomposable concepts (champTa > champS4 everywhere); a second
+   distillation generation (champVe) deepens *state* encoding (gorilla
+   conv2 LP lift 0.708 → 0.762) but not agent-relative concepts (tiger
+   fc1 flat, conv2 −0.039).
+2. **The wall is the objective, not capacity.** k-sweep (2A Campaign E)
+   + exp-sweep (ch. 4) both null; dead features ↑ to ~99 % with width.
+3. **Target framing matters but does not remove the wall.** tiger >
+   hawk for SAE accessibility (+25–51 pp efficiency); unsupervised SAEs
+   still sit at 25–32 % of LP on gorilla/hawk on every champion.
+4. **Anchoring works where pointed** (I04 recipe, 86 % SAE/LP on tiger,
+   reproduced ×2 champions ×3 seeds) — but is supervision-hungry and
+   does not lift unanchored slots.
+5. **The residual failure is category-structured**: conjunctive threat
+   concepts (`threat_line` SAE F1 0.07–0.23 vs LP 0.55–0.89) vs captured
+   additive concepts. This pattern is the empirical seed of Phase 3's
+   geometric hypothesis (H10).
+
+Open items inherited by Phase 3: matryoshka (now part of step 3C
+head-to-head), E2E SAEs (parked behind gate G-3A), base-rate-weighted
+reconstruction (subsumed by the allocation-regime analysis, step 3B).
+
+Successor: [`phase-3.md`](phase-3.md). Founding design note:
+[`2026-06-09_geometric-pivot.md`](2026-06-09_geometric-pivot.md).
 
 ## Pointers
 
