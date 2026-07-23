@@ -1,0 +1,13 @@
+# E06-champYb: conv2 batchtopk k=64 exp=8.
+experiment: E06-champYb-s42
+architecture: batchtopk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64

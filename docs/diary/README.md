@@ -69,6 +69,7 @@ without checking it, that is the failure mode this convention exists for.
 | 2026-05-22 | [anchored-sae-champta-tiger](2026-05-22_anchored-sae-champta-tiger.md) | Plan (**executed**) for anchored jumprelu / batchtopk on champTa fc1, anchored against `tigerTa` BSPs. Anchor topology, lambda sweep, pre-registered decision gates. |
 | 2026-05-25 | [anchored-sweep-ij-results](2026-05-25_anchored-sweep-ij-results.md) | **Results** of I/J anchored sweep (24 configs). Winner: I04 anchored-jumprelu lh=1.0 (+62% F1-lift). Decision gate PASS. Per-slot anchor analysis, cross-BSP coverage, J-series negative result, reporting standard for future anchored experiments. |
 | 2026-06-09 | [geometric-pivot](2026-06-09_geometric-pivot.md) | Phase 3 founding design note. H10 (the SAE/LP wall is geometric), evidence from 5 newly-ingested papers + 2026-06-08 synthesis, pre-registered plan 3A–3D with gates G-3A / G-3C, thesis-risk framing. |
+| 2026-06-18 | [champYb-onboarding](2026-06-18_champYb-onboarding.md) | champYb onboarding (Yb_hotChamp, hot-piece-shaped S4 subclass). New game module `quarto_s4_hot`, config, checkpoint integration, staged pipeline; how it slots into Phase 3 as a piece-safety-trained trunk. Groundwork only — no GPU run. |
 
 ### Supervisor advances
 

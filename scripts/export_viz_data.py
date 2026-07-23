@@ -5,16 +5,16 @@ picks shipped SAEs, and emits the JSON files documented in
 ``boardSAE-atlas/src/lib/types.ts``:
 
     global_summary.json
-    sae_registry.json     ── each entry stamped with `champion` + `kind`
+    sae_registry.json     -- each entry stamped with `champion` + `kind`
     bsps.json
-    coverage_matrix.json  ── includes linear-probe baseline rows
-    coverage_totals.json  ── per-(champion, category) aggregates + baselines
-    champions.json        ── ChampionRegistry (champions, baselines, matchups)
+    coverage_matrix.json  -- includes linear-probe baseline rows
+    coverage_totals.json  -- per-(champion, category) aggregates + baselines
+    champions.json        -- ChampionRegistry (champions, baselines, matchups)
     board_sample.json
     sae_<name>_features.json
     sae_<name>_bsp_alignment.json
     sae_<name>_top_boards.json
-    sae_<name>_positions.json  ── 2D embedding of decoder directions (feature map)
+    sae_<name>_positions.json  -- 2D embedding of decoder directions (feature map)
 
 Per-SAE files reuse the caches that ``sae_eval.py`` writes
 (``saes/<game>/cache/<name>_h.pt`` and ``<name>_matching-<animal>.pt``).
@@ -40,6 +40,12 @@ Options:
     --board-sample=<n>      Boards in board_sample.json [default: 1000].
     --max-shipped=<n>       Auto-pick top-N SAEs by coverage [default: 12].
     --per-champion=<n>      Top-N shipped SAEs per champion [default: 3].
+    --shipped-log=<path>    Upsert the shipped SAEs into a tracked JSONL
+                            manifest (one record per run_id: champion, hook,
+                            bsps, coverage, first_shipped, last_exported). This
+                            is the record of which checkpoints to keep in git;
+                            emit_stage.py reads it. [default: auto]
+                            (auto = saes/<game>/shipped_saes.jsonl; 'off' to skip.)
     --device=<dev>          cuda|cpu|auto [default: auto].
     --skip-features         Only emit catalogues (no per-SAE files).
     --force-encode          Re-encode h even if cache exists.
@@ -253,6 +259,7 @@ _CHAMPION_PATTERNS: list[tuple[str, re.Pattern[str]]] = [
     ("S4", re.compile(r"champS4", re.IGNORECASE)),
     ("Ta", re.compile(r"champTa", re.IGNORECASE)),
     ("Ve", re.compile(r"champVe", re.IGNORECASE)),
+    ("Yb", re.compile(r"champYb", re.IGNORECASE)),
 ]
 
 _AA_PREFIX_RE = re.compile(
@@ -314,6 +321,13 @@ _CHAMPION_META: dict[str, dict[str, Any]] = {
         "arch": "QuartoCNNAutoregUnifiedS4",
         "training": "minimax depth=2 (action selector), oracle never disabled, 10k epochs",
         "notes": "+9.4 pp head-to-head WR vs champTa. Same architecture as champS4/champTa — controlled A/B on oracle-ablation knob and training length.",
+    },
+    "Yb": {
+        "label": "champYb",
+        "full_name": "Yb_hotChamp(3) [hot lambda=1.0, seedB, E=10000]",
+        "arch": "QuartoCNNAutoregUnifiedS4Hot",
+        "training": "hot-piece BCE scaffold (lambda=1.0) + minimax depth-2 oracle, 10k epochs",
+        "notes": "Reigning champion. Same S4 trunk as champVe plus a train-only fc_hot auxiliary head; the hookable trunk (conv2, fc1) is identical to champS4/Ta/Ve. 95.1% WR vs Loss_BT; beats champVe 70.5% head-to-head.",
     },
 }
 
@@ -856,6 +870,8 @@ _OPPONENT_SLUGS: dict[str, str] = {
     "Aa_replay(2)": "Aa_replay2",
     "ME_endgame(2)": "ME_endgame2",
     "Sa_archScan(3) [S4]": "Sa_archScan3",
+    "Ya_hotHead(4) [hot lambda=1.0, E=6000]": "Ya_hotHead4",
+    "MinimaxBot (depth=2)": "Minimax2",
 }
 
 _BASELINE_META: dict[str, dict[str, Any]] = {
@@ -864,6 +880,8 @@ _BASELINE_META: dict[str, dict[str, Any]] = {
     "Aa_replay2": {"label": "Aa_replay(2)", "training": "anakin replay"},
     "ME_endgame2": {"label": "ME_endgame(2)", "training": "endgame solver"},
     "Sa_archScan3": {"label": "Sa_archScan(3) [S4]", "training": "arch-scan"},
+    "Ya_hotHead4": {"label": "Ya_hotHead(4)", "training": "hot-head sibling (seedA)"},
+    "Minimax2": {"label": "MinimaxBot (d=2)", "training": "minimax depth-2 (exact)"},
 }
 
 
@@ -1252,6 +1270,48 @@ def _resolve_device(arg: str) -> str:
     return arg
 
 
+def _upsert_shipped_log(path: Path, shipped: list[str], game: str, animal: str,
+                        eval_registry: dict) -> None:
+    """Upsert one record per shipped run_id into a tracked JSONL manifest.
+
+    The manifest is the record of which SAE checkpoints are flagged for export
+    and therefore worth keeping in git; ``emit_stage.py --shipped-jsonl`` reads
+    it to build the ``git add -f`` list. Dedup by run_id; preserve
+    ``first_shipped`` and refresh ``last_exported``/coverage.
+    """
+    records: dict[str, dict] = {}
+    if path.exists():
+        for line in path.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
+            try:
+                r = json.loads(line)
+                records[r["run_id"]] = r
+            except (json.JSONDecodeError, KeyError):
+                continue
+    today = datetime.now(timezone.utc).date().isoformat()
+    for rid in shipped:
+        cov = eval_registry.get(rid, {}).get("metrics", {}).get("coverage")
+        rec = records.get(rid, {"first_shipped": today})
+        rec.update({
+            "run_id": rid,
+            "game": game,
+            "champion": _infer_champion(rid),
+            "hook": _parse_run_id(rid).get("hook"),
+            "bsps": animal,
+            "coverage": round(cov, 4) if cov is not None else None,
+            "last_exported": today,
+        })
+        rec.setdefault("first_shipped", today)
+        records[rid] = rec
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        for rid in sorted(records):
+            f.write(json.dumps(records[rid], sort_keys=True) + "\n")
+    log.info("Updated shipped manifest %s (%d entries)", path, len(records))
+
+
 def main():
     args = docopt(__doc__)
     logging.basicConfig(level=logging.INFO, format="%(message)s", stream=sys.stderr)
@@ -1325,6 +1385,12 @@ def main():
 
     log.info("Game: %s | BSPs: %s | shipping %d SAE(s)", game, animal, len(shipped))
     log.info("Output: %s", out_dir)
+
+    shipped_log = args.get("--shipped-log")
+    if shipped_log != "off":
+        log_path = (Path(f"saes/{game}/shipped_saes.jsonl")
+                    if shipped_log in (None, "auto") else Path(shipped_log))
+        _upsert_shipped_log(log_path, shipped, game, animal, eval_registry)
 
     # ── Catalogues that don't need SAE encoding ──────────────────────────
     schema_path = _bsp_schema_path(game, animal)

@@ -7,7 +7,7 @@ Each game module must expose:
 
 from __future__ import annotations
 
-AVAILABLE_GAMES = ["quarto", "quarto_s4"]  # extend as games are added
+AVAILABLE_GAMES = ["quarto", "quarto_s4", "quarto_s4_hot"]  # extend as games are added
 
 
 def get_game_module(game: str):
@@ -20,6 +20,10 @@ def get_game_module(game: str):
         from . import quarto_s4
 
         return quarto_s4
+    elif game == "quarto_s4_hot":
+        from . import quarto_s4_hot
+
+        return quarto_s4_hot
     # elif game == "othello":
     #     from . import othello
     #     return othello

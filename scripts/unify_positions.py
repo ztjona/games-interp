@@ -55,6 +55,8 @@ PYTHON = sys.executable
 HOOKS_BY_GAME = {
     "quarto": ["fc1", "conv2"],
     "quarto_s4": ["s4.fc1", "s4.conv2"],
+    # champYb (Hot) shares the S4 trunk; same hookable layers as quarto_s4.
+    "quarto_s4_hot": ["s4.fc1", "s4.conv2"],
 }
 
 CONV_HOOKS = {"conv2", "s4.conv2", "conv1", "s4.conv1"}

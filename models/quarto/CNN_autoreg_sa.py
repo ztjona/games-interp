@@ -184,3 +184,41 @@ class QuartoCNNAutoregUnifiedS4(_QuartoCNNAutoregUnifiedBase):
 
     def _apply_output_activation(self, logits: torch.Tensor) -> torch.Tensor:
         return torch.tanh(logits)
+
+
+# ---------------------------------------------------------------------------
+# S4Hot: S4 trunk + auxiliary depth-1 hot-piece head (select-safety shaping)
+# ---------------------------------------------------------------------------
+
+
+class QuartoCNNAutoregUnifiedS4Hot(QuartoCNNAutoregUnifiedS4):
+    """S4 trunk + an auxiliary ``fc_hot`` head predicting the depth-1
+    hot-piece mask (1 = giving this piece loses to an immediate completion).
+
+    Purpose: a dense BCE signal that forces the *shared trunk* to encode
+    piece-safety, which the unchanged ``fc2_select`` head then reads. The
+    ``forward`` pass is unchanged and still returns ``(q_place, q_select)``,
+    so every existing bot / diagnostic / hook works as-is; the aux head is a
+    training-time scaffold, exposed via :meth:`hot_logits` (its own trunk
+    forward) and NOT consulted at inference.
+
+    The trunk (``conv1``, ``conv2``, ``fc1``=512, ``fc2_place``,
+    ``fc2_select``) is byte-identical to :class:`QuartoCNNAutoregUnifiedS4`,
+    so all SAE hook points (``s4.conv1``, ``s4.conv2``, ``s4.fc1`` ...) and
+    activation dimensions are unchanged. The only extra parameters are
+    ``fc_hot.{weight,bias}``, which the checkpoint carries but the pipeline
+    never reads. See champYb onboarding diary 2026-06-18.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self.fc_hot = nn.Linear(self.fc1.out_features, 16)
+
+    @property
+    def name(self) -> str:
+        return "QuartoCNN_autoreg_unified_S4_hot"
+
+    def hot_logits(self, x_board, x_aux) -> torch.Tensor:
+        """Raw logits (B, 16) for the depth-1 hot-piece mask (BCE target side)."""
+        x = self._shared_trunk(x_board, x_aux)
+        return self.fc_hot(x)

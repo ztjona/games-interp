@@ -1,0 +1,17 @@
+# F00-champYb: fc1 batchtopk k=16 exp=8.
+# Equivalent to A01v2-champS4 (i.e. A01 with the exp fix). The A01 ID is
+# preserved for champS4 only because it carries history of the original
+# A01@exp=2 mistake. champYb starts with the correct exp=8 from the start,
+# so it uses a fresh "F00" slot in the fc1 F-series.
+experiment: F00-champYb-s42
+architecture: batchtopk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16

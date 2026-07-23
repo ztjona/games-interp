@@ -21,9 +21,14 @@ data/**/*.pth
 models/**/*.pth
 *.ckpt
 # SAE checkpoints (saes/**/*.pt) are also large and NOT tracked by default.
-# Force-add only the key ones: git add -f saes/quarto/<run_id>.pt
+# Force-add only the key ones -- a runner's final emit_stage step writes the
+# exact `git add -f` commands (only the Atlas-shipped checkpoints) to
+# stage_<slug>.md, so you never have to guess which. See CLAUDE.md "runners/".
 # Metrics (*.jsonl) and registry JSONs ARE tracked (small, useful for cross-device sync).
 saes/**/*.pt
+
+# Per-runner stage plans (auto-generated to-do lists; regenerated every run)
+/stage_*.md
 
 # Logs
 logs/

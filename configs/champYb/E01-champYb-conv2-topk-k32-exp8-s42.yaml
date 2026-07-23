@@ -1,0 +1,16 @@
+# E01-champYb: conv2 topk k=32 exp=8. Mirrors E01-champS4 for direct A/B.
+experiment: E01-champYb-s42
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+patience: 20
+min_improvement: 0.02

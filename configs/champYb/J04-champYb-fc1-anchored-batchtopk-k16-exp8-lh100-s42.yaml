@@ -1,0 +1,28 @@
+# J04-champYb: anchored-batchtopk, k=16, exp=8, λ_high=1.0, λ_medium=0.333.
+# Anchors first 36 dictionary slots to tigerYb BSPs via BCE-with-logits on the
+# encoder pre-activation. High-tier categories (3): ['tiger_square_winnable', 'tiger_offered_completing_attr', 'tiger_line_winnable'].
+# Built on F00 batchtopk-k16 (champYb fc1 anchor) as the base architecture;
+# the J-series sweeps λ_high ∈ {0.03, 0.10, 0.30, 1.0} × 3 seeds.
+experiment: J04-champYb-lh100-s42
+architecture: anchored-batchtopk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16
+# Anchor configuration
+anchor_bsps: data/quarto/bsp_labels-tigerYb_36.pt
+anchor_schema: data/quarto/bsp_schema-tiger_36.json
+anchor_index_mode: prefix
+anchor_loss: bce
+anchor_lambda_high: 1.0
+anchor_lambda_medium: 0.333
+anchor_high_categories:
+  - tiger_square_winnable
+  - tiger_offered_completing_attr
+  - tiger_line_winnable

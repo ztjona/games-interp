@@ -1,0 +1,40 @@
+# Quarto champion: Yb_hotChamp(3) HOT_1.0 seedB 10k.
+# Same trunk architecture as champS4 / champTa / champVe
+# (QuartoCNNAutoregUnifiedS4, fc1=512); the model class is the subclass
+# QuartoCNNAutoregUnifiedS4Hot, which adds a training-time-only auxiliary
+# head (fc_hot, depth-1 hot-piece BCE scaffold). That head is never read at
+# inference and does not touch any SAE hook point, so the hookable trunk
+# (s4.conv1, s4.conv2, s4.fc1, s4.fc2_place, s4.fc2_select) is identical to
+# champS4/Ta/Ve. Loading needs the Hot subclass because the checkpoint
+# carries the extra fc_hot.{weight,bias} tensors -> game module quarto_s4_hot.
+#
+# Training procedure: "hot-piece" select-safety shaping with lambda=1.0,
+# seed B, 10,000 epochs. The dense BCE signal forces the shared trunk to
+# encode piece-safety; q_select reads it through the unchanged head.
+#
+# Benchmark (2026-06-16, hierarchical-SAE/champion-results.jsonl, 500 matches
+# per direction):
+#   vs Random Baseline           97.5%
+#   vs Loss_BT                   95.8%
+#   vs Aa_replay(2) [Aa]         91.2%
+#   vs ME_endgame(2)             85.4%
+#   vs Sa_archScan(3) [S4]       90.0%
+#   vs Ta_minimaxSelect(1) [Ta]  75.3%
+#   vs Ve_oracleAblation(4) [Ve] 70.5%   <- previous champion
+#   vs Ya_hotHead(4) [seedA]     49.1%   (sibling, statistical tie)
+#   vs MinimaxBot (depth=2)      44.5%   (still below depth-2 minimax)
+name: champYb
+display_name: "Yb_hotChamp(3) [hot lambda=1.0, seedB, E=10000]"
+game: quarto_s4_hot
+path: models/quarto/20260614_2031-Yb_hotChamp(3)0612_HOT_1.0_seedB_E_10000.pt
+random_path: models/quarto/20260612_1414-Yb_hotChamp(3)0612_HOT_1.0_seedB_E_0000.pt
+# Source checkpoints live in the sibling hierarchical-SAE project under
+# CHECKPOINTS/Yb_hotChamp(3)0612_HOT_1.0_seedB/. Both already copied into
+# models/quarto/ (force-add because models/**/*.pt is gitignored).
+#
+# Model class: models.quarto.CNN_autoreg_sa.QuartoCNNAutoregUnifiedS4Hot
+# Loaded via the quarto_s4_hot game module (thin wrapper over quarto_s4).
+#
+# Hookable layers (via S4Wrapper, informational; identical to champS4/Ta/Ve):
+#   s4.conv1, s4.conv2, s4.fc1, s4.fc2_place, s4.fc2_select
+# d_act: s4.fc1=512, s4.conv2=32 per cell (512 flattened)
