@@ -293,7 +293,9 @@ def main():
         output_path = Path(output_path)
 
     with open(output_path, "w") as f:
-        json.dump(output, f, indent=2)
+        # sort_keys for reproducibility: the per_category dict is otherwise
+        # emitted in a non-deterministic key order and churns git on re-runs.
+        json.dump(output, f, indent=2, sort_keys=True)
 
     # --- Print summary ---
     print("\n=== Linear Probe Baseline ===", file=sys.stderr)

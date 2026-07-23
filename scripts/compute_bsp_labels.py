@@ -295,7 +295,10 @@ def main():
     }
 
     with open(schema_path, "w", encoding="utf-8") as f:
-        json.dump(schema_doc, f, indent=2)
+        # sort_keys for reproducibility: dict key iteration order is otherwise
+        # non-deterministic across runs and produces spurious git churn (the
+        # "categories" summary is a dict; the "bsps" list order is preserved).
+        json.dump(schema_doc, f, indent=2, sort_keys=True)
 
     print(f"Saved BSP schema to: {schema_path}", file=sys.stderr)
 
