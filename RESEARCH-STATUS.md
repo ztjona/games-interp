@@ -11,7 +11,15 @@
 
 ## Project State
 
-### 2026-06-09 (Phase 3 opened: geometric concept structure) -- current
+### 2026-07-21 (Phase 3 reassessed vs litv2; 3A implemented) -- current
+
+Plan reassessed against the 2026-07-14 paper-DB synthesis v2 (~278 summaries). 3A–3D skeleton survives; changes are additive: **3B-causal** promoted early (gradient-alignment + clamp/steer, G11 epiphenomenality insurance); **H11** added (linearity-vs-decision-relevance, LP-only, an *extension test into RL* since our objective is value-based not softmax-CE); 3C roster refreshed (Matryoshka-vs-H-SAE-vs-MP-SAE, sign-aware tiger arm, γ dead-feature pre-check, centered cross-seed stability); thesis safe-path reframed to "validated ground-truth SAE benchmark". **3A implemented and validated** (`lib/sae/dilution.py` + `scripts/dilution_diagnostic.py` + `runner3A.sh` + `tests/test_dilution.py`, 11 tests); awaits champTa/Ve `_h.pt` caches on Deep Brain (`bash runner3A.sh`). I04 anchored-JumpReLU banked numbers confirmed (tigerTa F1 0.547 / MCC 0.496; weak on conjunctions even supervised). Detail + citations: [`docs/diary/phase-3.md`](docs/diary/phase-3.md) ch. 2026-07-21; 3A spec: [`docs/diary/2026-07-21_3A-dilution-diagnostic.md`](docs/diary/2026-07-21_3A-dilution-diagnostic.md).
+
+### 2026-06-18 (champYb onboarded into Phase 3)
+
+New champion **champYb** = `Yb_hotChamp(3)` [hot lambda=1.0, seedB, E=10000] integrated: strongest *learned* champion to date (beats champVe 70.5%, champTa 75.3%, champS4 90.0% head-to-head; still below depth-2 minimax). Same S4 trunk as champS4/Ta/Ve (fc1=512, hooks `s4.conv1/conv2/fc1/...`), via subclass `QuartoCNNAutoregUnifiedS4Hot` (adds an inference-unused `fc_hot` head). Onboarding groundwork only (config + thin `quarto_s4_hot` game module + checkpoints + staged pipeline); GPU data-pipeline-to-parity must run on Deep Brain. Phase 3 plan unchanged; champYb adds a piece-safety-trained trunk as a fourth, orthogonal point on the training-procedure axis (hot-piece shaping vs Ve's oracle distillation). Detail: [`docs/diary/2026-06-18_champYb-onboarding.md`](docs/diary/2026-06-18_champYb-onboarding.md).
+
+### 2026-06-09 (Phase 3 opened: geometric concept structure)
 
 **Phases 1–2B closed; Phase 3 open.** champVe pipeline re-verified (43/43/24 registry entries match configs). New founding hypothesis **H10**: the residual SAE/LP wall is *geometric* — conjunctive threat concepts occupy multi-dimensional structure that flat dictionary atoms dilute/tile (threat_line SAE F1 0.07–0.23 vs LP 0.55–0.89, while additive concepts are captured); absorption = hierarchy co-linearity; Sweep H null = pathological capacity-allocation regime. Triggered by the 2026-06-08 paper-DB synthesis + 5 papers ingested 2026-06-09 (Engels multi-dim features, Park polytopes/hierarchy, H-SAE, Brill–Michaud SAE scaling, Jiang origins-of-linearity). Plan 3A–3D with pre-registered gates: diagnostic → ground-truth geometry (α/β measurable here, not in LLMs) → geometry-aware SAE variants → causal patching. Rationale: [`docs/diary/2026-06-09_geometric-pivot.md`](docs/diary/2026-06-09_geometric-pivot.md). Ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md).
 
@@ -80,7 +88,8 @@
 | H7 | Offered piece is not learned | ✅ CONFIRMED — F1 = 0.667 is trivial baseline |
 | H8 | Threat info is spatially encoded, lost at fc1 bottleneck | ⚠️ CHAMPION-SPECIFIC — confirmed for champAa, overturned for champS4 / champTa. Unified-aux family preserves threats through fc1; minimax distillation amplifies them. |
 | H9 | Oracle distillation distils *concepts* (vs non-decomposable shortcut) | ✅ CONFIRMED (2026-05-19). Extended on Ve (2026-05-26): DISABLE_NEVER deepens state encoding (gorilla conv2 LP +0.054 vs Ta) but does NOT boost strategic/tiger concepts (fc1 flat, conv2 -0.039). Concept distillation has a ceiling on agent-relative BSPs. See [phase-2B.md](docs/diary/phase-2B.md) ch. 3 and [champVe-results.md](docs/diary/2026-05-26_champVe-results.md). |
-| H10 | SAE/LP wall is *geometric*: conjunctive concepts occupy multi-dim structure that flat atoms dilute/tile; absorption = hierarchy co-linearity; Sweep H null = allocation regime | 🔬 OPEN (2026-06-09) — Phase 3 founding hypothesis. Diagnostic 3A distinguishes diluted/tiled/absent. See [2026-06-09_geometric-pivot.md](docs/diary/2026-06-09_geometric-pivot.md). |
+| H10 | SAE/LP wall is *geometric*: conjunctive concepts occupy multi-dim structure that flat atoms dilute/tile; absorption = hierarchy co-linearity; Sweep H null = allocation regime | 🔬 OPEN (2026-06-09) — Phase 3 founding hypothesis. Diagnostic 3A (implemented 2026-07-21) distinguishes diluted/tiled/absent. See [2026-06-09_geometric-pivot.md](docs/diary/2026-06-09_geometric-pivot.md). |
+| H11 | Decision-upstream concepts (tiger) are more linearly readable than spectator concepts (gorilla) at matched base rate, improving along the competence axis Aa→S4→Ta→(Ve→Yb); champYb hot-piece shaping linearizes pool-safety concepts further while state concepts stay flat | 🔬 OPEN (2026-07-21, pre-registered before Yb data) — LP-only, part of 3B. NB: Jiang's linearity guarantee is softmax-CE-specific; our champions are value-based RL, so this is an *extension test*, and decodability ≠ causality (see 3B-causal). |
 
 ## BSP Sets
 
@@ -100,15 +109,18 @@ Full table template and rationale: [`phase-2A.md`](docs/diary/phase-2A.md) § "R
 
 ## Active plan / next steps (Phase 3)
 
-Method, evidence, and pre-registered gates: [`docs/diary/2026-06-09_geometric-pivot.md`](docs/diary/2026-06-09_geometric-pivot.md). Running ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md).
+Founding rationale + gates: [`docs/diary/2026-06-09_geometric-pivot.md`](docs/diary/2026-06-09_geometric-pivot.md). litv2 reassessment (2026-07-21) + running ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md). Two tracks run in parallel — 3A/3B/3B-causal on cached data (local/Deep Brain, unblocked); Yb-to-parity on Deep Brain.
 
-1. **3A — Dilution diagnostic** on existing champVe/champTa SAE caches: Ising-coupling communities (not decoder cosine), restricted-R², irreducibility indices. Verdict per threat group: diluted / tiled / absent. Gate G-3A decides whether 3C proceeds.
-2. **3B — Ground-truth geometry** (runs regardless): measure the Brill–Michaud allocation regime (α from BSP base rates, β from per-concept latent-allocation curves over the existing H01–H06 width sweep); Park polytope/hierarchy-orthogonality checks on `game_phase`, `offered_piece`, threat families.
-3. **3C — Geometry-aware SAE variants** (gated on G-3A): (i) hierarchical anchoring (child-minus-parent targets; extends `_AnchorMixin`), (ii) H-SAE-vs-matryoshka head-to-head (absorbs the old matryoshka track; per-expert TopK_j, not TopK₁), (iii) bilinear/quadratic slots for conjunctions. Gate G-3C: beat I04 tigerVe 0.255 or close ≥50% of the threat SAE/LP gap, 3 seeds, random control unchanged.
-4. **3D — Causal subspace patching** (Engels recipe → Quarto move-change rate) on the best 3C variant + baseline-SAE communities.
-5. **Paper-DB re-synthesis** — the 2026-06-08 synthesis predates the 5 papers ingested 2026-06-09.
+1. **3A — Dilution diagnostic** on champVe/champTa SAE caches: co-firing communities (not decoder cosine), restricted-R² support curve, intrinsic dim; verdict per threat BSP: absent / captured / diluted / tiled. Gate G-3A (≥50% diluted-or-tiled → 3C proceeds). **Implemented 2026-07-21** — `bash runner3A.sh` on Deep Brain. Spec: [`docs/diary/2026-07-21_3A-dilution-diagnostic.md`](docs/diary/2026-07-21_3A-dilution-diagnostic.md).
+2. **3B — Ground-truth geometry** (runs regardless): Brill–Michaud α/β allocation regime; **κ_ms multi-scale curvature** per concept family; Park polytope/hierarchy-orthogonality on `game_phase`, `offered_piece`, threat families; **H11** linearity-vs-decision-relevance across the competence axis (LP-only, pre-registered).
+3. **3B-causal (new)** — gradient-alignment screen (∂decision-margin/∂activation vs LP direction, vs random null) + small clamp/steer move-change spot-check on LP directions and top SAE features; amnesic-probing/INLP on the LP side. Runs **before** any 3C compute (G11 insurance).
+4. **3C — Geometry-aware SAE variants** (gated on G-3A): γ=‖μ‖/‖σ‖ dead-feature pre-check; hierarchical anchoring (extends `_AnchorMixin`); **Matryoshka-vs-H-SAE-vs-MP-SAE** head-to-head (per-expert TopK_j); bilinear/quadratic slots; **sign-aware/bipolar arm** for tiger's me-vs-opponent pairs. Gate G-3C: beat I04 tigerVe 0.255 or close ≥50% of the threat SAE/LP gap, 3 seeds, random control unchanged, **+ centered cross-seed feature-overlap stability**; never select on the sparsity–reconstruction frontier.
+5. **3D — Causal subspace patching** (Engels recipe → Quarto move-change rate) on the best 3C variant + baseline-SAE communities; pre-register the add(~80–100%)-vs-remove(~0%) asymmetry.
+6. **Yb-to-parity (Deep Brain, scoped)** — pipeline-to-parity + LP baselines + winning recipes only (E05, F04, I04 × 3 seeds), not a full sweep; needed for comparison-to-existing-methods coverage on all champions and for H11's Yb clause.
 
-Resolved from the previous plan (2026-06-09): anchored champTa→tiger ✅ executed (I04 winner, [`2026-05-25_anchored-sweep-ij-results.md`](docs/diary/2026-05-25_anchored-sweep-ij-results.md)); literature refresh ✅ (synthesis + 5 papers); matryoshka → folded into 3C-ii; E2E SAEs → parked behind gate G-3A; base-rate-weighted reconstruction loss → subsumed by 3B; cell-relative BSP set → still parked (unchanged).
+Resolved from the previous plan: anchored champTa→tiger ✅ (I04 winner); literature refresh ✅ (2026-07-14 synthesis v2, ~278 summaries — **plan item 5 "paper-DB re-synthesis" DONE**); matryoshka → folded into 3C; E2E SAEs → parked behind G-3A; base-rate-weighted reconstruction loss → subsumed by 3B; cell-relative BSP set → still parked.
+
+Deferred with a named gate: **multi-game replication** (tic-tac-toe 4×4 then Othello) — port after the 3A verdict + 3B measurement freeze, so the second game tests generality of a frozen toolkit rather than re-running sweeps. De-risk now = keep 3A/3B code game-agnostic in `lib/` (enforced; `lib/sae/dilution.py` operates on plain tensors).
 
 ## Deprioritized
 
