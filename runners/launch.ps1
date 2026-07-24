@@ -25,7 +25,19 @@ $runner = Join-Path $repo "runners\$Name.ps1"
 if (-not (Test-Path $runner)) { throw "No such runner: $runner" }
 New-Item -ItemType Directory -Force -Path (Join-Path $repo 'logs') | Out-Null
 
-$cmd = "pwsh -NoProfile -File `"$runner`""
+# Absolute path to pwsh: the WMI service resolves against the SYSTEM PATH, which
+# lacks the winget/Store `pwsh` alias (that is Win32_Process.Create error 9,
+# "path not found"). Prefer a clean MSI install (C:\Program Files\PowerShell\7)
+# because Store/MSIX binaries under WindowsApps can be finicky when spawned by
+# the WMI service; else use the running interpreter's own real image path.
+$pwsh = @(
+    (Join-Path $env:ProgramFiles 'PowerShell\7\pwsh.exe'),
+    (Join-Path $env:LOCALAPPDATA 'Microsoft\PowerShell\7\pwsh.exe')
+) | Where-Object { $_ -and (Test-Path $_) } | Select-Object -First 1
+if ([string]::IsNullOrEmpty($pwsh)) { $pwsh = (Get-Process -Id $PID).Path }
+if ([string]::IsNullOrEmpty($pwsh)) { throw 'Cannot locate pwsh.exe to launch the runner.' }
+
+$cmd = "`"$pwsh`" -NoProfile -File `"$runner`""
 $r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
     CommandLine      = $cmd
     CurrentDirectory = $repo

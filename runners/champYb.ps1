@@ -26,6 +26,11 @@ $PSNativeCommandUseErrorActionPreference = $true   # native non-zero exit -> thr
 
 Set-Location (Join-Path $PSScriptRoot '..')
 $env:PYTHONUTF8 = '1'
+# Activate the project venv explicitly: a detached (WMI/scheduler) launch does
+# NOT inherit an interactively-activated venv, so `python` must be made the venv
+# interpreter here or the run uses the wrong deps.
+$activate = '.\.venv\Scripts\Activate.ps1'
+if (Test-Path $activate) { & $activate } else { throw ".venv not found at $activate" }
 New-Item -ItemType Directory -Force -Path logs | Out-Null
 Start-Transcript -Path 'logs/champYb.transcript.log' -Append | Out-Null
 
