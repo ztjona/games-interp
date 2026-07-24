@@ -40,6 +40,9 @@ Options:
     --board-sample=<n>      Boards in board_sample.json [default: 1000].
     --max-shipped=<n>       Auto-pick top-N SAEs by coverage [default: 12].
     --per-champion=<n>      Top-N shipped SAEs per champion [default: 3].
+    --champion=<tag>        Restrict the shipped/per-SAE render to one champion
+                            (e.g. Yb), so a single champion's runner does not
+                            re-render other champions' files [default: all].
     --shipped-log=<path>    Upsert the shipped SAEs into a tracked JSONL
                             manifest (one record per run_id: champion, hook,
                             bsps, coverage, first_shipped, last_exported). This
@@ -1382,6 +1385,10 @@ def main():
         )
     else:
         shipped = [s.strip() for s in shipped_arg.split(",") if s.strip()]
+
+    champion_filter = args.get("--champion")
+    if champion_filter and champion_filter != "all":
+        shipped = [r for r in shipped if _infer_champion(r) == champion_filter]
 
     log.info("Game: %s | BSPs: %s | shipping %d SAE(s)", game, animal, len(shipped))
     log.info("Output: %s", out_dir)
