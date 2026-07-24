@@ -92,10 +92,13 @@ Reproducible workflows live in `runners/` (one committed, self-contained
 folding in the relevant `export_*.py` and writing a `stage_<slug>.md` commit plan.
 Launch detached (survives SSH logout) via `runners/launch.ps1`:
 ```powershell
-pwsh -File runners\launch.ps1 champYb        # detached; logs -> logs\champYb.out/.err
-pwsh -File runners\3A-dilution.ps1 -DryRun   # analysis runner; check inputs first
-Get-Content logs\champYb.out -Wait           # follow progress
+pwsh -File runners\launch.ps1 champYb              # detached via WMI; SURVIVES ssh disconnect
+pwsh -File runners\3A-dilution.ps1 -DryRun         # analysis runner; check inputs first
+Get-Content logs\champYb.transcript.log -Wait -Tail 40   # follow progress
 ```
+`launch.ps1` spawns via `Win32_Process.Create` (WMI), not `Start-Process`: a
+Start-Process child stays in sshd's job object and is killed on disconnect (same
+as `nohup`); the WMI-spawned process is outside that job and survives.
 
 Visualization data export (invoked by the champion runners; also standalone):
 ```bash

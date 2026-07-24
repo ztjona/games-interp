@@ -44,7 +44,7 @@ try {
     # Launch a python process pinned to a GPU, logging to logs/<tag>.{out,err}.
     function Start-Py([int]$Gpu, [string[]]$PyArgs, [string]$Tag) {
         $env:CUDA_VISIBLE_DEVICES = "$Gpu"
-        Start-Process -FilePath python -ArgumentList $PyArgs -PassThru -NoNewWindow `
+        Start-Process -FilePath python -ArgumentList $PyArgs -PassThru -WindowStyle Hidden `
             -RedirectStandardOutput "logs/$Tag.out" -RedirectStandardError "logs/$Tag.err"
     }
     # Wait for a batch of processes; throw if any exited non-zero.
@@ -143,7 +143,7 @@ try {
     Remove-Item Env:\CUDA_VISIBLE_DEVICES -ErrorAction SilentlyContinue
     $procs = @()
     for ($g = 0; $g -lt $NGPU; $g++) {
-        $procs += Start-Process -FilePath python -PassThru -NoNewWindow `
+        $procs += Start-Process -FilePath python -PassThru -WindowStyle Hidden `
             -RedirectStandardOutput "logs/sweep_gpu$g.out" -RedirectStandardError "logs/sweep_gpu$g.err" `
             -ArgumentList @('run_sweep.py', '--configs=configs/champYb', "--gpu=$g",
                             "--split=$($g + 1)/$NGPU", '--skip-existing')
