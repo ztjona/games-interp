@@ -1,0 +1,1067 @@
+{
+  "animal": "hawk",
+  "bsp_set_name": "hawk_173",
+  "bsps": [
+    {
+      "category": "reframed_count",
+      "description": "Row 0: >=3 occupied cells are TALL",
+      "id": "row_0_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 0: >=3 occupied cells are BLACK",
+      "id": "row_0_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 0: >=3 occupied cells are SQUARE",
+      "id": "row_0_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 0: >=3 occupied cells are WITH_HOLE",
+      "id": "row_0_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 1: >=3 occupied cells are TALL",
+      "id": "row_1_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 1: >=3 occupied cells are BLACK",
+      "id": "row_1_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 1: >=3 occupied cells are SQUARE",
+      "id": "row_1_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 1: >=3 occupied cells are WITH_HOLE",
+      "id": "row_1_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 2: >=3 occupied cells are TALL",
+      "id": "row_2_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 2: >=3 occupied cells are BLACK",
+      "id": "row_2_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 2: >=3 occupied cells are SQUARE",
+      "id": "row_2_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 2: >=3 occupied cells are WITH_HOLE",
+      "id": "row_2_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 3: >=3 occupied cells are TALL",
+      "id": "row_3_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 3: >=3 occupied cells are BLACK",
+      "id": "row_3_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 3: >=3 occupied cells are SQUARE",
+      "id": "row_3_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Row 3: >=3 occupied cells are WITH_HOLE",
+      "id": "row_3_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 0: >=3 occupied cells are TALL",
+      "id": "col_0_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 0: >=3 occupied cells are BLACK",
+      "id": "col_0_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 0: >=3 occupied cells are SQUARE",
+      "id": "col_0_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 0: >=3 occupied cells are WITH_HOLE",
+      "id": "col_0_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 1: >=3 occupied cells are TALL",
+      "id": "col_1_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 1: >=3 occupied cells are BLACK",
+      "id": "col_1_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 1: >=3 occupied cells are SQUARE",
+      "id": "col_1_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 1: >=3 occupied cells are WITH_HOLE",
+      "id": "col_1_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 2: >=3 occupied cells are TALL",
+      "id": "col_2_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 2: >=3 occupied cells are BLACK",
+      "id": "col_2_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 2: >=3 occupied cells are SQUARE",
+      "id": "col_2_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 2: >=3 occupied cells are WITH_HOLE",
+      "id": "col_2_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 3: >=3 occupied cells are TALL",
+      "id": "col_3_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 3: >=3 occupied cells are BLACK",
+      "id": "col_3_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 3: >=3 occupied cells are SQUARE",
+      "id": "col_3_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Col 3: >=3 occupied cells are WITH_HOLE",
+      "id": "col_3_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag main: >=3 occupied cells are TALL",
+      "id": "diag_main_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag main: >=3 occupied cells are BLACK",
+      "id": "diag_main_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag main: >=3 occupied cells are SQUARE",
+      "id": "diag_main_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag main: >=3 occupied cells are WITH_HOLE",
+      "id": "diag_main_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag anti: >=3 occupied cells are TALL",
+      "id": "diag_anti_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag anti: >=3 occupied cells are BLACK",
+      "id": "diag_anti_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag anti: >=3 occupied cells are SQUARE",
+      "id": "diag_anti_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_count",
+      "description": "Diag anti: >=3 occupied cells are WITH_HOLE",
+      "id": "diag_anti_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 0: threat in TALL AND offered piece is TALL",
+      "id": "row_0_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 0: threat in BLACK AND offered piece is BLACK",
+      "id": "row_0_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 0: threat in SQUARE AND offered piece is SQUARE",
+      "id": "row_0_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 0: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "row_0_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 1: threat in TALL AND offered piece is TALL",
+      "id": "row_1_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 1: threat in BLACK AND offered piece is BLACK",
+      "id": "row_1_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 1: threat in SQUARE AND offered piece is SQUARE",
+      "id": "row_1_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 1: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "row_1_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 2: threat in TALL AND offered piece is TALL",
+      "id": "row_2_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 2: threat in BLACK AND offered piece is BLACK",
+      "id": "row_2_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 2: threat in SQUARE AND offered piece is SQUARE",
+      "id": "row_2_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 2: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "row_2_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 3: threat in TALL AND offered piece is TALL",
+      "id": "row_3_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 3: threat in BLACK AND offered piece is BLACK",
+      "id": "row_3_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 3: threat in SQUARE AND offered piece is SQUARE",
+      "id": "row_3_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Row 3: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "row_3_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 0: threat in TALL AND offered piece is TALL",
+      "id": "col_0_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 0: threat in BLACK AND offered piece is BLACK",
+      "id": "col_0_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 0: threat in SQUARE AND offered piece is SQUARE",
+      "id": "col_0_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 0: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "col_0_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 1: threat in TALL AND offered piece is TALL",
+      "id": "col_1_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 1: threat in BLACK AND offered piece is BLACK",
+      "id": "col_1_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 1: threat in SQUARE AND offered piece is SQUARE",
+      "id": "col_1_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 1: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "col_1_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 2: threat in TALL AND offered piece is TALL",
+      "id": "col_2_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 2: threat in BLACK AND offered piece is BLACK",
+      "id": "col_2_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 2: threat in SQUARE AND offered piece is SQUARE",
+      "id": "col_2_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 2: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "col_2_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 3: threat in TALL AND offered piece is TALL",
+      "id": "col_3_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 3: threat in BLACK AND offered piece is BLACK",
+      "id": "col_3_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 3: threat in SQUARE AND offered piece is SQUARE",
+      "id": "col_3_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Col 3: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "col_3_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag main: threat in TALL AND offered piece is TALL",
+      "id": "diag_main_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag main: threat in BLACK AND offered piece is BLACK",
+      "id": "diag_main_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag main: threat in SQUARE AND offered piece is SQUARE",
+      "id": "diag_main_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag main: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "diag_main_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag anti: threat in TALL AND offered piece is TALL",
+      "id": "diag_anti_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag anti: threat in BLACK AND offered piece is BLACK",
+      "id": "diag_anti_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag anti: threat in SQUARE AND offered piece is SQUARE",
+      "id": "diag_anti_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_completable",
+      "description": "Diag anti: threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "diag_anti_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Row 0: at least one attribute has a threat pattern",
+      "id": "row_0_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Row 1: at least one attribute has a threat pattern",
+      "id": "row_1_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Row 2: at least one attribute has a threat pattern",
+      "id": "row_2_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Row 3: at least one attribute has a threat pattern",
+      "id": "row_3_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Col 0: at least one attribute has a threat pattern",
+      "id": "col_0_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Col 1: at least one attribute has a threat pattern",
+      "id": "col_1_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Col 2: at least one attribute has a threat pattern",
+      "id": "col_2_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Col 3: at least one attribute has a threat pattern",
+      "id": "col_3_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Diag main: at least one attribute has a threat pattern",
+      "id": "diag_main_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_any_threat",
+      "description": "Diag anti: at least one attribute has a threat pattern",
+      "id": "diag_anti_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,0): >=3 occupied cells are TALL",
+      "id": "square_0_0_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,0): >=3 occupied cells are BLACK",
+      "id": "square_0_0_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,0): >=3 occupied cells are SQUARE",
+      "id": "square_0_0_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,0): >=3 occupied cells are WITH_HOLE",
+      "id": "square_0_0_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,1): >=3 occupied cells are TALL",
+      "id": "square_0_1_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,1): >=3 occupied cells are BLACK",
+      "id": "square_0_1_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,1): >=3 occupied cells are SQUARE",
+      "id": "square_0_1_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,1): >=3 occupied cells are WITH_HOLE",
+      "id": "square_0_1_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,2): >=3 occupied cells are TALL",
+      "id": "square_0_2_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,2): >=3 occupied cells are BLACK",
+      "id": "square_0_2_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,2): >=3 occupied cells are SQUARE",
+      "id": "square_0_2_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (0,2): >=3 occupied cells are WITH_HOLE",
+      "id": "square_0_2_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,0): >=3 occupied cells are TALL",
+      "id": "square_1_0_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,0): >=3 occupied cells are BLACK",
+      "id": "square_1_0_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,0): >=3 occupied cells are SQUARE",
+      "id": "square_1_0_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,0): >=3 occupied cells are WITH_HOLE",
+      "id": "square_1_0_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,1): >=3 occupied cells are TALL",
+      "id": "square_1_1_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,1): >=3 occupied cells are BLACK",
+      "id": "square_1_1_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,1): >=3 occupied cells are SQUARE",
+      "id": "square_1_1_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,1): >=3 occupied cells are WITH_HOLE",
+      "id": "square_1_1_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,2): >=3 occupied cells are TALL",
+      "id": "square_1_2_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,2): >=3 occupied cells are BLACK",
+      "id": "square_1_2_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,2): >=3 occupied cells are SQUARE",
+      "id": "square_1_2_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (1,2): >=3 occupied cells are WITH_HOLE",
+      "id": "square_1_2_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,0): >=3 occupied cells are TALL",
+      "id": "square_2_0_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,0): >=3 occupied cells are BLACK",
+      "id": "square_2_0_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,0): >=3 occupied cells are SQUARE",
+      "id": "square_2_0_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,0): >=3 occupied cells are WITH_HOLE",
+      "id": "square_2_0_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,1): >=3 occupied cells are TALL",
+      "id": "square_2_1_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,1): >=3 occupied cells are BLACK",
+      "id": "square_2_1_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,1): >=3 occupied cells are SQUARE",
+      "id": "square_2_1_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,1): >=3 occupied cells are WITH_HOLE",
+      "id": "square_2_1_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,2): >=3 occupied cells are TALL",
+      "id": "square_2_2_count_ge3_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,2): >=3 occupied cells are BLACK",
+      "id": "square_2_2_count_ge3_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,2): >=3 occupied cells are SQUARE",
+      "id": "square_2_2_count_ge3_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_count",
+      "description": "2x2 at (2,2): >=3 occupied cells are WITH_HOLE",
+      "id": "square_2_2_count_ge3_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,0): threat in TALL AND offered piece is TALL",
+      "id": "square_0_0_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,0): threat in BLACK AND offered piece is BLACK",
+      "id": "square_0_0_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,0): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_0_0_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,0): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_0_0_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,1): threat in TALL AND offered piece is TALL",
+      "id": "square_0_1_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,1): threat in BLACK AND offered piece is BLACK",
+      "id": "square_0_1_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,1): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_0_1_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,1): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_0_1_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,2): threat in TALL AND offered piece is TALL",
+      "id": "square_0_2_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,2): threat in BLACK AND offered piece is BLACK",
+      "id": "square_0_2_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,2): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_0_2_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (0,2): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_0_2_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,0): threat in TALL AND offered piece is TALL",
+      "id": "square_1_0_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,0): threat in BLACK AND offered piece is BLACK",
+      "id": "square_1_0_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,0): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_1_0_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,0): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_1_0_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,1): threat in TALL AND offered piece is TALL",
+      "id": "square_1_1_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,1): threat in BLACK AND offered piece is BLACK",
+      "id": "square_1_1_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,1): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_1_1_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,1): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_1_1_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,2): threat in TALL AND offered piece is TALL",
+      "id": "square_1_2_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,2): threat in BLACK AND offered piece is BLACK",
+      "id": "square_1_2_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,2): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_1_2_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (1,2): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_1_2_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,0): threat in TALL AND offered piece is TALL",
+      "id": "square_2_0_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,0): threat in BLACK AND offered piece is BLACK",
+      "id": "square_2_0_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,0): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_2_0_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,0): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_2_0_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,1): threat in TALL AND offered piece is TALL",
+      "id": "square_2_1_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,1): threat in BLACK AND offered piece is BLACK",
+      "id": "square_2_1_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,1): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_2_1_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,1): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_2_1_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,2): threat in TALL AND offered piece is TALL",
+      "id": "square_2_2_completable_tall",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,2): threat in BLACK AND offered piece is BLACK",
+      "id": "square_2_2_completable_black",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,2): threat in SQUARE AND offered piece is SQUARE",
+      "id": "square_2_2_completable_square",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_completable",
+      "description": "2x2 at (2,2): threat in WITH_HOLE AND offered piece is WITH_HOLE",
+      "id": "square_2_2_completable_with_hole",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (0,0): at least one attribute has a threat pattern",
+      "id": "square_0_0_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (0,1): at least one attribute has a threat pattern",
+      "id": "square_0_1_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (0,2): at least one attribute has a threat pattern",
+      "id": "square_0_2_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (1,0): at least one attribute has a threat pattern",
+      "id": "square_1_0_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (1,1): at least one attribute has a threat pattern",
+      "id": "square_1_1_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (1,2): at least one attribute has a threat pattern",
+      "id": "square_1_2_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (2,0): at least one attribute has a threat pattern",
+      "id": "square_2_0_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (2,1): at least one attribute has a threat pattern",
+      "id": "square_2_1_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_sq_any_threat",
+      "description": "2x2 at (2,2): at least one attribute has a threat pattern",
+      "id": "square_2_2_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_global",
+      "description": "At least one threat exists on any line",
+      "id": "board_threat_exists",
+      "type": "binary"
+    },
+    {
+      "category": "reframed_global",
+      "description": "At least one threat is completable with the offered piece",
+      "id": "board_completable_exists",
+      "type": "binary"
+    }
+  ],
+  "categories": {
+    "reframed_any_threat": 10,
+    "reframed_completable": 40,
+    "reframed_count": 40,
+    "reframed_global": 2,
+    "reframed_sq_any_threat": 9,
+    "reframed_sq_completable": 36,
+    "reframed_sq_count": 36
+  },
+  "filters": {
+    "exclude_categories": null,
+    "only_categories": [
+      "reframed_count",
+      "reframed_completable",
+      "reframed_any_threat",
+      "reframed_sq_count",
+      "reframed_sq_completable",
+      "reframed_sq_any_threat",
+      "reframed_global"
+    ]
+  },
+  "game": "quarto_s4_hot",
+  "num_bsps": 173
+}
