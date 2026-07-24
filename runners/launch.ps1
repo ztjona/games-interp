@@ -23,6 +23,19 @@ $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
 $runner = Join-Path $repo "runners\$Name.ps1"
 if (-not (Test-Path $runner)) { throw "No such runner: $runner" }
+
+# Refuse to start a second copy: a WMI-detached run is invisible to the terminal,
+# so it is easy to launch twice, and two runners racing the shared registry / _h
+# caches corrupts them. Match the runner's own command line (not this launcher's).
+$pat = [regex]::Escape("$Name.ps1")
+$already = @(Get-CimInstance Win32_Process |
+    Where-Object { $_.CommandLine -and $_.CommandLine -match $pat -and $_.CommandLine -notmatch 'launch\.ps1' })
+if ($already.Count -gt 0) {
+    Write-Host "A '$Name' runner is ALREADY running (PID $(( $already.ProcessId ) -join ', ')). Not starting another."
+    Write-Host "To stop it:  Get-CimInstance Win32_Process | ? { `$_.CommandLine -match '$Name' } | % { taskkill /PID `$_.ProcessId /T /F }"
+    return
+}
+
 New-Item -ItemType Directory -Force -Path (Join-Path $repo 'logs') | Out-Null
 
 # Absolute path to pwsh: the WMI service resolves against the SYSTEM PATH, which

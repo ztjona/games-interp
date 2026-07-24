@@ -171,6 +171,12 @@ try {
             try { python sae_eval.py evaluate $ck --bsps=$b }
             catch { $failed += "$(Split-Path $ck -Leaf):$b"; Write-Warning "eval failed: $_" }
         }
+        # Reclaim the (regenerable, 4.6-38 GB) _h cache right after this
+        # checkpoint's BSP sets: keeping all 43 fills the disk, and a full disk
+        # truncates the next write to a 0-byte "corrupt" cache. The small
+        # _matching-*.pt caches + registry entries (the actual results) remain.
+        $rid = [System.IO.Path]::GetFileNameWithoutExtension($ck)
+        Remove-Item "saes/quarto/cache/${rid}_h.pt" -Force -ErrorAction SilentlyContinue
     }
     python scripts/registry_query.py top --bsps=gorillaYb --limit=20
     if ($failed.Count -gt 0) { throw "Eval: $($failed.Count) (ckpt:bsp) failed: $($failed -join ', ')" }
