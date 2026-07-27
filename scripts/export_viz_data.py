@@ -235,11 +235,18 @@ def _load_training_registry(game: str) -> dict[str, dict]:
     return out
 
 
+# Hook base names. The S4 family namespaces them (e.g. ``s4.fc1``, ``s4.conv2``),
+# champAa uses the bare form (``fc1``, ``conv2``).
+_HOOK_BASES = ("conv1", "conv2", "fc1", "fc2_board", "fc2_piece",
+               "fc2_place", "fc2_select")
+
+
 def _parse_run_id(run_id: str) -> dict[str, Any]:
-    """Best-effort parse of fields embedded in a run id (e.g. ``...-k16-exp8-fc1``)."""
+    """Best-effort parse of fields embedded in a run id (e.g. ``...-k16-exp8-s4.fc1``)."""
     info: dict[str, Any] = {"k": None, "expansion_factor": None, "hook": None}
     for tok in run_id.split("-"):
-        if tok in ("fc1", "conv2"):
+        # hook may be bare ("fc1") or namespaced ("s4.fc1"); keep the full token
+        if tok.rsplit(".", 1)[-1] in _HOOK_BASES:
             info["hook"] = tok
         elif tok.startswith("k") and tok[1:].isdigit():
             info["k"] = int(tok[1:])
