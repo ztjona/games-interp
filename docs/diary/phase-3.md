@@ -23,9 +23,9 @@ Working steps (gates and full method in the founding note, as revised by the
 
 | Step | What | Gate | Status |
 |---|---|---|---|
-| 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on existing champVe/champTa SAE caches | G-3A: diluted/tiled vs absent | spec + code ready; awaiting Deep Brain run |
+| 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | code ready + runs on Deep Brain (regens missing `_h` via `sae_eval --force`) |
 | 3B | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending |
-| 3B-causal | Gradient-alignment screen + clamp/steer spot-check on LP dirs and top SAE features (G11 insurance) | — (informs 3C budget) | pending |
+| 3B-causal | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | pending |
 | 3C | Geometry-aware SAE variants: γ pre-check, hierarchical anchoring, **Matryoshka-vs-H-SAE-vs-MP-SAE**, bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | gated on 3A |
 | 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
 
@@ -104,6 +104,45 @@ enough, and supervised" — a fallback, not the scalable headline.
 smoke run); it awaits the champTa/Ve caches on Deep Brain. Run with
 `bash runner3A.sh`.
 
+### 2026-07-27 — champYb results + method refinements
+
+champYb fully evaluated (43/43 x gorilla/hawk/tiger). Full record + tables:
+[`2026-07-27_champYb-results.md`](2026-07-27_champYb-results.md). Headline
+[AI-REASONED PROVISIONAL]:
+
+- **Unsupervised SAEs still hit the conjunction wall on Yb** (line/square
+  winnable ~0.18–0.27, same as Ta/Ve). No unsupervised breakthrough.
+- **Anchored extracts conjunctions far better on Yb** (I04 line 0.60 / square
+  0.81 vs Ta 0.26 / 0.41) — the largest anchored-vs-unsupervised gap of any
+  champion. So the hot-piece (completion-threat) training makes the info **more
+  present**; flat unsupervised SAEs still dilute it. "SAE saturation" is an
+  *unsupervised-method* ceiling (H10/Dorrell), not a model-representation
+  ceiling. gorilla-unsup rose on Yb (0.52) and tiger-anchored ~doubled (0.77),
+  so much of the play gain *is* visible. → Yb is the cleanest 3C target.
+
+Method refinements adopted (fold into 3B-causal / 3C / 3D):
+
+- **Alignment is greedy argmax on decodability, not causality.** `eval.py`
+  matches each BSP to the max-F1 feature; that feature may be epiphenomenal
+  while the causal one ranks #2+. Adopt: prefer **MCC** for rare threats and
+  treat F1-vs-MCC disagreement as a robustness flag; **export top-K candidate
+  features per BSP** (not just argmax); rank the top-K by **causal effect**
+  (ablation/steering, gradient-alignment pre-screen) in 3B-causal/3D. 3A already
+  scores **communities** (top-K by signed phi), not a single feature.
+- **Anchored-SAE-vs-LP "true performance" is causal**, not decodability (the
+  decodability gap is just the cost of the SAE's sparsity constraint). Compare
+  the causal effect of LP dir vs anchored-SAE feature vs unsupervised-SAE
+  feature for the same concept.
+- **Karvonen chess/othello** (~48–50% board-coverage): pin their metric vs our
+  F1-lift first; a comparable cross-check strengthens the "validated benchmark"
+  claim. Inspect their eval/SAE impl; do not reproduce their training.
+
+Operational: `runners/3A-dilution.ps1` now covers champYb (unsup F04/E05 +
+anchored I04 control) and regenerates a missing `_h` via `sae_eval --force`
+(plain eval skips already-registered runs and never writes `_h`). Export
+`_parse_run_id` fixed for namespaced hooks (`s4.fc1`/`s4.conv2`; were
+`hook=null` in `shipped_saes.jsonl`).
+
 ## Pointers
 
 - Literature base: 5 papers ingested 2026-06-09 (tags in founding note);
@@ -111,7 +150,8 @@ smoke run); it awaits the champTa/Ve caches on Deep Brain. Run with
 - Eval caches for 3A: `saes/quarto/cache/{run_id}_h.pt`,
   `{run_id}_matching-{bsp_set}.pt` (Deep Brain; gitignored locally).
 - 3A code: `lib/sae/dilution.py` (game-agnostic core), CLI
-  `scripts/dilution_diagnostic.py`, runner `runner3A.sh`, tests
-  `tests/test_dilution.py`. Output: `saes/quarto/analysis/{run_id}_dilution-{bsp_set}.json`
-  + `3A_gate_summary.json`.
+  `scripts/dilution_diagnostic.py`, runner `runners/3A-dilution.ps1` (launch
+  detached via `runners/launch.ps1 3A-dilution`), tests `tests/test_dilution.py`.
+  Output: `saes/quarto/analysis/{run_id}_dilution-{bsp_set}.json` +
+  `3A_gate_summary.json`.
 - Cross-check claims: `python scripts/registry_query.py top|category|compare`.

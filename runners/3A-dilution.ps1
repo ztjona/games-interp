@@ -87,8 +87,11 @@ try {
         # 3A reads the SAE code cache (_h). Regenerate it via a normal eval if a
         # prior disk cleanup removed it (writes {rid}_h.pt + matching + registry).
         if (-not (Test-Path "$CACHE/$($rid)_h.pt")) {
-            Write-Host '   _h cache missing -> regenerating via sae_eval...'
-            python sae_eval.py evaluate "saes/quarto/$rid.pt" --bsps=$bsps
+            Write-Host '   _h cache missing -> regenerating via sae_eval --force...'
+            # --force is required: these champTa/Ve/Yb runs are already in the
+            # eval registry, so without it sae_eval skips ("Found cached") and
+            # never writes the _h cache that dilution_diagnostic needs.
+            python sae_eval.py evaluate "saes/quarto/$rid.pt" --bsps=$bsps --force
         }
         python scripts/dilution_diagnostic.py --run-id=$rid --bsps=$bsps --random-run-id=$rand --top-k=$TOPK
     }
