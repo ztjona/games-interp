@@ -592,8 +592,11 @@ def _print_summary(
     log.info("  L0:                   %.1f", metrics.get("l0", 0))
     log.info("  Dead features:        %.1f%%", metrics.get("dead_features_pct", 0))
     log.info("  Coverage (F1):        %.4f", metrics.get("coverage", 0))
-    log.info("  Coverage F1 >50%%:     %.4f", metrics.get("coverage_above_50", 0))
-    log.info("  Coverage F1 >75%%:     %.4f", metrics.get("coverage_above_75", 0))
+    log.info("  Coverage MCC >25%%:    %.4f", metrics.get("coverage_mcc_above_25", 0))
+    log.info("  Coverage MCC >50%%:    %.4f", metrics.get("coverage_mcc_above_50", 0))
+    log.info("  Youden J:             %.4f", metrics.get("coverage_youden_j", 0))
+    log.info("  MCC @ p_ref=%s:    %.4f",
+             metrics.get("p_ref"), metrics.get("coverage_mcc_at_pref", 0))
     if "coverage_mcc" in metrics:
         log.info("  Coverage (MCC):       %.4f", metrics["coverage_mcc"])
         log.info(
@@ -604,12 +607,8 @@ def _print_summary(
             "  Coverage MCC >50%%:    %.4f",
             metrics.get("coverage_mcc_above_50", 0),
         )
-    if "coverage_f1_lift" in metrics:
-        log.info("  Coverage F1-lift:     %.4f", metrics["coverage_f1_lift"])
-        log.info(
-            "  F1-lift >10%%:         %.4f",
-            metrics.get("coverage_f1_lift_above_10", 0),
-        )
+    if "mean_base_rate" in metrics:
+        log.info("  Mean base rate:       %.4f", metrics["mean_base_rate"])
     feature_sharing = metrics.get("feature_sharing", {})
     if feature_sharing:
         log.info(
@@ -679,9 +678,9 @@ def cmd_history(args: dict) -> None:
         ("l0", ".0f"),
         ("dead_features_pct", ".0f"),
         ("coverage", ".3f"),
-        ("coverage_above_50", ".3f"),
+        ("coverage_youden_j", ".3f"),
         ("coverage_mcc", ".3f"),
-        ("coverage_f1_lift", ".3f"),
+        ("coverage_mcc_at_pref", ".3f"),
         ("board_reconstruction", ".3f"),
     ]
 
@@ -808,8 +807,8 @@ def cmd_compare(args: dict) -> None:
         ("l0", ".1f"),
         ("dead_features_pct", ".1f"),
         ("coverage", ".4f"),
-        ("coverage_above_50", ".4f"),
-        ("coverage_above_75", ".4f"),
+        ("coverage_youden_j", ".4f"),
+        ("coverage_mcc_at_pref", ".4f"),
         ("board_reconstruction", ".4f"),
         ("num_reconstructable_bsps", "d"),
         ("fraction_reconstructable", ".1%"),

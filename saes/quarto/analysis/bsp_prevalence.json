@@ -1,0 +1,212 @@
+{
+  "gorillaYb": {
+    "bsp_set": "gorillaYb",
+    "n_rows": 296045,
+    "n_bsps": 164,
+    "categories": {
+      "threat_line": {
+        "n": 40,
+        "min": 0.007559661753475666,
+        "median": 0.00936681916937232,
+        "max": 0.013011535629630089,
+        "trivial_f1_at_median": 0.0186,
+        "flags": [
+          "VERY RARE"
+        ]
+      },
+      "threat_square_2x2": {
+        "n": 36,
+        "min": 0.0065530575811862946,
+        "median": 0.009397219866514206,
+        "max": 0.01230556145310402,
+        "trivial_f1_at_median": 0.0186,
+        "flags": [
+          "VERY RARE"
+        ]
+      },
+      "cell_attribute": {
+        "n": 64,
+        "min": 0.1266023814678192,
+        "median": 0.16287388652563095,
+        "max": 0.2570386230945587,
+        "trivial_f1_at_median": 0.2801,
+        "flags": []
+      },
+      "global": {
+        "n": 1,
+        "min": 0.23356246948242188,
+        "median": 0.23356246948242188,
+        "max": 0.23356246948242188,
+        "trivial_f1_at_median": 0.3787,
+        "flags": []
+      },
+      "cell_occupancy": {
+        "n": 16,
+        "min": 0.25700145959854126,
+        "median": 0.32110659778118134,
+        "max": 0.49227651953697205,
+        "trivial_f1_at_median": 0.4861,
+        "flags": [
+          "TRIVIAL-F1"
+        ]
+      },
+      "game_phase": {
+        "n": 3,
+        "min": 0.017382493242621422,
+        "median": 0.44517555832862854,
+        "max": 0.5374419689178467,
+        "trivial_f1_at_median": 0.6161,
+        "flags": [
+          "TRIVIAL-F1"
+        ]
+      },
+      "offered_piece": {
+        "n": 4,
+        "min": 0.49422892928123474,
+        "median": 0.5030316114425659,
+        "max": 0.5146481394767761,
+        "trivial_f1_at_median": 0.6694,
+        "flags": [
+          "TRIVIAL-F1"
+        ]
+      }
+    },
+    "n_very_rare": 53,
+    "n_degenerate": 0,
+    "n_trivial_f1": 9
+  },
+  "hawkYb": {
+    "bsp_set": "hawkYb",
+    "n_rows": 296045,
+    "n_bsps": 173,
+    "categories": {
+      "reframed_sq_completable": {
+        "n": 36,
+        "min": 0.0023070815950632095,
+        "median": 0.002805316704325378,
+        "max": 0.0035906704142689705,
+        "trivial_f1_at_median": 0.0056,
+        "flags": [
+          "VERY RARE"
+        ]
+      },
+      "reframed_completable": {
+        "n": 40,
+        "min": 0.0026955362409353256,
+        "median": 0.0030282558873295784,
+        "max": 0.0036852506455034018,
+        "trivial_f1_at_median": 0.006,
+        "flags": [
+          "VERY RARE"
+        ]
+      },
+      "reframed_sq_count": {
+        "n": 36,
+        "min": 0.010822678916156292,
+        "median": 0.018015841953456402,
+        "max": 0.02353358455002308,
+        "trivial_f1_at_median": 0.0354,
+        "flags": []
+      },
+      "reframed_count": {
+        "n": 40,
+        "min": 0.012751439586281776,
+        "median": 0.018709992989897728,
+        "max": 0.029039504006505013,
+        "trivial_f1_at_median": 0.0367,
+        "flags": []
+      },
+      "reframed_sq_any_threat": {
+        "n": 9,
+        "min": 0.024942154064774513,
+        "median": 0.033694200217723846,
+        "max": 0.04049722105264664,
+        "trivial_f1_at_median": 0.0652,
+        "flags": []
+      },
+      "reframed_any_threat": {
+        "n": 10,
+        "min": 0.029009103775024414,
+        "median": 0.0341704823076725,
+        "max": 0.0430610217154026,
+        "trivial_f1_at_median": 0.0661,
+        "flags": []
+      },
+      "reframed_global": {
+        "n": 2,
+        "min": 0.14516036212444305,
+        "median": 0.2509213164448738,
+        "max": 0.35668227076530457,
+        "trivial_f1_at_median": 0.4012,
+        "flags": []
+      }
+    },
+    "n_very_rare": 76,
+    "n_degenerate": 0,
+    "n_trivial_f1": 0
+  },
+  "tigerYb": {
+    "bsp_set": "tigerYb",
+    "n_rows": 296045,
+    "n_bsps": 36,
+    "categories": {
+      "tiger_square_winnable": {
+        "n": 9,
+        "min": 0.018564745783805847,
+        "median": 0.02180749550461769,
+        "max": 0.024280091747641563,
+        "trivial_f1_at_median": 0.0427,
+        "flags": []
+      },
+      "tiger_line_winnable": {
+        "n": 10,
+        "min": 0.021250147372484207,
+        "median": 0.022795521654188633,
+        "max": 0.025675151497125626,
+        "trivial_f1_at_median": 0.0446,
+        "flags": []
+      },
+      "tiger_offered_completing_attr": {
+        "n": 4,
+        "min": 0.04276714846491814,
+        "median": 0.044383455067873,
+        "max": 0.046793561428785324,
+        "trivial_f1_at_median": 0.085,
+        "flags": []
+      },
+      "tiger_pool_winning_count": {
+        "n": 4,
+        "min": 0.1281089037656784,
+        "median": 0.42161327600479126,
+        "max": 0.465645432472229,
+        "trivial_f1_at_median": 0.5931,
+        "flags": [
+          "TRIVIAL-F1"
+        ]
+      },
+      "tiger_decision_global": {
+        "n": 5,
+        "min": 0.1281089037656784,
+        "median": 0.465645432472229,
+        "max": 0.8713607788085938,
+        "trivial_f1_at_median": 0.6354,
+        "flags": [
+          "TRIVIAL-F1"
+        ]
+      },
+      "tiger_pool_safe_count": {
+        "n": 4,
+        "min": 0.1281089037656784,
+        "median": 0.7480197250843048,
+        "max": 0.8713607788085938,
+        "trivial_f1_at_median": 0.8558,
+        "flags": [
+          "TRIVIAL-F1"
+        ]
+      }
+    },
+    "n_very_rare": 0,
+    "n_degenerate": 0,
+    "n_trivial_f1": 8
+  }
+}

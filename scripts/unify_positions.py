@@ -142,14 +142,31 @@ def main():
     if unified_path.exists() and not force:
         import torch
         existing = torch.load(unified_path, map_location="cpu", weights_only=False)
-        existing_sources = set(
-            existing.get("provenance", {}).get("source_files", [])
-        )
-        current_sources = set(str(p) for p in amalgams)
+        existing_sources = {
+            # Compare by NAME: provenance stores whatever separator the merging
+            # box used, so a raw string compare spuriously reports every source
+            # as new when the pool was built under a different path style.
+            Path(s.replace("\\", "/")).name
+            for s in existing.get("provenance", {}).get("source_files", [])
+        }
+        current_sources = {p.name for p in amalgams}
         n_positions = existing["boards"].shape[0]
         del existing
 
-        if current_sources == existing_sources:
+        # Make-style staleness check. The source-NAME set is unchanged whenever
+        # an input is CORRECTED in place rather than added -- which is exactly
+        # what runners/champTa-rebuild.ps1 does -- so a set comparison alone
+        # silently keeps the old pool and every downstream number stays wrong.
+        # champTa's rebuild is the reason this check exists.
+        pool_mtime = unified_path.stat().st_mtime
+        newer = [p.name for p in amalgams if p.stat().st_mtime > pool_mtime]
+
+        if newer:
+            print(f"  Stale: {len(newer)} input(s) modified after the pool was built")
+            for name in sorted(newer):
+                print(f"    ~ {name}")
+            need_rebuild = True
+        elif current_sources == existing_sources:
             suffix = position_count_suffix(n_positions)
             print(f"  Already up-to-date: {n_positions} positions ({suffix})")
         else:
@@ -194,20 +211,25 @@ def main():
             count = count_match.group(1)
 
             label_path = game_dir / f"bsp_labels-{animal}_{count}.pt"
-            schema_out = game_dir / f"bsp_schema-{animal}_{count}.json"
 
             if label_path.exists() and not force:
                 print(f"  {animal}_{count}: already exists, skipping")
                 continue
 
             print(f"  -> {animal}_{count}")
+            # NO --schema-out. Labels are per-distribution and carry the pool
+            # suffix; the SCHEMA is distribution-independent, so it stays keyed
+            # by basis (CLAUDE.md, Domain conventions) and compute_bsp_labels.py
+            # already does that by default. Passing a suffixed --schema-out
+            # minted a byte-identical copy per pool size -- one more file for
+            # resolve_schema_path to prefer over the basis schema, and one more
+            # place for the two to drift apart.
             label_args = [
                 PYTHON, str(PROJECT_DIR / "scripts" / "compute_bsp_labels.py"),
                 str(unified_path),
                 "--game", bsp_game,
                 "--name", basis,
                 "--output", str(label_path),
-                "--schema-out", str(schema_out),
             ]
             if not run_cmd(label_args, f"BSP labels: {animal}", dry_run):
                 print(f"  FAILED: {animal}", file=sys.stderr)

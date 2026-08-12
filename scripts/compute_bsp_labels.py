@@ -279,6 +279,39 @@ def main():
     torch.save(torch.from_numpy(bsp_labels), output_path)
     print(f"Saved BSP labels to: {output_path}", file=sys.stderr)
 
+    # Stamp the cross-basis concept family onto every BSP. A basis is a
+    # packaging convention; the family is the underlying game fact, so this is
+    # what makes gorilla/hawk/tiger comparable. Keeping it in the schema (rather
+    # than in whichever analysis script needs it) means every consumer reads one
+    # mapping that cannot drift -- see scripts/games/quarto.py CONCEPT_FAMILIES.
+    family_of = getattr(game_mod, "concept_family_of", None)
+    family_summary: dict[str, int] = {}
+    category_families: dict[str, dict[str, str]] = {}
+    unclassified: set[str] = set()
+    if family_of is not None:
+        for b in selected_bsps:
+            cat = b.get("category", "unknown")
+            fam = family_of(cat)
+            if fam is None:
+                unclassified.add(cat)
+                continue
+            family, role = fam
+            b["concept_family"] = family
+            b["family_role"] = role
+            family_summary[family] = family_summary.get(family, 0) + 1
+            category_families[cat] = {"concept_family": family,
+                                      "family_role": role}
+        if unclassified:
+            # Loud but non-fatal: an unclassified category still produces valid
+            # labels, it just cannot take part in a cross-basis comparison.
+            print(
+                f"WARNING: {len(unclassified)} category/categories have no "
+                f"concept_family and will be excluded from family rollups: "
+                f"{sorted(unclassified)}. Add them to CONCEPT_FAMILIES in "
+                f"scripts/games/quarto.py (the s4 modules re-export it).",
+                file=sys.stderr,
+            )
+
     # Save schema (basis-keyed; content is identical across champion
     # distributions, so overwriting an existing basis schema is a no-op).
     schema_doc = {
@@ -287,6 +320,8 @@ def main():
         "game": game,
         "num_bsps": len(selected_bsps),
         "categories": category_summary,
+        "concept_families": family_summary,
+        "category_families": category_families,
         "filters": {
             "only_categories": include_cats,
             "exclude_categories": exclude_cats,

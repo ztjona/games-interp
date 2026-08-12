@@ -31,7 +31,14 @@ log = logging.getLogger(__name__)
 # The BSP schema is identical across distributions of the same basis, so the
 # schema file is keyed by basis alone; only the label tensor differs per
 # champion. See CLAUDE.md § "Domain conventions".
-_ANIMAL_BASIS_RE = re.compile(r"^([a-z]+)([A-Z].*)?$")
+# An animal is `{basis}{Suffix?}`. Two suffix kinds exist (CLAUDE.md, Domain
+# conventions): a CHAMPION tag, which is upper-case-initial (`gorillaVe`), and a
+# POOL-SIZE tag, which is `<digits>k` (`gorilla677k`, from unify_positions.py).
+# The numeric form was missing here, so `gorilla677k` resolved to itself, the
+# basis fallback in resolve_schema_path never fired, and unify_positions.py had
+# to write a suffixed schema copy per pool size just to be findable -- which is
+# what produced the duplicate, convention-violating schemas on disk.
+_ANIMAL_BASIS_RE = re.compile(r"^([a-z]+)(\d+k|[A-Z].*)?$")
 
 
 def animal_to_basis(animal: str) -> str:
@@ -66,6 +73,126 @@ def resolve_schema_path(data_dir: Path, animal: str) -> Path | None:
 
 
 # ---------------------------------------------------------------------------
+# Concept families (cross-basis grouping)
+# ---------------------------------------------------------------------------
+#
+# A BSP *basis* (gorilla / hawk / tiger) is a packaging convention; a *concept
+# family* is the underlying game fact that several bases each describe in their
+# own vocabulary. The mapping is stamped onto the schema by
+# ``compute_bsp_labels.py`` (source: the game module's ``CONCEPT_FAMILIES``), so
+# these readers stay game-agnostic: they only read what the data declares and
+# never carry a mapping of their own.
+
+
+# Ascending agent-relativity; mirrors the game module's FAMILY_ROLE_ORDER.
+FAMILY_ROLE_ORDER: tuple[str, ...] = ("state", "state_any", "agent_relative")
+
+
+def category_families(schema: dict) -> dict[str, dict[str, str]]:
+    """Return ``{category: {"concept_family", "family_role"}}`` from a schema.
+
+    Reads the schema-level ``category_families`` rollup when present, and
+    otherwise reconstructs it from the per-BSP stamps. Returns ``{}`` for a
+    schema written before concept families existed, which callers should treat
+    as "this schema predates families -- re-stamp it with
+    ``scripts/stamp_concept_families.py``" rather than as "no families".
+    """
+    rollup = schema.get("category_families")
+    if isinstance(rollup, dict) and rollup:
+        return rollup
+    out: dict[str, dict[str, str]] = {}
+    for bsp in schema.get("bsps", []):
+        family = bsp.get("concept_family")
+        if not family:
+            continue
+        out[bsp.get("category", "unknown")] = {
+            "concept_family": family,
+            "family_role": bsp.get("family_role", "state"),
+        }
+    return out
+
+
+def family_of_category(schema: dict, category: str) -> str | None:
+    """Concept family for one category, or ``None`` if the schema declares none."""
+    entry = category_families(schema).get(category)
+    return entry.get("concept_family") if entry else None
+
+
+def derive_triads(schemas: dict[str, dict]) -> dict[str, dict[str, str]]:
+    """Derive ``{family: {basis: category}}`` across several bases' schemas.
+
+    ``schemas`` maps a basis label (``"gorilla"``) to its loaded schema dict.
+    Within one (family, basis) the category kept is the one at the highest
+    agent-relativity that basis offers, so a triad contrasts each basis at its
+    most agent-relative phrasing -- the contrast the 2026-05-22 reframing audit
+    was actually making.
+
+    Families present in only one basis are dropped: they are not a cross-basis
+    comparison, and reporting them as one would be misleading.
+    """
+    rank = {role: i for i, role in enumerate(FAMILY_ROLE_ORDER)}
+    best: dict[str, dict[str, tuple[int, str]]] = {}
+    for basis, schema in schemas.items():
+        for category, entry in category_families(schema).items():
+            family = entry.get("concept_family")
+            if not family:
+                continue
+            score = rank.get(entry.get("family_role", ""), -1)
+            slot = best.setdefault(family, {})
+            if basis not in slot or score > slot[basis][0]:
+                slot[basis] = (score, category)
+    return {
+        family: {basis: cat for basis, (_, cat) in sorted(per_basis.items())}
+        for family, per_basis in sorted(best.items())
+        if len(per_basis) > 1
+    }
+
+
+def aggregate_per_category_by_family(
+    per_category: dict[str, dict],
+    schema: dict,
+    metric_keys: tuple[str, ...] = ("mean_mcc", "mean_youden_j",
+                                    "mean_mcc_at_pref", "mean_base_rate",
+                                    "mean_f1"),
+) -> dict[str, dict]:
+    """Roll a ``per_category`` block up into concept families.
+
+    Category means are re-weighted by BSP ``count`` so the family mean is the
+    mean over BSPs, not the mean over categories -- categories differ in size by
+    an order of magnitude (``global`` has 1 BSP, ``cell_attribute`` has 64), so
+    an unweighted mean would silently be a different statistic.
+    """
+    fams = category_families(schema)
+    out: dict[str, dict] = {}
+    for category, vals in per_category.items():
+        entry = fams.get(category)
+        if not entry:
+            continue
+        family = entry["concept_family"]
+        n = vals.get("count") or 0
+        if not n:
+            continue
+        acc = out.setdefault(family, {"count": 0, "categories": []})
+        acc["count"] += n
+        acc["categories"].append(category)
+        for key in metric_keys:
+            v = vals.get(key)
+            if v is None:
+                continue
+            acc.setdefault(f"_{key}", 0.0)
+            acc[f"_{key}"] += float(v) * n
+            acc.setdefault(f"_{key}_n", 0)
+            acc[f"_{key}_n"] += n
+    for family, acc in out.items():
+        acc["categories"] = sorted(acc["categories"])
+        for key in metric_keys:
+            total, n = acc.pop(f"_{key}", None), acc.pop(f"_{key}_n", None)
+            if total is not None and n:
+                acc[key] = round(total / n, 4)
+    return out
+
+
+# ---------------------------------------------------------------------------
 # Feature–BSP matching
 # ---------------------------------------------------------------------------
 
@@ -83,6 +210,9 @@ class FeatureBSPMatching:
         best_feature_per_bsp:  (num_bsps,) index of best (F1) feature per BSP
         best_mcc_per_bsp:      (num_bsps,) best MCC for each BSP
         best_feature_per_bsp_mcc: (num_bsps,) index of best (MCC) feature per BSP
+        youden_j:  (d_dict, num_bsps) TPR - FPR, prevalence-INVARIANT
+        best_j_per_bsp:        (num_bsps,) best Youden J for each BSP
+        best_feature_per_bsp_j: (num_bsps,) index of best (J) feature per BSP
         base_rates:            (num_bsps,) base rate (positive-class freq) per BSP
         f1_lift_per_bsp:       (num_bsps,) best_f1 minus trivial-baseline F1, clipped at 0
         trivial_f1_per_bsp:    (num_bsps,) the "always positive" F1 = 2p/(1+p)
@@ -97,14 +227,58 @@ class FeatureBSPMatching:
     mcc: torch.Tensor | None = None
     best_mcc_per_bsp: torch.Tensor | None = None
     best_feature_per_bsp_mcc: torch.Tensor | None = None
+
+    # Youden's J = TPR - FPR: the prevalence-INVARIANT companion to MCC.
+    youden_j: torch.Tensor | None = None
+    best_j_per_bsp: torch.Tensor | None = None
+    best_feature_per_bsp_j: torch.Tensor | None = None
+
+    # MCC standardised to a reference prevalence -- comparable across
+    # populations with different base rates. p_ref is stored so a standardised
+    # number is never ambiguous.
+    mcc_at_pref: torch.Tensor | None = None
+    best_mcc_at_pref_per_bsp: torch.Tensor | None = None
+    best_feature_per_bsp_mcc_at_pref: torch.Tensor | None = None
+    p_ref: float | None = None
     base_rates: torch.Tensor | None = None
     f1_lift_per_bsp: torch.Tensor | None = None
     trivial_f1_per_bsp: torch.Tensor | None = None
 
 
+# Reference prevalence for standardised MCC. Chosen on evidence (rank stability
+# across p_ref = 0.002..0.100 with zero flips; median observed tiger base rate
+# 0.0233; inside the measured range so nothing is extrapolated) -- see
+# docs/methods-reference.md S1.4 and scripts/choose_p_ref.py. FROZEN: changing it
+# changes every standardised number, so it is stored in each registry row.
+P_REF_DEFAULT = 0.025
+
+
+def mcc_from_rates(tpr, tnr, p):
+    """MCC a classifier of quality (tpr, tnr) would score at prevalence ``p``.
+
+    MCC is a deterministic function of (TPR, TNR, prevalence), so a feature's
+    measured sensitivity and specificity can be re-expressed at a canonical
+    prevalence with NO rows discarded and NO sampling noise. This is the
+    analytic, noise-free equivalent of subsample matching (verified to agree to
+    4 decimal places), and it is what makes MCC comparable across populations
+    whose base rates differ.
+    """
+    eps = 1e-12
+    tp = tpr * p
+    fn = (1.0 - tpr) * p
+    tn = tnr * (1.0 - p)
+    fp = (1.0 - tnr) * (1.0 - p)
+    num = tp * tn - fp * fn
+    den = torch.sqrt(
+        ((tp + fp) * (tp + fn) * (tn + fp) * (tn + fn)).clamp(min=eps)
+    )
+    return num / den
+
+
 def match_features_to_bsps(
     h: torch.Tensor,
     bsp_labels: torch.Tensor,
+    p_ref: float = P_REF_DEFAULT,
 ) -> FeatureBSPMatching:
     """Compute precision, recall, F1, MCC between every SAE feature and every BSP.
 
@@ -154,8 +328,29 @@ def match_features_to_bsps(
         )
         mcc = mcc_num / mcc_den
 
+        # Youden's J = TPR - FPR = sensitivity + specificity - 1.
+        # THE prevalence-invariant companion to MCC. F1, F1-lift, MCC and
+        # precision all move with the base rate for a detector of FIXED quality
+        # (audited in scripts/prevalence_audit.py: 44-76% swing over
+        # p in [0.005, 0.100]); TPR, TNR and J do not move at all. J is
+        # literally the (a + b - 1) factor in the MCC numerator, i.e. MCC with
+        # the prevalence term stripped out, so MCC-vs-J divergence is a direct
+        # read on how much of a difference is prevalence rather than quality.
+        # Report the PAIR: J alone is misleading in the other direction, since a
+        # latent firing on half the dataset can score J = 0.4 while being
+        # useless at base rate 0.02.
+        tpr = tp / (tp + fn + eps)
+        fpr = fp / (fp + tn + eps)
+        youden_j = tpr - fpr
+
         best_f1_per_bsp, best_feature_per_bsp = f1.max(dim=0)
         best_mcc_per_bsp, best_feature_per_bsp_mcc = mcc.max(dim=0)
+        best_j_per_bsp, best_feature_per_bsp_j = youden_j.max(dim=0)
+
+        # Standardised MCC: what each feature would score at P_REF_DEFAULT.
+        # Comparable across populations/champions with different base rates.
+        mcc_at_pref = mcc_from_rates(tpr, 1.0 - fpr, p_ref)
+        best_mcc_at_pref_per_bsp, best_feature_per_bsp_mcc_at_pref = mcc_at_pref.max(dim=0)
 
         # Base rates and trivial-baseline F1 ("always predict positive")
         base_rates = labels.mean(dim=0)  # (num_bsps,)
@@ -167,6 +362,13 @@ def match_features_to_bsps(
         recall=recall,
         f1=f1,
         mcc=mcc,
+        youden_j=youden_j,
+        best_j_per_bsp=best_j_per_bsp,
+        best_feature_per_bsp_j=best_feature_per_bsp_j,
+        mcc_at_pref=mcc_at_pref,
+        best_mcc_at_pref_per_bsp=best_mcc_at_pref_per_bsp,
+        best_feature_per_bsp_mcc_at_pref=best_feature_per_bsp_mcc_at_pref,
+        p_ref=p_ref,
         best_f1_per_bsp=best_f1_per_bsp,
         best_feature_per_bsp=best_feature_per_bsp,
         best_mcc_per_bsp=best_mcc_per_bsp,
@@ -206,14 +408,15 @@ def compute_coverage(matching: FeatureBSPMatching) -> dict[str, float]:
     best_f1 = matching.best_f1_per_bsp
     num_bsps = best_f1.shape[0]
 
+    # `coverage` (mean best-F1) is retained as the SINGLE F1 number, for
+    # comparison with the published literature at write-up. Its derivatives
+    # (above_50/above_75/min/max/median and the whole F1-lift family) were
+    # removed on 2026-08-11: all are prevalence-dependent, none is used to
+    # select, rank, gate or conclude, and their presence made the registry read
+    # as if the project optimises F1. MCC equivalents cover every real use.
     out: dict[str, float] = {
         "coverage": round(best_f1.mean().item(), 4),
-        "coverage_above_50": round((best_f1 > 0.50).float().mean().item(), 4),
-        "coverage_above_75": round((best_f1 > 0.75).float().mean().item(), 4),
         "num_bsps": num_bsps,
-        "min_f1": round(best_f1.min().item(), 4),
-        "max_f1": round(best_f1.max().item(), 4),
-        "median_f1": round(best_f1.median().item(), 4),
     }
 
     if matching.best_mcc_per_bsp is not None:
@@ -233,20 +436,52 @@ def compute_coverage(matching: FeatureBSPMatching) -> dict[str, float]:
             }
         )
 
-    if matching.f1_lift_per_bsp is not None:
-        lift = matching.f1_lift_per_bsp
+    if matching.best_j_per_bsp is not None:
+        best_j = matching.best_j_per_bsp
         out.update(
             {
-                "coverage_f1_lift": round(lift.mean().item(), 4),
-                "coverage_f1_lift_above_10": round(
-                    (lift > 0.10).float().mean().item(), 4
-                ),
-                "coverage_f1_lift_above_25": round(
-                    (lift > 0.25).float().mean().item(), 4
-                ),
-                "median_f1_lift": round(lift.median().item(), 4),
+                # Prevalence-invariant. Compare THIS across populations or
+                # champions with different base rates; coverage_mcc is not safe
+                # for that without matching (see docs/methods-reference.md S1).
+                "coverage_youden_j": round(best_j.mean().item(), 4),
+                "median_youden_j": round(best_j.median().item(), 4),
+                "min_youden_j": round(best_j.min().item(), 4),
+                "max_youden_j": round(best_j.max().item(), 4),
             }
         )
+
+    if matching.base_rates is not None:
+        br = matching.base_rates
+        out.update(
+            {
+                # Prevalence belongs in the registry: it decides how hard each
+                # concept is to score and which comparisons are legitimate at
+                # all. Without it a reader cannot tell a weak SAE from a rare
+                # concept. See docs/methods-reference.md S1.1.
+                "mean_base_rate": round(br.mean().item(), 4),
+                "median_base_rate": round(br.median().item(), 4),
+                "min_base_rate": round(br.min().item(), 4),
+                "max_base_rate": round(br.max().item(), 4),
+                # How much of the menu sits where metrics misbehave.
+                "frac_bsps_very_rare": round((br < 0.01).float().mean().item(), 4),
+                "frac_bsps_trivial_f1": round((br > 0.40).float().mean().item(), 4),
+            }
+        )
+
+    if matching.best_mcc_at_pref_per_bsp is not None:
+        best_std = matching.best_mcc_at_pref_per_bsp
+        out.update(
+            {
+                # Prevalence-STANDARDISED. This is the number to compare across
+                # champions/populations whose base rates differ; raw
+                # coverage_mcc is not safe for that (see methods-reference S1.4).
+                "coverage_mcc_at_pref": round(best_std.mean().item(), 4),
+                "median_mcc_at_pref": round(best_std.median().item(), 4),
+                "p_ref": matching.p_ref,
+            }
+        )
+
+
 
     return out
 
@@ -292,21 +527,34 @@ def compute_per_category_coverage(
 
     result = {}
     for cat, indices in sorted(categories.items()):
-        cat_f1 = best_f1[indices]
+        # ONE F1 number only, for the literature comparison at write-up. The
+        # F1 derivatives (min/max/median/lift) were dropped on 2026-08-11: they
+        # are all prevalence-dependent, none is used to select or conclude, and
+        # a registry full of F1 columns reads as if the project optimises F1.
         entry = {
             "count": len(indices),
-            "mean_f1": round(cat_f1.mean().item(), 4),
-            "min_f1": round(cat_f1.min().item(), 4),
-            "max_f1": round(cat_f1.max().item(), 4),
-            "median_f1": round(cat_f1.median().item(), 4),
+            "mean_f1": round(best_f1[indices].mean().item(), 4),
         }
         if best_mcc is not None:
             cat_mcc = best_mcc[indices]
             entry["mean_mcc"] = round(cat_mcc.mean().item(), 4)
             entry["median_mcc"] = round(cat_mcc.median().item(), 4)
-        if f1_lift is not None:
-            cat_lift = f1_lift[indices]
-            entry["mean_f1_lift"] = round(cat_lift.mean().item(), 4)
+            entry["min_mcc"] = round(cat_mcc.min().item(), 4)
+            entry["max_mcc"] = round(cat_mcc.max().item(), 4)
+            # Within-category spread. Reporting Standard clause 3: a category is
+            # many independent BSPs and the mean can hide a structural split
+            # (champYb's anchored line_winnable: rows/cols 0.66-0.83, the two
+            # DIAGONALS 0.20, invisible in the 0.60 mean).
+            entry["sd_mcc"] = round(cat_mcc.std(unbiased=False).item(), 4)
+            entry["heterogeneous"] = bool(
+                (cat_mcc.max() - cat_mcc.min()).item() > 0.30
+            )
+        if matching.best_j_per_bsp is not None:
+            entry["mean_youden_j"] = round(
+                matching.best_j_per_bsp[indices].mean().item(), 4)
+        if matching.best_mcc_at_pref_per_bsp is not None:
+            entry["mean_mcc_at_pref"] = round(
+                matching.best_mcc_at_pref_per_bsp[indices].mean().item(), 4)
         if base_rates is not None:
             entry["mean_base_rate"] = round(base_rates[indices].mean().item(), 4)
         result[cat] = entry

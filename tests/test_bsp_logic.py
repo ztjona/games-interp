@@ -642,5 +642,80 @@ class TestTigerBSPs:
         assert vec[4] == 1.0
 
 
+class TestConceptFamilies:
+    """The cross-basis concept-family map (gorilla/hawk/tiger -> one game fact).
+
+    A basis is a packaging convention; a family is the concept. These tests
+    guard the map itself -- the schema stamp and the analysis rollups are only
+    as trustworthy as this mapping.
+    """
+
+    def test_every_category_in_every_basis_has_a_family(self):
+        """An unclassified category silently vanishes from family rollups."""
+        from games.quarto import BSP_SETS, CONCEPT_FAMILIES
+
+        missing = {
+            category
+            for categories in BSP_SETS.values()
+            for category in categories
+            if category not in CONCEPT_FAMILIES
+        }
+        assert not missing, (
+            f"categories with no concept_family: {sorted(missing)} -- add them "
+            f"to CONCEPT_FAMILIES in scripts/games/quarto.py"
+        )
+
+    def test_family_roles_are_known(self):
+        from games.quarto import CONCEPT_FAMILIES, FAMILY_ROLE_ORDER
+
+        bad = {c: r for c, (_, r) in CONCEPT_FAMILIES.items()
+               if r not in FAMILY_ROLE_ORDER}
+        assert not bad, f"unknown family_role(s): {bad}"
+
+    def test_triads_pick_one_category_per_basis(self):
+        """A triad must be a 1:1 correspondence, else it is not a comparison."""
+        from games.quarto import BSP_SETS, concept_triads
+
+        triads = concept_triads()
+        assert triads, "no cross-basis triads derived"
+        for family, per_basis in triads.items():
+            assert len(per_basis) > 1, f"{family} spans only one basis"
+            for basis, category in per_basis.items():
+                assert category in BSP_SETS[basis], (
+                    f"{family}: {category} is not a {basis} category")
+
+    def test_threat_triads_match_the_reframing_audit(self):
+        """Regression: the line/square triads the 2026-05-22 audit compared.
+
+        These were a hardcoded dict in scripts/basis_comparison.py before the
+        schema carried the mapping; if the derivation ever stops reproducing
+        them, the published basis comparison silently changes meaning.
+        """
+        from games.quarto import concept_triads
+
+        triads = concept_triads()
+        assert triads["line_threat"] == {
+            "gorilla": "threat_line",
+            "hawk": "reframed_completable",
+            "tiger": "tiger_line_winnable",
+        }
+        assert triads["square_threat"] == {
+            "gorilla": "threat_square_2x2",
+            "hawk": "reframed_sq_completable",
+            "tiger": "tiger_square_winnable",
+        }
+
+    def test_offered_piece_readout_is_not_a_threat_family(self):
+        """gorilla ``offered_piece`` is a 4-bit readout carrying the F1~=0.667
+        artefact; folding it in with a real threat concept would corrupt the
+        family mean."""
+        from games.quarto import CONCEPT_FAMILIES
+
+        readout = CONCEPT_FAMILIES["offered_piece"][0]
+        completion = CONCEPT_FAMILIES["tiger_offered_completing_attr"][0]
+        assert readout != completion
+        assert readout not in ("line_threat", "square_threat")
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])

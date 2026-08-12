@@ -4,217 +4,289 @@
   "bsps": [
     {
       "category": "tiger_decision_global",
+      "concept_family": "global_threat",
       "description": "Current player can win this turn by placing the offered piece somewhere",
+      "family_role": "agent_relative",
       "id": "tiger_win_now_exists",
       "type": "binary"
     },
     {
       "category": "tiger_decision_global",
+      "concept_family": "global_threat",
       "description": "At least one pool piece, if offered, lets the opponent win on their next turn",
+      "family_role": "agent_relative",
       "id": "tiger_opp_winning_offer_exists",
       "type": "binary"
     },
     {
       "category": "tiger_decision_global",
+      "concept_family": "global_threat",
       "description": "Every pool piece, if offered, lets the opponent win \u2014 i.e. forced to gift a win",
+      "family_role": "agent_relative",
       "id": "tiger_lose_next_forced",
       "type": "binary"
     },
     {
       "category": "tiger_decision_global",
+      "concept_family": "global_threat",
       "description": "At least one pool piece can be offered without giving opponent an immediate win",
+      "family_role": "agent_relative",
       "id": "tiger_safe_offer_exists",
       "type": "binary"
     },
     {
       "category": "tiger_decision_global",
+      "concept_family": "global_threat",
       "description": "Every pool piece is a safe offer (no pool piece gives opponent an immediate win)",
+      "family_role": "agent_relative",
       "id": "tiger_every_offer_safe",
       "type": "binary"
     },
     {
       "category": "tiger_offered_completing_attr",
+      "concept_family": "offered_completion",
       "description": "Offered piece is TALL AND at least one line/2x2 on the board has 3 cells already matching TALL (offered piece is a winning completer via the size attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_offered_completes_tall",
       "type": "binary"
     },
     {
       "category": "tiger_offered_completing_attr",
+      "concept_family": "offered_completion",
       "description": "Offered piece is BLACK AND at least one line/2x2 on the board has 3 cells already matching BLACK (offered piece is a winning completer via the coloration attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_offered_completes_black",
       "type": "binary"
     },
     {
       "category": "tiger_offered_completing_attr",
+      "concept_family": "offered_completion",
       "description": "Offered piece is SQUARE AND at least one line/2x2 on the board has 3 cells already matching SQUARE (offered piece is a winning completer via the shape attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_offered_completes_square",
       "type": "binary"
     },
     {
       "category": "tiger_offered_completing_attr",
+      "concept_family": "offered_completion",
       "description": "Offered piece is WITH_HOLE AND at least one line/2x2 on the board has 3 cells already matching WITH_HOLE (offered piece is a winning completer via the hole attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_offered_completes_with_hole",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Row 0: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_row_0_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Row 1: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_row_1_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Row 2: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_row_2_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Row 3: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_row_3_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Col 0: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_col_0_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Col 1: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_col_1_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Col 2: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_col_2_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Col 3: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_col_3_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Diag main: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_diag_main_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_line_winnable",
+      "concept_family": "line_threat",
       "description": "Diag anti: line has exactly 1 empty cell AND placing the offered piece there completes the line (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_line_diag_anti_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (0,0): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_0_0_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (0,1): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_0_1_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (0,2): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_0_2_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (1,0): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_1_0_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (1,1): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_1_1_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (1,2): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_1_2_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (2,0): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_2_0_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (2,1): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_2_1_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_square_winnable",
+      "concept_family": "square_threat",
       "description": "2x2 at (2,2): exactly 1 empty cell AND placing the offered piece there completes the square (\u22651 shared attribute)",
+      "family_role": "agent_relative",
       "id": "tiger_square_2_2_winnable",
       "type": "binary"
     },
     {
       "category": "tiger_pool_winning_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: ge1 (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_winning_count_ge1",
       "type": "binary"
     },
     {
       "category": "tiger_pool_winning_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: ge2 (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_winning_count_ge2",
       "type": "binary"
     },
     {
       "category": "tiger_pool_winning_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: ge4 (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_winning_count_ge4",
       "type": "binary"
     },
     {
       "category": "tiger_pool_winning_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that, if offered, let opponent win immediately. Bucket: all (\u22651 / \u22652 / \u22654 / = pool_size)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_winning_count_all",
       "type": "binary"
     },
     {
       "category": "tiger_pool_safe_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: ge1 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_safe_count_ge1",
       "type": "binary"
     },
     {
       "category": "tiger_pool_safe_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: ge2 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_safe_count_ge2",
       "type": "binary"
     },
     {
       "category": "tiger_pool_safe_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: ge4 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_safe_count_ge4",
       "type": "binary"
     },
     {
       "category": "tiger_pool_safe_count",
+      "concept_family": "pool_reasoning",
       "description": "Count of pool pieces that can be safely offered (opponent cannot win). Bucket: eq0 (\u22651 / \u22652 / \u22654 / = 0, the last being the forced-loss signal)",
+      "family_role": "agent_relative",
       "id": "tiger_pool_safe_count_eq0",
       "type": "binary"
     }
@@ -226,6 +298,39 @@
     "tiger_pool_safe_count": 4,
     "tiger_pool_winning_count": 4,
     "tiger_square_winnable": 9
+  },
+  "category_families": {
+    "tiger_decision_global": {
+      "concept_family": "global_threat",
+      "family_role": "agent_relative"
+    },
+    "tiger_line_winnable": {
+      "concept_family": "line_threat",
+      "family_role": "agent_relative"
+    },
+    "tiger_offered_completing_attr": {
+      "concept_family": "offered_completion",
+      "family_role": "agent_relative"
+    },
+    "tiger_pool_safe_count": {
+      "concept_family": "pool_reasoning",
+      "family_role": "agent_relative"
+    },
+    "tiger_pool_winning_count": {
+      "concept_family": "pool_reasoning",
+      "family_role": "agent_relative"
+    },
+    "tiger_square_winnable": {
+      "concept_family": "square_threat",
+      "family_role": "agent_relative"
+    }
+  },
+  "concept_families": {
+    "global_threat": 5,
+    "line_threat": 10,
+    "offered_completion": 4,
+    "pool_reasoning": 8,
+    "square_threat": 9
   },
   "filters": {
     "exclude_categories": null,

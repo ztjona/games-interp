@@ -414,6 +414,121 @@ BSP_SETS: dict[str, list[str]] = {
 }
 
 
+# ---------------------------------------------------------------------------
+# Concept families — the cross-basis axis
+# ---------------------------------------------------------------------------
+#
+# A *basis* (gorilla / hawk / tiger) is a packaging convention; a *concept
+# family* is the underlying game fact, which several bases describe in their own
+# vocabulary. Whole-basis averages are not interpretable because they mix
+# unrelated families (pool counts vs cell occupancy); the meaningful comparison
+# is family-by-family across bases -- the "triad".
+#
+# ``family_role`` records HOW agent-relative a category's phrasing is, which is
+# the axis the 2026-05-22 reframing audit was really varying:
+#
+#   state          pure board state, no reference to the offered piece or to
+#                  whose turn it is         (gorilla ``threat_line``)
+#   state_any      the same state, aggregated over attributes (an OR)
+#                                           (hawk ``reframed_any_threat``)
+#   agent_relative involves the offered piece, the pool or the player to move
+#                  -- what an agent could actually DO
+#                                           (tiger ``tiger_line_winnable``)
+#
+# A triad is then "one category per basis within a family, at the highest
+# agent-relativity that basis offers" (see :func:`concept_triads`). Keeping this
+# here rather than in an analysis script makes the cross-basis correspondence a
+# property of the DATA: ``compute_bsp_labels.py`` stamps it onto every BSP in
+# the schema, so every consumer reads the same mapping.
+#
+# category -> (concept_family, family_role)
+CONCEPT_FAMILIES: dict[str, tuple[str, str]] = {
+    # --- line_threat: "a line is (nearly) completed in some attribute" -------
+    "threat_line": ("line_threat", "state"),
+    "reframed_count": ("line_threat", "state"),
+    "reframed_any_threat": ("line_threat", "state_any"),
+    "reframed_completable": ("line_threat", "agent_relative"),
+    "tiger_line_winnable": ("line_threat", "agent_relative"),
+    # --- square_threat: the same fact for 2x2 squares ------------------------
+    "threat_square_2x2": ("square_threat", "state"),
+    "reframed_sq_count": ("square_threat", "state"),
+    "reframed_sq_any_threat": ("square_threat", "state_any"),
+    "reframed_sq_completable": ("square_threat", "agent_relative"),
+    "tiger_square_winnable": ("square_threat", "agent_relative"),
+    # --- global_threat: whole-board summary of the above ---------------------
+    # gorilla ``global`` = "an immediate winning placement exists"; hawk
+    # ``reframed_global`` = "some threat exists"; tiger
+    # ``tiger_decision_global`` = win-now / forced-gift / safe-offer-exists.
+    # Same axis (one number for the whole board), three levels of agency.
+    "global": ("global_threat", "state"),
+    "reframed_global": ("global_threat", "state_any"),
+    "tiger_decision_global": ("global_threat", "agent_relative"),
+    # --- offered_piece: what the piece in hand IS vs what it DOES ------------
+    # Deliberately two families. ``offered_piece`` is a raw 4-bit readout of the
+    # piece's attributes and is the source of the F1 ~= 0.667 trivial-baseline
+    # artefact; ``tiger_offered_completing_attr`` is a board-conditioned
+    # conjunction. Merging them would put a trivial readout and a real threat
+    # concept in one average.
+    "offered_piece": ("offered_piece_attr", "state"),
+    "tiger_offered_completing_attr": ("offered_completion", "agent_relative"),
+    # --- pool reasoning: no gorilla/hawk counterpart exists ------------------
+    "tiger_pool_winning_count": ("pool_reasoning", "agent_relative"),
+    "tiger_pool_safe_count": ("pool_reasoning", "agent_relative"),
+    # --- board readout: no cross-basis counterpart, kept separate ------------
+    "cell_occupancy": ("board_occupancy", "state"),
+    "cell_attribute": ("board_attribute", "state"),
+    "game_phase": ("game_phase", "state"),
+}
+
+# Ascending agent-relativity. :func:`concept_triads` picks the LAST role a basis
+# offers within a family, so a triad contrasts each basis at its most
+# agent-relative phrasing -- the contrast the reframing audit was making.
+FAMILY_ROLE_ORDER: tuple[str, ...] = ("state", "state_any", "agent_relative")
+
+
+def concept_family_of(category: str) -> tuple[str, str] | None:
+    """Return ``(concept_family, family_role)`` for a BSP category.
+
+    Returns ``None`` for a category with no declared family, so callers can
+    tell "not yet classified" apart from a real family. A new category showing
+    up unclassified is caught by ``tests/test_bsp_logic.py``.
+    """
+    return CONCEPT_FAMILIES.get(category)
+
+
+def concept_triads(
+    bases: tuple[str, ...] = ("gorilla", "hawk", "tiger"),
+) -> dict[str, dict[str, str]]:
+    """Derive ``{family: {basis: category}}`` from ``BSP_SETS`` + families.
+
+    Within one (family, basis) the category kept is the one at the highest
+    agent-relativity that basis offers, so e.g. ``line_threat`` resolves to
+    gorilla ``threat_line`` (state is all gorilla has), hawk
+    ``reframed_completable`` and tiger ``tiger_line_winnable``.
+
+    Only families present in more than one basis are returned -- a
+    single-basis family (``pool_reasoning``) is not a cross-basis comparison
+    and reporting it as one would be misleading.
+    """
+    rank = {role: i for i, role in enumerate(FAMILY_ROLE_ORDER)}
+    best: dict[str, dict[str, tuple[int, str]]] = {}
+    for basis in bases:
+        for category in BSP_SETS.get(basis, []):
+            fam = CONCEPT_FAMILIES.get(category)
+            if fam is None:
+                continue
+            family, role = fam
+            slot = best.setdefault(family, {})
+            score = rank.get(role, -1)
+            if basis not in slot or score > slot[basis][0]:
+                slot[basis] = (score, category)
+    return {
+        family: {basis: cat for basis, (_, cat) in sorted(per_basis.items())}
+        for family, per_basis in sorted(best.items())
+        if len(per_basis) > 1
+    }
+
+
 def get_all_bsp_definitions() -> list[dict]:
     """Return metadata for all available BSPs (337 total — a *menu*, not a set).
 

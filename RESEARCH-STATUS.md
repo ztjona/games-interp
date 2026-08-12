@@ -4,14 +4,26 @@
 > headline numbers, hypothesis status, policy decisions. Sweep-level
 > specifics (full per-category tables, per-config breakdowns, AI-assisted
 > interpretation, design rationale) live in
-> [`docs/diary/`](docs/diary/README.md). Supervisor meeting snapshots —
-> one file per cycle, self-contained, frozen after the meeting — live in
-> [`docs/advances-supervisor/`](docs/advances-supervisor/).
+> [`docs/diary/`](docs/diary/README.md). Standalone explanatory pieces —
+> written on request, self-contained, not tied to a date — live in
+> [`docs/explanations/`](docs/explanations/README.md).
 > When in doubt, add a one-line bullet here and a dated diary entry there.
 
 ## Project State
 
-### 2026-07-27 (champYb SAE sweep evaluated; method refinements) -- current
+### 2026-08-12 (pre-run audit; `concept_family` added to the BSP schema) -- current
+
+Audited the phase3A branch before launching the rebuild chain. **Two blocking, silent defects found and fixed**: `unify_positions.py` decided staleness by source-path set, so champTa's *in-place* rebuild would not have triggered a pool rebuild at all (every matched-base-rate number would have kept the old defective 677k pool); and `unified-pool.ps1` resolved the pool suffix by globbing label files, which matches the superseded 677k set and would have thrown *after* stage 2's GPU work. Also fixed: bare `pytest` ran zero project tests (vendored `repositories/` aborted collection — now 159 pass), and `linear_probe_baseline.py` emitted no J / `mcc_at_pref` / family rollup, so it could not serve as the upper bound for a prevalence-fair verdict. **`scripts/backfill_eval_metrics.py` rewritten** — its skip condition and its `_h`-rebuild condition both keyed off metrics that 497/523 rows already had, so neither `--force-recompute` nor a plain run added J or `mcc_at_pref`; it also saved a hand-listed field subset that dropped the very fields a rebuild produced. Now keyed on the newest metrics, rebuilds when any field is missing, persists all fields, trims the retired F1 derivatives, and names rows whose `_h` is gone with the command to regenerate them (116 rows backfillable from disk, 371 need re-encoding, mostly retired/legacy). **`_h` is now encoded once per checkpoint, not once per basis** across three runners (`--bsps` already took a comma list): 27→9, 132→44 and 18→6 encodes of a 1.4–4.8 GB tensor. **champTa retrains in full** (its 43 configs are recipe-identical to Ve/Yb) and the runner clears its quarantine only after provenance passes. **Schema naming root-caused**: `animal_to_basis` never stripped the `<digits>k` pool suffix, so `unify_positions.py` *had* to mint a suffixed schema copy per pool size to be findable — regex fixed, 8 redundant/orphaned schema files deleted, one per basis remains, guarded by a test. `advances-supervisor/` retired in favour of [`docs/explanations/`](docs/explanations/README.md). **`concept_family` + `family_role` now stamped onto every BSP schema** (source: `CONCEPT_FAMILIES` in `scripts/games/quarto.py`; retrofit via `scripts/stamp_concept_families.py`), making cross-basis triads a property of the data — `basis_comparison.py`'s hardcoded dict is gone, `registry_query.py` gained `family` / `triads`. New `runners/basis-verdict.ps1` + `scripts/sae_lp_efficiency.py` settle hawk-vs-tiger on **efficiency (SAE / LP) per family**, separating "the concept is decodable at all" from "the dictionary finds it" — a distinction the 2026-05-22 audit never made. Full audit: [`docs/diary/2026-08-12_pre-run-audit-and-concept-families.md`](docs/diary/2026-08-12_pre-run-audit-and-concept-families.md).
+
+### 2026-08-11 (DATA INTEGRITY: champTa and champS4 are on the wrong position distribution)
+
+Found while building the unified 677k pool. **champTa's dataset (88,524 positions) was aggregated from `random_v_random` alone — it contains zero model-generated positions**, so every champTa SAE was trained on random-play activations and every `*Ta` label tensor scores that distribution. **champS4's position file is byte-identical to champAa's.** champVe and champYb are correct. This explains champTa's ~2x tiger base rate (0.045 vs 0.023 — random play blunders into winnable positions far more often) and means **every champTa-vs-other comparison is confounded on three axes at once** (distribution, sample size, base rate) — including the champYb headline "anchored extracts conjunctions far better on Yb than Ta". **The raw data was never missing**: champTa's three unused self-play files hold 263,393 positions and would bring it to ~290k parity; nothing needs regenerating, only re-aggregating. Cheap to fix through activations; the expensive step is retraining the champTa/champS4 SAE sweeps. Full audit + fix plan: [`docs/diary/2026-08-11_position-dataset-integrity-audit.md`](docs/diary/2026-08-11_position-dataset-integrity-audit.md).
+
+### 2026-07-27 PM (3A executed; gate passes; verdict rule recalibrated to 3A.2)
+
+3A ran on champTa/Ve/Yb (12 run x BSP-set combos, 488 concept-verdicts over 99 distinct threat concepts). **Gate G-3A passes and 3C proceeds** — every *unsupervised* run on tiger is 0.96–1.00 geometric (diluted). **But the pre-registered calibration check failed:** the supervised anchored positive control (I04-champYb) came out 22/23 `diluted` despite community_size 2 / intrinsic_dim 1.01, and `captured` fired only 1 time in 488 — the gate's non-geometric arm was unreachable, so the "pass" carried no information. Cause: the `captured` branch ANDed `knee_k` (candidate-list scope, inflated by noise creep in the R2 tail) with `community_size` (community scope, counts redundancy not necessity). **Rule 3A.2** adds `solo_frac >= 0.70 AND (intrinsic_dim <= 2 OR knee_k <= 2)`, keeps the old condition (nothing loses `captured`), stamps `rule_version`, and adds a `reclassify` command that re-verdicts stored reports without the multi-GB `_h` caches. New finding the old rule hid: **champYb's unsupervised fc1 SAE has essentially captured the gorilla state-threats** (geometric → 0.11) while champTa's stays at 1.00 diluted — so the residual wall is specifically **agent-relative (tiger) conjunctions, strongest champion, unsupervised**. Panel revised to 17 runs (adds hawk + the missing F04-champVe fc1 row); still no random-model SAE control for Ta/Ve/Yb. Full record + glossary: [`docs/diary/2026-07-27_3A-dilution-results.md`](docs/diary/2026-07-27_3A-dilution-results.md); ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md) ch. 2026-07-27 (PM).
+
+### 2026-07-27 (champYb SAE sweep evaluated; method refinements)
 
 champYb full sweep (43 configs) trained + evaluated on gorillaYb/hawkYb/tigerYb. **Unsupervised SAEs still hit the conjunction wall** (line/square winnable ~0.18–0.27, as Ta/Ve) — no unsupervised breakthrough — but **anchored extracts conjunctions far better on Yb** (I04 line 0.60 / square 0.81 vs Ta 0.26 / 0.41), the largest anchored-vs-unsupervised gap of any champion: the hot-piece (completion-threat) training makes the info *more present*, flat unsupervised SAEs still dilute it. So "SAE saturation" is an *unsupervised-method* ceiling (H10/Dorrell), not a model-representation ceiling; gorilla-unsup rose (0.52) and tiger-anchored ~doubled (0.77). **Do not headline anchored — pursue the unsupervised method; Yb is the cleanest 3C target.** Method refinements adopted: feature-BSP alignment is greedy-argmax-on-decodability (matched feature may be epiphenomenal) → export **top-K candidates per BSP**, prefer **MCC** for rare threats, rank by **causal effect** in 3B-causal/3D. Full record + tables: [`docs/diary/2026-07-27_champYb-results.md`](docs/diary/2026-07-27_champYb-results.md); ledger: [`docs/diary/phase-3.md`](docs/diary/phase-3.md) ch. 2026-07-27.
 
@@ -43,29 +55,35 @@ New champion **champYb** = `Yb_hotChamp(3)` [hot lambda=1.0, seedB, E=10000] int
 
 ## Key Metrics Summary
 
+> ⚠️ **Every row marked ‡ is PROVISIONAL** (2026-08-11): champTa's positions are
+> random-play-only and champS4's are champAa's, so those rows are measured on the
+> wrong distribution. champVe and champYb rows are sound. See
+> [the integrity audit](docs/diary/2026-08-11_position-dataset-integrity-audit.md).
+
+
 | Probe / SAE | Champion | Hook | BSP set | F1 | F1-lift |
 |---|---|---|---|:---:|:---:|
 | Linear probe (trained) | Aa | fc1 | gorilla_164 | 0.402 | — |
 | Linear probe (random)  | Aa | fc1 | gorilla_164 | 0.194 | — |
 | Linear probe (trained) | Aa | conv2 | gorilla_164 | 0.789 | — |
-| Linear probe (trained) | S4 | fc1 | gorillaS4 | 0.719 | 0.520 |
-| Linear probe (trained) | S4 | conv2 | gorillaS4 | 0.877 | 0.678 |
-| Linear probe (trained) | S4 | fc1 | hawkS4 | 0.584 | 0.548 |
-| Linear probe (trained) | S4 | conv2 | hawkS4 | 0.750 | 0.715 |
-| Linear probe (trained) | **Ta** | fc1 | gorillaTa | 0.810 | 0.595 |
-| Linear probe (trained) | **Ta** | conv2 | gorillaTa | 0.923 | **0.708** |
-| Linear probe (trained) | **Ta** | fc1 | hawkTa | 0.702 | 0.660 |
-| Linear probe (trained) | **Ta** | conv2 | hawkTa | 0.826 | **0.785** |
+| Linear probe (trained) ‡ | S4 | fc1 | gorillaS4 | 0.719 | 0.520 |
+| Linear probe (trained) ‡ | S4 | conv2 | gorillaS4 | 0.877 | 0.678 |
+| Linear probe (trained) ‡ | S4 | fc1 | hawkS4 | 0.584 | 0.548 |
+| Linear probe (trained) ‡ | S4 | conv2 | hawkS4 | 0.750 | 0.715 |
+| Linear probe (trained) ‡ | **Ta** | fc1 | gorillaTa | 0.810 | 0.595 |
+| Linear probe (trained) ‡ | **Ta** | conv2 | gorillaTa | 0.923 | **0.708** |
+| Linear probe (trained) ‡ | **Ta** | fc1 | hawkTa | 0.702 | 0.660 |
+| Linear probe (trained) ‡ | **Ta** | conv2 | hawkTa | 0.826 | **0.785** |
 | Best SAE (anakin batchtopk-k16 fc1) | Aa | fc1 | gorilla | 0.338 | 0.141 |
 | Best SAE (C01 topk-k16-exp8 conv2) | Aa | conv2 | gorilla | **0.353** | — |
-| Best SAE (E05 batchtopk-k32 conv2) | **Ta** | conv2 | gorillaTa | 0.428 | **0.214** |
-| Best SAE (F04 jumprelu-t64 fc1) | **Ta** | fc1 | hawkTa | 0.214 | **0.172** |
-| Linear probe (trained) | **Ta** | fc1 | tigerTa | **0.591** | **0.301** |
-| Linear probe (trained) | **Ta** | conv2 | tigerTa | 0.463 | 0.175 |
-| Linear probe (trained) | S4 | fc1 | tigerS4 | 0.440 | 0.179 |
-| Linear probe (trained) | S4 | conv2 | tigerS4 | 0.335 | 0.098 |
-| Best SAE (F04 jumprelu-t64 fc1) | **Ta** | fc1 | tigerTa | 0.449 | **0.158** |
-| Best SAE (E05 batchtopk-k32 conv2) | **Ta** | conv2 | tigerTa | 0.353 | 0.063 |
+| Best SAE (E05 batchtopk-k32 conv2) ‡ | **Ta** | conv2 | gorillaTa | 0.428 | **0.214** |
+| Best SAE (F04 jumprelu-t64 fc1) ‡ | **Ta** | fc1 | hawkTa | 0.214 | **0.172** |
+| Linear probe (trained) ‡ | **Ta** | fc1 | tigerTa | **0.591** | **0.301** |
+| Linear probe (trained) ‡ | **Ta** | conv2 | tigerTa | 0.463 | 0.175 |
+| Linear probe (trained) ‡ | S4 | fc1 | tigerS4 | 0.440 | 0.179 |
+| Linear probe (trained) ‡ | S4 | conv2 | tigerS4 | 0.335 | 0.098 |
+| Best SAE (F04 jumprelu-t64 fc1) ‡ | **Ta** | fc1 | tigerTa | 0.449 | **0.158** |
+| Best SAE (E05 batchtopk-k32 conv2) ‡ | **Ta** | conv2 | tigerTa | 0.353 | 0.063 |
 | Linear probe (trained) | **Ve** | fc1 | gorillaVe | 0.802 | 0.605 |
 | Linear probe (trained) | **Ve** | conv2 | gorillaVe | **0.959** | **0.762** |
 | Linear probe (trained) | **Ve** | fc1 | hawkVe | 0.692 | 0.662 |
@@ -110,10 +128,14 @@ Cross-champion (best **unsupervised**, cov): gorilla S4 0.421 / Ta 0.428 / Ve 0.
 
 ## Reporting Standard (REQUIRED for every winner claim, adopted 2026-05-11)
 
-1. **Always report three coverage metrics side-by-side** — F1 (literature standard), MCC (base-rate-invariant), F1-lift (F1 minus trivial `2p/(1+p)` baseline, clipped at 0). Eval pipeline writes all three to `eval_registry.json`; `scripts/backfill_eval_metrics.py` retro-fills.
+1. **MCC IS THE HEADLINE METRIC. F1 IS NOT USED FOR ANALYSIS** (revised 2026-07-27, superseding the earlier "F1-lift is the recommended headline"). Every ranking, every winner claim, every gate and every cross-champion comparison uses **MCC** (`coverage_mcc`, `mean_mcc`, per-BSP `best_mcc_per_bsp`). **F1 and F1-lift are computed and stored for one purpose only — comparison with the published literature at write-up time — and must never be used to select, rank, or conclude.** Rationale: F1 depends on the base rate through precision, so it is not comparable across concepts or across champions; on the tiger conjunctions champTa→champVe F1 falls 55% while MCC is *identical* (0.140 vs 0.140), i.e. the entire apparent difference was base rate. MCC is a correlation coefficient and is **far less** base-rate sensitive than F1 (it is 0 for any constant predictor) — but it is **NOT base-rate invariant**: for a detector of fixed quality (TPR 0.50, TNR 0.99) MCC still falls 25% from p=0.050 to p=0.013. **So MCC replaces F1 as the metric, but it does not remove the need to match prevalence when comparing populations, champions or datasets with different base rates** (champTa's tiger base rate is ~2x champVe/champYb's). **Always report `coverage_youden_j` (Youden's J = TPR − FPR) alongside it** — J is the prevalence-INVARIANT companion (0% swing where MCC swings 50%, F1 54%, F1-lift 44%, R² 75%), and MCC-vs-J divergence reads off how much of a gap is prevalence rather than quality. **The metric set is now three numbers, reported together:** `coverage_mcc` (headline, prevalence-aware), `coverage_youden_j` (prevalence-invariant), and `coverage_mcc_at_pref` (**MCC standardised to p_ref = 0.025**, the number that IS comparable across populations/champions with different base rates; `p_ref` is stored in every row and is FROZEN). Full audit: [`docs/methods-reference.md`](docs/methods-reference.md) §1.1–1.4. See clause 5. `registry_query.py` defaults to `--metric=coverage_mcc`; 3A ranks candidates by signed phi, which **is** MCC for a 2x2 table, so 3A is already MCC-native. **F1 and F1-lift are DEMOTED from every headline table** (2026-08-11): `registry_query.py top` now shows MCC, J, FVU, L0 and a parenthesised (F1); F1-lift is gone from the default view. Both columns are still computed and stored — F1 for the literature comparison at write-up, F1-lift so older rows stay readable. All numbers stay in `eval_registry.json` (`scripts/backfill_eval_metrics.py` retro-fills); reporting all three side-by-side is still fine, but the *conclusion* is drawn from MCC.
 2. **Always compare against LP ceiling AND random-network control.** The learned-gap fraction `(cov_SAE − cov_rand_SAE) / (LP_trained − LP_random)` is the cleanest way to claim an SAE captures *learned* structure rather than the architectural prior.
-3. **Always present the per-category breakdown count-weighted by N.** Headline mean drags down through high-N low-F1 categories (76 of 164 gorilla BSPs are threats at ~0.08).
+3. **Always present the per-category breakdown count-weighted by N, AND its within-category spread.** Headline mean drags down through high-N low-MCC categories (76 of 164 gorilla BSPs are threats). Each BSP in a category is an independent concept with its own MCC, and a category mean can hide a structural split among them — on champYb's anchored SAE the eight row/column `tiger_line_winnable` BSPs sit at |phi| 0.66–0.83 while the two **diagonals** sit at 0.20, invisible in the 0.60 mean. Report `sd` and the min/max BSP; 3A flags a category `heterogeneous` when the spread exceeds 0.30.
 4. **Feature-BSP alignment is greedy argmax on *decodability*, not causality** (added 2026-07-27). `eval.py` matches each BSP to the max-F1 feature; that feature may be a spectator while the causally-used one ranks #2+. For rare threats (base rate ~0.02) prefer **MCC** and treat F1-vs-MCC disagreement as a robustness flag. For any *causal* claim, export **top-K candidates per BSP** and rank them by intervention effect (3B-causal/3D), not by F1. 3A already scores communities (top-K by signed phi), not a single feature.
+
+5. **Match prevalence before comparing populations** (added 2026-08-11, replacing a retracted "report on-policy" clause). Per-mode coverage first appeared to show tiger coverage collapsing on-policy (0.167 self-play vs 0.270 random play, monotone across two hooks, two architectures, two champions, supervised and unsupervised). **That was a prevalence artefact.** Base rate falls in lockstep (0.050 → 0.013) and MCC is not prevalence-invariant. With rows and positives matched exactly, the gap vanishes and reverses: self-play is +7.0% / +8.5% / +0.8% *better*. Population overlap (3.5–4.4%) and game phase (mean 5.87 vs 5.19–5.67 pieces) were ruled out as explanations. **Rule: any comparison across populations with different base rates requires prevalence matching, not just MCC.** Headline stays **pooled**, with the on-policy figure reported next to it as a check (the two agree within ~8% once matched). Tools: `scripts/investigate_mode_gap.py` (subsample matching), `scripts/prevalence_audit.py` (metric audit + standardisation), `scripts/per_mode_coverage.py` (per-mode breakdown). Detail: [`docs/diary/2026-08-11_per-mode-coverage-and-minimax-probe.md`](docs/diary/2026-08-11_per-mode-coverage-and-minimax-probe.md).
+6. **Every results presentation opens with an experiment-specific glossary**, and defers to [`docs/methods-reference.md`](docs/methods-reference.md) — the standing definition of every metric (range, ideal value, estimator, hyperparameters). Link, do not restate, so definitions cannot drift (added 2026-07-27). Any diary entry, report, or chat answer carrying numbers begins with a short table defining the terms and metrics it uses — for each metric: **range, ideal value, and what the number means** — plus any hypothesis / gate IDs referenced (H10, G11, phi, R2, base rate, ...). A metric no reader can place is a metric that cannot be checked. Machine-readable version: analysis JSONs embed the same definitions under a `glossary` key (see `lib/sae/dilution.py:GLOSSARY`), so a report is self-describing.
+7. **A pre-registered gate must be able to fail** (added 2026-07-27). Before reading a gate, verify its *other* arm is reachable — run the positive control and confirm the rule classifies it as designed. 3A's G-3A "passed" at 93–100% while its `captured` arm fired 1 time in 488, which made the pass uninformative. See [`2026-07-27_3A-dilution-results.md`](docs/diary/2026-07-27_3A-dilution-results.md) §3.
 
 Full table template and rationale: [`phase-2A.md`](docs/diary/phase-2A.md) § "Reporting standard".
 
@@ -135,6 +157,9 @@ Resolved from the previous plan: anchored champTa→tiger ✅ (I04 winner); lite
 Deferred with a named gate: **multi-game replication** (tic-tac-toe 4×4 then Othello) — port after the 3A verdict + 3B measurement freeze, so the second game tests generality of a frozen toolkit rather than re-running sweeps. De-risk now = keep 3A/3B code game-agnostic in `lib/` (enforced; `lib/sae/dilution.py` operates on plain tensors).
 
 ## Deprioritized
+
+- **champS4 — RETIRED (2026-08-11).** Its `positions-amalgam_s4_unique.pt` is **byte-identical** to champAa's, so champS4 has never been measured on its own distribution. Its `Sa_archScan` self-play raws exist, so it is rebuildable later if needed; the call is that champS4 is the weakest champion and mainly a historical baseline, and the retrain is not worth the GPU time. **Do not quote champS4-vs-champAa numbers as a distribution comparison** — they are the same positions under two models (which is a clean *model* comparison, and the only claim those numbers support). See [`docs/diary/2026-08-11_position-dataset-integrity-audit.md`](docs/diary/2026-08-11_position-dataset-integrity-audit.md).
+- **All champTa results — PROVISIONAL pending rebuild (2026-08-11).** champTa's dataset is random-play-only (see Project State). Every number below that involves champTa is measured on the wrong distribution and must be re-derived after `runners/champTa-rebuild.ps1`: the **2026-05-22 tiger reframing audit** (H1c, the hawk→tiger supervision pivot), **H9** (concept distillation, Ta-vs-S4 arm), **H11**, the **I04 anchored headline** (tigerTa F1 0.547 / MCC 0.496), the **E05/F04 champTa winners**, and the **3A champTa verdicts**. The champVe↔champYb comparisons are unaffected and stand.
 
 - **Broad unsupervised arch sweeps on fc1** — Anakin (28 configs, σ = 0.004) showed this is second-order for fc1. Scope clarified 2026-04-29: this deprioritization is fc1-specific. Conv2 had its full arch sweep in Phase 2A (Campaigns C–G). **Caveat (2026-05-19):** fc1 deprioritization is `CNN_uncoupled`-specific. On champS4 / champTa the fc1 bottleneck preserves threat information; fc1 SAE work on threats is reactivated for the unified-aux family.
 - **fc1-only threat investigation on champAa** — Phase 1F redirected this work to conv2. fc1 retained only as bottleneck-comparison reference for the Aa champion.

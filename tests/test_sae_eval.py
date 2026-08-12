@@ -179,8 +179,10 @@ class TestCoverage:
         cov = compute_coverage(matching)
 
         assert cov["coverage"] == pytest.approx(1.0, abs=1e-4)
-        assert cov["coverage_above_50"] == pytest.approx(1.0, abs=1e-4)
-        assert cov["coverage_above_75"] == pytest.approx(1.0, abs=1e-4)
+        # F1 threshold-fraction keys were removed 2026-08-11; the MCC
+        # equivalents (coverage_mcc_above_25/50) carry that role now.
+        assert "coverage_above_50" not in cov
+        assert "coverage_f1_lift" not in cov
 
     def test_zero_coverage(self):
         """If best_f1 is 0 for all BSPs, coverage = 0."""
@@ -193,7 +195,6 @@ class TestCoverage:
         )
         cov = compute_coverage(matching)
         assert cov["coverage"] == pytest.approx(0.0, abs=1e-4)
-        assert cov["coverage_above_50"] == pytest.approx(0.0, abs=1e-4)
 
     def test_partial_coverage(self):
         """Coverage is the mean of best-F1 values."""
@@ -208,12 +209,8 @@ class TestCoverage:
 
         assert cov["coverage"] == pytest.approx(0.55, abs=1e-4)
         assert cov["num_bsps"] == 4
-        assert cov["min_f1"] == pytest.approx(0.0, abs=1e-4)
-        assert cov["max_f1"] == pytest.approx(1.0, abs=1e-4)
-        # Above 50: 1.0 and 0.8 → 2/4 = 0.5
-        assert cov["coverage_above_50"] == pytest.approx(0.5, abs=1e-4)
-        # Above 75: only 1.0 and 0.8 → 2/4 = 0.5
-        assert cov["coverage_above_75"] == pytest.approx(0.5, abs=1e-4)
+        # F1 derivatives (min/max/median/above_N/lift) were removed 2026-08-11;
+        # `coverage` is the only F1 number kept, for literature comparison.
 
     def test_required_keys_present(self):
         """Coverage dict must contain all expected keys."""
@@ -224,12 +221,7 @@ class TestCoverage:
 
         expected_keys = {
             "coverage",
-            "coverage_above_50",
-            "coverage_above_75",
             "num_bsps",
-            "min_f1",
-            "max_f1",
-            "median_f1",
             # MCC-based (added when matching has MCC fields populated)
             "coverage_mcc",
             "coverage_mcc_above_25",
@@ -237,11 +229,27 @@ class TestCoverage:
             "median_mcc",
             "min_mcc",
             "max_mcc",
-            # F1-lift over trivial base-rate baseline
-            "coverage_f1_lift",
-            "coverage_f1_lift_above_10",
-            "coverage_f1_lift_above_25",
-            "median_f1_lift",
+            # Youden's J = TPR - FPR: the prevalence-INVARIANT companion to MCC.
+            # F1, F1-lift, MCC and precision all move with the base rate for a
+            # detector of fixed quality; J does not. See scripts/prevalence_audit.py.
+            "coverage_youden_j",
+            "median_youden_j",
+            "min_youden_j",
+            "max_youden_j",
+            # MCC standardised to a reference prevalence: the number that IS
+            # comparable across populations with different base rates. p_ref is
+            # stored so a standardised value is never ambiguous.
+            "coverage_mcc_at_pref",
+            "median_mcc_at_pref",
+            "p_ref",
+            # Prevalence belongs in the registry: without it a reader cannot
+            # tell a weak SAE from a rare concept.
+            "mean_base_rate",
+            "median_base_rate",
+            "min_base_rate",
+            "max_base_rate",
+            "frac_bsps_very_rare",
+            "frac_bsps_trivial_f1",
         }
         assert expected_keys == set(cov.keys())
 
@@ -504,7 +512,9 @@ class TestEvaluateSAE:
 
         # Coverage metrics
         assert "coverage" in results
-        assert "coverage_above_50" in results
+        assert "coverage_mcc" in results
+        assert "coverage_youden_j" in results
+        assert "coverage_mcc_at_pref" in results
         assert "num_bsps" in results
         assert results["num_bsps"] == 10
 
@@ -568,3 +578,256 @@ class TestEvaluateSAE:
         assert "board_reconstruction" in results
         assert "feature_sharing" in results
         assert 0.0 <= results["coverage"] <= 1.0
+
+
+class TestPrevalenceStandardisation:
+    """MCC@p_ref must be the noise-free equivalent of subsample matching:
+    a detector of fixed quality scored on two populations that differ ONLY in
+    base rate must land on the same standardised number."""
+
+    def test_mcc_at_pref_removes_a_pure_prevalence_gap(self):
+        import torch
+
+        from lib.sae.eval import match_features_to_bsps
+
+        torch.manual_seed(0)
+        a, b = 0.55, 0.985  # fixed detector quality
+
+        def population(n, p):
+            y = (torch.rand(n) < p).float()
+            fires = torch.where(
+                y > 0, (torch.rand(n) < a).float(), (torch.rand(n) > b).float()
+            )
+            h = fires.unsqueeze(1)  # one feature
+            return h, y.unsqueeze(1)
+
+        hX, yX = population(300_000, 0.050)
+        hY, yY = population(300_000, 0.013)
+        mX = match_features_to_bsps(hX, yX)
+        mY = match_features_to_bsps(hY, yY)
+
+        raw_gap = abs(
+            float(mY.best_mcc_per_bsp[0]) / float(mX.best_mcc_per_bsp[0]) - 1.0
+        )
+        std_gap = abs(
+            float(mY.best_mcc_at_pref_per_bsp[0])
+            / float(mX.best_mcc_at_pref_per_bsp[0])
+            - 1.0
+        )
+        # Raw MCC shows a large spurious gap; standardised MCC must not.
+        assert raw_gap > 0.15, f"expected a raw prevalence gap, got {raw_gap:.3f}"
+        assert std_gap < 0.05, f"standardisation left a {std_gap:.3f} gap"
+
+    def test_p_ref_is_frozen_and_recorded(self):
+        from lib.sae.eval import P_REF_DEFAULT
+
+        # Frozen by decision (docs/methods-reference.md S1.4). Changing it
+        # changes every standardised number ever reported.
+        assert P_REF_DEFAULT == 0.025
+
+    def test_youden_j_is_prevalence_invariant_where_mcc_is_not(self):
+        import torch
+
+        from lib.sae.eval import match_features_to_bsps
+
+        torch.manual_seed(1)
+        a, b = 0.60, 0.98
+
+        def population(n, p):
+            y = (torch.rand(n) < p).float()
+            fires = torch.where(
+                y > 0, (torch.rand(n) < a).float(), (torch.rand(n) > b).float()
+            )
+            return fires.unsqueeze(1), y.unsqueeze(1)
+
+        hX, yX = population(300_000, 0.100)
+        hY, yY = population(300_000, 0.013)
+        jX = float(match_features_to_bsps(hX, yX).best_j_per_bsp[0])
+        jY = float(match_features_to_bsps(hY, yY).best_j_per_bsp[0])
+        assert abs(jY - jX) < 0.02, f"J moved with prevalence: {jX:.3f} vs {jY:.3f}"
+
+
+class TestConceptFamilyRollups:
+    """Schema-driven family grouping (lib side).
+
+    The library must never carry its own category->family mapping: it reads
+    only what the schema declares. These tests pin that contract.
+    """
+
+    @staticmethod
+    def _schema(*rows):
+        """Build a minimal schema from ``(category, family, role, n)`` rows."""
+        bsps = []
+        for category, family, role, n in rows:
+            for i in range(n):
+                bsps.append({
+                    "id": f"{category}_{i}",
+                    "category": category,
+                    "concept_family": family,
+                    "family_role": role,
+                })
+        return {"bsps": bsps}
+
+    def test_category_families_reads_per_bsp_stamps(self):
+        from lib.sae.eval import category_families
+
+        schema = self._schema(("threat_line", "line_threat", "state", 2))
+        assert category_families(schema) == {
+            "threat_line": {"concept_family": "line_threat",
+                            "family_role": "state"}
+        }
+
+    def test_unstamped_schema_yields_empty_not_a_guess(self):
+        """A pre-family schema must report 'nothing declared', so callers can
+        tell the user to re-stamp rather than silently reporting no families."""
+        from lib.sae.eval import category_families
+
+        assert category_families({"bsps": [{"id": "x", "category": "threat_line"}]}) == {}
+
+    def test_triads_prefer_the_most_agent_relative_category(self):
+        from lib.sae.eval import derive_triads
+
+        schemas = {
+            "gorilla": self._schema(("threat_line", "line_threat", "state", 1)),
+            "hawk": self._schema(
+                ("reframed_count", "line_threat", "state", 1),
+                ("reframed_completable", "line_threat", "agent_relative", 1),
+            ),
+        }
+        assert derive_triads(schemas) == {
+            "line_threat": {"gorilla": "threat_line",
+                            "hawk": "reframed_completable"}
+        }
+
+    def test_triads_drop_single_basis_families(self):
+        """A family only one basis has is not a cross-basis comparison."""
+        from lib.sae.eval import derive_triads
+
+        schemas = {
+            "tiger": self._schema(
+                ("tiger_pool_safe_count", "pool_reasoning", "agent_relative", 4)),
+            "gorilla": self._schema(
+                ("cell_occupancy", "board_occupancy", "state", 16)),
+        }
+        assert derive_triads(schemas) == {}
+
+    def test_family_means_are_weighted_by_bsp_count(self):
+        """Categories differ in size by an order of magnitude, so an unweighted
+        mean over categories would be a different statistic than the mean over
+        BSPs -- and would over-weight tiny categories like ``global`` (1 BSP)."""
+        from lib.sae.eval import aggregate_per_category_by_family
+
+        schema = self._schema(
+            ("threat_line", "line_threat", "state", 40),
+            ("reframed_any_threat", "line_threat", "state_any", 10),
+        )
+        per_category = {
+            "threat_line": {"count": 40, "mean_mcc": 1.0},
+            "reframed_any_threat": {"count": 10, "mean_mcc": 0.0},
+        }
+        out = aggregate_per_category_by_family(per_category, schema)
+        assert out["line_threat"]["count"] == 50
+        # Weighted: (40*1.0 + 10*0.0) / 50 = 0.8, NOT the unweighted 0.5.
+        assert out["line_threat"]["mean_mcc"] == pytest.approx(0.8)
+        assert out["line_threat"]["categories"] == [
+            "reframed_any_threat", "threat_line"]
+
+    def test_family_rollup_ignores_categories_the_schema_does_not_declare(self):
+        from lib.sae.eval import aggregate_per_category_by_family
+
+        schema = self._schema(("threat_line", "line_threat", "state", 4))
+        out = aggregate_per_category_by_family(
+            {"threat_line": {"count": 4, "mean_mcc": 0.5},
+             "mystery_cat": {"count": 9, "mean_mcc": 0.9}},
+            schema,
+        )
+        assert set(out) == {"line_threat"}
+        assert out["line_threat"]["count"] == 4
+
+
+class TestShippedSchemasCarryFamilies:
+    """The real schemas on disk must be stamped, or every family rollup in the
+    analysis scripts degrades to an error message."""
+
+    def test_each_basis_schema_is_stamped(self):
+        import json
+
+        from lib.sae.eval import category_families
+
+        data_dir = PROJECT_ROOT / "data" / "quarto"
+        for basis, count in (("gorilla", 164), ("hawk", 173), ("tiger", 36)):
+            path = data_dir / f"bsp_schema-{basis}_{count}.json"
+            if not path.exists():
+                pytest.skip(f"{path.name} not on this box")
+            schema = json.loads(path.read_text(encoding="utf-8"))
+            fams = category_families(schema)
+            declared = set(schema["categories"])
+            assert declared == set(fams), (
+                f"{path.name}: unstamped categories "
+                f"{sorted(declared - set(fams))} -- run "
+                f"scripts/stamp_concept_families.py")
+
+
+class TestSchemaNamingConvention:
+    """One schema per basis, and every animal resolves to it.
+
+    A BSP *schema* is distribution-independent, so the convention is
+    ``bsp_schema-<basis>_<count>.json`` with NO champion or pool suffix
+    (CLAUDE.md, Domain conventions). Suffixed copies used to be minted per
+    champion and per unified-pool size; each was byte-identical, each was
+    preferred over the basis schema by ``resolve_schema_path``, and each was a
+    place for the two to silently drift apart.
+    """
+
+    @pytest.mark.parametrize(
+        "animal,expected",
+        [
+            ("gorilla", "gorilla"),
+            ("gorillaVe", "gorilla"),      # champion suffix (upper-case initial)
+            ("tigerTa", "tiger"),
+            ("gorilla677k", "gorilla"),    # unified-pool suffix (<digits>k)
+            ("hawk156k", "hawk"),
+            ("fox", "fox"),
+        ],
+    )
+    def test_animal_to_basis(self, animal, expected):
+        from lib.sae.eval import animal_to_basis
+
+        assert animal_to_basis(animal) == expected
+
+    def test_pool_suffixed_animal_resolves_to_the_basis_schema(self, tmp_path):
+        """The reason the duplicates existed: before the numeric suffix was
+        handled, `gorilla677k` resolved to itself and the basis fallback never
+        fired, so unify_positions.py had to write a suffixed copy to be
+        findable at all."""
+        from lib.sae.eval import resolve_schema_path
+
+        basis = tmp_path / "bsp_schema-gorilla_164.json"
+        basis.write_text("{}", encoding="utf-8")
+        assert resolve_schema_path(tmp_path, "gorilla677k") == basis
+        assert resolve_schema_path(tmp_path, "gorillaYb") == basis
+
+    def test_no_suffixed_schema_files_on_disk(self):
+        """Exactly one schema per basis. A second file for the same basis makes
+        `resolve_schema_path`'s sorted()[0] pick load-bearing and arbitrary."""
+        import collections
+        import re
+
+        data_dir = PROJECT_ROOT / "data" / "quarto"
+        if not data_dir.exists():
+            pytest.skip("no quarto data dir on this box")
+
+        by_basis = collections.defaultdict(list)
+        for path in sorted(data_dir.glob("bsp_schema-*.json")):
+            m = re.match(r"bsp_schema-(.+)_(\d+)\.json$", path.name)
+            assert m, f"{path.name} does not match bsp_schema-<name>_<count>.json"
+            from lib.sae.eval import animal_to_basis
+
+            name = m.group(1)
+            assert animal_to_basis(name) == name, (
+                f"{path.name} is suffixed ('{name}'); schemas are keyed by "
+                f"BASIS only -- labels carry the suffix, schemas do not")
+            by_basis[name].append(path.name)
+
+        dupes = {b: names for b, names in by_basis.items() if len(names) > 1}
+        assert not dupes, f"multiple schemas for one basis: {dupes}"

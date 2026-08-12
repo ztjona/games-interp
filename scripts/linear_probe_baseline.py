@@ -6,11 +6,23 @@ metrics. Establishes the upper bound any SAE can achieve on these activations.
 
 Output format mirrors ``sae_eval`` so LP vs SAE numbers are directly comparable:
 
-    coverage          mean of per-BSP best F1 (literature standard)
-    coverage_mcc      mean of per-BSP best MCC (base-rate-invariant; 0 for any
-                      constant predictor; collapses the F1 ~= 0.667 artifact)
-    coverage_f1_lift  mean of max(0, F1 - 2p/(1+p)), where p is the population
-                      base rate. Headline metric for trained-vs-random gaps.
+    coverage_mcc          mean per-BSP MCC. HEADLINE metric. Zero for any
+                          constant predictor, so it collapses the F1 ~= 0.667
+                          offered_piece artefact. Not base-rate invariant --
+                          see the two below before comparing populations.
+    coverage_youden_j     mean per-BSP Youden's J = TPR + TNR - 1. Prevalence-
+                          INVARIANT companion; MCC-vs-J divergence reads off
+                          how much of a gap is base rate rather than quality.
+    coverage_mcc_at_pref  mean per-BSP MCC restated at p_ref = 0.025. This is
+                          the number to compare ACROSS bases or champions
+                          whose base rates differ (e.g. hawk vs tiger).
+    coverage              mean per-BSP F1. Retained for comparison with the
+                          published literature ONLY -- never rank on it.
+
+Per-category numbers use the same key names as
+``lib/sae/eval.compute_per_category_coverage``, and ``per_family`` rolls them up
+by the schema's ``concept_family`` stamp, so an LP report and an SAE registry
+row are directly diffable field-by-field and family-by-family.
 
 Usage:
     linear_probe_baseline.py <activations> <bsp_labels> <bsp_schema> [options]
@@ -55,6 +67,14 @@ try:
 except ImportError:
     print("Install docopt: pip install docopt", file=sys.stderr)
     sys.exit(1)
+
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+
+from lib.sae.eval import (  # noqa: E402
+    P_REF_DEFAULT,
+    aggregate_per_category_by_family,
+    mcc_from_rates,
+)
 
 
 def _infer_bsp_set_name(bsp_path: Path, schema: dict) -> str:
@@ -181,6 +201,10 @@ def main():
                     "category": category,
                     "f1": round(f1, 4),
                     "mcc": 0.0,
+                    "youden_j": 0.0,
+                    "mcc_at_pref": 0.0,
+                    "tpr": 0.0,
+                    "tnr": 0.0,
                     "f1_lift": 0.0,
                     "base_rate": round(base_rate, 4),
                     "trivial_f1": round(trivial_f1, 4),
@@ -204,12 +228,26 @@ def main():
         f1, mcc = _scores_from_confusion(tn, fp, fn, tp)
         f1_lift = max(0.0, f1 - trivial_f1)
 
+        # Prevalence-fair companions, identical in definition to the SAE side
+        # (lib/sae/eval.py). Without them an LP-vs-SAE efficiency ratio can only
+        # be formed on prevalence-DEPENDENT numbers, so it would confound
+        # "hawk is harder to probe" with "hawk concepts are rarer".
+        tpr = tp / (tp + fn) if (tp + fn) else 0.0
+        tnr = tn / (tn + fp) if (tn + fp) else 0.0
+        youden_j = tpr + tnr - 1.0
+        mcc_at_pref = float(mcc_from_rates(
+            torch.tensor(tpr), torch.tensor(tnr), P_REF_DEFAULT))
+
         results_per_bsp.append(
             {
                 "bsp_id": bsp_id,
                 "category": category,
                 "f1": round(f1, 4),
                 "mcc": round(mcc, 4),
+                "youden_j": round(youden_j, 4),
+                "mcc_at_pref": round(mcc_at_pref, 4),
+                "tpr": round(tpr, 4),
+                "tnr": round(tnr, 4),
                 "f1_lift": round(f1_lift, 4),
                 "base_rate": round(base_rate, 4),
                 "trivial_f1": round(trivial_f1, 4),
@@ -234,14 +272,25 @@ def main():
         brs = np.array(
             [r["base_rate"] for r in results_per_bsp if r["category"] == cat]
         )
+        js = np.array(
+            [r["youden_j"] for r in results_per_bsp if r["category"] == cat]
+        )
+        stds = np.array(
+            [r["mcc_at_pref"] for r in results_per_bsp if r["category"] == cat]
+        )
+        # Key names mirror lib/sae/eval.compute_per_category_coverage exactly, so
+        # an LP report and an SAE registry row can be diffed field-by-field.
         per_category[cat] = {
             "count": int(f1s.size),
             "mean_f1": round(float(f1s.mean()), 4),
-            "min_f1": round(float(f1s.min()), 4),
-            "max_f1": round(float(f1s.max()), 4),
-            "median_f1": round(float(np.median(f1s)), 4),
             "mean_mcc": round(float(mccs.mean()), 4),
             "median_mcc": round(float(np.median(mccs)), 4),
+            "min_mcc": round(float(mccs.min()), 4),
+            "max_mcc": round(float(mccs.max()), 4),
+            "sd_mcc": round(float(mccs.std()), 4),
+            "heterogeneous": bool((mccs.max() - mccs.min()) > 0.30),
+            "mean_youden_j": round(float(js.mean()), 4),
+            "mean_mcc_at_pref": round(float(stds.mean()), 4),
             "mean_f1_lift": round(float(lifts.mean()), 4),
             "mean_base_rate": round(float(brs.mean()), 4),
         }
@@ -249,30 +298,52 @@ def main():
     all_f1s = np.array([r["f1"] for r in results_per_bsp])
     all_mccs = np.array([r["mcc"] for r in results_per_bsp])
     all_lifts = np.array([r["f1_lift"] for r in results_per_bsp])
+    all_js = np.array([r["youden_j"] for r in results_per_bsp])
+    all_stds = np.array([r["mcc_at_pref"] for r in results_per_bsp])
+    all_brs = np.array([r["base_rate"] for r in results_per_bsp])
     overall = {
-        "coverage": round(float(all_f1s.mean()), 4),
-        "coverage_above_50": round(float((all_f1s > 0.50).mean()), 4),
-        "coverage_above_75": round(float((all_f1s > 0.75).mean()), 4),
-        "num_bsps": num_bsps,
-        "min_f1": round(float(all_f1s.min()), 4),
-        "max_f1": round(float(all_f1s.max()), 4),
-        "median_f1": round(float(np.median(all_f1s)), 4),
+        # MCC is the headline; J is the prevalence-INVARIANT companion and
+        # mcc_at_pref the prevalence-STANDARDISED one. The F1 family is kept
+        # only for comparison with the published literature -- do not rank on
+        # it. Same contract as the SAE registry (see CLAUDE.md).
         "coverage_mcc": round(float(all_mccs.mean()), 4),
         "coverage_mcc_above_25": round(float((all_mccs > 0.25).mean()), 4),
         "coverage_mcc_above_50": round(float((all_mccs > 0.50).mean()), 4),
         "median_mcc": round(float(np.median(all_mccs)), 4),
         "min_mcc": round(float(all_mccs.min()), 4),
         "max_mcc": round(float(all_mccs.max()), 4),
+        "coverage_youden_j": round(float(all_js.mean()), 4),
+        "median_youden_j": round(float(np.median(all_js)), 4),
+        "coverage_mcc_at_pref": round(float(all_stds.mean()), 4),
+        "median_mcc_at_pref": round(float(np.median(all_stds)), 4),
+        "p_ref": P_REF_DEFAULT,
+        "mean_base_rate": round(float(all_brs.mean()), 4),
+        "median_base_rate": round(float(np.median(all_brs)), 4),
+        "min_base_rate": round(float(all_brs.min()), 4),
+        "max_base_rate": round(float(all_brs.max()), 4),
+        "frac_bsps_very_rare": round(float((all_brs < 0.01).mean()), 4),
+        "num_bsps": num_bsps,
+        # --- demoted: literature comparison only ---
+        "coverage": round(float(all_f1s.mean()), 4),
         "coverage_f1_lift": round(float(all_lifts.mean()), 4),
-        "coverage_f1_lift_above_10": round(float((all_lifts > 0.10).mean()), 4),
-        "coverage_f1_lift_above_25": round(float((all_lifts > 0.25).mean()), 4),
-        "median_f1_lift": round(float(np.median(all_lifts)), 4),
     }
+
+    # Concept-family rollup, read off the schema's stamp -- the LP side must
+    # group exactly the way the SAE side does, or a hawk-vs-tiger LP/SAE ratio
+    # is comparing different partitions of the concept menu.
+    per_family = aggregate_per_category_by_family(per_category, schema)
+    if not per_family:
+        print(
+            "WARNING: schema carries no concept_family stamp; no per-family "
+            "rollup. Run: python scripts/stamp_concept_families.py",
+            file=sys.stderr,
+        )
 
     # --- Output ---
     output = {
         "overall": overall,
         "per_category": per_category,
+        "per_family": per_family,
         "per_bsp": results_per_bsp,
         "config": {
             "activations": str(act_path),
@@ -300,32 +371,51 @@ def main():
     # --- Print summary ---
     print("\n=== Linear Probe Baseline ===", file=sys.stderr)
     print(
-        f"coverage (F1)       : {overall['coverage']:.4f}  "
-        f"(above50={overall['coverage_above_50']:.1%}, "
-        f"above75={overall['coverage_above_75']:.1%})",
-        file=sys.stderr,
-    )
-    print(
         f"coverage_mcc        : {overall['coverage_mcc']:.4f}  "
         f"(above25={overall['coverage_mcc_above_25']:.1%}, "
-        f"above50={overall['coverage_mcc_above_50']:.1%})",
+        f"above50={overall['coverage_mcc_above_50']:.1%})   <- headline",
         file=sys.stderr,
     )
     print(
-        f"coverage_f1_lift    : {overall['coverage_f1_lift']:.4f}  "
-        f"(above10={overall['coverage_f1_lift_above_10']:.1%}, "
-        f"above25={overall['coverage_f1_lift_above_25']:.1%})",
+        f"coverage_youden_j   : {overall['coverage_youden_j']:.4f}  "
+        f"(prevalence-invariant)",
         file=sys.stderr,
     )
-    print("\nPer-category (F1 / MCC / F1-lift):", file=sys.stderr)
+    print(
+        f"coverage_mcc_at_pref: {overall['coverage_mcc_at_pref']:.4f}  "
+        f"(p_ref={overall['p_ref']}; compare ACROSS bases with this)",
+        file=sys.stderr,
+    )
+    print(
+        f"mean_base_rate      : {overall['mean_base_rate']:.4f}  "
+        f"({overall['frac_bsps_very_rare']:.1%} of BSPs below p=0.01)",
+        file=sys.stderr,
+    )
+    print(
+        f"coverage (F1)       : {overall['coverage']:.4f}  "
+        f"(literature comparison only -- do not rank on it)",
+        file=sys.stderr,
+    )
+    print("\nPer-category (MCC / J / MCC@pref / base):", file=sys.stderr)
     for cat, stats in per_category.items():
         print(
             f"  {cat:25s}  n={stats['count']:3d}  "
-            f"F1={stats['mean_f1']:.4f}  "
             f"MCC={stats['mean_mcc']:.4f}  "
-            f"lift={stats['mean_f1_lift']:.4f}",
+            f"J={stats['mean_youden_j']:.4f}  "
+            f"MCC@pref={stats['mean_mcc_at_pref']:.4f}  "
+            f"base={stats['mean_base_rate']:.4f}",
             file=sys.stderr,
         )
+    if per_family:
+        print("\nPer-concept-family (count-weighted over BSPs):",
+              file=sys.stderr)
+        for family, stats in sorted(per_family.items()):
+            print(
+                f"  {family:25s}  n={stats['count']:3d}  "
+                f"MCC={stats.get('mean_mcc', float('nan')):.4f}  "
+                f"MCC@pref={stats.get('mean_mcc_at_pref', float('nan')):.4f}",
+                file=sys.stderr,
+            )
     print(f"\nResults saved to: {output_path}", file=sys.stderr)
 
     # Also print JSON to stdout for programmatic consumption

@@ -46,3 +46,8 @@ desktop.ini
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Vendored third-party repos checked out for reference (SAE_BoardGameEval, ...).
+# Not ours to track, and their test modules break a bare `pytest` run -- see
+# pytest.ini norecursedirs.
+repositories/

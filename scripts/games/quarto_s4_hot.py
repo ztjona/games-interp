@@ -104,8 +104,14 @@ def generate_positions(*args, **kwargs):
         return quarto_s4.generate_positions(*args, **kwargs)
 
 
-# Mirror BSP_SETS if the sibling module exposes it (delegated to quarto).
+# Mirror BSP_SETS and the concept-family map (delegated to quarto).
 try:
-    from .quarto_s4 import BSP_SETS  # type: ignore  # noqa: F401
+    from .quarto_s4 import (  # type: ignore  # noqa: F401
+        BSP_SETS,
+        CONCEPT_FAMILIES,
+        FAMILY_ROLE_ORDER,
+        concept_family_of,
+        concept_triads,
+    )
 except Exception:  # pragma: no cover
     pass

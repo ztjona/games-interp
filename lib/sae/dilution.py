@@ -58,28 +58,227 @@ class DilutionConfig:
     output JSON so a verdict can always be recomputed from the raw metrics.
     """
 
+    # top_k is THE scale hyperparameter of this diagnostic: knee_k,
+    # community_size and n_candidates are all bounded by it, and asymptote_r2
+    # is measured at exactly this support. A metric "up to 64" means "up to
+    # top_k", not anything intrinsic about the SAE. Changing it changes those
+    # numbers, so it is recorded in every report and must be quoted with them.
     top_k: int = 64             # candidate latents ranked by |assoc| with y
-    max_rows: int = 40000       # deterministic row cap for the numeric work
+
+    # Two row budgets, because the two stages have very different cost:
+    #   ranking  -- needs ALL d_dict columns, so rows are expensive (memory);
+    #   curve    -- needs only the top_k selected columns, so rows are cheap.
+    # Splitting them lets the curve use far more rows (and therefore far more
+    # positives for a rare concept) at negligible cost.
+    max_rows: int = 40000       # rows for the phi ranking (all d_dict columns)
+    curve_rows: int = 120000    # rows for the R2 curve / community (top_k cols)
+    min_positives: int = 2000   # raise curve_rows until the concept has this
+                                # many positive rows (capped at N). At base rate
+                                # 0.02, 40k rows leave only ~240 positives in the
+                                # held-out split -- too few to trust knee_k.
+
     min_freq: float = 1e-4      # alive-latent firing-rate floor
     max_freq: float = 0.999     # alive-latent firing-rate ceiling
+    fire_threshold: float = 0.0  # a latent "fires" when h > this. NOT swept and
+                                # NOT relative to h_max: TopK/BatchTopK/JumpReLU
+                                # all emit exact structural zeros, so 0 is the
+                                # architecture's own on/off boundary. Only change
+                                # it for a dense (Vanilla/Gated) dictionary.
     ridge: float = 1e-2         # regularizer for the precision (coupling) matrix
     coupling_tau: float = 0.05  # |partial corr| threshold for a community edge
     test_frac: float = 0.30     # held-out fraction for honest restricted-R2
     knee_frac: float = 0.90     # fraction of asymptotic R2 that defines the knee
-    n_perm: int = 3             # label permutations for the absent null
+    n_splits: int = 5           # train/test resamples the R2 curve averages over
+    n_perm: int = 5             # label permutations for the absent null
 
     # verdict thresholds
     absent_margin: float = 0.02  # real_R2 - null_R2 below this -> absent
     absent_floor: float = 0.02   # asymptotic R2 below this -> absent
     captured_k: int = 2          # knee at or below this many latents -> captured
     captured_size: int = 3       # community at or below this size -> captured
+    captured_solo_frac: float = 0.70  # solo latent recovers >= this share -> captured
+    captured_idim: float = 2.0        # ...AND community is this low-dimensional
     tile_overlap: float = 0.15   # mean support Jaccard below this -> tiled-ish
     tile_neg_frac: float = 0.50  # negative-coupling fraction above this -> tiled
+
+    # Bumped whenever ``classify`` changes, so a stored verdict can always be
+    # traced to the rule that produced it. 3A.1 = original (knee_k AND
+    # community_size only); 3A.2 = adds the solo_frac/intrinsic_dim path.
+    rule_version: str = "3A.2"
 
     seed: int = 0
 
     def to_dict(self) -> dict:
         return asdict(self)
+
+
+# ---------------------------------------------------------------------------
+# Glossary -- embedded verbatim in every report so a JSON is self-describing
+# ---------------------------------------------------------------------------
+
+# Each entry: (range, ideal-for-"captured", what the number means).
+GLOSSARY: dict[str, dict[str, str]] = {
+    "base_rate": {
+        "range": "0..1",
+        "ideal": "n/a (a property of the data, not the SAE)",
+        "means": "Fraction of positions where the concept is TRUE. Rare concepts "
+                 "(~0.02) make F1 and R2 look small even when the signal is real, "
+                 "so compare like base rates or use MCC/phi.",
+    },
+    "top_phi": {
+        "range": "-1..1",
+        "ideal": "|phi| near 1",
+        "means": "Signed phi coefficient (identical to MCC for a 2x2 table) between "
+                 "the single best-associated latent's firing and the concept. 0 = no "
+                 "association. This is the strongest single-latent association that "
+                 "exists in the dictionary for this concept.",
+    },
+    "asymptote_r2": {
+        "range": "<=1 (can go slightly negative)",
+        "ideal": "high",
+        "means": "Held-out R2 of the concept regressed on ALL top_k candidate "
+                 "latents together. Total information about the concept recoverable "
+                 "from the dictionary, independent of how many latents it takes. "
+                 "1.0 = perfectly predicted; 0 = no better than predicting the mean.",
+    },
+    "asymptote_r2_std": {
+        "range": ">=0",
+        "ideal": "small vs asymptote_r2",
+        "means": "Standard deviation of asymptote_r2 across the n_splits train/test "
+                 "resamples. A value comparable to asymptote_r2 itself means the "
+                 "concept's numbers (especially knee_k) are split noise, not signal.",
+    },
+    "null_r2": {
+        "range": "around 0",
+        "ideal": "0",
+        "means": "Same regression with the labels shuffled -- the overfitting floor. "
+                 "Averaged over n_perm shuffles x n_splits splits. "
+                 "asymptote_r2 minus null_r2 is the real signal.",
+    },
+    "solo_r2": {
+        "range": "<=1",
+        "ideal": "close to asymptote_r2",
+        "means": "Held-out R2 using only the single best-associated latent (k=1).",
+    },
+    "solo_frac": {
+        "range": "0..1",
+        "ideal": ">= 0.70 (captured)",
+        "means": "solo_r2 / asymptote_r2: the share of all recoverable signal that "
+                 "ONE latent already carries. Low = the concept is smeared across "
+                 "many latents (dilution). This is the primary concentration metric.",
+    },
+    "knee_k": {
+        "range": "1..top_k",
+        "ideal": "1-2",
+        "means": "Smallest number of latents reaching 90% of asymptote_r2. Intuitive "
+                 "but brittle: a slow ~2% upward drift in the tail of the curve pushes "
+                 "the crossing far right even when latent #1 already did the work. "
+                 "Read it alongside solo_frac, never alone.",
+    },
+    "community_size": {
+        "range": "1..top_k",
+        "ideal": "small (1-3)",
+        "means": "Number of latents in the co-firing community around the top latent "
+                 "(greedy-modularity community over |partial correlation| > tau). "
+                 "Counts REDUNDANCY: near-duplicate latents inflate it without the "
+                 "concept being any harder to read out.",
+    },
+    "intrinsic_dim": {
+        "range": "1..community_size",
+        "ideal": "~1",
+        "means": "PCA participation ratio of the community's codes on positions where "
+                 "the concept is TRUE. ~1 = one dominant direction (a genuine single "
+                 "feature); 5 = the community spans ~5 effective dimensions. This is "
+                 "the dimensionality that actually matters, vs community_size which "
+                 "merely counts members.",
+    },
+    "support_overlap": {
+        "range": "0..1",
+        "ideal": "n/a -- it selects dilution vs tiling, not quality",
+        "means": "Mean PAIRWISE JACCARD of the community latents' firing supports: "
+                 "for each pair, |rows where both fire| / |rows where either fires|, "
+                 "averaged over pairs. NOT 'how many latents fire per position'. "
+                 "HIGH = same rows (redundant -> diluted); LOW = disjoint rows "
+                 "(shattered -> tiled). Neither end is good. A single-latent "
+                 "community has no pairs and returns 1.0 by convention -- check "
+                 "singleton_community before reading a 1.0 as redundancy.",
+    },
+    "singleton_community": {
+        "range": "true/false",
+        "ideal": "n/a",
+        "means": "True when the community is a single latent, i.e. support_overlap "
+                 "and neg_coupling_frac are conventional defaults rather than "
+                 "measurements.",
+    },
+    "n_curve_rows": {
+        "range": "<= N",
+        "ideal": "n/a",
+        "means": "Rows used for the R2 curve / community stage. Raised above "
+                 "curve_rows automatically until the concept has min_positives "
+                 "positive rows, so rare concepts are not judged on a few hundred.",
+    },
+    "orbit_aware_split": {
+        "range": "true/false",
+        "ideal": "true",
+        "means": "Whether train/test splits kept each position together with its 8 "
+                 "board symmetries. Positions are deduplicated by exact bytes, so "
+                 "symmetric images survive as separate rows; they are legitimately "
+                 "distinct inputs but statistically dependent, and for a "
+                 "rotation-invariant concept they form near-duplicate (x, y) pairs "
+                 "that inflate held-out R2 if they straddle a split. False means the "
+                 "orbit IDs were unavailable and the R2 may be slightly optimistic.",
+    },
+    "n_curve_positives": {
+        "range": ">=0",
+        "ideal": ">= min_positives",
+        "means": "Positive rows available to the curve stage. If this is far below "
+                 "min_positives the concept is too rare in this dataset to diagnose "
+                 "and its verdict should be treated as provisional.",
+    },
+    "neg_coupling_frac": {
+        "range": "0..1",
+        "ideal": "n/a -- selects dilution vs tiling",
+        "means": "Fraction of within-community couplings that are negative, i.e. "
+                 "latents that suppress each other (competing for the same concept). "
+                 "High + low support_overlap = tiled.",
+    },
+    "knee_over_idim": {
+        "range": ">=1 typically",
+        "ideal": "~1",
+        "means": "knee_k / intrinsic_dim. >>1 means many more latents are needed than "
+                 "the code's own dimensionality implies -- a splitting signature.",
+    },
+    "curve": {
+        "range": "list of R2, length top_k",
+        "ideal": "flat after k=1",
+        "means": "The restricted-R2 support curve: entry k is the held-out R2 using "
+                 "the k best-associated latents. A steep early rise then a plateau = "
+                 "concentrated; a long slow climb = diluted.",
+    },
+    "geometric_frac": {
+        "range": "0..1",
+        "ideal": "n/a -- this is the gate quantity",
+        "means": "(n_diluted + n_tiled) / n_threat_bsps for one run. The fraction of "
+                 "threat concepts whose failure mode is GEOMETRIC (present in the code "
+                 "but spread out) rather than absent or already clean. >= 0.50 -> "
+                 "Gate G-3A says phase 3C proceeds.",
+    },
+}
+
+VERDICT_GLOSSARY: dict[str, str] = {
+    "absent": "The codes carry no more signal about the concept than the null. The "
+              "information is not in this dictionary at all -- an architecture change "
+              "on the same activations cannot recover it (change the hook, or use E2E "
+              "/ supervision).",
+    "captured": "Recovered by a small, low-dimensional set of latents. The SAE already "
+                "has this concept cleanly; nothing to fix.",
+    "diluted": "Recoverable, but only by aggregating MANY MUTUALLY-OVERLAPPING latents "
+               "(feature splitting). The information IS present -- an aggregating or "
+               "hierarchical readout can recover it. One of the two GEOMETRIC verdicts.",
+    "tiled": "Recoverable, but spread over NEAR-DISJOINT, COMPETING latents (a "
+             "shattered manifold). Needs a manifold-aware or bilinear readout. The "
+             "other GEOMETRIC verdict.",
+}
 
 
 # ---------------------------------------------------------------------------
@@ -93,40 +292,52 @@ def _to_numpy(x) -> np.ndarray:
     return np.asarray(x)
 
 
-def phi_association(firing: np.ndarray, y: np.ndarray) -> np.ndarray:
+def phi_association(
+    firing: np.ndarray, y: np.ndarray, freq: np.ndarray | None = None
+) -> np.ndarray:
     """Signed phi coefficient (== MCC for 2x2) of each column of ``firing``
     against binary ``y``. Shape (d_dict,). Constant columns give 0.
 
-    firing: (N, d_dict) in {0,1}; y: (N,) in {0,1}.
+    firing: (N, d_dict) in {0,1}, any float dtype; y: (N,) in {0,1}.
+    freq:   optional precomputed column means (firing rates) -- they do not
+            depend on ``y``, so a caller diagnosing many concepts against the
+            same codes should compute them once.
+
+    The joint term is a single BLAS matrix-vector product rather than a
+    broadcast product, which avoids allocating a second (N, d_dict) array per
+    concept -- that allocation dominated the runtime when this is called once
+    per BSP over a 296k x 4096 code cache.
     """
     N = y.shape[0]
-    y = y.astype(np.float64)
-    f = firing.astype(np.float64)
-    py = y.mean()
-    pf = f.mean(axis=0)
-    # covariance and standard deviations
-    cov = (f * y[:, None]).mean(axis=0) - pf * py
+    y = y.astype(firing.dtype, copy=False)
+    py = float(y.mean())
+    pf = firing.mean(axis=0) if freq is None else freq
+    cov = (firing.T @ y) / N - pf * py
     var_f = pf * (1.0 - pf)
     var_y = py * (1.0 - py)
-    denom = np.sqrt(var_f * var_y)
-    phi = np.zeros_like(pf)
+    denom = np.sqrt(np.clip(var_f * var_y, 0.0, None))
+    phi = np.zeros(pf.shape, dtype=np.float64)
     ok = denom > 0
     phi[ok] = cov[ok] / denom[ok]
     return phi
 
 
 def select_concept_features(
-    firing: np.ndarray, y: np.ndarray, cfg: DilutionConfig
+    firing: np.ndarray, y: np.ndarray, cfg: DilutionConfig,
+    freq: np.ndarray | None = None, alive: np.ndarray | None = None,
 ) -> tuple[np.ndarray, np.ndarray]:
     """Return (indices, phi) of the top-k alive latents by |phi| with y.
 
     Indices are ordered by descending |phi| (the association ranking used by
     the restricted-R2 curve). ``phi`` is the signed association for those
-    indices, same order.
+    indices, same order. ``freq``/``alive`` may be supplied precomputed; they
+    depend only on the codes, not on the concept.
     """
-    freq = firing.mean(axis=0)
-    alive = (freq >= cfg.min_freq) & (freq <= cfg.max_freq)
-    phi = phi_association(firing, y)
+    if freq is None:
+        freq = firing.mean(axis=0)
+    if alive is None:
+        alive = (freq >= cfg.min_freq) & (freq <= cfg.max_freq)
+    phi = phi_association(firing, y, freq=freq)
     score = np.abs(phi)
     score[~alive] = -1.0
     k = min(cfg.top_k, int(alive.sum()))
@@ -196,9 +407,21 @@ def detect_community(P: np.ndarray, seed_idx: int, cfg: DilutionConfig) -> list[
 
 
 def support_overlap(firing_comm: np.ndarray) -> float:
-    """Mean pairwise Jaccard overlap of the firing supports of community latents.
+    """Mean PAIRWISE JACCARD overlap of the firing supports of community latents.
 
-    High -> redundant/overlapping (dilution). Low -> disjoint (tiling).
+    For each unordered pair (a, b) of community latents, Jaccard is
+    ``|rows where both fire| / |rows where either fires|``; the result is the
+    mean over all pairs. It is NOT "how many latents fire per position".
+
+    High -> the latents fire on the same rows: redundant/overlapping (dilution).
+    Low  -> they fire on disjoint rows: shattered (tiling).
+
+    There is no "good" value: this metric picks *which* geometric failure mode
+    is present, it does not measure quality. Note the degenerate case -- a
+    single-latent community has no pairs and returns 1.0 by convention, which is
+    numerically identical to "perfectly redundant duplicates". Always read it
+    together with ``community_size`` (or the ``singleton_community`` flag).
+
     firing_comm: (N, c) in {0,1}.
     """
     c = firing_comm.shape[1]
@@ -249,30 +472,127 @@ def _r2_heldout(Xtr, ytr, Xte, yte) -> float:
     return 1.0 - ss_res / ss_tot
 
 
+class _NestedOLS:
+    """Held-out R2 for every nested prefix X[:, :k], k = 1..m, in one pass.
+
+    OLS with intercept, identical to fitting ``LinearRegression`` per prefix,
+    but the (m x m) train Gram matrix and cross-product are formed ONCE and each
+    prefix is a k x k solve. The naive version refits from scratch m times per
+    split and, at m=64 with five splits and a permutation null, was the dominant
+    cost of the whole diagnostic.
+
+    The permutation null reuses the same Gram: shuffling the labels changes only
+    the cross-product ``b``, so a null draw costs one mat-vec, not a refit.
+    """
+
+    def __init__(self, Xtr, ytr, Xte, yte, jitter: float = 1e-10):
+        self.mu_x = Xtr.mean(axis=0)
+        self.Xtrc = (Xtr - self.mu_x).astype(np.float64, copy=False)
+        self.Xtec = (Xte - self.mu_x).astype(np.float64, copy=False)
+        self.yte = yte.astype(np.float64, copy=False)
+        self.m = Xtr.shape[1]
+        self.G = self.Xtrc.T @ self.Xtrc
+        # Scale-relative jitter keeps rank-deficient prefixes solvable (latents
+        # in a community are often near-collinear) without biasing the fit.
+        self.G.flat[:: self.m + 1] += jitter * max(np.trace(self.G), 1.0) / self.m
+        ss_tot = float(((self.yte - self.yte.mean()) ** 2).sum())
+        self.ss_tot = ss_tot if ss_tot > 0 else None
+
+    def _r2_for(self, ytr, ks) -> list[float]:
+        if self.ss_tot is None:
+            return [0.0] * len(ks)
+        mu_y = float(ytr.mean())
+        b = self.Xtrc.T @ (ytr.astype(np.float64, copy=False) - mu_y)
+        out = []
+        for k in ks:
+            try:
+                w = np.linalg.solve(self.G[:k, :k], b[:k])
+            except np.linalg.LinAlgError:
+                w = np.linalg.lstsq(self.G[:k, :k], b[:k], rcond=None)[0]
+            resid = self.yte - (self.Xtec[:, :k] @ w + mu_y)
+            out.append(1.0 - float((resid ** 2).sum()) / self.ss_tot)
+        return out
+
+    def curve(self, ytr) -> list[float]:
+        return self._r2_for(ytr, range(1, self.m + 1))
+
+    def full_support(self, ytr) -> float:
+        return self._r2_for(ytr, [self.m])[0]
+
+
+def split_train_test(
+    N: int, n_te: int, rng: np.random.Generator, groups: np.ndarray | None = None
+) -> tuple[np.ndarray, np.ndarray]:
+    """(test_idx, train_idx). With ``groups``, whole groups go to one side.
+
+    Positions are deduplicated by exact bytes, so the 8 board symmetries survive
+    as separate rows. They are legitimately distinct inputs (the CNN is not
+    rotation equivariant) but they are statistically DEPENDENT, and for a
+    rotation-invariant concept a position and its rotation are a near-duplicate
+    (x, y) pair. Splitting by orbit instead of by row keeps such a pair on the
+    same side, so the held-out R2 is not inflated by that dependence.
+
+    Group IDs come from ``scripts/compute_orbit_ids.py``.
+    """
+    if groups is None:
+        perm = rng.permutation(N)
+        return perm[:n_te], perm[n_te:]
+
+    order = np.argsort(groups, kind="stable")
+    _, counts = np.unique(groups[order], return_counts=True)
+    gperm = rng.permutation(counts.size)
+    # Take whole groups until the test budget is reached.
+    n_test_groups = int(np.searchsorted(np.cumsum(counts[gperm]), n_te) + 1)
+    is_test = np.zeros(counts.size, dtype=bool)
+    is_test[gperm[:n_test_groups]] = True
+    mask = np.repeat(is_test, counts)          # aligned to the sorted order
+    return order[mask], order[~mask]
+
+
 def restricted_r2_curve(
-    codes: np.ndarray, y: np.ndarray, order: np.ndarray, cfg: DilutionConfig
+    codes: np.ndarray, y: np.ndarray, order: np.ndarray, cfg: DilutionConfig,
+    groups: np.ndarray | None = None,
 ) -> dict:
     """Held-out restricted-R2 as latents are added in ``order``.
 
-    Returns curve (list over k=1..m), asymptote (== last point), knee (smallest
-    k reaching knee_frac * asymptote), and a permutation-null asymptote (mean
-    over cfg.n_perm label shuffles at full support).
+    The curve is averaged over ``cfg.n_splits`` independent train/test resamples
+    rather than a single split. A single split makes every downstream number --
+    and especially ``knee_k``, which reads off a threshold crossing -- a hostage
+    to one draw: for a base-rate-0.02 concept a single 30% test split holds only
+    a few hundred positives, so split noise alone can move the crossing by many
+    latents. ``asymptote_r2_std`` reports the across-split spread so that
+    instability is visible in the report instead of silently priced in.
+
+    Returns the mean curve (k=1..m), its asymptote (last point) and spread, the
+    knee (smallest k reaching knee_frac * asymptote), and a permutation-null
+    asymptote (mean over cfg.n_perm label shuffles per split, at full support).
     """
     rng = np.random.default_rng(cfg.seed)
     N = codes.shape[0]
-    perm = rng.permutation(N)
+    m = len(order)
+    X_all = codes[:, order]
     n_te = max(1, int(cfg.test_frac * N))
-    te_idx, tr_idx = perm[:n_te], perm[n_te:]
-    Xtr_all = codes[tr_idx][:, order]
-    Xte_all = codes[te_idx][:, order]
-    ytr, yte = y[tr_idx], y[te_idx]
 
-    curve = []
-    for k in range(1, len(order) + 1):
-        curve.append(_r2_heldout(Xtr_all[:, :k], ytr, Xte_all[:, :k], yte))
+    split_curves, null_vals, asymptotes = [], [], []
+    for _ in range(max(1, cfg.n_splits)):
+        te_idx, tr_idx = split_train_test(N, n_te, rng, groups)
+        ytr, yte = y[tr_idx], y[te_idx]
+        ols = _NestedOLS(X_all[tr_idx], ytr, X_all[te_idx], yte)
+
+        c = ols.curve(ytr)
+        split_curves.append(c)
+        asymptotes.append(c[-1] if c else 0.0)
+
+        for _ in range(cfg.n_perm):
+            yp = ytr.copy()
+            rng.shuffle(yp)
+            null_vals.append(ols.full_support(yp))
+
+    curve = np.mean(split_curves, axis=0).tolist() if split_curves else []
     asymptote = curve[-1] if curve else 0.0
+    asym_std = float(np.std(asymptotes)) if len(asymptotes) > 1 else 0.0
 
-    knee = len(order)
+    knee = m
     if asymptote > 0:
         target = cfg.knee_frac * asymptote
         for k, v in enumerate(curve, start=1):
@@ -280,19 +600,26 @@ def restricted_r2_curve(
                 knee = k
                 break
 
-    # permutation null at full support
-    null_vals = []
-    for _ in range(cfg.n_perm):
-        yp = ytr.copy()
-        rng.shuffle(yp)
-        null_vals.append(_r2_heldout(Xtr_all, yp, Xte_all, yte))
     null_r2 = float(np.mean(null_vals)) if null_vals else 0.0
+
+    # Share of the total recoverable signal already carried by the single
+    # best-associated latent. This is the metric that separates "one latent
+    # does the job, the rest is noise-level creep" from real dilution; knee_k
+    # alone cannot, because a 2% upward drift in the tail of the curve pushes
+    # the 90%-of-asymptote crossing arbitrarily far to the right.
+    solo_r2 = curve[0] if curve else 0.0
+    solo_frac = (solo_r2 / asymptote) if asymptote > 0 else 0.0
 
     return {
         "curve": [round(float(v), 4) for v in curve],
         "asymptote_r2": round(float(asymptote), 4),
+        "asymptote_r2_std": round(asym_std, 4),
+        "solo_r2": round(float(solo_r2), 4),
+        "solo_frac": round(float(np.clip(solo_frac, 0.0, 1.0)), 4),
         "knee_k": int(knee),
         "null_r2": round(float(null_r2), 4),
+        "n_curve_rows": int(N),
+        "n_curve_positives": int(y.sum()),
     }
 
 
@@ -301,13 +628,59 @@ def restricted_r2_curve(
 # ---------------------------------------------------------------------------
 
 
+def solo_frac_of(metrics: dict) -> float:
+    """``solo_frac`` for a metrics dict, back-filling it from ``curve`` when the
+    dict predates rule 3A.2. Lets ``classify`` re-run on stored JSON reports
+    without recomputing anything (see the ``reclassify`` CLI command)."""
+    if "solo_frac" in metrics:
+        return float(metrics["solo_frac"])
+    curve, asym = metrics.get("curve") or [], metrics.get("asymptote_r2", 0.0)
+    if not curve or asym <= 0:
+        return 0.0
+    return float(min(max(curve[0] / asym, 0.0), 1.0))
+
+
 def classify(metrics: dict, cfg: DilutionConfig) -> str:
     """Map raw metrics to {absent, captured, diluted, tiled}. Pure function of
-    the numbers in ``metrics`` and the thresholds in ``cfg`` -- auditable."""
+    the numbers in ``metrics`` and the thresholds in ``cfg`` -- auditable, and
+    re-runnable on a stored report without touching the SAE codes.
+
+    Rule 3A.2. The ``captured`` branch has two *sufficient* conditions:
+
+      (a) knee_k <= captured_k AND community_size <= captured_size   [3A.1]
+      (b) solo_frac >= captured_solo_frac
+          AND (intrinsic_dim <= captured_idim OR knee_k <= captured_k)
+
+    In (b), ``solo_frac`` is the necessary term -- the concept must actually be
+    concentrated in ONE latent -- and the second term confirms the carrier is
+    low-dimensional by either available measure. Either measure suffices because
+    both are one-sided: ``intrinsic_dim`` is inflated by redundant community
+    members that add no information, and ``knee_k`` is inflated by noise creep;
+    a concept that is concentrated *and* clean on either one is not diluted.
+
+    (b) was added after the 2026-07-27 run, where (a) alone put the *supervised*
+    anchored positive control at ``diluted`` on 22/23 concepts despite
+    community_size 2 and intrinsic_dim 1.01 -- i.e. it failed the calibration
+    check pre-registered in the 3A method spec. Two independent causes:
+    ``knee_k`` is measured over the association-ranked candidate list while
+    ``community_size`` is measured over the community (mixing scopes), and
+    ``community_size`` counts co-firing *redundancy*, which is not the same as
+    the dimensionality actually needed. (b) is scope-consistent: both of its
+    terms describe how concentrated the signal is, not how many latents happen
+    to co-fire. (a) is retained because it is correct whenever it fires, so no
+    previously-``captured`` verdict changes.
+
+    Rationale and the full before/after tally:
+    ``docs/diary/2026-07-27_3A-dilution-results.md``.
+    """
     gap = metrics["asymptote_r2"] - metrics["null_r2"]
     if gap < cfg.absent_margin or metrics["asymptote_r2"] < cfg.absent_floor:
         return "absent"
     if metrics["knee_k"] <= cfg.captured_k and metrics["community_size"] <= cfg.captured_size:
+        return "captured"
+    if solo_frac_of(metrics) >= cfg.captured_solo_frac and (
+            metrics["intrinsic_dim"] <= cfg.captured_idim
+            or metrics["knee_k"] <= cfg.captured_k):
         return "captured"
     if (metrics["support_overlap"] < cfg.tile_overlap
             and metrics["neg_coupling_frac"] > cfg.tile_neg_frac):
@@ -315,11 +688,41 @@ def classify(metrics: dict, cfg: DilutionConfig) -> str:
     return "diluted"
 
 
+class RankingCache:
+    """Per-run stage-A state: the binarized firing subsample and its rates.
+
+    None of this depends on the concept, so building it once per run instead of
+    once per BSP removes an (max_rows x d_dict) materialisation from every
+    concept. Pass the same instance to every ``diagnose_concept`` call for a
+    given ``h``; it is safe to omit, in which case it is rebuilt per call.
+    """
+
+    def __init__(self, h: torch.Tensor, cfg: DilutionConfig):
+        N_full = h.shape[0]
+        if N_full > cfg.max_rows:
+            rng = np.random.default_rng(cfg.seed)
+            rows = rng.choice(N_full, size=cfg.max_rows, replace=False)
+            rows.sort()
+            self.rows = rows
+            firing_src = h[rows]
+        else:
+            self.rows = None
+            firing_src = h
+        # float32 (not float64): phi is computed through a BLAS product, and the
+        # precision is irrelevant for a ranking over {0,1} columns.
+        self.firing = (_to_numpy(firing_src) > cfg.fire_threshold).astype(np.float32)
+        self.freq = self.firing.mean(axis=0, dtype=np.float64)
+        self.alive = (self.freq >= cfg.min_freq) & (self.freq <= cfg.max_freq)
+
+
 def diagnose_concept(
     h: torch.Tensor,
     y: torch.Tensor,
     cfg: DilutionConfig,
     h_random: torch.Tensor | None = None,
+    cache: RankingCache | None = None,
+    cache_random: RankingCache | None = None,
+    orbit_ids: np.ndarray | None = None,
 ) -> dict:
     """Full 3A diagnosis of a single concept. Returns a JSON-ready dict.
 
@@ -330,39 +733,59 @@ def diagnose_concept(
     """
     y_full = _to_numpy(y).astype(np.float64).ravel()
     base_rate = float(y_full.mean())
-
-    # Deterministic row subsample for the numeric work. R2 / couplings / PCA
-    # are stable well below the full N (hundreds of thousands); capping keeps
-    # the per-concept cost to well under a second. The base rate above is taken
-    # on the full data so the reported value is exact.
     N_full = h.shape[0]
-    if N_full > cfg.max_rows:
-        rng = np.random.default_rng(cfg.seed)
-        rows = rng.choice(N_full, size=cfg.max_rows, replace=False)
-        rows.sort()
-        h_np = _to_numpy(h[rows]).astype(np.float32)
-        y_np = y_full[rows]
-    else:
-        rows = None
-        h_np = _to_numpy(h).astype(np.float32)
-        y_np = y_full
-    firing = (h_np > 0).astype(np.float64)
-    order, phi = select_concept_features(firing, y_np, cfg)
+
+    # --- Stage A: rank candidates. Needs every column, so rows are capped at
+    # max_rows to bound the (rows x d_dict) materialisation. Ranking by |phi| is
+    # stable well below the full N. The base rate above is taken on the full
+    # data so the reported value is exact.
+    if cache is None:
+        cache = RankingCache(h, cfg)
+    rows = cache.rows
+    y_rank = y_full if rows is None else y_full[rows]
+    order, phi = select_concept_features(
+        cache.firing, y_rank, cfg, freq=cache.freq, alive=cache.alive)
 
     if order.size == 0:
         metrics = {
             "base_rate": round(base_rate, 4),
             "n_candidates": 0,
-            "asymptote_r2": 0.0, "null_r2": 0.0, "knee_k": 0,
+            "asymptote_r2": 0.0, "asymptote_r2_std": 0.0,
+            "solo_r2": 0.0, "solo_frac": 0.0,
+            "null_r2": 0.0, "knee_k": 0,
             "community_size": 0, "neg_coupling_frac": 0.0,
-            "support_overlap": 0.0, "intrinsic_dim": 0.0,
-            "top_phi": 0.0, "curve": [],
+            "support_overlap": 0.0, "singleton_community": True,
+            "intrinsic_dim": 0.0, "n_curve_rows": 0, "n_curve_positives": 0,
+            "top_phi": 0.0, "curve": [], "orbit_aware_split": False,
         }
         metrics["verdict"] = "absent"
         return metrics
 
-    codes_sub = h_np[:, order]
-    firing_sub = firing[:, order]
+    # --- Stage B: everything else runs on the top_k selected columns only, so
+    # rows are cheap (n x top_k floats). Use more of them -- and enough of them
+    # that a rare concept still has min_positives positive rows -- because the
+    # curve, the community and the intrinsic dimension are all estimated here.
+    n_curve = cfg.curve_rows
+    if base_rate > 0:
+        n_curve = max(n_curve, int(np.ceil(cfg.min_positives / base_rate)))
+    n_curve = min(N_full, max(n_curve, cfg.max_rows))
+
+    codes_cols = _to_numpy(h[:, torch.as_tensor(order, dtype=torch.long)])
+    codes_cols = codes_cols.astype(np.float32)
+    if N_full > n_curve:
+        rng_b = np.random.default_rng(cfg.seed + 1)
+        rows_b = rng_b.choice(N_full, size=n_curve, replace=False)
+        rows_b.sort()
+        codes_sub = codes_cols[rows_b]
+        y_np = y_full[rows_b]
+    else:
+        rows_b = None
+        codes_sub, y_np = codes_cols, y_full
+    del codes_cols
+    groups = None
+    if orbit_ids is not None:
+        groups = orbit_ids if rows_b is None else orbit_ids[rows_b]
+    firing_sub = (codes_sub > cfg.fire_threshold).astype(np.float64)
 
     # couplings + community around the top-associated latent (local idx 0)
     P = signed_partial_correlations(firing_sub, cfg)
@@ -380,29 +803,43 @@ def diagnose_concept(
     else:
         neg_frac, overlap, idim = 0.0, 1.0, 1.0
 
-    r2 = restricted_r2_curve(codes_sub, y_np, np.arange(len(order)), cfg)
+    r2 = restricted_r2_curve(codes_sub, y_np, np.arange(len(order)), cfg, groups=groups)
 
     metrics = {
         "base_rate": round(base_rate, 4),
         "n_candidates": int(order.size),
         "top_phi": round(float(phi[0]), 4),
         "asymptote_r2": r2["asymptote_r2"],
+        "asymptote_r2_std": r2["asymptote_r2_std"],
+        "solo_r2": r2["solo_r2"],
+        "solo_frac": r2["solo_frac"],
         "null_r2": r2["null_r2"],
         "knee_k": r2["knee_k"],
         "community_size": int(len(community)),
         "neg_coupling_frac": round(neg_frac, 4),
         "support_overlap": round(overlap, 4),
+        "singleton_community": bool(len(community) <= 1),
         "intrinsic_dim": round(float(idim), 4),
         "knee_over_idim": round(r2["knee_k"] / max(1.0, idim), 4),
+        "n_curve_rows": r2["n_curve_rows"],
+        "n_curve_positives": r2["n_curve_positives"],
+        "orbit_aware_split": bool(orbit_ids is not None),
         "curve": r2["curve"],
     }
 
     if h_random is not None:
-        hr = _to_numpy(h_random if rows is None else h_random[rows]).astype(np.float32)
-        fr = (hr > 0).astype(np.float64)
-        ro, _ = select_concept_features(fr, y_np, cfg)
+        # Same two-stage treatment, on the SAME rows, so the control is
+        # row-aligned with the real measurement.
+        if cache_random is None:
+            cache_random = RankingCache(h_random, cfg)
+        ro, _ = select_concept_features(
+            cache_random.firing, y_rank, cfg,
+            freq=cache_random.freq, alive=cache_random.alive)
         if ro.size:
-            rr = restricted_r2_curve(hr[:, ro], y_np, np.arange(len(ro)), cfg)
+            rcols = _to_numpy(
+                h_random[:, torch.as_tensor(ro, dtype=torch.long)]).astype(np.float32)
+            rcols = rcols if rows_b is None else rcols[rows_b]
+            rr = restricted_r2_curve(rcols, y_np, np.arange(len(ro)), cfg, groups=groups)
             metrics["random_asymptote_r2"] = rr["asymptote_r2"]
 
     metrics["verdict"] = classify(metrics, cfg)

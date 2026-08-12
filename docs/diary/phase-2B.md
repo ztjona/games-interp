@@ -421,8 +421,9 @@ The H sweep ruled out *capacity* as the binding constraint on the *current BSP f
 
 ## Chapter 5 — Close-out (2026-06-09)
 
-The "Phase 2C — concept-targeted SAEs" plan from the
-[2026-05 supervisor advance](advances-supervisor/2026-05.md) was executed
+The "Phase 2C — concept-targeted SAEs" plan from the 2026-05 supervisor advance
+(that file was pruned on 2026-08-12 when `advances-supervisor/` was retired —
+see [README](README.md#explanations-formerly-supervisor-advances)) was executed
 between 2026-05-22 and 2026-05-26 without its own ledger; its results live
 in dated entries. This chapter folds that arc into the 2B record and
 closes the phase.

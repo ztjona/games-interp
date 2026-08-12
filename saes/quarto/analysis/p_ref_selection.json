@@ -1,0 +1,110 @@
+{
+  "grid": [
+    0.1,
+    0.075,
+    0.05,
+    0.035,
+    0.025,
+    0.02,
+    0.015,
+    0.013,
+    0.01,
+    0.005,
+    0.002
+  ],
+  "runs": [
+    "F04-Yb/tigerYb",
+    "E05-Yb/tigerYb",
+    "I04-Yb/tigerYb",
+    "E05-Ve/tigerVe",
+    "I04-Ve/tigerVe"
+  ],
+  "table": {
+    "0.1": {
+      "F04-Yb/tigerYb": 0.2894,
+      "E05-Yb/tigerYb": 0.1672,
+      "I04-Yb/tigerYb": 0.7406,
+      "E05-Ve/tigerVe": 0.2657,
+      "I04-Ve/tigerVe": 0.3971
+    },
+    "0.075": {
+      "F04-Yb/tigerYb": 0.2586,
+      "E05-Yb/tigerYb": 0.1469,
+      "I04-Yb/tigerYb": 0.7287,
+      "E05-Ve/tigerVe": 0.2342,
+      "I04-Ve/tigerVe": 0.355
+    },
+    "0.05": {
+      "F04-Yb/tigerYb": 0.2188,
+      "E05-Yb/tigerYb": 0.1217,
+      "I04-Yb/tigerYb": 0.7091,
+      "E05-Ve/tigerVe": 0.1947,
+      "I04-Ve/tigerVe": 0.2997
+    },
+    "0.035": {
+      "F04-Yb/tigerYb": 0.1877,
+      "E05-Yb/tigerYb": 0.1027,
+      "I04-Yb/tigerYb": 0.689,
+      "E05-Ve/tigerVe": 0.1647,
+      "I04-Ve/tigerVe": 0.2561
+    },
+    "0.025": {
+      "F04-Yb/tigerYb": 0.1616,
+      "E05-Yb/tigerYb": 0.0873,
+      "I04-Yb/tigerYb": 0.6669,
+      "E05-Ve/tigerVe": 0.1402,
+      "I04-Ve/tigerVe": 0.2196
+    },
+    "0.02": {
+      "F04-Yb/tigerYb": 0.1459,
+      "E05-Yb/tigerYb": 0.0783,
+      "I04-Yb/tigerYb": 0.6504,
+      "E05-Ve/tigerVe": 0.1259,
+      "I04-Ve/tigerVe": 0.1978
+    },
+    "0.015": {
+      "F04-Yb/tigerYb": 0.1277,
+      "E05-Yb/tigerYb": 0.068,
+      "I04-Yb/tigerYb": 0.6266,
+      "E05-Ve/tigerVe": 0.1094,
+      "I04-Ve/tigerVe": 0.1726
+    },
+    "0.013": {
+      "F04-Yb/tigerYb": 0.1195,
+      "E05-Yb/tigerYb": 0.0634,
+      "I04-Yb/tigerYb": 0.6135,
+      "E05-Ve/tigerVe": 0.102,
+      "I04-Ve/tigerVe": 0.1612
+    },
+    "0.01": {
+      "F04-Yb/tigerYb": 0.1055,
+      "E05-Yb/tigerYb": 0.0557,
+      "I04-Yb/tigerYb": 0.5876,
+      "E05-Ve/tigerVe": 0.0896,
+      "I04-Ve/tigerVe": 0.142
+    },
+    "0.005": {
+      "F04-Yb/tigerYb": 0.0755,
+      "E05-Yb/tigerYb": 0.0395,
+      "I04-Yb/tigerYb": 0.5068,
+      "E05-Ve/tigerVe": 0.0636,
+      "I04-Ve/tigerVe": 0.1012
+    },
+    "0.002": {
+      "F04-Yb/tigerYb": 0.0481,
+      "E05-Yb/tigerYb": 0.025,
+      "I04-Yb/tigerYb": 0.384,
+      "E05-Ve/tigerVe": 0.0403,
+      "I04-Ve/tigerVe": 0.0643
+    }
+  },
+  "base_rate_stats": {
+    "min": 0.018564745783805847,
+    "median": 0.023250918835401535,
+    "max": 0.04985938221216202,
+    "p25": 0.022030433639883995,
+    "p75": 0.025409340858459473
+  },
+  "rank_flips": 0,
+  "recommended_p_ref": 0.025
+}

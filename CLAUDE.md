@@ -15,9 +15,10 @@ The repo has a strict layered doc structure. **Before writing to any of these, r
 | `RESEARCH-STATUS.md` | High-level ledger: current phase, key metrics, hypothesis status, active plan, deprioritized list. | One-line "Project State" bullet per phase change; link to diary for detail. | **Yes** — collapse older entries to one-liners under "Earlier states" once their diary link exists. Cap at ~200 lines. |
 | `docs/diary/YYYY-MM-DD_*.md` | Dated entries with full tables, AI-reasoned interpretation, design notes. | New file when a sweep produces >~3 rows or a pivot needs rationale. Tag interpretation paragraphs `[AI-REASONED PROVISIONAL ANALYSIS]`. | **No** — frozen after creation. |
 | `docs/diary/phase-N.md` | Running ledger for a multi-entry phase. | Append chapters with date stamps inside. | Start a new phase file once the current one exceeds ~400 lines. |
-| `docs/diary/advances-supervisor/` | One file per supervisor cycle; self-contained snapshot. | One per month, frozen after the meeting. | **No**. |
+| `docs/explanations/` | Standalone explanatory pieces written **on request**: a description, an explanation, or a progress write-up worth keeping past the meeting it was made for. Self-contained — assume the reader has not read the diary. Name `<topic>.md`, no date prefix (these are living explanations, not dated records). | Only when explicitly asked for one. | Update in place; delete when superseded. Replaces the old `advances-supervisor/` cycle files, which were dropped on 2026-08-12 because each meeting presented something too different for a fixed monthly template. |
 | `Quarto-specifications.md` | Stable game/model/data reference: rules, hooks, naming conventions, run-id rule. | Only when a *convention* changes. | Do **not** add per-champion or per-dataset instance tables — those live in `configs/models/*.yaml` and on the filesystem. Drop "resolved issues" sections; git history is the audit trail. |
 | `docs/BSP-schema-summary.md` | BSP schema reference (gorilla/hawk/tiger correspondence). | Only when basis sets change. | Stable. |
+| `docs/methods-reference.md` | **Stable reference for *how a number is computed*** — metric definitions with range + ideal value, estimators, hyperparameters, verdict rules, hypothesis/gate IDs. Contains **no results**. Diary entries **link here** instead of restating definitions, so a definition cannot drift between documents. | Only when a *method* changes; bump the rule version where one exists. | Update in place. **Never** append dated entries. |
 | `CLAUDE.md` (this file) | Agent operating manual: commands, architecture, conventions, recurring bite-marks. | Recurring failure modes that are *general-purpose* (not one-off results). | Drop bite-marks once the fix is in code + a test guards it. |
 | `configs/models/champ*.yaml` | Source of truth for a champion (paths, benchmarks, hooks). | One per champion. | **No**. |
 | `runners/<slug>.ps1` | Committed, self-contained **PowerShell 7** runner, one per champion or analysis (`champYb.ps1`, `3A-dilution.ps1`). Full workflow end-to-end: data/train -> eval -> **export** -> **stage plan**. `cd`s to repo root; fail-fast (`$PSNativeCommandUseErrorActionPreference`); parallelizes only file-disjoint stages (position-gen, activation, SAE *training*) across all GPUs, **eval sequential** (shared registry/_h). Runs on Deep Brain (Win PS 7; no bash). Launch detached via `runners/launch.ps1 <slug>`. | One per unit of reproducible work. Always end by folding in the relevant `export_*.py` and calling `scripts/emit_stage.py --slug=<slug>` so it writes `stage_<slug>.md`. | Update in place; committed as the reproducibility record. |
@@ -65,6 +66,8 @@ python scripts/registry_query.py top --bsps=gorilla --limit=10           # top b
 python scripts/registry_query.py top --bsps=hawk --hook=conv2 --exclude=random
 python scripts/registry_query.py category <run_id> --bsps=gorilla        # per-category
 python scripts/registry_query.py compare <run_a> <run_b> --bsps=gorilla  # side-by-side
+python scripts/registry_query.py family <run_id> --bsps=tigerYb          # roll categories up by concept family
+python scripts/registry_query.py triads                                  # cross-basis correspondence
 python scripts/registry_query.py bsps                                    # which BSP sets exist
 python scripts/registry_query.py top --bsps=gorilla --json | jq ...      # composable
 ```
@@ -110,6 +113,17 @@ python scripts/export_onnx.py --game quarto                      # ONNX encoders
 # and marks the bulk activations/_h caches as "do not commit".
 ```
 
+Phase 3A dilution diagnostic (how a threat concept is carried in the dictionary):
+```bash
+python scripts/dilution_diagnostic.py --run-id=<stem> --bsps=tigerYb     # one run
+# Verdicts are a PURE FUNCTION of the metrics stored in the report, so changing a
+# threshold never needs the multi-GB _h caches or a rerun:
+python scripts/dilution_diagnostic.py reclassify saes/quarto/analysis/*_dilution-*.json --dry-run
+```
+Output: `saes/quarto/analysis/{run_id}_dilution-{bsp_set}.json` (per-concept
+metrics + verdict + an embedded `glossary` key) and `3A_gate_summary.json`.
+Full panel: `pwsh -File runners\3A-dilution.ps1 -DryRun`.
+
 Anchor slot analysis (for anchored SAE runs — reads cached matching data):
 ```bash
 python scripts/anchor_analysis.py saes/quarto/<anchored_checkpoint>.pt           # auto-detects anchor BSP set + cross-BSP sets
@@ -128,12 +142,23 @@ python sae_eval.py evaluate saes/quarto/<ckpt>.pt --bsps=gorilla<N>k \
     --data=data/quarto/<hook>_amalgam_all_<tag>_activations.pt --force
 ```
 
-Linear-probe baseline (upper bound for any SAE on the same activations):
+Linear-probe baseline (upper bound for any SAE on the same activations).
+Emits the same metric schema as `sae_eval` (`coverage_mcc` headline,
+`coverage_youden_j`, `coverage_mcc_at_pref`) plus a `per_family` rollup, so LP
+and SAE numbers are diffable field-by-field:
 ```bash
 python scripts/linear_probe_baseline.py \
     data/quarto/fc1_amalgam_activations.pt \
     data/quarto/bsp_labels-gorilla_164.pt \
     data/quarto/bsp_schema-gorilla_164.json
+```
+
+Basis verdict — hawk vs tiger on **efficiency** (SAE / LP) per concept family,
+which separates "the concept is decodable at all" from "the dictionary finds
+it". Full pipeline incl. the LP denominators: `runners/basis-verdict.ps1`.
+```bash
+python scripts/stamp_concept_families.py --dry-run    # schemas must be stamped first
+python scripts/sae_lp_efficiency.py --champ=Yb --hook=s4.fc1
 ```
 
 Data pipeline (rarely needed — datasets already exist on disk).
@@ -230,7 +255,8 @@ These naming rules are project-specific and are required for files to flow throu
 - Filename patterns:
   - `positions-<metal>_unique.pt` — position dataset.
   - `bsp_labels-<animal>_<count>.pt` — per-distribution label tensor (animal carries the champion suffix).
-  - `bsp_schema-<basis>_<count>.json` — **basis-only**; the schema is identical across champion distributions. `sae_eval.py` and `export_viz_data.py` fall back from the suffixed lookup to the basis schema automatically.
+  - `bsp_schema-<basis>_<count>.json` — **basis-only, exactly one file per basis**; the schema is distribution-independent, so it carries neither the champion nor the pool suffix. `animal_to_basis()` strips **both** suffix kinds — champion (`gorillaVe` → `gorilla`, upper-case initial) and unified-pool size (`gorilla677k` → `gorilla`, `<digits>k`) — and `resolve_schema_path` falls back to the basis file automatically. Never write a suffixed schema: it is byte-identical, `resolve_schema_path` *prefers* it over the basis file, and the two are then free to drift. Guarded by `tests/test_sae_eval.py::TestSchemaNamingConvention`.
+- **`concept_family` is the cross-basis axis; a basis is only packaging.** Every BSP in a schema carries `concept_family` (the underlying game fact: `line_threat`, `square_threat`, `global_threat`, `pool_reasoning`, …) and `family_role` (`state` | `state_any` | `agent_relative` — how agent-relative the phrasing is). The map lives in **one** place, `CONCEPT_FAMILIES` in `scripts/games/quarto.py` (re-exported by `quarto_s4`/`quarto_s4_hot`); `compute_bsp_labels.py` stamps it onto every schema it writes, and `scripts/stamp_concept_families.py` retrofits schemas already on disk without recomputing labels. **Never re-derive the mapping in an analysis script** — read it from the schema (`lib/sae/eval.py`: `category_families`, `derive_triads`, `aggregate_per_category_by_family`). A *triad* is one category per basis within a family, at the highest agent-relativity that basis offers; it reproduces the line/square pairs the 2026-05-22 audit compared, guarded by `tests/test_bsp_logic.py::TestConceptFamilies`. **Whole-basis averages are not interpretable** — hawk's 173 BSPs and tiger's 36 partition the concept menu differently, so compare family-by-family.
 - **Follow-up SAE run IDs** (from 2026-04-24): `{Major}{Minor}-{tag}-s{seed}`, e.g. `A01-random-control-s42`. The trainer appends `-{arch}-{hook}` to that stem, so do **not** include arch/hook/expansion in `experiment:`. New `{Major}{Minor}` whenever the *condition* (hook, arch family, data source, purpose) changes; only `s{seed}` varies for replicates. See `configs/followup/README.md` and `Quarto-specifications.md` for the policy.
 - Binary attribute suffixes follow quartopy enum naming: `_tall`, `_black`, `_square`, `_with_hole` (positives only — negative complements are not currently probed; this is a known gap).
 
@@ -245,8 +271,10 @@ the diary; drop an entry here once a test guards the fix.
 - **BatchTopK `_thresholds_calibrated` does not survive save/load** (plain attribute, not a buffer). Detect calibration via the buffer instead: `torch.any(sae._threshold_estimate != 0)`. Used by `export_onnx.py`.
 - **Decoder normalization** must run after every optimizer step. Without it, the L1 penalty trivially shrinks `h` instead of producing sparsity.
 - **`offered_piece` F1 ≈ 0.667 is the trivial baseline** (P=0.5, R=1.0), not signal. The MCC and F1-lift columns collapse to 0 for this — use them in headline tables and the artefact disappears.
-- **Three coverage metrics, always together**: every eval writes `coverage` (F1), `coverage_mcc`, and `coverage_f1_lift` (F1 − `2p/(1+p)`, clipped at 0). F1-lift is the recommended headline. `scripts/backfill_eval_metrics.py --game=quarto` retro-fills older entries.
+- **MCC is the headline metric; F1 is for literature comparison only** (2026-07-27). Rank, select, gate and conclude on **MCC** (`coverage_mcc`) — never on F1 or F1-lift. F1 moves with the base rate through precision, so it is not comparable across concepts or champions (tiger conjunctions Ta→Ve: F1 −55%, MCC unchanged at 0.140). Every eval still writes all three (`coverage` = F1, `coverage_mcc`, `coverage_f1_lift`); `registry_query.py` defaults to `--metric=coverage_mcc`; `scripts/backfill_eval_metrics.py --game=quarto` retro-fills older entries. **Three numbers are reported together**: `coverage_mcc` (headline), `coverage_youden_j` (Youden's J = TPR−FPR, prevalence-INVARIANT), and `coverage_mcc_at_pref` (MCC standardised to **p_ref = 0.025**, frozen). MCC is *not* base-rate invariant — a fixed-quality detector loses 25% MCC from p=0.050 to p=0.013 — so **comparisons across populations or champions use `coverage_mcc_at_pref` or matched prevalence**, never raw MCC. MCC-vs-J divergence reads off how much of a gap is base rate rather than quality. Audit + method: `docs/methods-reference.md` §1.1–1.4; `scripts/prevalence_audit.py`, `scripts/investigate_mode_gap.py`, `scripts/bsp_prevalence.py`.
 - **Feature→BSP alignment is greedy argmax on *decodability*, not causality.** `eval.py` matches each BSP to its max-F1 feature (max-MCC also stored); that feature can be a *spectator* while the causally-used one ranks #2+. Prefer MCC for rare threats (base rate ~0.02) and read F1-vs-MCC disagreement as an instability flag. For any causal claim, rank the **top-K candidates** by intervention effect (3B-causal / 3D) — do not trust the argmax. 3A already scores communities (top-K), not one feature.
+- **A pre-registered gate whose other arm never fires is not a test.** Before reading any gate, run the positive control and confirm the rule classifies it as designed. 3A's G-3A read "pass" at 93–100% while its `captured` arm fired 1 time in 488 verdicts, because the rule ANDed a candidate-list statistic (`knee_k`, inflated by noise creep in the R2 tail) with a community statistic (`community_size`, which counts redundancy, not necessity). Mixing measurement scopes inside one threshold rule is the general form of the bug. Fixed in rule 3A.2 + `tests/test_dilution.py`.
+- **Verify a champion's amalgam by PROVENANCE, not by row count** — now enforced: `python scripts/validate_datasets.py` (exit 1 on any undeclared problem; the 3A and unified-pool runners gate on it). Status of every dataset: [`data/quarto/DATA-STATUS.md`](data/quarto/DATA-STATUS.md) + `_dataset_status.json`. `positions-amalgam_<tag>_unique.pt` must name that champion's own four opponent-mode raw files and carry the right `game` module. champTa's was built from `random_v_random` alone (88,524 rows, zero model-generated positions) and champS4's is byte-identical to champAa's — both went unnoticed for months because a small-but-plausible row count doesn't look like corruption. Check `provenance['source_files']` and `provenance['game']`. See [`docs/diary/2026-08-11_position-dataset-integrity-audit.md`](docs/diary/2026-08-11_position-dataset-integrity-audit.md).
 - **Deduplicate AFTER aggregating** raw position files. Early-game positions repeat heavily across opponent modes; per-file dedup leaves cross-file duplicates.
 - **`sae_eval.py` re-eval skipping** uses `run_id:bsp_set` as the registry key. Evaluating the same checkpoint against a *different* BSP set without `--force` works (no key collision). Use `--force` only to recompute an existing pair.
 - **docopt quirks**: avoid `--` prefix collisions and line continuations inside docstrings — they break parsing silently.

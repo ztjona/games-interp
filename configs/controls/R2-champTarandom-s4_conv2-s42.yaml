@@ -1,0 +1,18 @@
+# Random-model SAE control for champTa / s4.conv2.
+# Recipe is IDENTICAL to E05-champTa (the unsupervised panel
+# member); the ONLY difference is that the activations come from the
+# randomly-initialised network. Required by RESEARCH-STATUS clause 2
+# (learned-gap fraction) and by the 3A 'absent' verdict, which rests on
+# a permutation null without it.
+experiment: R2-champTarandom-s42
+architecture: batchtopk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_ta_random_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32

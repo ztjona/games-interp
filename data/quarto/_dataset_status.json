@@ -1,0 +1,64 @@
+{
+  "_comment": [
+    "Authoritative status of every position dataset. Machine-readable companion",
+    "to DATA-STATUS.md. Checked by scripts/validate_datasets.py, which fails on",
+    "any problem that is neither declared here nor listed in accepted_problems.",
+    "Statuses: OK | QUARANTINED (do not use for new work) | RETIRED (champion",
+    "dropped) | SUPERSEDED (a corrected rebuild exists)."
+  ],
+  "updated": "2026-08-11",
+  "datasets": {
+    "positions-amalgam_unique.pt": {
+      "champion": "Aa",
+      "status": "OK",
+      "note": "champAa baseline, correctly built from its own four opponent modes. champS4's dataset is a copy of this file; that is champS4's defect, not this one's.",
+      "accepted_problems": ["board tensor identical to champion(s) ['S4']"]
+    },
+    "positions-amalgam_s4_unique.pt": {
+      "champion": "S4",
+      "status": "RETIRED",
+      "reason": "Byte-identical to champAa's dataset -- champS4 was never measured on its own distribution. Its Sa_archScan self-play raws exist, so it is rebuildable, but champS4 is retired as of 2026-08-11 rather than rebuilt.",
+      "do_not": "Do not present champS4-vs-champAa as a distribution comparison. It is the same positions under two models -- a clean MODEL comparison, and the only claim these numbers support.",
+      "audit": "docs/diary/2026-08-11_position-dataset-integrity-audit.md"
+    },
+    "positions-amalgam_ta_unique.pt": {
+      "champion": "Ta",
+      "status": "QUARANTINED",
+      "reason": "Aggregated from positions-random_v_random_raw.pt ALONE: contains zero model-generated positions. It is pure random-vs-random play under champAa's game module. Every champTa SAE was trained on these activations and every *Ta label tensor scores this distribution.",
+      "consequences": [
+        "champTa tiger base rates are ~2x other champions (0.045 vs 0.023) because random play blunders into winnable positions far more often -- this is NOT a property of champTa.",
+        "Every champTa-vs-other comparison is confounded on three axes: distribution, sample size, base rate.",
+        "All champTa results are marked provisional in RESEARCH-STATUS.md."
+      ],
+      "fix": "runners/champTa-rebuild.ps1 -- the three self-play raws exist (263,393 positions); nothing needs regenerating, only re-aggregating.",
+      "audit": "docs/diary/2026-08-11_position-dataset-integrity-audit.md"
+    },
+    "positions-amalgam_ve_unique.pt": {
+      "champion": "Ve",
+      "status": "OK",
+      "note": "Correctly built from all four Ve_oracleAblation opponent modes under quarto_s4."
+    },
+    "positions-amalgam_yb_unique.pt": {
+      "champion": "Yb",
+      "status": "OK",
+      "note": "Correctly built from all four Yb_hotChamp opponent modes under quarto_s4_hot."
+    },
+    "positions-amalgam_all_unique.pt": {
+      "champion": "(unified pool)",
+      "status": "SUPERSEDED",
+      "reason": "677,744 positions, but its composition inherits the defects above: of five inputs, two are champAa's positions (amalgam + amalgam_s4, identical) and one is random-play-only (amalgam_ta). Only champVe and champYb contribute agent-generated positions.",
+      "fix": "Rebuild with runners/unified-pool.ps1 AFTER champTa-rebuild. The position-count suffix changes, so gorilla677k/hawk677k/tiger677k label sets are superseded too."
+    }
+  },
+  "derived_artifacts_quarantined": {
+    "_comment": "Everything computed from a QUARANTINED dataset inherits its status.",
+    "labels": ["bsp_labels-gorillaTa_164.pt", "bsp_labels-hawkTa_173.pt", "bsp_labels-tigerTa_36.pt"],
+    "activations": [
+      "s4.fc1_amalgam_ta_activations.pt", "s4.conv2_amalgam_ta_activations.pt",
+      "s4.fc1_amalgam_ta_random_activations.pt", "s4.conv2_amalgam_ta_random_activations.pt"
+    ],
+    "saes": "saes/quarto/*champTa*.pt and their eval_registry rows (key suffix :gorillaTa/:hawkTa/:tigerTa)",
+    "analysis": "saes/quarto/analysis/*champTa*_dilution-*.json",
+    "unified_labels": ["bsp_labels-gorilla677k_164.pt", "bsp_labels-hawk677k_173.pt", "bsp_labels-tiger677k_36.pt"]
+  }
+}

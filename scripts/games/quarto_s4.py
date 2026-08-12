@@ -452,8 +452,16 @@ def compute_bsp_vector(*args, **kwargs):
     return _impl(*args, **kwargs)
 
 
-# Mirror BSP_SETS if the sibling module exposes it.
+# Mirror BSP_SETS and the concept-family map if the sibling module exposes them.
+# BSP definitions are champion-independent, so these are shared verbatim rather
+# than redefined -- two copies would be free to drift.
 try:
-    from .quarto import BSP_SETS  # type: ignore  # noqa: F401
+    from .quarto import (  # type: ignore  # noqa: F401
+        BSP_SETS,
+        CONCEPT_FAMILIES,
+        FAMILY_ROLE_ORDER,
+        concept_family_of,
+        concept_triads,
+    )
 except Exception:  # pragma: no cover
     pass

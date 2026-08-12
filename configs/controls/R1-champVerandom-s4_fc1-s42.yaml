@@ -1,0 +1,23 @@
+# Random-model SAE control for champVe / s4.fc1.
+# Recipe is IDENTICAL to F04-champVe (the unsupervised panel
+# member); the ONLY difference is that the activations come from the
+# randomly-initialised network. Required by RESEARCH-STATUS clause 2
+# (learned-gap fraction) and by the 3A 'absent' verdict, which rests on
+# a permutation null without it.
+experiment: R1-champVerandom-s42
+architecture: jumprelu
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_ve_random_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64
+patience: 0
+min_improvement: 0.001
+l0_patience: 0
+l0_min_change: 5.0

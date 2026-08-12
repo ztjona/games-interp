@@ -71,17 +71,19 @@ without checking it, that is the failure mode this convention exists for.
 | 2026-06-09 | [geometric-pivot](2026-06-09_geometric-pivot.md) | Phase 3 founding design note. H10 (the SAE/LP wall is geometric), evidence from 5 newly-ingested papers + 2026-06-08 synthesis, pre-registered plan 3A–3D with gates G-3A / G-3C, thesis-risk framing. |
 | 2026-06-18 | [champYb-onboarding](2026-06-18_champYb-onboarding.md) | champYb onboarding (Yb_hotChamp, hot-piece-shaped S4 subclass). New game module `quarto_s4_hot`, config, checkpoint integration, staged pipeline; how it slots into Phase 3 as a piece-safety-trained trunk. Groundwork only — no GPU run. |
 
-### Supervisor advances
+### Explanations (formerly "supervisor advances")
 
-Self-contained snapshots prepared for each supervisor meeting cycle.
-One file per month under [`advances-supervisor/`](advances-supervisor/);
-frozen after the meeting (subsequent updates go in the next month's
-file). Each entry defines the metrics, BSP sets, and current state in
-a single document so the supervisor can read it standalone.
+`advances-supervisor/` was retired on 2026-08-12. It assumed one
+self-contained snapshot per monthly meeting cycle, but each meeting
+ended up presenting something too different for that template to fit,
+so the files were pruned rather than kept as a half-followed convention.
 
-| Cycle | Entry | Topic |
-|---|---|---|
-| 2026-05 | [advances-supervisor/2026-05.md](advances-supervisor/2026-05.md) | Phase 2B complete — champAa / champS4 / champTa, H9 confirmed, 11 % conv2/hawk SAE/LP wall identified, Phase 2C plan, Karvonen-framework comparison. |
+Standalone explanatory pieces now live in
+[`../explanations/`](../explanations/README.md) — written on request,
+named by topic rather than by date, and updated in place. Use one when
+something needs to be readable on its own by someone who has not read
+the diary; use a dated diary entry when you are recording what happened
+and when.
 
 ## How agents should use this folder
 
