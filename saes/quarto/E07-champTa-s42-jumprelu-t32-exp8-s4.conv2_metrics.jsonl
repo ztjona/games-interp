@@ -1,7 +1,7 @@
-{"step": 500, "loss": 10.858231, "l_reconstruct": 8.688902, "l0": 46.71, "l0_std": 6.24, "fvu": 0.124483, "mse": 8.673036, "dead_features_pct": 90.6, "median_feat_freq": 0.0}
-{"step": 1000, "loss": 8.029209, "l_reconstruct": 6.121038, "l0": 45.79, "l0_std": 7.23, "fvu": 0.086004, "mse": 6.115456, "dead_features_pct": 87.77, "median_feat_freq": 0.0}
-{"step": 1500, "loss": 6.96431, "l_reconstruct": 5.256113, "l0": 45.09, "l0_std": 7.53, "fvu": 0.074698, "mse": 5.243827, "dead_features_pct": 88.18, "median_feat_freq": 0.0}
-{"step": 2000, "loss": 6.581797, "l_reconstruct": 4.952633, "l0": 44.69, "l0_std": 7.87, "fvu": 0.070019, "mse": 4.965709, "dead_features_pct": 87.11, "median_feat_freq": 0.0}
-{"step": 2500, "loss": 6.19918, "l_reconstruct": 4.731278, "l0": 44.08, "l0_std": 8.03, "fvu": 0.068264, "mse": 4.735992, "dead_features_pct": 86.67, "median_feat_freq": 0.0}
-{"step": 3000, "loss": 6.020595, "l_reconstruct": 4.676753, "l0": 43.57, "l0_std": 8.26, "fvu": 0.066553, "mse": 4.676476, "dead_features_pct": 86.74, "median_feat_freq": 0.0}
+{"step": 500, "loss": 10.448318, "l_reconstruct": 8.354164, "l0": 46.48, "l0_std": 4.21, "fvu": 0.131758, "mse": 8.32642, "dead_features_pct": 94.7, "median_feat_freq": 0.0}
+{"step": 1000, "loss": 7.312789, "l_reconstruct": 5.48089, "l0": 45.5, "l0_std": 5.32, "fvu": 0.087507, "mse": 5.481659, "dead_features_pct": 96.34, "median_feat_freq": 0.0}
+{"step": 1500, "loss": 6.709488, "l_reconstruct": 4.955702, "l0": 45.24, "l0_std": 6.16, "fvu": 0.07798, "mse": 4.95134, "dead_features_pct": 96.41, "median_feat_freq": 0.0}
+{"step": 2000, "loss": 6.358505, "l_reconstruct": 4.823253, "l0": 44.41, "l0_std": 6.46, "fvu": 0.076369, "mse": 4.813316, "dead_features_pct": 96.9, "median_feat_freq": 0.0}
+{"step": 2500, "loss": 6.139102, "l_reconstruct": 4.752896, "l0": 43.79, "l0_std": 6.71, "fvu": 0.074896, "mse": 4.747103, "dead_features_pct": 95.83, "median_feat_freq": 0.0}
+{"step": 3000, "loss": 5.895893, "l_reconstruct": 4.574627, "l0": 43.47, "l0_std": 6.72, "fvu": 0.073016, "mse": 4.574549, "dead_features_pct": 95.97, "median_feat_freq": 0.0}
 {"stop_reason": "early_stopped"}

@@ -112,6 +112,50 @@ print(",".join(sorted(bad)))
         Write-Host '  champion is rebuilt AND retrained, and its status flipped to OK.'
     }
 
+    # --- Disk pre-flight ---------------------------------------------------
+    # Every eval writes an (N x d_dict) float32 _h cache. At champVe's 289,795
+    # positions that is 4.4 GB per exp8 run and 35 GB per exp64 run, so this
+    # stage can want ~170 GB. Running out mid-way leaves a truncated cache that
+    # later loads as a corrupt tensor, so size it up front and refuse early.
+    $needGb = @'
+import glob, json, os, sys, torch
+pairs = [l.strip().split("|") for l in open("runners/_missing_evals.txt") if l.strip()]
+status = json.load(open("data/quarto/_dataset_status.json"))["datasets"]
+bad = {v["champion"] for v in status.values()
+       if v.get("status") in ("QUARANTINED", "RETIRED") and v.get("champion")}
+need = 0.0
+for rid, bsps in pairs:
+    if any(f"champ{c}-" in rid for c in bad):
+        continue
+    if os.path.exists(f"saes/quarto/cache/{rid}_h.pt"):
+        continue          # reused, not rewritten
+    ck = f"saes/quarto/{rid}.pt"
+    lbl = sorted(glob.glob(f"data/quarto/bsp_labels-{bsps}_[0-9]*.pt"))
+    if not os.path.exists(ck) or not lbl:
+        continue
+    sd = torch.load(ck, map_location="cpu", weights_only=False)
+    sd = sd.get("state_dict") or sd
+    d = sd["W_enc"].shape[1]
+    n = torch.load(lbl[0], map_location="cpu", weights_only=True).shape[0]
+    need += n * d * 4 / 2**30
+print(f"{need:.1f}")
+'@
+    $needStage1 = [double](($needGb | python -) -join '').Trim()
+    $freeGb = [math]::Round((Get-PSDrive (Get-Location).Drive.Name).Free / 1GB, 1)
+    # +25 GB headroom for the six control _h caches written by stage 3.
+    $wantGb = [math]::Round($needStage1 + 25, 1)
+    Write-Host "`nDisk pre-flight: ~$wantGb GB needed (stage 1 _h $needStage1 GB + ~25 GB controls); $freeGb GB free."
+    if ($freeGb -lt $wantGb) {
+        Write-Host ''
+        Write-Host 'NOT ENOUGH DISK. _h is a regenerable cache, so the cheapest'
+        Write-Host 'reclaim is the champTa caches nothing downstream reads --'
+        Write-Host 'champTa registry rows already carry J and MCC@pref, so the'
+        Write-Host 'backfill never re-reads them, and 3A/basis-verdict need only'
+        Write-Host 'F04 / E05 / I04. See the 2026-08-13 diary entry for the'
+        Write-Host 'exact prune command (frees ~274 GB).'
+        throw "Insufficient disk: need ~$wantGb GB, have $freeGb GB."
+    }
+
     # --- Stage 1: tiger backfill ------------------------------------------
     if (-not $SkipBackfill) {
         if (-not (Test-Path $MANIFEST)) { throw "$MANIFEST missing (run with -Rescan)" }
@@ -130,16 +174,27 @@ print(",".join(sorted(bad)))
         # Sequential: sae_eval writes the shared eval registry and the _h cache.
         # Parallel runs corrupt both (see CLAUDE.md).
         $i = 0
+        $bfStart = Get-Date
         foreach ($pair in $pairs) {
             $i++
             $rid, $bsps = $pair.Split('|')
             $ckpt = "saes/quarto/$rid.pt"
             if (-not (Test-Path $ckpt)) { Write-Host "  [SKIP] no checkpoint: $rid"; continue }
-            Write-Host "`n  ($i/$($pairs.Count)) $rid  bsps=$bsps"
+            $el = (Get-Date) - $bfStart
+            $eta = if ($i -gt 1) {
+                '~{0:hh\:mm}' -f [TimeSpan]::FromSeconds(
+                    ($el.TotalSeconds / ($i - 1)) * ($pairs.Count - $i + 1))
+            }
+            else { 'unknown' }
+            Write-Host ("`n  ({0}/{1}) {2}  bsps={3} | elapsed {4:hh\:mm} | ETA {5}" -f `
+                    $i, $pairs.Count, $rid, $bsps, $el, $eta)
             if ($DryRun) { Write-Host "    [DRY] python sae_eval.py evaluate $ckpt --bsps=$bsps"; continue }
             # No --force: these are new (run_id:bsp_set) keys, so nothing is
             # being overwritten and an already-done cell is skipped on a rerun.
             python sae_eval.py evaluate $ckpt --bsps=$bsps
+        }
+        if (-not $DryRun) {
+            Write-Host ("  Backfill done in {0:hh\:mm\:ss}." -f ((Get-Date) - $bfStart))
         }
     }
     else { Write-Host "`n[1/3] Tiger backfill SKIPPED." }
@@ -179,7 +234,7 @@ print(",".join(sorted(bad)))
                 $mine = @($cfgs | Where-Object { $cfgs.IndexOf($_) % $nGpu -eq $gpu } |
                     ForEach-Object { $_.FullName })
                 if (-not $mine) { return }
-                Start-Job -ScriptBlock {
+                Start-Job -Name "gpu$gpu" -ScriptBlock {
                     param($root, $gpu, $mine)
                     Set-Location $root
                     $env:PYTHONUTF8 = '1'
@@ -190,17 +245,43 @@ print(",".join(sorted(bad)))
                     }
                 } -ArgumentList $root, $gpu, $mine
             }
-            $jobs | Receive-Job -Wait -AutoRemoveJob | ForEach-Object { Write-Host $_ }
+
+            # Drain incrementally, tagged by GPU. `Receive-Job -Wait` buffers
+            # each job's whole output and flushes it only when that job ends, so
+            # the transcript replays each GPU's timestamps from the start after
+            # the previous one finishes -- time appears to run backwards and
+            # every block looks like the end of the run.
+            $trStart = Get-Date
+            while (@($jobs | Where-Object { $_.State -eq 'Running' }).Count -gt 0) {
+                foreach ($jb in $jobs) {
+                    Receive-Job -Job $jb | ForEach-Object {
+                        if ("$_".Trim()) { Write-Host "  [$($jb.Name)] $_" }
+                    }
+                }
+                Start-Sleep -Seconds 5
+            }
+            foreach ($jb in $jobs) {
+                Receive-Job -Job $jb | ForEach-Object {
+                    if ("$_".Trim()) { Write-Host "  [$($jb.Name)] $_" }
+                }
+            }
+            $failed = @($jobs | Where-Object { $_.State -eq 'Failed' } | ForEach-Object Name)
+            $jobs | Remove-Job -Force
+            if ($failed) { throw "Control training job(s) FAILED: $($failed -join ', ')" }
+            Write-Host ("  Training done in {0:hh\:mm\:ss}." -f ((Get-Date) - $trStart))
         }
 
         # --- Stage 3: evaluate the controls (writes their _h caches) -------
-        Write-Host "`n[3/3] Evaluating the controls (sequential; also writes _h)."
-        foreach ($cfg in $cfgs) {
-            # champTa/Ve/Yb -> the champion's own BSP label sets
-            if ($cfg.Name -notmatch 'champ(\w\w)random') { continue }
-            $champ = $Matches[1]
+        # Iterate CHAMPIONS, not configs. Each champion has two configs (R1 fc1
+        # + R2 conv2) but the glob below already returns both of that champion's
+        # checkpoints, so looping over configs evaluated every champion twice.
+        $champs = @($cfgs | ForEach-Object {
+                if ($_.Name -match 'champ(\w\w)random') { $Matches[1] } } | Select-Object -Unique)
+        Write-Host "`n[3/3] Evaluating controls for $($champs.Count) champion(s) (sequential; also writes _h)."
+        foreach ($champ in $champs) {
             $stem = @(Get-ChildItem "saes/quarto/*champ$($champ)random*.pt" -ErrorAction SilentlyContinue |
                 Where-Object { $_.Name -notlike '*_metrics*' })
+            if (-not $stem) { Write-Host "  [SKIP] champ$champ -- no control checkpoint on disk"; continue }
             # ONE call, all three bases: sae_eval encodes the codes once and
             # reuses them across every BSP set in the call. A per-basis loop
             # re-encodes and rewrites the same multi-GB _h file each time.
@@ -220,7 +301,21 @@ print(",".join(sorted(bad)))
     python scripts/emit_stage.py --slug 3A-prep saes/quarto/eval_registry.json saes/quarto/training_registry.json
 
     Write-Host "`nDone. Next:"
-    Write-Host "  1. populate `$RANDOM_CONTROLS in runners/3A-dilution.ps1 with the R1/R2 run_ids"
+    # Verify rather than instruct: the run_ids are already in 3A-dilution.ps1,
+    # so what matters is whether each one now has a checkpoint AND an _h cache.
+    # A control whose _h is missing does not fail -- the CLI silently falls back
+    # to the permutation null, which UNDERSTATES what "absent" should mean.
+    $ctlCheck = @'
+import os, re
+txt = open("runners/3A-dilution.ps1", encoding="utf-8").read()
+ids = re.findall(r"=\s*'(R[12]-champ\w+random-[\w.\-]+)'", txt)
+missing = [r for r in ids if not os.path.exists(f"saes/quarto/cache/{r}_h.pt")]
+print(f"  {len(ids) - len(missing)}/{len(ids)} random-model controls have an _h cache.")
+for r in missing:
+    print(f"    NO _h (will fall back to the permutation null): {r}")
+'@
+    $ctlCheck | python -
+    Write-Host "  1. review the control coverage line above"
     Write-Host "  2. pwsh -File runners\launch.ps1 3A-dilution"
 }
 finally {

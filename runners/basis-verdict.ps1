@@ -39,16 +39,36 @@
       4. basis_comparison (per champ) -- one SAE, one code set, three framings
       5. sae_lp_efficiency            -- the verdict
 
-  Champions: champVe and champYb only. champTa is EXCLUDED until
-  runners/champTa-rebuild.ps1 has rebuilt its distribution AND retrained its
-  SAEs -- its dataset is random-play-only, so its base rates are ~2x everyone
-  else's, which is exactly the confound this runner exists to remove.
+  Champions: Ta, Ve, Yb. champTa was rebuilt and retrained on 2026-08-12
+  (runners/champTa-rebuild.ps1), which brought its tiger-conjunction base rate
+  from 0.045 to 0.0255 -- in line with Ve 0.0239 and Yb 0.0223 -- so the
+  distribution confound this runner exists to remove is gone. Any champion
+  still QUARANTINED/RETIRED is dropped automatically at stage 0.
+
+  COST. The LP stage dominates and scales with the training split: ~32 s per
+  BSP fit at the full 232k rows, i.e. 373 BSPs x 6 champion-hook combos ~= 21 h
+  CPU (~7 h wall across 3 parallel champions). Measured on champTa/fc1/tiger:
+
+      max_train    s/BSP    MCC (base 0.28)   MCC (base 0.12)
+        232,117     31.8         0.6365            0.5754
+        100,000     11.2         0.6350            0.5699
+         50,000      4.2         0.6326            0.5643
+         25,000      1.8         0.6296            0.5632
+
+  So `-MaxTrain 50000` costs ~1-2% of MCC on common concepts and turns ~7 h of
+  wall clock into ~50 min. The probe is an UPPER BOUND, not a precision
+  estimate, and 512 features do not need 232k rows. Caveat: rare concepts
+  degrade first (hawk `completable` sits near base rate 0.003, so 50k leaves
+  ~150 positives) -- linear_probe_baseline.py names any BSP left with <50
+  positives, so read that warning before trusting a rare-family ratio.
 
   Launch:   pwsh -File runners\launch.ps1 basis-verdict
   Dry-run:  pwsh -File runners\basis-verdict.ps1 -DryRun
   Skip the slow LP stage if the reports are already current: -SkipProbes
+  Cap the LP training split (big time saver, see below): -MaxTrain 50000
 #>
-param([switch]$DryRun, [switch]$SkipProbes, [string[]]$Champions = @('Ve', 'Yb'))
+param([switch]$DryRun, [switch]$SkipProbes, [int]$MaxTrain = 0,
+      [string[]]$Champions = @('Ta', 'Ve', 'Yb'))
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
@@ -145,18 +165,51 @@ print(",".join(sorted({v["champion"] for v in s.values()
             $jobs = $Champions | ForEach-Object {
                 $champ = $_
                 $mine = @($plan | Where-Object { $_.Champ -eq $champ })
-                Start-Job -ScriptBlock {
-                    param($root, $mine)
+                Start-Job -Name "champ$champ" -ScriptBlock {
+                    param($root, $mine, $maxTrain)
                     Set-Location $root
                     $env:PYTHONUTF8 = '1'
                     foreach ($j in $mine) {
                         Write-Output ">> LP $($j.Champ) $($j.Hook) $($j.Basis)"
-                        & '.\.venv\Scripts\python.exe' scripts/linear_probe_baseline.py `
-                            $j.Act $j.Labels $j.Schema 2>&1
+                        $a = @('scripts/linear_probe_baseline.py',
+                            $j.Act, $j.Labels, $j.Schema)
+                        if ($maxTrain -gt 0) { $a += "--max-train=$maxTrain" }
+                        & '.\.venv\Scripts\python.exe' @a 2>&1
                     }
-                } -ArgumentList $root, $mine
+                } -ArgumentList $root, $mine, $MaxTrain
             }
-            $jobs | Receive-Job -Wait -AutoRemoveJob | ForEach-Object { Write-Host $_ }
+
+            # Incremental drain, tagged per champion -- `Receive-Job -Wait`
+            # buffers each job whole and replays its timestamps from the start
+            # once the previous one ends, which makes the log read as though the
+            # run finished several times over.
+            $lpStart = Get-Date
+            $lastBeat = Get-Date
+            while (@($jobs | Where-Object { $_.State -eq 'Running' }).Count -gt 0) {
+                foreach ($jb in $jobs) {
+                    Receive-Job -Job $jb | ForEach-Object {
+                        if ("$_".Trim()) { Write-Host "  [$($jb.Name)] $_" }
+                    }
+                }
+                if (((Get-Date) - $lastBeat).TotalSeconds -ge 120) {
+                    $lastBeat = Get-Date
+                    $reports = @(Get-ChildItem "$DATA/linear_probe_*_results.json" -ErrorAction SilentlyContinue |
+                        Where-Object { $_.LastWriteTime -gt $lpStart }).Count
+                    $active = @($jobs | Where-Object { $_.State -eq 'Running' } | ForEach-Object Name) -join ','
+                    Write-Host ("  ... {0}/{1} LP reports written | elapsed {2:hh\:mm} | active: {3}" -f `
+                            $reports, $plan.Count, ((Get-Date) - $lpStart), $active)
+                }
+                Start-Sleep -Seconds 5
+            }
+            foreach ($jb in $jobs) {
+                Receive-Job -Job $jb | ForEach-Object {
+                    if ("$_".Trim()) { Write-Host "  [$($jb.Name)] $_" }
+                }
+            }
+            $lpFailed = @($jobs | Where-Object { $_.State -eq 'Failed' } | ForEach-Object Name)
+            $jobs | Remove-Job -Force
+            if ($lpFailed) { throw "LP job(s) FAILED: $($lpFailed -join ', ')" }
+            Write-Host ("  Probes done in {0:hh\:mm\:ss}." -f ((Get-Date) - $lpStart))
         }
     }
     else { Write-Host "`n[2/5] Linear-probe baselines SKIPPED (-SkipProbes)." }

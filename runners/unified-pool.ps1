@@ -22,6 +22,28 @@
   Cost: GPU-bound. 4 champions x 2 hooks x {trained, random} activation
   collections over the merged pool, then one eval per SAE per BSP set.
 
+  RUN THIS LAST, AND DECIDE WHETHER IT IS STILL WORTH RUNNING AT ALL.
+
+  (a) It DESTROYS the per-champion code caches. `sae_eval` names the cache
+      `{run_id}_h.pt` with NO dataset in the name, and stage 3 below re-evaluates
+      the 9 panel SAEs with --force against the unified activations. That
+      overwrites ~36 GB of per-champion codes that 3A-dilution, basis_comparison
+      and backfill_eval_metrics all read -- and 3A-dilution checks only whether
+      the file EXISTS, so it would silently consume unified-pool codes against
+      per-champion labels. Run 3A-prep, 3A-dilution, the registry backfill and
+      basis-verdict FIRST.
+
+  (b) Its original justification is largely gone. The pool existed because
+      champTa's base rates were ~2x the other champions'; after the 2026-08-12
+      rebuild champTa sits at 0.0255 on tiger conjunctions vs Ve 0.0239 and
+      Yb 0.0223, with matched N (290k/290k/296k). What remains is byte-identical
+      positions across champions -- but `coverage_mcc_at_pref` already
+      standardises prevalence analytically, with no rows discarded and no
+      sampling noise.
+
+  (c) It costs ~2.5 h and ~160 GB (9 unified _h caches at ~14 GB each, 16
+      activation files, the pool itself). Check free space before starting.
+
   Launch:   pwsh -File runners\launch.ps1 unified-pool
   Dry-run:  pwsh -File runners\unified-pool.ps1 -DryRun
   Stage 1 only (cheap, no GPU): pwsh -File runners\unified-pool.ps1 -LabelsOnly

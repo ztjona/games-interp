@@ -36,6 +36,13 @@ Arguments:
 Options:
     -h --help              Show this help message
     --test-frac=<f>        Fraction held out for test [default: 0.2]
+    --max-train=<n>        Cap the TRAINING split at n rows (0 = use all)
+                           [default: 0]. The probe is an upper bound, not a
+                           precision estimate, and with 512 features a 232k-row
+                           train split is far past diminishing returns -- at
+                           ~33 s/BSP the full panel is ~21 h of CPU. The test
+                           split is never subsampled. Rare BSPs suffer first;
+                           the script names any with <50 positives left.
     --seed=<int>           Random seed [default: 42]
     --max-iter=<int>       Max iterations for solver [default: 1000]
     --C=<float>            Inverse regularization strength [default: 1.0]
@@ -173,6 +180,39 @@ def main():
     X_train, X_test, Y_train, Y_test = train_test_split(
         X, Y, test_size=test_frac, random_state=seed
     )
+
+    # Optional train-set subsample. The probe is an UPPER BOUND on decodability,
+    # not a precision estimate, and with d=512 features a 232k-row training set
+    # is far past the point where more rows change the fit. lbfgs cost is roughly
+    # linear in rows, so capping the train split is close to a pure time saving:
+    # ~33 s/BSP at 232k rows means 373 BSPs x 6 champion-hook combos ~= 21 h CPU.
+    #
+    # The TEST split is deliberately left at full size -- the metric should still
+    # be measured against the real distribution, and prediction is cheap.
+    n_train_full = X_train.shape[0]
+    max_train = int(args["--max-train"])
+    subsampled = 0 < max_train < n_train_full
+    if subsampled:
+        rng = np.random.default_rng(seed)
+        keep = rng.choice(n_train_full, size=max_train, replace=False)
+        X_train, Y_train = X_train[keep], Y_train[keep]
+        print(
+            f"Subsampled train split: {n_train_full} -> {max_train} rows "
+            f"(seed={seed}); test split left at {X_test.shape[0]}.",
+            file=sys.stderr,
+        )
+        # Rare BSPs are where subsampling actually costs something: at base rate
+        # 0.003 a 50k subsample holds ~150 positives. Name them rather than let
+        # the reader assume every column is equally well estimated.
+        pos = Y_train.sum(axis=0)
+        thin = int((pos < 50).sum())
+        if thin:
+            print(
+                f"WARNING: {thin}/{Y_train.shape[1]} BSPs have <50 positives in "
+                f"the subsampled train split; their probes are noisy upper "
+                f"bounds. Raise --max-train if those concepts matter.",
+                file=sys.stderr,
+            )
     print(
         f"Train: {X_train.shape[0]}, Test: {X_test.shape[0]}",
         file=sys.stderr,
@@ -351,6 +391,10 @@ def main():
             "bsp_set": _infer_bsp_set_name(bsp_path, schema),
             "C": C,
             "test_frac": test_frac,
+            # Recorded so a subsampled report is never mistaken for a full one.
+            "max_train": max_train,
+            "train_subsampled": subsampled,
+            "n_train_full": n_train_full,
             "seed": seed,
             "max_iter": max_iter,
             "n_train": X_train.shape[0],

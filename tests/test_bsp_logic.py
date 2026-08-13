@@ -719,3 +719,118 @@ class TestConceptFamilies:
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
+
+
+class TestRunnerLabelNaming:
+    """Runners must compute PER-DISTRIBUTION labels under a suffixed animal.
+
+    Regression guard for the 2026-08-12 incident: champTa-rebuild.ps1 called
+    ``compute_bsp_labels.py --name gorilla`` (the bare basis) instead of
+    ``--name gorillaTa``. Because the baseline champion champAa is the un-tagged
+    one, that wrote champTa's 290,147-row labels straight over champAa's
+    ``bsp_labels-gorilla_164.pt`` and ``-hawk_173.pt``, destroying them, while
+    champTa's own ``*Ta`` files were left stale at 88,524 rows. Nothing errored.
+
+    A bare ``--name <basis>`` is only ever correct for champAa itself, which is
+    driven by hand and not by a champion runner.
+    """
+
+    BASES = ("gorilla", "hawk", "tiger", "fox")
+
+    def _runner_files(self):
+        runners = PROJECT_ROOT / "runners"
+        if not runners.is_dir():
+            pytest.skip("no runners/ directory on this box")
+        return sorted(runners.glob("*.ps1"))
+
+    def test_no_runner_passes_a_bare_basis_as_name(self):
+        import re
+
+        offenders = []
+        for path in self._runner_files():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            for line_no, line in enumerate(text.splitlines(), 1):
+                if "compute_bsp_labels.py" not in line:
+                    continue
+                # Only flag a literal bare basis; a variable such as
+                # --name $animal is resolved at runtime and cannot be judged here.
+                m = re.search(r"--name\s+(['\"]?)([a-z]+)\1(?:\s|$)", line)
+                if m and m.group(2) in self.BASES:
+                    offenders.append(f"{path.name}:{line_no}: --name {m.group(2)}")
+        assert not offenders, (
+            "runner(s) pass a bare BASIS to compute_bsp_labels --name; labels are "
+            "per-distribution and must carry the champion suffix (e.g. gorillaTa), "
+            "or champAa's un-suffixed label files are silently overwritten:\n  "
+            + "\n  ".join(offenders)
+        )
+
+    def test_rebuild_runners_verify_label_row_counts(self):
+        """A runner that REPLACES an existing distribution must assert the labels
+        it writes have one row per position.
+
+        Scoped to rebuild runners (those that move the old positions file aside)
+        because that is where the failure is silent and destructive: the stale
+        label file from the previous distribution is still on disk, still loads,
+        and still matches the stale activations, so every number stays
+        self-consistent and wrong. A first-time build has no stale file to
+        shadow it.
+        """
+        for path in self._runner_files():
+            text = path.read_text(encoding="utf-8", errors="replace")
+            if "compute_bsp_labels.py" not in text:
+                continue
+            if "legacy_wrong_distribution" not in text:
+                continue  # not a rebuild of an existing distribution
+            assert "N_POSITIONS" in text, (
+                f"{path.name} rebuilds a distribution and recomputes BSP labels "
+                f"but never checks the label row count against the position "
+                f"count")
+
+
+class TestRunnerVariableHygiene:
+    """PowerShell variable names are CASE-INSENSITIVE.
+
+    Regression guard for the 2026-08-12 stage-4 failure: the runner held the
+    positions-file path in ``$OUT`` and then assigned the per-hook activation
+    path to ``$out`` inside the loop. Those are ONE variable, so ``$OUT`` was
+    silently overwritten and ``collect_activations.py`` was handed its own
+    output file as ``--positions-file`` -- surfacing only as
+    ``IndexError: too many indices for tensor of dimension 2``, several frames
+    away from the cause.
+
+    Two spellings of one name is never intentional here, so flag it outright.
+    """
+
+    # Automatic / built-in names whose casing we do not control.
+    AUTOMATIC = {
+        "args", "input", "error", "host", "true", "false", "null", "matches",
+        "_", "psitem", "pscmdlet", "psscriptroot", "lastexitcode", "pwd",
+        "home", "pid", "profile",
+    }
+
+    def test_no_case_only_variable_collisions(self):
+        import collections
+        import re
+
+        runners = PROJECT_ROOT / "runners"
+        if not runners.is_dir():
+            pytest.skip("no runners/ directory on this box")
+
+        offenders = {}
+        for path in sorted(runners.glob("*.ps1")):
+            text = path.read_text(encoding="utf-8", errors="replace")
+            spellings = collections.defaultdict(set)
+            for m in re.finditer(r"\$([A-Za-z_]\w*)\s*(?:=|\+=)", text):
+                name = m.group(1)
+                if name.lower() in self.AUTOMATIC:
+                    continue
+                spellings[name.lower()].add(name)
+            clashes = {k: sorted(v) for k, v in spellings.items() if len(v) > 1}
+            if clashes:
+                offenders[path.name] = clashes
+
+        assert not offenders, (
+            "PowerShell variables differing only in case are the SAME variable; "
+            "one assignment silently clobbers the other:\n  "
+            + "\n  ".join(f"{f}: {c}" for f, c in offenders.items())
+        )

@@ -443,6 +443,18 @@ def cmd_evaluate(args: dict) -> None:
                     "mcc": matching.mcc,
                     "best_mcc_per_bsp": matching.best_mcc_per_bsp,
                     "best_feature_per_bsp_mcc": matching.best_feature_per_bsp_mcc,
+                    # These four were missing, so every cache written here
+                    # looked stale to backfill_eval_metrics.py's
+                    # REQUIRED_MATCHING_FIELDS check and would have been
+                    # rebuilt from _h for nothing.
+                    "youden_j": matching.youden_j,
+                    "best_j_per_bsp": matching.best_j_per_bsp,
+                    "best_feature_per_bsp_j": matching.best_feature_per_bsp_j,
+                    "mcc_at_pref": matching.mcc_at_pref,
+                    "best_mcc_at_pref_per_bsp": matching.best_mcc_at_pref_per_bsp,
+                    "best_feature_per_bsp_mcc_at_pref":
+                        matching.best_feature_per_bsp_mcc_at_pref,
+                    "p_ref": matching.p_ref,
                     "base_rates": matching.base_rates,
                     "f1_lift_per_bsp": matching.f1_lift_per_bsp,
                     "trivial_f1_per_bsp": matching.trivial_f1_per_bsp,

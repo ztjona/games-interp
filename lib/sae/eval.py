@@ -300,16 +300,40 @@ def match_features_to_bsps(
         )
 
     with torch.no_grad():
-        # Binarize feature activations
-        fires = (h > 0).float()  # (N, d_dict)
-        labels = bsp_labels.float()  # (N, num_bsps)
-        N = float(fires.shape[0])
+        labels = bsp_labels.float()  # (N, num_bsps) -- small
+        N = float(h.shape[0])
+        d_dict, num_bsps = h.shape[1], labels.shape[1]
 
-        # Pairwise counts via matrix multiplication
-        # TP[i,j] = sum over samples where feature i fires AND BSP j is true
-        tp = fires.T @ labels  # (d_dict, num_bsps)
-        fp = fires.T @ (1.0 - labels)  # (d_dict, num_bsps)
-        fn = (1.0 - fires).T @ labels  # (d_dict, num_bsps)
+        # Confusion counts, accumulated over ROW CHUNKS.
+        #
+        # The obvious version materialises `fires = (h > 0).float()` and then
+        # `(1.0 - fires)`, i.e. TWO more tensors the size of h. At champVe's
+        # 289,795 positions an exp64 dictionary (d_dict = 32,768) is 38 GB, so
+        # that peaked at ~114 GB and died with
+        #   "DefaultCPUAllocator: not enough memory: tried to allocate 37984010240"
+        # even on a 256 GB box.
+        #
+        # Only three reductions are actually needed, and fp/fn follow from them
+        # by identity rather than by building complement matrices:
+        #     fp = fires.T @ (1 - labels) = fires_sum[:, None] - tp
+        #     fn = (1 - fires).T @ labels = label_sum[None, :] - tp
+        # so peak extra memory is one chunk (chunk_rows x d_dict), not 2N.
+        #
+        # 2**26 elements per chunk is ~256 MB in float32 and keeps the matmul
+        # large enough to stay BLAS-efficient; clamp to >=1 row for tiny d_dict.
+        chunk_rows = max(1, min(h.shape[0], (2 ** 26) // max(1, d_dict)))
+        tp = torch.zeros(d_dict, num_bsps, dtype=torch.float32)
+        fires_sum = torch.zeros(d_dict, dtype=torch.float32)
+        for start in range(0, h.shape[0], chunk_rows):
+            stop = min(start + chunk_rows, h.shape[0])
+            f = (h[start:stop] > 0).float()          # (chunk, d_dict)
+            tp += f.T @ labels[start:stop]           # (d_dict, num_bsps)
+            fires_sum += f.sum(dim=0)
+            del f
+
+        label_sum = labels.sum(dim=0)                # (num_bsps,)
+        fp = fires_sum.unsqueeze(1) - tp
+        fn = label_sum.unsqueeze(0) - tp
         tn = N - tp - fp - fn
 
         eps = 1e-8
@@ -637,7 +661,10 @@ def compute_board_reconstruction(
     num_bsps = bsp_labels.shape[1]
 
     with torch.no_grad():
-        fires = (h > 0).float()  # (N, d_dict)
+        # NOTE: `fires` is deliberately NOT materialised. Only single columns
+        # are ever read below, so `(h > 0).float()` would allocate a second
+        # tensor the size of h -- 35 GB for an exp64 dictionary at ~290k
+        # positions -- to use one column at a time. Binarise per column instead.
         labels = bsp_labels.float()  # (N, num_bsps)
 
         # For each BSP, find the feature with highest precision above threshold
@@ -675,7 +702,7 @@ def compute_board_reconstruction(
                 continue
 
             feat_idx = int(best_prec_feature[j].item())
-            pred = fires[:, feat_idx]  # (N,)
+            pred = (h[:, feat_idx] > 0).float()  # (N,) -- one column only
             true = labels[:, j]  # (N,)
             correct = (pred == true).float().mean().item()
             per_bsp_accuracy.append(round(correct, 4))

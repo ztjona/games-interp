@@ -831,3 +831,67 @@ class TestSchemaNamingConvention:
 
         dupes = {b: names for b, names in by_basis.items() if len(names) > 1}
         assert not dupes, f"multiple schemas for one basis: {dupes}"
+
+
+class TestMatchingMemoryFootprint:
+    """`match_features_to_bsps` must not allocate copies the size of h.
+
+    Regression guard for the 2026-08-13 OOM: the original computed
+    ``fires = (h > 0).float()`` and then ``(1.0 - fires)``, i.e. two tensors the
+    size of h. At champVe's 289,795 positions an exp64 dictionary
+    (d_dict = 32,768) is 35 GB each, so a run died with
+
+        DefaultCPUAllocator: not enough memory: tried to allocate 37984010240
+
+    on a 256 GB machine. fp and fn are now derived by identity from tp and the
+    row/column sums, and the tp accumulation is chunked.
+    """
+
+    @staticmethod
+    def _naive_counts(h, y):
+        """The pre-2026-08-13 formulation, as the reference."""
+        fires = (h > 0).float()
+        labels = y.float()
+        n = float(fires.shape[0])
+        tp = fires.T @ labels
+        fp = fires.T @ (1.0 - labels)
+        fn = (1.0 - fires).T @ labels
+        return tp, fp, fn, n - tp - fp - fn
+
+    @pytest.mark.parametrize(
+        "n,d,b",
+        [
+            (1000, 64, 7),
+            (997, 301, 13),     # N not a multiple of any natural chunk size
+            (5003, 17, 3),
+            (64, 4096, 5),      # d_dict > N
+            (3000, 8192, 4),    # forces many chunks
+        ],
+    )
+    def test_chunked_counts_match_the_naive_formulation(self, n, d, b):
+        from lib.sae.eval import match_features_to_bsps
+
+        torch.manual_seed(0)
+        h = torch.randn(n, d)
+        y = (torch.rand(n, b) < 0.3).float()
+
+        m = match_features_to_bsps(h, y)
+        tp, fp, fn, _ = self._naive_counts(h, y)
+        eps = 1e-8
+
+        assert torch.allclose(m.precision, tp / (tp + fp + eps), atol=1e-5)
+        assert torch.allclose(m.recall, tp / (tp + fn + eps), atol=1e-5)
+        assert torch.isfinite(m.mcc).all()
+        assert torch.isfinite(m.youden_j).all()
+
+    def test_board_reconstruction_does_not_materialise_fires(self):
+        """It reads one feature column per BSP, so binarising all of h is pure
+        waste -- and was a second full-size allocation in the same call."""
+        import inspect
+
+        from lib.sae.eval import compute_board_reconstruction
+
+        src = inspect.getsource(compute_board_reconstruction)
+        assert "fires = (h > 0).float()" not in src, (
+            "compute_board_reconstruction materialises a full (N, d_dict) copy "
+            "of h to read single columns")

@@ -2131,7 +2131,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:18:46.664517",
+    "timestamp": "2026-08-12T21:18:42.053095",
     "checkpoint": "saes\\quarto\\C01-champTa-s42-topk-k16-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2146,10 +2146,10 @@
     "final_metrics": {
       "l0": 16.0,
       "l0_std": 0.04,
-      "fvu": 0.055242,
-      "mse": 3.814028,
-      "dead_features_pct": 27.0,
-      "median_feat_freq": 0.000366
+      "fvu": 0.066993,
+      "mse": 4.625283,
+      "dead_features_pct": 40.87,
+      "median_feat_freq": 0.000122
     }
   },
   "E02-champTa-s42-topk-k48-exp8-s4.conv2": {
@@ -2157,7 +2157,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:18:53.543214",
+    "timestamp": "2026-08-12T21:18:47.155238",
     "checkpoint": "saes\\quarto\\E02-champTa-s42-topk-k48-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2172,10 +2172,10 @@
     "final_metrics": {
       "l0": 48.0,
       "l0_std": 0.0,
-      "fvu": 0.016968,
-      "mse": 1.171483,
-      "dead_features_pct": 34.64,
-      "median_feat_freq": 0.000183
+      "fvu": 0.020208,
+      "mse": 1.395229,
+      "dead_features_pct": 66.33,
+      "median_feat_freq": 0.0
     }
   },
   "E01-champTa-s42-topk-k32-exp8-s4.conv2": {
@@ -2183,7 +2183,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:19:04.314387",
+    "timestamp": "2026-08-12T21:18:54.069848",
     "checkpoint": "saes\\quarto\\E01-champTa-s42-topk-k32-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2198,10 +2198,10 @@
     "final_metrics": {
       "l0": 32.0,
       "l0_std": 0.0,
-      "fvu": 0.029673,
-      "mse": 2.048641,
-      "dead_features_pct": 20.7,
-      "median_feat_freq": 0.000366
+      "fvu": 0.033937,
+      "mse": 2.343089,
+      "dead_features_pct": 37.94,
+      "median_feat_freq": 0.000122
     }
   },
   "E05-champTa-s42-batchtopk-k32-exp8-s4.conv2": {
@@ -2209,7 +2209,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:32:44.056102",
+    "timestamp": "2026-08-12T21:22:38.781310",
     "checkpoint": "saes\\quarto\\E05-champTa-s42-batchtopk-k32-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2222,10 +2222,10 @@
     "k": 32,
     "final_metrics": {
       "l0": 32.0,
-      "l0_std": 14.81,
-      "fvu": 0.03627,
-      "mse": 2.504168,
-      "dead_features_pct": 94.68,
+      "l0_std": 13.57,
+      "fvu": 0.043855,
+      "mse": 3.027853,
+      "dead_features_pct": 97.53,
       "median_feat_freq": 0.0
     }
   },
@@ -2234,7 +2234,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:37:59.266090",
+    "timestamp": "2026-08-12T21:24:19.997488",
     "checkpoint": "saes\\quarto\\E03-champTa-s42-topk-k64-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2249,9 +2249,9 @@
     "final_metrics": {
       "l0": 64.0,
       "l0_std": 0.0,
-      "fvu": 0.011114,
-      "mse": 0.767346,
-      "dead_features_pct": 57.1,
+      "fvu": 0.012645,
+      "mse": 0.873062,
+      "dead_features_pct": 82.45,
       "median_feat_freq": 0.0
     }
   },
@@ -2260,7 +2260,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:38:25.598059",
+    "timestamp": "2026-08-12T21:25:00.812026",
     "checkpoint": "saes\\quarto\\E04-champTa-s42-topk-k96-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2275,9 +2275,9 @@
     "final_metrics": {
       "l0": 96.0,
       "l0_std": 0.0,
-      "fvu": 0.004957,
-      "mse": 0.342251,
-      "dead_features_pct": 74.66,
+      "fvu": 0.005895,
+      "mse": 0.406975,
+      "dead_features_pct": 90.43,
       "median_feat_freq": 0.0
     }
   },
@@ -2286,7 +2286,7 @@
     "architecture": "jumprelu",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:35:21.734666",
+    "timestamp": "2026-08-12T21:25:45.532584",
     "checkpoint": "saes\\quarto\\E07-champTa-s42-jumprelu-t32-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2299,11 +2299,11 @@
     "theta_init": 0.001,
     "l0_target": 32.0,
     "final_metrics": {
-      "l0": 42.85,
-      "l0_std": 8.78,
-      "fvu": 0.066348,
-      "mse": 4.580773,
-      "dead_features_pct": 83.64,
+      "l0": 43.74,
+      "l0_std": 8.06,
+      "fvu": 0.069174,
+      "mse": 4.775919,
+      "dead_features_pct": 92.41,
       "median_feat_freq": 0.0
     }
   },
@@ -2312,7 +2312,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-19T15:43:38.101544",
+    "timestamp": "2026-08-12T21:26:36.814851",
     "checkpoint": "saes\\quarto\\F00-champTa-s42-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2325,10 +2325,10 @@
     "k": 16,
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 9.35,
-      "fvu": 0.047281,
-      "mse": 8.947153,
-      "dead_features_pct": 98.44,
+      "l0_std": 9.11,
+      "fvu": 0.042144,
+      "mse": 7.975048,
+      "dead_features_pct": 98.41,
       "median_feat_freq": 0.0
     }
   },
@@ -2337,7 +2337,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-19T15:48:42.500389",
+    "timestamp": "2026-08-12T21:28:18.017711",
     "checkpoint": "saes\\quarto\\E06-champTa-s42-batchtopk-k64-exp8-s4.conv2.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2350,10 +2350,10 @@
     "k": 64,
     "final_metrics": {
       "l0": 64.0,
-      "l0_std": 20.94,
-      "fvu": 0.010347,
-      "mse": 0.714406,
-      "dead_features_pct": 89.55,
+      "l0_std": 21.28,
+      "fvu": 0.012041,
+      "mse": 0.831338,
+      "dead_features_pct": 94.38,
       "median_feat_freq": 0.0
     }
   },
@@ -2362,7 +2362,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-19T15:51:20.991939",
+    "timestamp": "2026-08-12T21:30:29.787916",
     "checkpoint": "saes\\quarto\\F03-champTa-s42-batchtopk-k32-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2375,10 +2375,10 @@
     "k": 32,
     "final_metrics": {
       "l0": 32.0,
-      "l0_std": 14.54,
-      "fvu": 0.012971,
-      "mse": 2.454484,
-      "dead_features_pct": 95.31,
+      "l0_std": 14.83,
+      "fvu": 0.015557,
+      "mse": 2.943894,
+      "dead_features_pct": 97.0,
       "median_feat_freq": 0.0
     }
   },
@@ -2387,7 +2387,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-19T15:54:20.038822",
+    "timestamp": "2026-08-12T21:32:06.374071",
     "checkpoint": "saes\\quarto\\F02-champTa-s42-topk-k64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2402,9 +2402,9 @@
     "final_metrics": {
       "l0": 64.0,
       "l0_std": 0.0,
-      "fvu": 0.004046,
-      "mse": 0.765718,
-      "dead_features_pct": 68.48,
+      "fvu": 0.004863,
+      "mse": 0.920289,
+      "dead_features_pct": 86.08,
       "median_feat_freq": 0.0
     }
   },
@@ -2413,7 +2413,7 @@
     "architecture": "topk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-19T16:02:20.384970",
+    "timestamp": "2026-08-12T21:33:57.846535",
     "checkpoint": "saes\\quarto\\F01-champTa-s42-topk-k32-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2428,10 +2428,10 @@
     "final_metrics": {
       "l0": 32.0,
       "l0_std": 0.0,
-      "fvu": 0.010979,
-      "mse": 2.077628,
-      "dead_features_pct": 37.72,
-      "median_feat_freq": 0.000122
+      "fvu": 0.013103,
+      "mse": 2.479518,
+      "dead_features_pct": 63.21,
+      "median_feat_freq": 0.0
     }
   },
   "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1": {
@@ -2439,7 +2439,7 @@
     "architecture": "jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-20T15:52:41.419015",
+    "timestamp": "2026-08-12T21:39:11.178688",
     "checkpoint": "saes\\quarto\\F04-champTa-s42-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2452,11 +2452,11 @@
     "theta_init": 0.001,
     "l0_target": 64.0,
     "final_metrics": {
-      "l0": 65.18,
-      "l0_std": 16.24,
-      "fvu": 0.005401,
-      "mse": 1.022094,
-      "dead_features_pct": 83.13,
+      "l0": 67.76,
+      "l0_std": 15.37,
+      "fvu": 0.005696,
+      "mse": 1.077899,
+      "dead_features_pct": 90.7,
       "median_feat_freq": 0.0
     }
   },
@@ -2618,7 +2618,7 @@
     "architecture": "jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-20T18:26:55.459029",
+    "timestamp": "2026-08-12T21:42:24.612598",
     "checkpoint": "saes\\quarto\\H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
     "expansion": 16,
     "batch_size": 4096,
@@ -2631,11 +2631,11 @@
     "theta_init": 0.001,
     "l0_target": 64.0,
     "final_metrics": {
-      "l0": 65.2,
-      "l0_std": 15.95,
-      "fvu": 0.005396,
-      "mse": 1.02111,
-      "dead_features_pct": 92.66,
+      "l0": 67.62,
+      "l0_std": 17.0,
+      "fvu": 0.005852,
+      "mse": 1.107485,
+      "dead_features_pct": 96.3,
       "median_feat_freq": 0.0
     }
   },
@@ -2644,7 +2644,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-20T18:34:32.202204",
+    "timestamp": "2026-08-12T21:50:44.019812",
     "checkpoint": "saes\\quarto\\H04-champTa-s42-batchtopk-k32-exp16-s4.conv2.pt",
     "expansion": 16,
     "batch_size": 4096,
@@ -2657,10 +2657,10 @@
     "k": 32,
     "final_metrics": {
       "l0": 32.0,
-      "l0_std": 14.73,
-      "fvu": 0.036125,
-      "mse": 2.494104,
-      "dead_features_pct": 96.56,
+      "l0_std": 13.49,
+      "fvu": 0.043335,
+      "mse": 2.991953,
+      "dead_features_pct": 98.69,
       "median_feat_freq": 0.0
     }
   },
@@ -2669,7 +2669,7 @@
     "architecture": "jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-20T18:36:59.070696",
+    "timestamp": "2026-08-12T21:49:04.780436",
     "checkpoint": "saes\\quarto\\H02-champTa-s42-jumprelu-t64-exp32-s4.fc1.pt",
     "expansion": 32,
     "batch_size": 4096,
@@ -2682,11 +2682,11 @@
     "theta_init": 0.001,
     "l0_target": 64.0,
     "final_metrics": {
-      "l0": 65.07,
-      "l0_std": 17.37,
-      "fvu": 0.005497,
-      "mse": 1.040255,
-      "dead_features_pct": 97.09,
+      "l0": 67.49,
+      "l0_std": 17.2,
+      "fvu": 0.006083,
+      "mse": 1.151019,
+      "dead_features_pct": 98.57,
       "median_feat_freq": 0.0
     }
   },
@@ -2695,7 +2695,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-20T18:52:10.828898",
+    "timestamp": "2026-08-12T22:02:52.440417",
     "checkpoint": "saes\\quarto\\H05-champTa-s42-batchtopk-k32-exp32-s4.conv2.pt",
     "expansion": 32,
     "batch_size": 4096,
@@ -2708,10 +2708,10 @@
     "k": 32,
     "final_metrics": {
       "l0": 32.0,
-      "l0_std": 14.13,
-      "fvu": 0.038003,
-      "mse": 2.623769,
-      "dead_features_pct": 97.79,
+      "l0_std": 12.95,
+      "fvu": 0.047903,
+      "mse": 3.307316,
+      "dead_features_pct": 99.49,
       "median_feat_freq": 0.0
     }
   },
@@ -2720,7 +2720,7 @@
     "architecture": "jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-20T18:56:57.943495",
+    "timestamp": "2026-08-12T22:16:21.194265",
     "checkpoint": "saes\\quarto\\H03-champTa-s42-jumprelu-t64-exp64-s4.fc1.pt",
     "expansion": 64,
     "batch_size": 4096,
@@ -2733,11 +2733,11 @@
     "theta_init": 0.001,
     "l0_target": 64.0,
     "final_metrics": {
-      "l0": 64.87,
-      "l0_std": 18.38,
-      "fvu": 0.005394,
-      "mse": 1.020777,
-      "dead_features_pct": 98.76,
+      "l0": 67.43,
+      "l0_std": 17.6,
+      "fvu": 0.007029,
+      "mse": 1.330097,
+      "dead_features_pct": 99.45,
       "median_feat_freq": 0.0
     }
   },
@@ -2746,7 +2746,7 @@
     "architecture": "batchtopk",
     "game": "quarto",
     "hook": "s4.conv2",
-    "timestamp": "2026-05-20T19:26:04.244490",
+    "timestamp": "2026-08-12T22:45:30.731489",
     "checkpoint": "saes\\quarto\\H06-champTa-s42-batchtopk-k32-exp64-s4.conv2.pt",
     "expansion": 64,
     "batch_size": 4096,
@@ -2759,10 +2759,10 @@
     "k": 32,
     "final_metrics": {
       "l0": 32.0,
-      "l0_std": 14.29,
-      "fvu": 0.037051,
-      "mse": 2.558075,
-      "dead_features_pct": 98.07,
+      "l0_std": 13.48,
+      "fvu": 0.046044,
+      "mse": 3.17898,
+      "dead_features_pct": 99.74,
       "median_feat_freq": 0.0
     }
   },
@@ -2771,7 +2771,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:07:03.617389",
+    "timestamp": "2026-08-12T21:57:39.411690",
     "checkpoint": "saes\\quarto\\I01-champTa-lh003-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -2898,11 +2898,11 @@
       0.01
     ],
     "final_metrics": {
-      "l0": 65.28,
-      "l0_std": 15.92,
-      "fvu": 0.005549,
-      "mse": 1.049978,
-      "dead_features_pct": 82.96,
+      "l0": 67.73,
+      "l0_std": 15.31,
+      "fvu": 0.005987,
+      "mse": 1.133034,
+      "dead_features_pct": 90.82,
       "median_feat_freq": 0.0
     }
   },
@@ -2911,7 +2911,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:14:06.927946",
+    "timestamp": "2026-08-12T22:09:21.950558",
     "checkpoint": "saes\\quarto\\I01-champTa-lh003-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3038,11 +3038,11 @@
       0.01
     ],
     "final_metrics": {
-      "l0": 64.87,
-      "l0_std": 15.51,
-      "fvu": 0.005634,
-      "mse": 1.066118,
-      "dead_features_pct": 83.03,
+      "l0": 67.77,
+      "l0_std": 15.6,
+      "fvu": 0.005874,
+      "mse": 1.111499,
+      "dead_features_pct": 90.99,
       "median_feat_freq": 0.0
     }
   },
@@ -3051,7 +3051,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:21:10.658227",
+    "timestamp": "2026-08-12T22:51:59.349457",
     "checkpoint": "saes\\quarto\\I01-champTa-lh003-s44-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3178,11 +3178,11 @@
       0.01
     ],
     "final_metrics": {
-      "l0": 65.16,
-      "l0_std": 16.3,
-      "fvu": 0.005498,
-      "mse": 1.040336,
-      "dead_features_pct": 83.18,
+      "l0": 67.89,
+      "l0_std": 16.16,
+      "fvu": 0.00573,
+      "mse": 1.084273,
+      "dead_features_pct": 90.11,
       "median_feat_freq": 0.0
     }
   },
@@ -3191,7 +3191,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:28:14.210481",
+    "timestamp": "2026-08-12T22:04:41.660352",
     "checkpoint": "saes\\quarto\\I02-champTa-lh010-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3318,11 +3318,11 @@
       0.0333
     ],
     "final_metrics": {
-      "l0": 65.29,
-      "l0_std": 15.47,
-      "fvu": 0.005899,
-      "mse": 1.116272,
-      "dead_features_pct": 83.45,
+      "l0": 67.84,
+      "l0_std": 16.99,
+      "fvu": 0.005759,
+      "mse": 1.089712,
+      "dead_features_pct": 90.48,
       "median_feat_freq": 0.0
     }
   },
@@ -3331,7 +3331,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:35:17.408389",
+    "timestamp": "2026-08-12T22:15:51.479815",
     "checkpoint": "saes\\quarto\\I02-champTa-lh010-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3458,11 +3458,11 @@
       0.0333
     ],
     "final_metrics": {
-      "l0": 64.98,
-      "l0_std": 15.33,
-      "fvu": 0.005905,
-      "mse": 1.117364,
-      "dead_features_pct": 82.62,
+      "l0": 67.78,
+      "l0_std": 16.18,
+      "fvu": 0.006071,
+      "mse": 1.1488,
+      "dead_features_pct": 90.65,
       "median_feat_freq": 0.0
     }
   },
@@ -3471,7 +3471,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:42:21.463187",
+    "timestamp": "2026-08-12T22:58:27.534856",
     "checkpoint": "saes\\quarto\\I02-champTa-lh010-s44-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3598,11 +3598,11 @@
       0.0333
     ],
     "final_metrics": {
-      "l0": 64.9,
-      "l0_std": 17.03,
-      "fvu": 0.005649,
-      "mse": 1.068932,
-      "dead_features_pct": 82.64,
+      "l0": 67.79,
+      "l0_std": 18.0,
+      "fvu": 0.005653,
+      "mse": 1.06983,
+      "dead_features_pct": 90.36,
       "median_feat_freq": 0.0
     }
   },
@@ -3611,7 +3611,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:49:24.335454",
+    "timestamp": "2026-08-12T22:11:45.420593",
     "checkpoint": "saes\\quarto\\I03-champTa-lh030-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3738,11 +3738,11 @@
       0.1
     ],
     "final_metrics": {
-      "l0": 65.81,
-      "l0_std": 17.52,
-      "fvu": 0.006409,
-      "mse": 1.212795,
-      "dead_features_pct": 83.74,
+      "l0": 68.17,
+      "l0_std": 18.46,
+      "fvu": 0.006568,
+      "mse": 1.242931,
+      "dead_features_pct": 90.99,
       "median_feat_freq": 0.0
     }
   },
@@ -3751,7 +3751,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T10:56:27.469923",
+    "timestamp": "2026-08-12T22:22:21.293175",
     "checkpoint": "saes\\quarto\\I03-champTa-lh030-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -3878,11 +3878,11 @@
       0.1
     ],
     "final_metrics": {
-      "l0": 65.18,
-      "l0_std": 15.54,
-      "fvu": 0.006345,
-      "mse": 1.200675,
-      "dead_features_pct": 83.47,
+      "l0": 68.5,
+      "l0_std": 18.44,
+      "fvu": 0.006367,
+      "mse": 1.204903,
+      "dead_features_pct": 91.19,
       "median_feat_freq": 0.0
     }
   },
@@ -3891,7 +3891,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:03:31.397881",
+    "timestamp": "2026-08-12T23:04:55.264391",
     "checkpoint": "saes\\quarto\\I03-champTa-lh030-s44-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4018,11 +4018,11 @@
       0.1
     ],
     "final_metrics": {
-      "l0": 65.42,
-      "l0_std": 16.04,
-      "fvu": 0.00626,
-      "mse": 1.184513,
-      "dead_features_pct": 83.57,
+      "l0": 68.33,
+      "l0_std": 17.45,
+      "fvu": 0.006641,
+      "mse": 1.256783,
+      "dead_features_pct": 90.04,
       "median_feat_freq": 0.0
     }
   },
@@ -4031,7 +4031,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:10:37.949716",
+    "timestamp": "2026-08-12T22:18:45.254752",
     "checkpoint": "saes\\quarto\\I04-champTa-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4158,11 +4158,11 @@
       0.333
     ],
     "final_metrics": {
-      "l0": 65.59,
-      "l0_std": 17.11,
-      "fvu": 0.006305,
-      "mse": 1.193051,
-      "dead_features_pct": 81.69,
+      "l0": 67.8,
+      "l0_std": 17.27,
+      "fvu": 0.006966,
+      "mse": 1.318227,
+      "dead_features_pct": 90.67,
       "median_feat_freq": 0.0
     }
   },
@@ -4171,7 +4171,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:24:48.627027",
+    "timestamp": "2026-08-12T23:11:39.785695",
     "checkpoint": "saes\\quarto\\I04-champTa-lh100-s44-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4298,11 +4298,11 @@
       0.333
     ],
     "final_metrics": {
-      "l0": 65.38,
-      "l0_std": 16.93,
-      "fvu": 0.006452,
-      "mse": 1.22089,
-      "dead_features_pct": 84.01,
+      "l0": 68.14,
+      "l0_std": 17.81,
+      "fvu": 0.006724,
+      "mse": 1.272355,
+      "dead_features_pct": 90.36,
       "median_feat_freq": 0.0
     }
   },
@@ -4311,7 +4311,7 @@
     "architecture": "anchored-jumprelu",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:17:45.345009",
+    "timestamp": "2026-08-12T22:28:49.715480",
     "checkpoint": "saes\\quarto\\I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4438,11 +4438,11 @@
       0.333
     ],
     "final_metrics": {
-      "l0": 64.93,
-      "l0_std": 18.2,
-      "fvu": 0.006571,
-      "mse": 1.243444,
-      "dead_features_pct": 83.74,
+      "l0": 67.96,
+      "l0_std": 17.64,
+      "fvu": 0.006778,
+      "mse": 1.282531,
+      "dead_features_pct": 89.82,
       "median_feat_freq": 0.0
     }
   },
@@ -4451,7 +4451,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:30:43.296293",
+    "timestamp": "2026-08-12T22:24:41.277338",
     "checkpoint": "saes\\quarto\\J01-champTa-lh003-s42-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4578,10 +4578,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.91,
-      "fvu": 0.04248,
-      "mse": 8.03866,
-      "dead_features_pct": 96.53,
+      "l0_std": 8.34,
+      "fvu": 0.042759,
+      "mse": 8.091385,
+      "dead_features_pct": 98.22,
       "median_feat_freq": 0.0
     }
   },
@@ -4590,7 +4590,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:42:26.991145",
+    "timestamp": "2026-08-12T23:16:55.158443",
     "checkpoint": "saes\\quarto\\J01-champTa-lh003-s44-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4717,10 +4717,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.66,
-      "fvu": 0.043353,
-      "mse": 8.203781,
-      "dead_features_pct": 97.19,
+      "l0_std": 9.81,
+      "fvu": 0.040098,
+      "mse": 7.58797,
+      "dead_features_pct": 98.12,
       "median_feat_freq": 0.0
     }
   },
@@ -4729,7 +4729,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:36:34.937499",
+    "timestamp": "2026-08-12T22:34:14.336285",
     "checkpoint": "saes\\quarto\\J01-champTa-lh003-s43-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4856,10 +4856,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 9.5,
-      "fvu": 0.040014,
-      "mse": 7.57207,
-      "dead_features_pct": 97.78,
+      "l0_std": 9.01,
+      "fvu": 0.040218,
+      "mse": 7.610642,
+      "dead_features_pct": 97.97,
       "median_feat_freq": 0.0
     }
   },
@@ -4868,7 +4868,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:48:19.008639",
+    "timestamp": "2026-08-12T22:30:31.182910",
     "checkpoint": "saes\\quarto\\J02-champTa-lh010-s42-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -4995,10 +4995,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.88,
-      "fvu": 0.043872,
-      "mse": 8.301973,
-      "dead_features_pct": 97.12,
+      "l0_std": 7.89,
+      "fvu": 0.047949,
+      "mse": 9.073577,
+      "dead_features_pct": 98.36,
       "median_feat_freq": 0.0
     }
   },
@@ -5007,7 +5007,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:00:12.572652",
+    "timestamp": "2026-08-12T23:22:11.821711",
     "checkpoint": "saes\\quarto\\J02-champTa-lh010-s44-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5134,10 +5134,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 8.54,
-      "fvu": 0.043074,
-      "mse": 8.151091,
-      "dead_features_pct": 96.95,
+      "l0_std": 7.95,
+      "fvu": 0.046701,
+      "mse": 8.837415,
+      "dead_features_pct": 98.29,
       "median_feat_freq": 0.0
     }
   },
@@ -5146,7 +5146,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T11:54:14.153655",
+    "timestamp": "2026-08-12T22:39:29.607824",
     "checkpoint": "saes\\quarto\\J02-champTa-lh010-s43-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5273,10 +5273,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.19,
-      "fvu": 0.04364,
-      "mse": 8.258079,
-      "dead_features_pct": 97.78,
+      "l0_std": 7.45,
+      "fvu": 0.047953,
+      "mse": 9.0743,
+      "dead_features_pct": 98.39,
       "median_feat_freq": 0.0
     }
   },
@@ -5285,7 +5285,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:06:07.938793",
+    "timestamp": "2026-08-12T22:36:25.071003",
     "checkpoint": "saes\\quarto\\J03-champTa-lh030-s42-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5412,10 +5412,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.6,
-      "fvu": 0.039648,
-      "mse": 7.502741,
-      "dead_features_pct": 96.88,
+      "l0_std": 7.76,
+      "fvu": 0.050753,
+      "mse": 9.604126,
+      "dead_features_pct": 98.36,
       "median_feat_freq": 0.0
     }
   },
@@ -5424,7 +5424,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:18:00.057265",
+    "timestamp": "2026-08-12T23:27:22.476504",
     "checkpoint": "saes\\quarto\\J03-champTa-lh030-s44-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5551,10 +5551,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.38,
-      "fvu": 0.045941,
-      "mse": 8.693584,
-      "dead_features_pct": 97.85,
+      "l0_std": 7.59,
+      "fvu": 0.049448,
+      "mse": 9.357276,
+      "dead_features_pct": 98.32,
       "median_feat_freq": 0.0
     }
   },
@@ -5563,7 +5563,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:12:04.448944",
+    "timestamp": "2026-08-12T22:45:19.932874",
     "checkpoint": "saes\\quarto\\J03-champTa-lh030-s43-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5690,10 +5690,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 6.83,
-      "fvu": 0.047749,
-      "mse": 9.035675,
-      "dead_features_pct": 97.66,
+      "l0_std": 7.9,
+      "fvu": 0.048608,
+      "mse": 9.198318,
+      "dead_features_pct": 98.29,
       "median_feat_freq": 0.0
     }
   },
@@ -5702,7 +5702,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:23:57.483120",
+    "timestamp": "2026-08-12T22:42:10.692580",
     "checkpoint": "saes\\quarto\\J04-champTa-lh100-s42-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5829,10 +5829,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 7.41,
-      "fvu": 0.043175,
-      "mse": 8.170223,
-      "dead_features_pct": 96.63,
+      "l0_std": 7.16,
+      "fvu": 0.052452,
+      "mse": 9.925649,
+      "dead_features_pct": 98.14,
       "median_feat_freq": 0.0
     }
   },
@@ -5841,7 +5841,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:35:05.926866",
+    "timestamp": "2026-08-12T23:32:35.228313",
     "checkpoint": "saes\\quarto\\J04-champTa-lh100-s44-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -5968,10 +5968,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 6.6,
-      "fvu": 0.054665,
-      "mse": 10.344461,
-      "dead_features_pct": 96.73,
+      "l0_std": 6.72,
+      "fvu": 0.050491,
+      "mse": 9.55452,
+      "dead_features_pct": 98.05,
       "median_feat_freq": 0.0
     }
   },
@@ -5980,7 +5980,7 @@
     "architecture": "anchored-batchtopk",
     "game": "quarto",
     "hook": "s4.fc1",
-    "timestamp": "2026-05-23T12:29:36.202763",
+    "timestamp": "2026-08-12T22:50:42.994618",
     "checkpoint": "saes\\quarto\\J04-champTa-lh100-s43-anchored-batchtopk-k16-exp8-s4.fc1.pt",
     "expansion": 8,
     "batch_size": 4096,
@@ -6107,10 +6107,10 @@
     ],
     "final_metrics": {
       "l0": 16.0,
-      "l0_std": 6.06,
-      "fvu": 0.053784,
-      "mse": 10.177662,
-      "dead_features_pct": 97.95,
+      "l0_std": 6.74,
+      "fvu": 0.051996,
+      "mse": 9.839331,
+      "dead_features_pct": 98.07,
       "median_feat_freq": 0.0
     }
   },
@@ -13781,6 +13781,159 @@
       "fvu": 0.094837,
       "mse": 13.131769,
       "dead_features_pct": 97.49,
+      "median_feat_freq": 0.0
+    }
+  },
+  "R1-champTarandom-s42-jumprelu-t64-exp8-s4.fc1": {
+    "experiment": "R1-champTarandom-s42",
+    "architecture": "jumprelu",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "timestamp": "2026-08-13T14:48:47.394265",
+    "checkpoint": "saes\\quarto\\R1-champTarandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.001,
+    "theta_init": 0.001,
+    "l0_target": 64.0,
+    "final_metrics": {
+      "l0": 64.0,
+      "l0_std": 0.07,
+      "fvu": 0.184391,
+      "mse": 0.004343,
+      "dead_features_pct": 98.44,
+      "median_feat_freq": 0.0
+    }
+  },
+  "R1-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1": {
+    "experiment": "R1-champYbrandom-s42",
+    "architecture": "jumprelu",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "timestamp": "2026-08-13T14:48:50.630739",
+    "checkpoint": "saes\\quarto\\R1-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.001,
+    "theta_init": 0.001,
+    "l0_target": 64.0,
+    "final_metrics": {
+      "l0": 63.99,
+      "l0_std": 0.08,
+      "fvu": 0.196432,
+      "mse": 0.007323,
+      "dead_features_pct": 98.44,
+      "median_feat_freq": 0.0
+    }
+  },
+  "R1-champVerandom-s42-jumprelu-t64-exp8-s4.fc1": {
+    "experiment": "R1-champVerandom-s42",
+    "architecture": "jumprelu",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "timestamp": "2026-08-13T14:48:57.156921",
+    "checkpoint": "saes\\quarto\\R1-champVerandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.001,
+    "theta_init": 0.001,
+    "l0_target": 64.0,
+    "final_metrics": {
+      "l0": 63.99,
+      "l0_std": 0.08,
+      "fvu": 0.184542,
+      "mse": 0.004346,
+      "dead_features_pct": 98.44,
+      "median_feat_freq": 0.0
+    }
+  },
+  "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2": {
+    "experiment": "R2-champTarandom-s42",
+    "architecture": "batchtopk",
+    "game": "quarto",
+    "hook": "s4.conv2",
+    "timestamp": "2026-08-13T14:52:46.143079",
+    "checkpoint": "saes\\quarto\\R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.01,
+    "k": 32,
+    "final_metrics": {
+      "l0": 32.0,
+      "l0_std": 9.5,
+      "fvu": 0.174261,
+      "mse": 0.026992,
+      "dead_features_pct": 97.24,
+      "median_feat_freq": 0.0
+    }
+  },
+  "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2": {
+    "experiment": "R2-champYbrandom-s42",
+    "architecture": "batchtopk",
+    "game": "quarto",
+    "hook": "s4.conv2",
+    "timestamp": "2026-08-13T14:52:54.225962",
+    "checkpoint": "saes\\quarto\\R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.01,
+    "k": 32,
+    "final_metrics": {
+      "l0": 32.0,
+      "l0_std": 13.27,
+      "fvu": 0.203933,
+      "mse": 0.058929,
+      "dead_features_pct": 97.07,
+      "median_feat_freq": 0.0
+    }
+  },
+  "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2": {
+    "experiment": "R2-champVerandom-s42",
+    "architecture": "batchtopk",
+    "game": "quarto",
+    "hook": "s4.conv2",
+    "timestamp": "2026-08-13T14:53:11.982512",
+    "checkpoint": "saes\\quarto\\R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2.pt",
+    "expansion": 8,
+    "batch_size": 4096,
+    "num_batches": 25000,
+    "lr": 0.0003,
+    "seed": 42,
+    "log_every": 500,
+    "patience": 0,
+    "min_improvement": 0.01,
+    "k": 32,
+    "final_metrics": {
+      "l0": 32.0,
+      "l0_std": 9.45,
+      "fvu": 0.170009,
+      "mse": 0.026334,
+      "dead_features_pct": 97.14,
       "median_feat_freq": 0.0
     }
   }
