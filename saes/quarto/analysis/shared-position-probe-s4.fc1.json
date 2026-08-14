@@ -1,0 +1,624 @@
+{
+  "champs": [
+    "Ta",
+    "Ve",
+    "Yb"
+  ],
+  "hook": "s4.fc1",
+  "label_agreement": {
+    "gorilla": true,
+    "hawk": true,
+    "tiger": true
+  },
+  "min_spread": 0.05,
+  "n_cells": 15,
+  "n_shared": 88970,
+  "per_basis": {
+    "gorilla": {
+      "Ta": {
+        "coverage_mcc": 0.3342,
+        "coverage_mcc_at_pref": 0.2647,
+        "coverage_youden_j": 0.4653,
+        "mean_base_rate": 0.1345,
+        "per_family": {
+          "board_attribute": {
+            "categories": [
+              "cell_attribute"
+            ],
+            "count": 64,
+            "mean_base_rate": 0.1827,
+            "mean_f1": 0.5097,
+            "mean_mcc": 0.4373,
+            "mean_mcc_at_pref": 0.2432,
+            "mean_youden_j": 0.3843
+          },
+          "board_occupancy": {
+            "categories": [
+              "cell_occupancy"
+            ],
+            "count": 16,
+            "mean_base_rate": 0.3653,
+            "mean_f1": 0.5753,
+            "mean_mcc": 0.4184,
+            "mean_mcc_at_pref": 0.27,
+            "mean_youden_j": 0.3177
+          },
+          "game_phase": {
+            "categories": [
+              "game_phase"
+            ],
+            "count": 3,
+            "mean_base_rate": 0.3333,
+            "mean_f1": 0.6034,
+            "mean_mcc": 0.3739,
+            "mean_mcc_at_pref": 0.1903,
+            "mean_youden_j": 0.3523
+          },
+          "global_threat": {
+            "categories": [
+              "global"
+            ],
+            "count": 1,
+            "mean_base_rate": 0.4074,
+            "mean_f1": 0.6816,
+            "mean_mcc": 0.4077,
+            "mean_mcc_at_pref": 0.1868,
+            "mean_youden_j": 0.3922
+          },
+          "line_threat": {
+            "categories": [
+              "threat_line"
+            ],
+            "count": 40,
+            "mean_base_rate": 0.0153,
+            "mean_f1": 0.1582,
+            "mean_mcc": 0.1976,
+            "mean_mcc_at_pref": 0.2456,
+            "mean_youden_j": 0.5284
+          },
+          "offered_piece_attr": {
+            "categories": [
+              "offered_piece"
+            ],
+            "count": 4,
+            "mean_base_rate": 0.4996,
+            "mean_f1": 0.6664,
+            "mean_mcc": 0.1685,
+            "mean_mcc_at_pref": 0.0744,
+            "mean_youden_j": 0.1135
+          },
+          "square_threat": {
+            "categories": [
+              "threat_square_2x2"
+            ],
+            "count": 36,
+            "mean_base_rate": 0.014,
+            "mean_f1": 0.2382,
+            "mean_mcc": 0.2783,
+            "mean_mcc_at_pref": 0.3514,
+            "mean_youden_j": 0.6552
+          }
+        }
+      },
+      "Ve": {
+        "coverage_mcc": 0.3659,
+        "coverage_mcc_at_pref": 0.3069,
+        "coverage_youden_j": 0.5546,
+        "mean_base_rate": 0.1345,
+        "per_family": {
+          "board_attribute": {
+            "categories": [
+              "cell_attribute"
+            ],
+            "count": 64,
+            "mean_base_rate": 0.1827,
+            "mean_f1": 0.4841,
+            "mean_mcc": 0.4082,
+            "mean_mcc_at_pref": 0.2296,
+            "mean_youden_j": 0.3871
+          },
+          "board_occupancy": {
+            "categories": [
+              "cell_occupancy"
+            ],
+            "count": 16,
+            "mean_base_rate": 0.3653,
+            "mean_f1": 0.6538,
+            "mean_mcc": 0.4407,
+            "mean_mcc_at_pref": 0.2607,
+            "mean_youden_j": 0.4191
+          },
+          "game_phase": {
+            "categories": [
+              "game_phase"
+            ],
+            "count": 3,
+            "mean_base_rate": 0.3333,
+            "mean_f1": 0.6013,
+            "mean_mcc": 0.3863,
+            "mean_mcc_at_pref": 0.221,
+            "mean_youden_j": 0.4228
+          },
+          "global_threat": {
+            "categories": [
+              "global"
+            ],
+            "count": 1,
+            "mean_base_rate": 0.4074,
+            "mean_f1": 0.6569,
+            "mean_mcc": 0.4515,
+            "mean_mcc_at_pref": 0.1969,
+            "mean_youden_j": 0.439
+          },
+          "line_threat": {
+            "categories": [
+              "threat_line"
+            ],
+            "count": 40,
+            "mean_base_rate": 0.0153,
+            "mean_f1": 0.2154,
+            "mean_mcc": 0.2766,
+            "mean_mcc_at_pref": 0.34,
+            "mean_youden_j": 0.6848
+          },
+          "offered_piece_attr": {
+            "categories": [
+              "offered_piece"
+            ],
+            "count": 4,
+            "mean_base_rate": 0.4996,
+            "mean_f1": 0.6664,
+            "mean_mcc": 0.1916,
+            "mean_mcc_at_pref": 0.0832,
+            "mean_youden_j": 0.1496
+          },
+          "square_threat": {
+            "categories": [
+              "threat_square_2x2"
+            ],
+            "count": 36,
+            "mean_base_rate": 0.014,
+            "mean_f1": 0.3009,
+            "mean_mcc": 0.372,
+            "mean_mcc_at_pref": 0.4632,
+            "mean_youden_j": 0.8272
+          }
+        }
+      },
+      "Yb": {
+        "coverage_mcc": 0.454,
+        "coverage_mcc_at_pref": 0.4154,
+        "coverage_youden_j": 0.5656,
+        "mean_base_rate": 0.1345,
+        "per_family": {
+          "board_attribute": {
+            "categories": [
+              "cell_attribute"
+            ],
+            "count": 64,
+            "mean_base_rate": 0.1827,
+            "mean_f1": 0.4011,
+            "mean_mcc": 0.3308,
+            "mean_mcc_at_pref": 0.1949,
+            "mean_youden_j": 0.2775
+          },
+          "board_occupancy": {
+            "categories": [
+              "cell_occupancy"
+            ],
+            "count": 16,
+            "mean_base_rate": 0.3653,
+            "mean_f1": 0.5976,
+            "mean_mcc": 0.3257,
+            "mean_mcc_at_pref": 0.1723,
+            "mean_youden_j": 0.2887
+          },
+          "game_phase": {
+            "categories": [
+              "game_phase"
+            ],
+            "count": 3,
+            "mean_base_rate": 0.3333,
+            "mean_f1": 0.54,
+            "mean_mcc": 0.2313,
+            "mean_mcc_at_pref": 0.1053,
+            "mean_youden_j": 0.3044
+          },
+          "global_threat": {
+            "categories": [
+              "global"
+            ],
+            "count": 1,
+            "mean_base_rate": 0.4074,
+            "mean_f1": 0.6954,
+            "mean_mcc": 0.4454,
+            "mean_mcc_at_pref": 0.1725,
+            "mean_youden_j": 0.414
+          },
+          "line_threat": {
+            "categories": [
+              "threat_line"
+            ],
+            "count": 40,
+            "mean_base_rate": 0.0153,
+            "mean_f1": 0.4109,
+            "mean_mcc": 0.4661,
+            "mean_mcc_at_pref": 0.5448,
+            "mean_youden_j": 0.8358
+          },
+          "offered_piece_attr": {
+            "categories": [
+              "offered_piece"
+            ],
+            "count": 4,
+            "mean_base_rate": 0.4996,
+            "mean_f1": 0.6664,
+            "mean_mcc": 0.2079,
+            "mean_mcc_at_pref": 0.1015,
+            "mean_youden_j": 0.1435
+          },
+          "square_threat": {
+            "categories": [
+              "threat_square_2x2"
+            ],
+            "count": 36,
+            "mean_base_rate": 0.014,
+            "mean_f1": 0.7415,
+            "mean_mcc": 0.7628,
+            "mean_mcc_at_pref": 0.8393,
+            "mean_youden_j": 0.9737
+          }
+        }
+      }
+    },
+    "hawk": {
+      "Ta": {
+        "coverage_mcc": 0.2566,
+        "coverage_mcc_at_pref": 0.3301,
+        "coverage_youden_j": 0.6413,
+        "mean_base_rate": 0.0224,
+        "per_family": {
+          "global_threat": {
+            "categories": [
+              "reframed_global"
+            ],
+            "count": 2,
+            "mean_base_rate": 0.3482,
+            "mean_f1": 0.6007,
+            "mean_mcc": 0.3577,
+            "mean_mcc_at_pref": 0.1737,
+            "mean_youden_j": 0.3521
+          },
+          "line_threat": {
+            "categories": [
+              "reframed_any_threat",
+              "reframed_completable",
+              "reframed_count"
+            ],
+            "count": 90,
+            "mean_base_rate": 0.0194,
+            "mean_f1": 0.184,
+            "mean_mcc": 0.2159,
+            "mean_mcc_at_pref": 0.2774,
+            "mean_youden_j": 0.5783
+          },
+          "square_threat": {
+            "categories": [
+              "reframed_sq_any_threat",
+              "reframed_sq_completable",
+              "reframed_sq_count"
+            ],
+            "count": 81,
+            "mean_base_rate": 0.0177,
+            "mean_f1": 0.2546,
+            "mean_mcc": 0.2994,
+            "mean_mcc_at_pref": 0.3926,
+            "mean_youden_j": 0.7183
+          }
+        }
+      },
+      "Ve": {
+        "coverage_mcc": 0.3148,
+        "coverage_mcc_at_pref": 0.4023,
+        "coverage_youden_j": 0.7429,
+        "mean_base_rate": 0.0224,
+        "per_family": {
+          "global_threat": {
+            "categories": [
+              "reframed_global"
+            ],
+            "count": 2,
+            "mean_base_rate": 0.3482,
+            "mean_f1": 0.6147,
+            "mean_mcc": 0.3981,
+            "mean_mcc_at_pref": 0.171,
+            "mean_youden_j": 0.407
+          },
+          "line_threat": {
+            "categories": [
+              "reframed_any_threat",
+              "reframed_completable",
+              "reframed_count"
+            ],
+            "count": 90,
+            "mean_base_rate": 0.0194,
+            "mean_f1": 0.2196,
+            "mean_mcc": 0.2703,
+            "mean_mcc_at_pref": 0.3444,
+            "mean_youden_j": 0.6806
+          },
+          "square_threat": {
+            "categories": [
+              "reframed_sq_any_threat",
+              "reframed_sq_completable",
+              "reframed_sq_count"
+            ],
+            "count": 81,
+            "mean_base_rate": 0.0177,
+            "mean_f1": 0.2948,
+            "mean_mcc": 0.362,
+            "mean_mcc_at_pref": 0.4724,
+            "mean_youden_j": 0.8204
+          }
+        }
+      },
+      "Yb": {
+        "coverage_mcc": 0.4788,
+        "coverage_mcc_at_pref": 0.5824,
+        "coverage_youden_j": 0.7692,
+        "mean_base_rate": 0.0224,
+        "per_family": {
+          "global_threat": {
+            "categories": [
+              "reframed_global"
+            ],
+            "count": 2,
+            "mean_base_rate": 0.3482,
+            "mean_f1": 0.6394,
+            "mean_mcc": 0.4375,
+            "mean_mcc_at_pref": 0.1836,
+            "mean_youden_j": 0.4386
+          },
+          "line_threat": {
+            "categories": [
+              "reframed_any_threat",
+              "reframed_completable",
+              "reframed_count"
+            ],
+            "count": 90,
+            "mean_base_rate": 0.0194,
+            "mean_f1": 0.3377,
+            "mean_mcc": 0.3875,
+            "mean_mcc_at_pref": 0.482,
+            "mean_youden_j": 0.7415
+          },
+          "square_threat": {
+            "categories": [
+              "reframed_sq_any_threat",
+              "reframed_sq_completable",
+              "reframed_sq_count"
+            ],
+            "count": 81,
+            "mean_base_rate": 0.0177,
+            "mean_f1": 0.5366,
+            "mean_mcc": 0.5811,
+            "mean_mcc_at_pref": 0.7038,
+            "mean_youden_j": 0.8082
+          }
+        }
+      }
+    },
+    "tiger": {
+      "Ta": {
+        "coverage_mcc": 0.2928,
+        "coverage_mcc_at_pref": 0.1765,
+        "coverage_youden_j": 0.3564,
+        "mean_base_rate": 0.2117,
+        "per_family": {
+          "global_threat": {
+            "categories": [
+              "tiger_decision_global"
+            ],
+            "count": 5,
+            "mean_base_rate": 0.4809,
+            "mean_f1": 0.6922,
+            "mean_mcc": 0.3683,
+            "mean_mcc_at_pref": 0.1567,
+            "mean_youden_j": 0.3366
+          },
+          "line_threat": {
+            "categories": [
+              "tiger_line_winnable"
+            ],
+            "count": 10,
+            "mean_base_rate": 0.045,
+            "mean_f1": 0.2391,
+            "mean_mcc": 0.2108,
+            "mean_mcc_at_pref": 0.1632,
+            "mean_youden_j": 0.3392
+          },
+          "offered_completion": {
+            "categories": [
+              "tiger_offered_completing_attr"
+            ],
+            "count": 4,
+            "mean_base_rate": 0.0794,
+            "mean_f1": 0.3387,
+            "mean_mcc": 0.285,
+            "mean_mcc_at_pref": 0.1847,
+            "mean_youden_j": 0.3213
+          },
+          "pool_reasoning": {
+            "categories": [
+              "tiger_pool_safe_count",
+              "tiger_pool_winning_count"
+            ],
+            "count": 8,
+            "mean_base_rate": 0.5093,
+            "mean_f1": 0.7087,
+            "mean_mcc": 0.3746,
+            "mean_mcc_at_pref": 0.1472,
+            "mean_youden_j": 0.3436
+          },
+          "square_threat": {
+            "categories": [
+              "tiger_square_winnable"
+            ],
+            "count": 9,
+            "mean_base_rate": 0.0417,
+            "mean_f1": 0.303,
+            "mean_mcc": 0.2726,
+            "mean_mcc_at_pref": 0.2244,
+            "mean_youden_j": 0.4137
+          }
+        }
+      },
+      "Ve": {
+        "coverage_mcc": 0.3114,
+        "coverage_mcc_at_pref": 0.1985,
+        "coverage_youden_j": 0.4185,
+        "mean_base_rate": 0.2117,
+        "per_family": {
+          "global_threat": {
+            "categories": [
+              "tiger_decision_global"
+            ],
+            "count": 5,
+            "mean_base_rate": 0.4809,
+            "mean_f1": 0.6956,
+            "mean_mcc": 0.4006,
+            "mean_mcc_at_pref": 0.1891,
+            "mean_youden_j": 0.3902
+          },
+          "line_threat": {
+            "categories": [
+              "tiger_line_winnable"
+            ],
+            "count": 10,
+            "mean_base_rate": 0.045,
+            "mean_f1": 0.2407,
+            "mean_mcc": 0.21,
+            "mean_mcc_at_pref": 0.1632,
+            "mean_youden_j": 0.4055
+          },
+          "offered_completion": {
+            "categories": [
+              "tiger_offered_completing_attr"
+            ],
+            "count": 4,
+            "mean_base_rate": 0.0794,
+            "mean_f1": 0.3569,
+            "mean_mcc": 0.3088,
+            "mean_mcc_at_pref": 0.2032,
+            "mean_youden_j": 0.374
+          },
+          "pool_reasoning": {
+            "categories": [
+              "tiger_pool_safe_count",
+              "tiger_pool_winning_count"
+            ],
+            "count": 8,
+            "mean_base_rate": 0.5093,
+            "mean_f1": 0.7198,
+            "mean_mcc": 0.3797,
+            "mean_mcc_at_pref": 0.179,
+            "mean_youden_j": 0.3717
+          },
+          "square_threat": {
+            "categories": [
+              "tiger_square_winnable"
+            ],
+            "count": 9,
+            "mean_base_rate": 0.0417,
+            "mean_f1": 0.332,
+            "mean_mcc": 0.315,
+            "mean_mcc_at_pref": 0.2581,
+            "mean_youden_j": 0.5099
+          }
+        }
+      },
+      "Yb": {
+        "coverage_mcc": 0.2794,
+        "coverage_mcc_at_pref": 0.1763,
+        "coverage_youden_j": 0.3697,
+        "mean_base_rate": 0.2117,
+        "per_family": {
+          "global_threat": {
+            "categories": [
+              "tiger_decision_global"
+            ],
+            "count": 5,
+            "mean_base_rate": 0.4809,
+            "mean_f1": 0.7078,
+            "mean_mcc": 0.2886,
+            "mean_mcc_at_pref": 0.1199,
+            "mean_youden_j": 0.279
+          },
+          "line_threat": {
+            "categories": [
+              "tiger_line_winnable"
+            ],
+            "count": 10,
+            "mean_base_rate": 0.045,
+            "mean_f1": 0.2355,
+            "mean_mcc": 0.2019,
+            "mean_mcc_at_pref": 0.1588,
+            "mean_youden_j": 0.3509
+          },
+          "offered_completion": {
+            "categories": [
+              "tiger_offered_completing_attr"
+            ],
+            "count": 4,
+            "mean_base_rate": 0.0794,
+            "mean_f1": 0.3442,
+            "mean_mcc": 0.3466,
+            "mean_mcc_at_pref": 0.2097,
+            "mean_youden_j": 0.5829
+          },
+          "pool_reasoning": {
+            "categories": [
+              "tiger_pool_safe_count",
+              "tiger_pool_winning_count"
+            ],
+            "count": 8,
+            "mean_base_rate": 0.5093,
+            "mean_f1": 0.7347,
+            "mean_mcc": 0.3009,
+            "mean_mcc_at_pref": 0.118,
+            "mean_youden_j": 0.2936
+          },
+          "square_threat": {
+            "categories": [
+              "tiger_square_winnable"
+            ],
+            "count": 9,
+            "mean_base_rate": 0.0417,
+            "mean_f1": 0.3092,
+            "mean_mcc": 0.3113,
+            "mean_mcc_at_pref": 0.2642,
+            "mean_youden_j": 0.4139
+          }
+        }
+      }
+    }
+  },
+  "ranking_flips": [],
+  "runs": {
+    "Ta": "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1",
+    "Ve": "F04-champVe-s42-jumprelu-t64-exp8-s4.fc1",
+    "Yb": "F04-champYb-s42-jumprelu-t64-exp8-s4.fc1"
+  },
+  "ties": [
+    {
+      "basis": "tiger",
+      "family": "line_threat",
+      "spread": 0.004400000000000015
+    },
+    {
+      "basis": "tiger",
+      "family": "offered_completion",
+      "spread": 0.024999999999999994
+    }
+  ]
+}
