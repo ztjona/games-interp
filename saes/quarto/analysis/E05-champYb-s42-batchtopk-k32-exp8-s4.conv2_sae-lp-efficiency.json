@@ -1,0 +1,250 @@
+{
+  "bands": {
+    "high": 0.8,
+    "low": 0.2,
+    "moderate": 0.5
+  },
+  "champ": "Yb",
+  "excluded": [],
+  "hook": "s4.conv2",
+  "lp_floor": 0.15,
+  "metric": "mcc_at_pref",
+  "per_basis": {
+    "gorilla": {
+      "families": {
+        "board_attribute": {
+          "band": "negligible",
+          "base_rate": 0.1757,
+          "efficiency": 0.1096,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.9847,
+          "lp_youden_j": 0.995,
+          "n_bsps": 64,
+          "sae_mcc_at_pref": 0.1079,
+          "sae_youden_j": 0.326
+        },
+        "board_occupancy": {
+          "band": "negligible",
+          "base_rate": 0.3435,
+          "efficiency": 0.077,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.9769,
+          "lp_youden_j": 0.9969,
+          "n_bsps": 16,
+          "sae_mcc_at_pref": 0.0752,
+          "sae_youden_j": 0.2332
+        },
+        "game_phase": {
+          "band": "negligible",
+          "base_rate": 0.3333,
+          "efficiency": 0.1096,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.781,
+          "lp_youden_j": 0.9149,
+          "n_bsps": 3,
+          "sae_mcc_at_pref": 0.0856,
+          "sae_youden_j": 0.26
+        },
+        "global_threat": {
+          "band": "low",
+          "base_rate": 0.2336,
+          "efficiency": 0.3826,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.2441,
+          "lp_youden_j": 0.5848,
+          "n_bsps": 1,
+          "sae_mcc_at_pref": 0.0934,
+          "sae_youden_j": 0.2894
+        },
+        "line_threat": {
+          "band": "negligible",
+          "base_rate": 0.0097,
+          "efficiency": 0.1275,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.958,
+          "lp_youden_j": 0.9669,
+          "n_bsps": 40,
+          "sae_mcc_at_pref": 0.1221,
+          "sae_youden_j": 0.3836
+        },
+        "offered_piece_attr": {
+          "band": "negligible",
+          "base_rate": 0.5037,
+          "efficiency": 0.0113,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.9821,
+          "lp_youden_j": 0.9971,
+          "n_bsps": 4,
+          "sae_mcc_at_pref": 0.0111,
+          "sae_youden_j": 0.0267
+        },
+        "square_threat": {
+          "band": "negligible",
+          "base_rate": 0.0091,
+          "efficiency": 0.122,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.946,
+          "lp_youden_j": 0.9374,
+          "n_bsps": 36,
+          "sae_mcc_at_pref": 0.1154,
+          "sae_youden_j": 0.3632
+        }
+      },
+      "lp_report": "data\\quarto\\linear_probe_gorilla_164_s4.conv2_amalgam_yb_activations_results.json",
+      "registry_key": "E05-champYb-s42-batchtopk-k32-exp8-s4.conv2:gorillaYb"
+    },
+    "hawk": {
+      "families": {
+        "global_threat": {
+          "band": "low",
+          "base_rate": 0.2509,
+          "efficiency": 0.3432,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.2573,
+          "lp_youden_j": 0.574,
+          "n_bsps": 2,
+          "sae_mcc_at_pref": 0.0883,
+          "sae_youden_j": 0.2758
+        },
+        "line_threat": {
+          "band": "negligible",
+          "base_rate": 0.0138,
+          "efficiency": 0.1345,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.8971,
+          "lp_youden_j": 0.9396,
+          "n_bsps": 90,
+          "sae_mcc_at_pref": 0.1207,
+          "sae_youden_j": 0.381
+        },
+        "square_threat": {
+          "band": "negligible",
+          "base_rate": 0.0127,
+          "efficiency": 0.1296,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.8865,
+          "lp_youden_j": 0.9175,
+          "n_bsps": 81,
+          "sae_mcc_at_pref": 0.1149,
+          "sae_youden_j": 0.3626
+        }
+      },
+      "lp_report": "data\\quarto\\linear_probe_hawk_173_s4.conv2_amalgam_yb_activations_results.json",
+      "registry_key": "E05-champYb-s42-batchtopk-k32-exp8-s4.conv2:hawkYb"
+    },
+    "tiger": {
+      "families": {
+        "global_threat": {
+          "band": "low",
+          "base_rate": 0.4465,
+          "efficiency": 0.2437,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.272,
+          "lp_youden_j": 0.6428,
+          "n_bsps": 5,
+          "sae_mcc_at_pref": 0.0663,
+          "sae_youden_j": 0.1906
+        },
+        "line_threat": {
+          "band": "low",
+          "base_rate": 0.023,
+          "efficiency": 0.2601,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.3368,
+          "lp_youden_j": 0.6372,
+          "n_bsps": 10,
+          "sae_mcc_at_pref": 0.0876,
+          "sae_youden_j": 0.2779
+        },
+        "offered_completion": {
+          "band": "low",
+          "base_rate": 0.0446,
+          "efficiency": 0.201,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.398,
+          "lp_youden_j": 0.5943,
+          "n_bsps": 4,
+          "sae_mcc_at_pref": 0.08,
+          "sae_youden_j": 0.2534
+        },
+        "pool_reasoning": {
+          "band": "low",
+          "base_rate": 0.4916,
+          "efficiency": 0.2539,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.2655,
+          "lp_youden_j": 0.6439,
+          "n_bsps": 8,
+          "sae_mcc_at_pref": 0.0674,
+          "sae_youden_j": 0.1938
+        },
+        "square_threat": {
+          "band": "low",
+          "base_rate": 0.0215,
+          "efficiency": 0.2674,
+          "lp_below_floor": false,
+          "lp_mcc_at_pref": 0.3384,
+          "lp_youden_j": 0.6143,
+          "n_bsps": 9,
+          "sae_mcc_at_pref": 0.0905,
+          "sae_youden_j": 0.2879
+        }
+      },
+      "lp_report": "data\\quarto\\linear_probe_tiger_36_s4.conv2_amalgam_yb_activations_results.json",
+      "registry_key": "E05-champYb-s42-batchtopk-k32-exp8-s4.conv2:tigerYb"
+    }
+  },
+  "run_id": "E05-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+  "triads": {
+    "global_threat": {
+      "gorilla": "global",
+      "hawk": "reframed_global",
+      "tiger": "tiger_decision_global"
+    },
+    "line_threat": {
+      "gorilla": "threat_line",
+      "hawk": "reframed_completable",
+      "tiger": "tiger_line_winnable"
+    },
+    "square_threat": {
+      "gorilla": "threat_square_2x2",
+      "hawk": "reframed_sq_completable",
+      "tiger": "tiger_square_winnable"
+    }
+  },
+  "verdict": {
+    "global_threat": {
+      "agrees": true,
+      "best_availability": "tiger",
+      "best_captured": "gorilla",
+      "best_efficiency": "gorilla",
+      "categories": {
+        "gorilla": "global",
+        "hawk": "reframed_global",
+        "tiger": "tiger_decision_global"
+      }
+    },
+    "line_threat": {
+      "agrees": false,
+      "best_availability": "gorilla",
+      "best_captured": "gorilla",
+      "best_efficiency": "tiger",
+      "categories": {
+        "gorilla": "threat_line",
+        "hawk": "reframed_completable",
+        "tiger": "tiger_line_winnable"
+      }
+    },
+    "square_threat": {
+      "agrees": false,
+      "best_availability": "gorilla",
+      "best_captured": "gorilla",
+      "best_efficiency": "tiger",
+      "categories": {
+        "gorilla": "threat_square_2x2",
+        "hawk": "reframed_sq_completable",
+        "tiger": "tiger_square_winnable"
+      }
+    }
+  }
+}

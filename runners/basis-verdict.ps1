@@ -95,6 +95,25 @@ try {
     $HOOKS = @('s4.fc1', 's4.conv2')
     $BASES = @('gorilla', 'hawk', 'tiger')
 
+    # The panel SAE for a champion+hook. ONE definition, used by both stage 4
+    # (basis_comparison) and stage 5 (the verdict) -- they previously picked
+    # independently and diverged: stage 5 left the choice to
+    # sae_lp_efficiency's "highest coverage_mcc_at_pref" default and so scored
+    # a different dictionary than stage 4 reported in five of six cells.
+    #
+    # Preference order, NOT filesystem order. F04/E05 are the UNSUPERVISED panel
+    # members and are what the verdict is about; I04 is the anchored positive
+    # control and only stands in when no unsupervised run has a cache.
+    function Get-PanelRun([string]$champ, [string]$hook) {
+        $cached = @(Get-ChildItem "saes/$GAME/cache/*champ$champ*$hook`_h.pt" -ErrorAction SilentlyContinue |
+            ForEach-Object { $_.Name -replace '_h\.pt$', '' })
+        foreach ($prefix in @('F04', 'E05', 'I04')) {
+            $hit = @($cached | Where-Object { $_ -like "$prefix-*" } | Sort-Object | Select-Object -First 1)[0]
+            if ($hit) { return $hit }
+        }
+        return $null
+    }
+
     Write-Host '=================================================================='
     Write-Host 'Basis verdict: hawk vs tiger, per family, SAE against the LP bound'
     Write-Host '=================================================================='
@@ -288,17 +307,7 @@ sys.exit(1 if missing else 0)
     Write-Host "`n[4/5] Basis comparison (one SAE, one code set, three framings)..."
     foreach ($champ in $Champions) {
         foreach ($hook in $HOOKS) {
-            $cached = @(Get-ChildItem "saes/$GAME/cache/*champ$champ*$hook`_h.pt" -ErrorAction SilentlyContinue |
-                ForEach-Object { $_.Name -replace '_h\.pt$', '' })
-            # Preference order, NOT filesystem order. F04/E05 are the
-            # UNSUPERVISED panel members and are what the verdict is about;
-            # I04 is the anchored positive control and only stands in when no
-            # unsupervised run has a cache, in which case say so.
-            $rid = $null
-            foreach ($prefix in @('F04', 'E05', 'I04')) {
-                $rid = @($cached | Where-Object { $_ -like "$prefix-*" } | Sort-Object | Select-Object -First 1)[0]
-                if ($rid) { break }
-            }
+            $rid = Get-PanelRun $champ $hook
             if (-not $rid) {
                 Write-Host "  [SKIP] champ$champ/$hook -- no _h cache for a panel run."
                 continue
@@ -319,13 +328,26 @@ sys.exit(1 if missing else 0)
     Write-Host "`n[5/5] SAE-vs-LP efficiency and the hawk-vs-tiger verdict..."
     foreach ($champ in $Champions) {
         foreach ($hook in $HOOKS) {
-            Write-Host "`n  >> champ$champ / $hook"
-            if ($DryRun) { Write-Host "    [DRY] sae_lp_efficiency.py --champ=$champ --hook=$hook"; continue }
+            # PIN the run id to the SAME SAE stage 4 analysed. Left unset,
+            # sae_lp_efficiency auto-selects whichever registry row scores
+            # highest on coverage_mcc_at_pref -- which on 2026-08-14 chose the
+            # ANCHORED I04 for champTa/champYb fc1, an exp64 H06 for champYb
+            # conv2, and C01/E01 elsewhere. Five of six cells then measured a
+            # different dictionary than stage 4 reported, and two of them were
+            # supervised runs, which inverts the question the verdict asks
+            # ("does an UNSUPERVISED dictionary find these concepts?").
+            $rid = Get-PanelRun $champ $hook
+            if (-not $rid) {
+                Write-Host "`n  >> champ$champ / $hook  [SKIP] no panel _h cache"
+                continue
+            }
+            Write-Host "`n  >> champ$champ / $hook  run=$rid"
+            if ($DryRun) { Write-Host "    [DRY] sae_lp_efficiency.py --champ=$champ --hook=$hook --run-id=$rid"; continue }
             # Non-fatal: a champion/hook with incomplete inputs reports exactly
             # what is missing and exits 1; the remaining cells still run.
             $prev = $PSNativeCommandUseErrorActionPreference
             $PSNativeCommandUseErrorActionPreference = $false
-            python scripts/sae_lp_efficiency.py --champ=$champ --hook=$hook
+            python scripts/sae_lp_efficiency.py --champ=$champ --hook=$hook --run-id=$rid
             $PSNativeCommandUseErrorActionPreference = $prev
         }
     }

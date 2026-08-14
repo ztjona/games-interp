@@ -261,7 +261,30 @@ def main():
             random_state=seed,
         )
         clf.fit(X_train, y_train_i)
-        y_pred = clf.predict(X_test)
+
+        # Choose the decision threshold that maximises MCC, FIT ON TRAIN.
+        #
+        # `clf.predict` cuts at p = 0.5, which is badly calibrated for rare
+        # classes: at base rate 0.025 it scored MCC 0.265 where the best
+        # threshold reaches 0.493 (measured 2026-08-14). That makes the "upper
+        # bound" beatable -- an SAE latent whose effective threshold happens to
+        # sit better was scoring efficiency > 1 in 11 cells -- and it understates
+        # LP worst on exactly the rare threat concepts this project is about.
+        #
+        # The threshold is selected on the TRAINING split and only then applied
+        # to test, so this adds no leakage; it just stops the probe from being
+        # crippled by an arbitrary cut.
+        p_train = clf.predict_proba(X_train)[:, 1]
+        best_t, best_m = 0.5, -2.0
+        for t in np.unique(np.quantile(p_train, np.linspace(0.001, 0.999, 200))):
+            tn_, fp_, fn_, tp_ = confusion_matrix(
+                y_train_i, (p_train >= t).astype(int), labels=[0, 1]).ravel()
+            den = math.sqrt(
+                float(tp_ + fp_) * (tp_ + fn_) * (tn_ + fp_) * (tn_ + fn_))
+            m = ((tp_ * tn_ - fp_ * fn_) / den) if den > 0 else 0.0
+            if m > best_m:
+                best_t, best_m = float(t), m
+        y_pred = (clf.predict_proba(X_test)[:, 1] >= best_t).astype(int)
 
         cm = confusion_matrix(y_test_i, y_pred, labels=[0, 1])
         tn, fp, fn, tp = (int(x) for x in cm.ravel())
@@ -288,6 +311,8 @@ def main():
                 "mcc_at_pref": round(mcc_at_pref, 4),
                 "tpr": round(tpr, 4),
                 "tnr": round(tnr, 4),
+                # Chosen on TRAIN; recorded so a report is auditable.
+                "threshold": round(best_t, 4),
                 "f1_lift": round(f1_lift, 4),
                 "base_rate": round(base_rate, 4),
                 "trivial_f1": round(trivial_f1, 4),

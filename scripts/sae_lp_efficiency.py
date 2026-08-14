@@ -71,7 +71,10 @@ BANDS = ((0.80, "high"), (0.50, "moderate"), (0.20, "low"))
 
 # Below this the linear probe itself has too little signal for a ratio to mean
 # anything: dividing two small numbers produces a loud, meaningless efficiency.
-LP_FLOOR = 0.05
+# Raised 0.05 -> 0.15 on 2026-08-14: at 0.05 a champYb conv2 cell reported
+# efficiency 2.01 from SAE 0.103 / LP 0.051, i.e. pure noise amplification, and
+# 11 cells across the panel came out above 1.0.
+LP_FLOOR = 0.15
 
 
 def band(ratio: float | None) -> str:
