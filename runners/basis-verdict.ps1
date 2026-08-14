@@ -81,6 +81,15 @@ New-Item -ItemType Directory -Force -Path logs | Out-Null
 Start-Transcript -Path 'logs/basis-verdict.transcript.log' -Append | Out-Null
 
 try {
+    # `pwsh -File` cannot bind an array parameter: `-Champions Ve,Yb` arrives as
+    # the SINGLE string "Ve,Yb" (verified), whether quoted or not. Since every
+    # detached run goes through `pwsh -File` (launch.ps1 and the documented
+    # direct invocation both do), split it here so the comma form works as a
+    # reader would expect instead of silently filtering to zero champions.
+    $Champions = @($Champions | ForEach-Object { $_ -split '[,;]' } |
+        ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    if (-not $Champions) { throw 'No champions given.' }
+
     $GAME = 'quarto'
     $DATA = "data/$GAME"
     $HOOKS = @('s4.fc1', 's4.conv2')
@@ -154,10 +163,13 @@ print(",".join(sorted({v["champion"] for v in s.values()
             }
         }
 
-        Write-Host "  $($plan.Count) probe job(s) planned."
+        $capNote = if ($MaxTrain -gt 0) { " --max-train=$MaxTrain" } else { '' }
+        Write-Host "  $($plan.Count) probe job(s) planned$(if ($MaxTrain -gt 0) { "; train split capped at $MaxTrain rows" } else { '; FULL train split (~7 h -- consider -MaxTrain 50000)' })."
         if ($DryRun) {
+            # Show the cap here too: a dry run that prints a different command
+            # than the real run is worse than no dry run.
             $plan | ForEach-Object {
-                Write-Host "    [DRY] linear_probe_baseline.py $($_.Act) $(Split-Path $_.Labels -Leaf) $(Split-Path $_.Schema -Leaf)"
+                Write-Host "    [DRY] linear_probe_baseline.py $($_.Act) $(Split-Path $_.Labels -Leaf) $(Split-Path $_.Schema -Leaf)$capNote"
             }
         }
         else {
@@ -219,31 +231,51 @@ print(",".join(sorted({v["champion"] for v in s.values()
     # existed still rolls up into families, so a missing metric would surface
     # as a page of "n/a" efficiencies with no explanation.
     Write-Host "`n[3/5] Checking the SAE registry carries mcc_at_pref..."
+    # Check what stage 5 CAN USE, not every row for these champions.
+    #
+    # The blunt version counted all 405 champion rows and so reported 99 stale
+    # -- every one of them a legacy non-panel run (C01/E01-Yb/E02...) whose _h
+    # is long gone and which will never be backfilled. It therefore warned on
+    # every run forever, which trains the reader to ignore it.
+    #
+    # What stage 5 actually needs is: for each (champion, hook, basis) cell it
+    # will evaluate, at least ONE candidate row carrying coverage_mcc_at_pref
+    # (sae_lp_efficiency picks the best such row). Report per CELL.
     $check = @'
 import json, sys
 reg = json.load(open("saes/quarto/eval_registry.json"))
-champs = sys.argv[1].split(",")
-scope = {k: v for k, v in reg.items() if any(f"champ{c}" in k for c in champs)}
-stale = [k for k, v in scope.items()
-         if "coverage_mcc_at_pref" not in (v.get("metrics") or {})]
-print(f"  in scope ({'/'.join(champs)}): {len(scope) - len(stale)}/{len(scope)} "
-      f"row(s) carry coverage_mcc_at_pref.")
-if stale:
-    for k in sorted(stale)[:8]:
-        print(f"    stale: {k}")
-    if len(stale) > 8:
-        print(f"    ... and {len(stale) - 8} more")
+champs, hooks, bases = (a.split(",") for a in sys.argv[1:4])
+missing = []
+for c in champs:
+    for hook in hooks:
+        for basis in bases:
+            ok = [k for k, v in reg.items()
+                  if k.endswith(f"{hook}:{basis}{c}") and f"champ{c}" in k
+                  and "coverage_mcc_at_pref" in (v.get("metrics") or {})]
+            if not ok:
+                missing.append(f"champ{c}/{hook}/{basis}{c}")
+total = len(champs) * len(hooks) * len(bases)
+print(f"  stage-5 cells with a usable row: {total - len(missing)}/{total}")
+for m in missing:
+    print(f"    NO row carries coverage_mcc_at_pref: {m}")
+if missing:
     print("  -> run: python scripts/backfill_eval_metrics.py --game=quarto")
     print("     (or re-evaluate those checkpoints) BEFORE trusting stage 5.")
-sys.exit(1 if stale else 0)
+sys.exit(1 if missing else 0)
 '@
     # Advisory, not fatal: a stale registry is worth finishing the LP work for,
     # and stage 5 excludes any basis whose row is stale rather than guessing.
     $prev = $PSNativeCommandUseErrorActionPreference
     $PSNativeCommandUseErrorActionPreference = $false
-    $check | python - ($Champions -join ',')
+    # CAPTURE then Write-Host. Start-Transcript does NOT record stdout from a
+    # script piped into `python -`, only from `python file.py`, so writing
+    # straight to stdout here produced a bare WARNING with no reason attached
+    # (and silently lost 3A-dilution's whole gate-summary table on 2026-08-13).
+    # Write-Host output is always transcribed.
+    $checkOut = $check | python - ($Champions -join ',') ($HOOKS -join ',') ($BASES -join ',')
     $saeReady = ($LASTEXITCODE -eq 0)
     $PSNativeCommandUseErrorActionPreference = $prev
+    $checkOut | ForEach-Object { Write-Host $_ }
     if (-not $saeReady) {
         Write-Host '  WARNING: continuing so the LP work is not wasted, but the'
         Write-Host '  stage-5 verdict will exclude any basis whose row is stale.'

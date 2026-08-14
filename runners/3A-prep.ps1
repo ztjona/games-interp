@@ -82,7 +82,8 @@ for p in sorted(glob.glob("saes/quarto/*.pt")):
 open("runners/_missing_evals.txt", "w", newline="").write("\n".join(rows) + "\n")
 print(f"  {len(rows)} missing cell(s) written to runners/_missing_evals.txt")
 '@
-        $scan | python -
+        # Capture then Write-Host -- stdout from `python -` is not transcribed.
+        ($scan | python -) | ForEach-Object { Write-Host $_ }
     }
 
     # Champions whose dataset is QUARANTINED or RETIRED. validate_datasets.py
@@ -314,7 +315,8 @@ print(f"  {len(ids) - len(missing)}/{len(ids)} random-model controls have an _h 
 for r in missing:
     print(f"    NO _h (will fall back to the permutation null): {r}")
 '@
-    $ctlCheck | python -
+    # Capture then Write-Host -- stdout from `python -` is not transcribed.
+    ($ctlCheck | python -) | ForEach-Object { Write-Host $_ }
     Write-Host "  1. review the control coverage line above"
     Write-Host "  2. pwsh -File runners\launch.ps1 3A-dilution"
 }

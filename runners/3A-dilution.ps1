@@ -251,7 +251,12 @@ print("geom = (diluted+tiled)/threat BSPs; solo = median share of recoverable")
 print("signal in ONE latent; idim = median effective dims; R2 = mean total")
 print("recoverable signal. Full glossary: 'glossary' key in each report JSON.")
 '@
-    $agg | python -
+    # CAPTURE then Write-Host: Start-Transcript does not record stdout from a
+    # script piped into `python -`, so on 2026-08-13 this table -- the combined
+    # gate summary, the single most useful output of the whole runner -- was
+    # absent from the log even though the JSON was written correctly.
+    $aggOut = $agg | python -
+    $aggOut | ForEach-Object { Write-Host $_ }
 
     Write-Host "`nEmitting stage plan..."
     $files = @(Get-ChildItem "$ANALYSIS/*_dilution-*.json" | ForEach-Object { $_.FullName })

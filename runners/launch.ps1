@@ -14,10 +14,22 @@
     pwsh -File runners\launch.ps1 champYb
     pwsh -File runners\launch.ps1 3A-dilution
 
+  Extra arguments are forwarded verbatim to the runner, so a long run that needs
+  a switch can still be detached:
+    pwsh -File runners\launch.ps1 basis-verdict -MaxTrain 50000
+    pwsh -File runners\launch.ps1 champTa-rebuild -SkipTrain
+
   (For survival across a full user LOGOFF, not just SSH disconnect, use Task
   Scheduler instead -- ask and I'll add a schtasks variant.)
 #>
-param([Parameter(Mandatory)][string]$Name)
+param(
+    [Parameter(Mandatory)][string]$Name,
+    # Everything after the runner name goes straight through to it. Without
+    # this the launcher could only ever start a runner on its defaults, so any
+    # run needing a switch had to be foreground -- i.e. killed by an SSH
+    # disconnect, which is the exact failure this launcher exists to avoid.
+    [Parameter(ValueFromRemainingArguments)][string[]]$RunnerArgs
+)
 
 $ErrorActionPreference = 'Stop'
 $repo = (Resolve-Path (Join-Path $PSScriptRoot '..')).Path
@@ -50,7 +62,16 @@ $pwsh = @(
 if ([string]::IsNullOrEmpty($pwsh)) { $pwsh = (Get-Process -Id $PID).Path }
 if ([string]::IsNullOrEmpty($pwsh)) { throw 'Cannot locate pwsh.exe to launch the runner.' }
 
-$cmd = "`"$pwsh`" -NoProfile -File `"$runner`""
+# Quote each forwarded argument so paths with spaces survive the trip through
+# Win32_Process.Create, which takes ONE command-line string rather than an argv
+# array. Bare switches (-MaxTrain) are unaffected by the quoting.
+$extra = ''
+if ($RunnerArgs) {
+    $extra = ' ' + (($RunnerArgs | ForEach-Object {
+                if ($_ -match '^-') { $_ } else { '"{0}"' -f ($_ -replace '"', '\"') }
+            }) -join ' ')
+}
+$cmd = "`"$pwsh`" -NoProfile -File `"$runner`"$extra"
 $r = Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{
     CommandLine      = $cmd
     CurrentDirectory = $repo
@@ -60,7 +81,7 @@ if ($r.ReturnValue -ne 0) {
 }
 
 $transcript = Join-Path $repo "logs\$Name.transcript.log"
-Write-Host "Launched '$Name' detached via WMI (PID $($r.ProcessId))."
+Write-Host "Launched '$Name'$(if ($RunnerArgs) { " $($RunnerArgs -join ' ')" }) detached via WMI (PID $($r.ProcessId))."
 Write-Host "  It survives SSH disconnect (spawned outside the sshd job)."
 Write-Host "  follow:  Get-Content '$transcript' -Wait -Tail 40"
 Write-Host "  stop:    Stop-Process -Id $($r.ProcessId)   # (children may need separate kill)"

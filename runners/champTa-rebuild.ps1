@@ -415,7 +415,8 @@ else:
     p.write_text(json.dumps(doc, indent=2) + "\n", encoding="utf-8")
     print("  champTa -> OK (provisional; validated below).")
 '@
-    $clear | python -
+    # Capture then Write-Host -- stdout from `python -` is not transcribed.
+    ($clear | python -) | ForEach-Object { Write-Host $_ }
 
     Write-Host '  Validating the POST-flip state...'
     $prev = $PSNativeCommandUseErrorActionPreference
