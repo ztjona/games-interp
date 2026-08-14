@@ -41,6 +41,7 @@ Options:
 from __future__ import annotations
 
 import json
+import os
 import logging
 import shutil
 import sys
@@ -207,6 +208,7 @@ def _augment_matching(
     cache_path: Path,
     h_path: Path | None,
     bsp_labels: torch.Tensor,
+    h_cache: "_HCache | None" = None,
 ) -> tuple[FeatureBSPMatching, bool]:
     """Load (or rebuild) a matching cache so every current field is populated.
 
@@ -227,7 +229,8 @@ def _augment_matching(
             raise FileNotFoundError(
                 f"needs rebuild (missing {', '.join(missing)}) but no _h cache "
                 f"at {h_path}")
-        h = torch.load(h_path, map_location="cpu", weights_only=False)
+        h = (h_cache.get(h_path) if h_cache is not None
+             else torch.load(h_path, map_location="cpu", weights_only=False))
         log.info("    rebuilding full matching from h.pt (%s)", tuple(h.shape))
         matching = match_features_to_bsps(h, bsp_labels)
         _save_matching(cache_path, matching)
@@ -269,6 +272,49 @@ def _augment_matching(
         rewrote = True
 
     return matching, rewrote
+
+
+class _HCache:
+    """One-slot cache for a checkpoint's ``(N, d_dict)`` code matrix.
+
+    The registry holds one row per (checkpoint, BSP set), so a checkpoint
+    evaluated against gorilla+hawk+tiger appears three times and each row needs
+    the SAME codes. Loading per row meant reading 1,125 GB where only 434 GB of
+    distinct data exists -- 691 GB of redundant I/O on a job that is already
+    I/O bound.
+
+    Rows are iterated grouped by run_id (see main), so a single slot is enough;
+    holding one at a time also keeps peak memory at one `_h` (up to 35 GB for an
+    exp64 dictionary) rather than several.
+    """
+
+    def __init__(self) -> None:
+        self.key: Path | None = None
+        self.value = None
+
+    def get(self, path: Path):
+        if self.key != path:
+            self.value = None  # drop the previous tensor BEFORE allocating
+            self.value = torch.load(path, map_location="cpu", weights_only=False)
+            self.key = path
+        return self.value
+
+
+def _write_registry(path: Path, registry: dict) -> None:
+    """Write the registry ATOMICALLY: temp file in the same dir, then replace.
+
+    ``open(path, "w")`` truncates immediately, so a crash part-way through
+    ``json.dump`` leaves an unparseable registry -- and this script runs for
+    hours over multi-GB caches on a box that has already hit OOM once.
+    ``os.replace`` is atomic on the same volume on both Windows and POSIX, so
+    the file on disk is only ever the old copy or the complete new one.
+    """
+    tmp = path.with_suffix(".json.tmp")
+    with open(tmp, "w", encoding="utf-8") as f:
+        json.dump(registry, f, indent=2)
+        f.flush()
+        os.fsync(f.fileno())
+    os.replace(tmp, path)
 
 
 def _trim_retired_keys(metrics: dict) -> int:
@@ -315,10 +361,17 @@ def main() -> int:
     n_skipped_no_h = 0
     n_already_done = 0
     n_trimmed = 0
+    n_failed = 0
     needs_h: list[str] = []
+    mismatched: list[str] = []
 
     log.info("Scanning %d registry entries (game=%s)", n_total, game)
-    for key, entry in registry.items():
+    # Iterate GROUPED BY CHECKPOINT so the one-slot _h cache actually hits: the
+    # 2-3 rows that share a checkpoint (one per BSP set) then land consecutively
+    # and read the codes once instead of once each. Registry insertion order
+    # interleaves checkpoints, which is why this needs an explicit sort.
+    h_cache = _HCache()
+    for key, entry in sorted(registry.items(), key=lambda kv: kv[0].split(":")[0]):
         bsp_set = entry.get("bsp_set", "gorilla")
         run_id = key.split(":", 1)[0]
 
@@ -406,7 +459,8 @@ def main() -> int:
 
         log.info("  [%s] backfilling …", key)
         try:
-            matching, rewrote = _augment_matching(cache_path, h_path, bsp_labels)
+            matching, rewrote = _augment_matching(
+                cache_path, h_path, bsp_labels, h_cache)
         except FileNotFoundError as e:
             # Named separately from a generic failure: this row is recoverable,
             # it just needs its codes re-encoded first. Silently lumping it in
@@ -415,8 +469,20 @@ def main() -> int:
             needs_h.append(key)
             n_skipped_no_h += 1
             continue
+        except ValueError as e:
+            # `match_features_to_bsps` raises this when the codes and the labels
+            # disagree on N -- i.e. the _h cache was computed on a DIFFERENT
+            # distribution than the labels it is being scored against. That is
+            # the exact damage `unified-pool.ps1` does if it runs before this
+            # script (the cache is keyed by run_id only, with no dataset in the
+            # name), so it gets its own counter instead of vanishing into a
+            # generic failure line among hundreds.
+            log.warning("  [%s] SHAPE MISMATCH (%s) -> skip", key, e)
+            mismatched.append(key)
+            continue
         except Exception as e:  # noqa: BLE001
             log.warning("  [%s] failed (%s) → skip", key, e)
+            n_failed += 1
             continue
 
         cov_extra = compute_coverage(matching)
@@ -444,6 +510,20 @@ def main() -> int:
     log.info("  No matching cache:  %d", n_skipped_no_cache)
     log.info("  No bsp_labels:      %d", n_skipped_no_labels)
     log.info("  Needs _h re-encode: %d", n_skipped_no_h)
+    log.info("  Shape mismatch:     %d", len(mismatched))
+    log.info("  Other failures:     %d", n_failed)
+
+    if mismatched:
+        log.info("")
+        log.info("SHAPE MISMATCHES -- the _h cache and the labels disagree on N.")
+        log.info("This means the codes were computed on a different position set")
+        log.info("than the labels they are scored against. Regenerate the codes:")
+        for key in mismatched[:10]:
+            rid, _, bsp = key.partition(":")
+            log.info("  python sae_eval.py evaluate saes/%s/%s.pt --bsps=%s --force",
+                     game, rid, bsp or "gorilla")
+        if len(mismatched) > 10:
+            log.info("  ... and %d more", len(mismatched) - 10)
 
     if needs_h:
         log.info("")
@@ -470,8 +550,7 @@ def main() -> int:
     backup = registry_path.with_suffix(".json.bak")
     shutil.copyfile(registry_path, backup)
     log.info("Backup written: %s", backup)
-    with open(registry_path, "w") as f:
-        json.dump(registry, f, indent=2)
+    _write_registry(registry_path, registry)
     log.info("Registry updated: %s", registry_path)
     return 0
 

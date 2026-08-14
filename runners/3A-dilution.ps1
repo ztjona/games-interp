@@ -1,10 +1,21 @@
 #Requires -Version 7
 <#
-  runners/3A-dilution.ps1 -- Phase 3A dilution diagnostic over the champTa/champVe
-  winner SAEs (NOT champYb; those caches live on Deep Brain). CPU analysis on
-  cached SAE codes, so it is sequential (no GPU fan-out needed). Verifies each
-  run's inputs are present before invoking, writes one JSON per run plus a
-  combined 3A_gate_summary.json, and emits stage_3A-dilution.md.
+  runners/3A-dilution.ps1 -- Phase 3A dilution diagnostic over the champTa /
+  champVe / champYb panel SAEs. CPU analysis on cached SAE codes, so it is
+  sequential (no GPU fan-out needed). Verifies each run's inputs are present
+  before invoking, writes one JSON per run plus a combined
+  3A_gate_summary.json, and emits stage_3A-dilution.md.
+
+  Nulls: every panel run is paired with a recipe-matched RANDOM-MODEL SAE
+  control (trained by runners/3A-prep.ps1). If a control's _h cache is absent,
+  dilution_diagnostic.py only WARNS on stderr and quietly drops to the
+  permutation null, which understates what "absent" should mean -- so the
+  pre-flight below fails fast on a missing control instead.
+
+  Read the verdicts against the 2026-08-13 learned-gap measurement: on conv2 the
+  random-model control already reaches 45-92% of the trained SAE's score
+  (champYb conv2: only 7-16% of the score is learned), so a conv2 dilution
+  verdict says much less about the TRAINED model than an fc1 one does.
 
   Method + thresholds: docs/diary/2026-07-21_3A-dilution-diagnostic.md
   Launch:        runners\launch.ps1 3A-dilution
@@ -113,34 +124,72 @@ try {
 
     # Need the checkpoint + BSP labels. The _h code cache is NOT required up front:
     # if a prior cleanup deleted it, we regenerate it from the checkpoint below.
+    # Resolve each entry's random-model control the same way the exec loop does,
+    # so the pre-flight reports the SAME pairing that will actually be used.
+    function Resolve-Control([string]$rid, [string]$fallback) {
+        if ($rid -match 'champ(\w\w)-.*-(s4\.\w+|fc1|conv2)$') {
+            $k = "$($Matches[1])|$($Matches[2])"
+            if ($RANDOM_CONTROLS.ContainsKey($k)) { return $RANDOM_CONTROLS[$k] }
+        }
+        return $fallback
+    }
+
     Write-Host "`nPre-flight (input presence):"
     $runnable = @()
+    $noControl = @()
     foreach ($entry in $RUNS) {
         $rid, $bsps, $rand = $entry.Split('|')
+        $rand = Resolve-Control $rid $rand
         $why = ''
         if (-not (Test-Path "saes/quarto/$rid.pt")) { $why += ' no checkpoint;' }
         if (-not (Test-Labels $bsps)) { $why += " no bsp_labels-$bsps;" }
         $hasH = Test-Path "$CACHE/$($rid)_h.pt"
+        # A control with no _h is NOT a skip -- the run would still succeed, but
+        # silently on the weaker permutation null. Collect and fail below.
+        if ($rand -ne 'none' -and -not (Test-Path "$CACHE/$($rand)_h.pt")) {
+            $noControl += "$rid  ->  $rand"
+        }
         if ($why) { Write-Host "  [SKIP] $rid  bsps=$bsps --$why" }
-        else { Write-Host "  [ OK ] $rid  bsps=$bsps$(if(-not $hasH){'  (will regen _h)'})"; $runnable += $entry }
+        else {
+            Write-Host ("  [ OK ] {0}  bsps={1}  null={2}{3}" -f $rid, $bsps,
+                $(if ($rand -eq 'none') { 'permutation' } else { 'random-model' }),
+                $(if (-not $hasH) { '  (will regen _h)' } else { '' }))
+            $runnable += $entry
+        }
+    }
+
+    if ($noControl) {
+        Write-Host "`nMissing random-model control _h cache for:"
+        $noControl | ForEach-Object { Write-Host "  $_" }
+        throw ('Refusing to run: these would silently fall back to the ' +
+               'permutation null, which UNDERSTATES "absent". Run ' +
+               'runners/3A-prep.ps1 to train and evaluate the controls first.')
     }
 
     if ($runnable.Count -eq 0) {
-        Write-Host "`nNothing runnable (need the champTa/champVe checkpoints + BSP labels on this box)."
+        Write-Host "`nNothing runnable (need the panel checkpoints + BSP labels on this box)."
         return
     }
     if ($DryRun) { Write-Host "`nDryRun -> not executing. $($runnable.Count) run(s) would execute."; return }
 
     Write-Host "`nExecuting $($runnable.Count) run(s)..."
+    $runStart = Get-Date
+    $n = 0
     foreach ($entry in $runnable) {
+        $n++
         $rid, $bsps, $rand = $entry.Split('|')
-        # Upgrade to the random-model control when one is registered for this
-        # champion+hook; otherwise the entry's own value ('none') stands.
-        if ($rid -match 'champ(\w\w)-.*-(s4\.\w+|fc1|conv2)$') {
-            $key = "$($Matches[1])|$($Matches[2])"
-            if ($RANDOM_CONTROLS.ContainsKey($key)) { $rand = $RANDOM_CONTROLS[$key] }
+        # Same resolver the pre-flight used, so the pairing reported above is
+        # the pairing actually run -- two copies of this regex would be free to
+        # disagree.
+        $rand = Resolve-Control $rid $rand
+        $el = (Get-Date) - $runStart
+        $eta = if ($n -gt 1) {
+            '~{0:hh\:mm}' -f [TimeSpan]::FromSeconds(
+                ($el.TotalSeconds / ($n - 1)) * ($runnable.Count - $n + 1))
         }
-        Write-Host "`n>> $rid  bsps=$bsps  random=$rand"
+        else { 'unknown' }
+        Write-Host ("`n>> ({0}/{1}) {2}  bsps={3}  random={4} | elapsed {5:hh\:mm} | ETA {6}" -f `
+                $n, $runnable.Count, $rid, $bsps, $rand, $el, $eta)
         # 3A reads the SAE code cache (_h). Regenerate it via a normal eval if a
         # prior disk cleanup removed it (writes {rid}_h.pt + matching + registry).
         if (-not (Test-Path "$CACHE/$($rid)_h.pt")) {
@@ -152,6 +201,8 @@ try {
         }
         python scripts/dilution_diagnostic.py --run-id=$rid --bsps=$bsps --random-run-id=$rand --top-k=$TOPK
     }
+    Write-Host ("`nAll {0} run(s) done in {1:hh\:mm\:ss}." -f `
+            $runnable.Count, ((Get-Date) - $runStart))
 
     Write-Host "`nWriting combined gate summary..."
     $agg = @'

@@ -832,3 +832,137 @@ rebuild with J and MCC@pref already present, so the backfill never re-reads
 them, and 3A/basis-verdict need only F04 / E05 / I04.
 
 `unified-pool` needs ~160 GB and cannot run until this is reclaimed.
+
+### J5 — 3A-dilution audited before running
+
+Checked against every failure class from H and I.
+
+**Already safe.** `dilution_diagnostic.py` validates `h` rows vs label rows and
+schema BSP count vs label columns, and **exits 1** on either — so the
+stale-cache class that has bitten repeatedly is loud here, and the runner's
+fail-fast preference stops the run. Confirmed empirically for all 17 panel
+cells (row counts inferred from `_h` file size and `d_dict` rather than loading
+~70 GB of tensors): **0 mismatches** — Ta 290,147 / Ve 289,795 / Yb 296,045,
+each matching its labels exactly. No case-only variable collisions (guarded), no
+conditional-flag interpolation, no `Receive-Job` buffering (this runner is
+sequential by design).
+
+**Bug found: the random control's `_h` was never checked.** The pre-flight
+verified the *run's* checkpoint, labels and `_h`, but nothing verified the
+**control's** `_h`. A missing control is not an error anywhere in the stack —
+`dilution_diagnostic.py` prints a stderr Warning, records `random_control: null`
+and continues on the permutation null, which is precisely the weaker null the
+design says must never be silently assumed. It would only have surfaced later,
+as a NOTE in the gate summary.
+
+Pre-flight now resolves each entry's control with the *same* function the exec
+loop uses (two copies of that regex were free to disagree) and **throws** if any
+control's `_h` is absent, naming the pairs. Verified by dry-run: all 17 report
+`null=random-model`, none falls back.
+
+**Also fixed:** the header still claimed the panel excluded champYb because
+"those caches live on Deep Brain" — champYb has been in `$RUNS` (5 of 17 cells)
+with local caches for some time. Added progress `(n/17)` with elapsed and ETA,
+and a total at the end.
+
+**Caveat to carry into the verdicts**, now recorded in the runner header: J3's
+learned-gap measurement means a conv2 dilution verdict says much less about the
+*trained* model than an fc1 one does — on champYb/conv2 only 7-16% of the score
+is learned at all. And `E01-champVe` (topk k32) is paired with the batchtopk k32
+control, the closest recipe match available.
+
+---
+
+## K. 3A-dilution verified (2026-08-13)
+
+17/17 runs in 48 min. All rule `3A.2`, all 17 JSONs freshly written, and — the
+point of 3A-prep — **zero runs on the permutation null**: every one carries a
+real random-model control.
+
+### K1 — the gate is no longer vacuous
+
+| | captured | diluted | tiled |
+|---|---:|---:|---:|
+| 2026-07-27 (rule 3A.1) | **1 / 488** | — | — |
+| 2026-08-13 (rule 3A.2) | **276 / 1100 (25.1%)** | 782 (71.1%) | 42 (3.8%) |
+
+The 3A.1 defect — a pre-registered gate whose `captured` arm was unreachable, so
+its "pass" carried no information — is fixed.
+
+### K2 — construct validity: capture tracks decodability
+
+`n_captured` rises monotonically with the run's actual threat-category MCC:
+
+| threat MCC | captured |
+|---|---|
+| 0.088–0.239 | 0 |
+| 0.277–0.286 | 14–29 |
+| 0.420–0.547 | 133 / 68 |
+| 0.724 | 16 / 23 |
+
+So the diagnostic is not measuring something orthogonal to decodability.
+
+### K3 — results
+
+```
+  run                                bsps        capt  dilu  geom  verdict
+  F04-champYb  fc1                gorillaYb    68/76     8  0.11  deprioritized
+  F04-champYb  fc1                hawkYb     133/171    38  0.22  deprioritized
+  F04-champYb  fc1                tigerYb      1/23     22  0.96  proceeds
+  I04-champYb  fc1 (anchored)     tigerYb     16/23      7  0.30  deprioritized
+  F04-champVe  fc1                gorillaVe   14/76     62  0.82  proceeds
+  F04-champVe  fc1                hawkVe     29/171    131  0.83  proceeds
+  F04-champTa  fc1                all three    0        —   1.00  proceeds
+  E01/E05      conv2              all          0        —   1.00  proceeds
+```
+
+Two things are new because champTa is finally on its own distribution:
+**champTa captures nothing anywhere** (0/76 gorilla, 0/171 hawk, 0/23 tiger)
+while champYb's unsupervised fc1 SAE has essentially captured gorilla (68/76)
+and most of hawk (133/171). The 2026-07-27 reading ("champYb gorilla geometric
+-> 0.11") reproduces exactly, now with a proper random-model null.
+
+The residual wall is confirmed as specifically **agent-relative (tiger)
+conjunctions**: champYb is 1/23 captured on tiger while at 68/76 on gorilla.
+
+### K4 — robustness: only one verdict is threshold-sensitive
+
+Rule 3A.2 is `solo_frac >= 0.70 AND (intrinsic_dim <= 2 OR knee_k <= 2)`.
+Counting concepts that already satisfy the geometry condition and sit in the
+`0.60 <= solo_frac < 0.70` band — i.e. would flip if the threshold moved to 0.60:
+
+| run | captured now | would flip |
+|---|---:|---:|
+| I04-champVe tigerVe | 0 | **4 of 23** |
+| I03-champVe gorillaVe | 15 | 3 |
+| F04-champVe gorillaVe | 14 | 3 |
+| F04-champVe hawkVe | 29 | 3 |
+| I04-champYb tigerYb | 16 | 3 |
+| **all champTa, all champYb-F04, all conv2** | — | **0** |
+
+So every headline conclusion is threshold-robust. The one fragile result is
+`I04-champVe tigerVe`'s "0 captured": four `tiger_offered_completes_*` concepts
+sit at `solo_frac` 0.62–0.64 with `intrinsic_dim` 1.00, failing only on the
+0.70 cut. Cheap to test — `dilution_diagnostic.py reclassify` re-verdicts from
+the stored metrics without touching the `_h` caches.
+
+### K5 — two reading caveats
+
+**The positive control validates on ONE champion, not three.** The
+pre-registration says the anchored I04 must land at `captured`. It does on
+champYb (16/23, threat MCC 0.724) but not on champTa (0/23, MCC 0.271) or
+champVe (0/23, MCC 0.341). That is defensible — those anchored SAEs barely
+extract the concepts, so "not captured" may simply be true — but the gate is
+now calibrated against a single working positive control.
+
+**Medians in `3A_gate_summary.json` can hide bimodality.** `I04-champVe` reports
+`median_intrinsic_dim` 1.01, which reads as "1-dimensional signal"; the
+per-concept detail is bimodal — 1.00 for `tiger_offered_completes_*` versus 6.37
+for `tiger_line_row_0_winnable`. The per-run tables already emit `HETEROGENEOUS`
+warnings per category; the summary medians do not. Read per-BSP before leaning
+on a summary row.
+
+**And carry J3 forward:** every conv2 row here reads `1.00 diluted /
+3C-proceeds`, but the random-model control reaches 45–92% of the trained conv2
+score (champYb conv2: only 7–16% learned). "Diluted" in a dictionary that barely
+differs from a random network's says little about the trained model.
