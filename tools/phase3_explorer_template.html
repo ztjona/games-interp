@@ -1,0 +1,1341 @@
+<title>Dilution Atlas</title>
+<style>
+:root{
+  color-scheme: light;
+  --plane:#f1f3f6; --surface:#fbfcfd; --surface-2:#f6f8fa;
+  --ink:#101418; --ink-2:#4d545e; --muted:#828a95;
+  --grid:#e2e6ec; --rule:#ccd3dc; --hair:rgba(16,20,24,.10);
+  --accent:#2a78d6; --accent-soft:rgba(42,120,214,.10);
+  --captured:#1baf7a; --diluted:#2a78d6; --tiled:#eb6834; --absent:#828a95;
+  --gorilla:#2a78d6; --hawk:#eb6834; --tiger:#1baf7a;
+  --ch-ta:#86b6ef; --ch-ve:#3987e5; --ch-yb:#184f95;
+  --critical:#d03b3b; --serious:#ec835a; --warning:#fab219; --good:#0ca30c;
+  --good-ink:#006300;
+  --sans:system-ui,-apple-system,"Segoe UI Variable Text","Segoe UI",Roboto,sans-serif;
+  --mono:ui-monospace,"Cascadia Mono","JetBrains Mono",Consolas,"DejaVu Sans Mono",monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --plane:#0c0e11; --surface:#16191d; --surface-2:#1c2026;
+    --ink:#f2f4f7; --ink-2:#a9b2bd; --muted:#79828d;
+    --grid:#242930; --rule:#333a42; --hair:rgba(255,255,255,.10);
+    --accent:#3987e5; --accent-soft:rgba(57,135,229,.14);
+    --captured:#199e70; --diluted:#3987e5; --tiled:#d95926; --absent:#79828d;
+    --gorilla:#3987e5; --hawk:#d95926; --tiger:#199e70;
+    --ch-ta:#184f95; --ch-ve:#3987e5; --ch-yb:#9ec5f4;
+    --good-ink:#0ca30c;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --plane:#0c0e11; --surface:#16191d; --surface-2:#1c2026;
+  --ink:#f2f4f7; --ink-2:#a9b2bd; --muted:#79828d;
+  --grid:#242930; --rule:#333a42; --hair:rgba(255,255,255,.10);
+  --accent:#3987e5; --accent-soft:rgba(57,135,229,.14);
+  --captured:#199e70; --diluted:#3987e5; --tiled:#d95926; --absent:#79828d;
+  --gorilla:#3987e5; --hawk:#d95926; --tiger:#199e70;
+  --ch-ta:#184f95; --ch-ve:#3987e5; --ch-yb:#9ec5f4;
+  --good-ink:#0ca30c;
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--plane); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:3px}
+
+/* ---------- shell ---------- */
+.shell{display:grid; grid-template-columns:212px minmax(0,1fr); gap:0; min-height:100vh}
+.rail{
+  border-right:1px solid var(--hair); background:var(--surface);
+  padding:20px 0 40px; position:sticky; top:0; height:100vh; overflow-y:auto;
+}
+.brand{padding:0 18px 18px; border-bottom:1px solid var(--hair); margin-bottom:14px}
+.brand h1{
+  font-size:19px; margin:0; letter-spacing:-.02em; font-weight:650; line-height:1.2;
+}
+.brand .sub{
+  font-family:var(--mono); font-size:10.5px; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--muted); margin-top:7px;
+}
+nav{display:flex; flex-direction:column; gap:1px; padding:0 10px}
+nav button{
+  all:unset; cursor:pointer; padding:8px 10px; border-radius:5px;
+  font-size:13.5px; color:var(--ink-2); display:flex; gap:9px; align-items:baseline;
+}
+nav button:hover{background:var(--surface-2); color:var(--ink)}
+nav button[aria-current="true"]{background:var(--accent-soft); color:var(--ink); font-weight:600}
+nav button .n{font-family:var(--mono); font-size:10.5px; color:var(--muted); width:14px}
+.rail-foot{padding:18px 18px 0; margin-top:20px; border-top:1px solid var(--hair)}
+.rail-foot p{font-size:11.5px; color:var(--muted); line-height:1.5; margin:0 0 8px}
+
+main{padding:26px 30px 80px; max-width:1240px; min-width:0}
+.view{display:none}
+.view.on{display:block}
+
+/* ---------- typography ---------- */
+.eyebrow{
+  font-family:var(--mono); font-size:10.5px; text-transform:uppercase;
+  letter-spacing:.14em; color:var(--muted); margin:0 0 6px;
+}
+h2{font-size:26px; margin:0 0 6px; letter-spacing:-.022em; font-weight:650; text-wrap:balance}
+h3{font-size:15px; margin:0 0 4px; letter-spacing:-.01em; font-weight:640}
+h4{font-size:12px; margin:0 0 8px; font-family:var(--mono); text-transform:uppercase;
+   letter-spacing:.1em; color:var(--muted); font-weight:600}
+.lede{color:var(--ink-2); font-size:14.5px; max-width:68ch; margin:0 0 20px}
+p{margin:0 0 12px}
+.note{font-size:12.5px; color:var(--muted); max-width:78ch; margin:8px 0 0}
+
+/* ---------- cards ---------- */
+.card{
+  background:var(--surface); border:1px solid var(--hair); border-radius:9px;
+  padding:18px 20px; margin-bottom:16px;
+}
+.card>h3{margin-bottom:2px}
+.card .capt{font-size:12.5px; color:var(--muted); margin:0 0 14px; max-width:80ch}
+.grid2{display:grid; grid-template-columns:repeat(auto-fit,minmax(330px,1fr)); gap:16px}
+.grid3{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:16px}
+
+/* ---------- stat tiles ---------- */
+.tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(158px,1fr)); gap:12px; margin-bottom:18px}
+.tile{background:var(--surface); border:1px solid var(--hair); border-radius:9px; padding:13px 15px}
+.tile .k{font-family:var(--mono); font-size:10px; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--muted)}
+.tile .v{font-size:27px; font-weight:640; letter-spacing:-.03em; margin-top:3px; line-height:1.1}
+.tile .d{font-size:11.5px; color:var(--ink-2); margin-top:3px}
+
+/* ---------- controls ---------- */
+.controls{
+  display:flex; flex-wrap:wrap; gap:10px 18px; align-items:flex-end;
+  padding:13px 16px; background:var(--surface); border:1px solid var(--hair);
+  border-radius:9px; margin-bottom:16px;
+}
+.ctl{display:flex; flex-direction:column; gap:4px}
+.ctl label{font-family:var(--mono); font-size:10px; letter-spacing:.11em;
+  text-transform:uppercase; color:var(--muted)}
+select,input[type=range]{font-family:var(--sans); font-size:13px}
+select{
+  background:var(--surface-2); color:var(--ink); border:1px solid var(--rule);
+  border-radius:5px; padding:5px 8px; min-width:110px;
+}
+input[type=range]{accent-color:var(--accent); width:130px}
+.seg{display:flex; border:1px solid var(--rule); border-radius:5px; overflow:hidden}
+.seg button{
+  all:unset; cursor:pointer; padding:5px 11px; font-size:12.5px; color:var(--ink-2);
+  background:var(--surface-2);
+}
+.seg button[aria-pressed="true"]{background:var(--accent); color:#fff; font-weight:600}
+.val{font-family:var(--mono); font-size:12px; color:var(--ink); font-variant-numeric:tabular-nums}
+
+/* ---------- tables ---------- */
+.scroller{overflow-x:auto; margin:0 -20px; padding:0 20px}
+table{border-collapse:collapse; width:100%; font-size:12.5px}
+th,td{text-align:right; padding:6px 9px; white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+th.l,td.l{text-align:left}
+thead th{
+  font-family:var(--mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+  color:var(--muted); font-weight:600; border-bottom:1px solid var(--rule);
+  position:sticky; top:0; background:var(--surface); z-index:1;
+}
+tbody td{border-bottom:1px solid var(--grid); font-variant-numeric:tabular-nums}
+tbody tr:hover td{background:var(--surface-2)}
+td.mono,th.mono{font-family:var(--mono)}
+.dim{color:var(--muted)}
+
+/* ---------- chips ---------- */
+.chip{
+  display:inline-flex; align-items:center; gap:5px; font-family:var(--mono);
+  font-size:10.5px; letter-spacing:.04em; padding:2px 7px; border-radius:99px;
+  border:1px solid var(--hair); background:var(--surface-2); color:var(--ink-2);
+  white-space:nowrap;
+}
+.chip .dot{width:8px; height:8px; border-radius:2px; flex:none}
+.chip.hollow .dot{background:transparent; border:1px solid var(--absent)}
+.sev{font-family:var(--mono); font-size:10px; letter-spacing:.09em; text-transform:uppercase;
+  padding:2px 7px; border-radius:4px; font-weight:600; color:#1a1408; white-space:nowrap}
+.sev.critical{background:var(--critical); color:#fff}
+.sev.serious{background:var(--serious)}
+.sev.warning{background:var(--warning)}
+.sev.good{background:var(--good); color:#fff}
+.flagref{
+  font-family:var(--mono); font-size:10px; padding:1px 5px; border-radius:3px;
+  background:var(--accent-soft); color:var(--accent); border:0; cursor:pointer;
+}
+
+/* ---------- verdict bar ---------- */
+.vbar{display:flex; height:13px; width:130px; gap:2px; align-items:stretch}
+.vbar span{display:block; border-radius:2px}
+.vbar span.absent{background:transparent; border:1px solid var(--absent)}
+
+/* ---------- charts ---------- */
+figure{margin:0}
+figcaption{font-size:12px; color:var(--muted); margin-top:8px; max-width:80ch}
+svg{display:block; width:100%; height:auto; overflow:visible}
+.ax{font-family:var(--mono); font-size:9.5px; fill:var(--muted)}
+.axtitle{font-family:var(--mono); font-size:9.5px; fill:var(--muted);
+  text-transform:uppercase; letter-spacing:.1em}
+.gl{stroke:var(--grid); stroke-width:1}
+.bl{stroke:var(--rule); stroke-width:1}
+.ref{stroke:var(--rule); stroke-width:1; stroke-dasharray:3 3}
+.lbl{font-family:var(--mono); font-size:10px; fill:var(--ink-2)}
+.lbl-s{font-family:var(--mono); font-size:9px; fill:var(--muted)}
+.pt{cursor:pointer}
+.legend{display:flex; flex-wrap:wrap; gap:6px 12px; margin:0 0 10px}
+
+#tip{
+  position:fixed; z-index:50; pointer-events:none; opacity:0; transition:opacity .1s;
+  background:var(--surface); border:1px solid var(--rule); border-radius:6px;
+  padding:8px 10px; font-family:var(--mono); font-size:11px; line-height:1.5;
+  box-shadow:0 6px 22px rgba(0,0,0,.16); max-width:290px; color:var(--ink);
+}
+#tip b{color:var(--ink); font-weight:650}
+#tip .r{display:flex; justify-content:space-between; gap:14px}
+#tip .r span:last-child{font-variant-numeric:tabular-nums}
+
+/* ---------- review ---------- */
+.finding{border:1px solid var(--hair); border-radius:9px; background:var(--surface);
+  padding:16px 18px; margin-bottom:12px}
+.finding header{display:flex; gap:10px; align-items:center; flex-wrap:wrap; margin-bottom:8px}
+.finding header h3{margin:0; flex:1 1 260px}
+.finding .id{font-family:var(--mono); font-size:11px; color:var(--muted)}
+.finding dl{display:grid; grid-template-columns:max-content minmax(0,1fr); gap:4px 14px;
+  margin:10px 0 0; font-size:13.5px}
+.finding dt{font-family:var(--mono); font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--muted); padding-top:4px}
+.finding dd{margin:0; color:var(--ink-2)}
+.finding dd code, code{font-family:var(--mono); font-size:12px; background:var(--surface-2);
+  padding:1px 4px; border-radius:3px; border:1px solid var(--hair)}
+ul.tight{margin:6px 0 0; padding-left:18px; font-size:13.5px; color:var(--ink-2)}
+ul.tight li{margin-bottom:4px}
+
+@media (max-width:880px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static; height:auto; border-right:0; border-bottom:1px solid var(--hair)}
+  nav{flex-direction:row; flex-wrap:wrap}
+  main{padding:20px 16px 60px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important; animation:none!important}}
+</style>
+
+<div class="shell">
+  <aside class="rail">
+    <div class="brand">
+      <h1>Dilution Atlas</h1>
+      <div class="sub">Quarto SAE &middot; phase 3A</div>
+    </div>
+    <nav id="nav">
+      <button data-v="panel"><span class="n">01</span>Verdict panel</button>
+      <button data-v="concepts"><span class="n">02</span>Concepts</button>
+      <button data-v="efficiency"><span class="n">03</span>SAE vs probe</button>
+      <button data-v="champions"><span class="n">04</span>Champions</button>
+      <button data-v="health"><span class="n">05</span>Dictionary health</button>
+      <button data-v="review"><span class="n">06</span>Review</button>
+      <button data-v="glossary"><span class="n">07</span>Glossary</button>
+    </nav>
+    <div class="rail-foot">
+      <p>17 SAE&times;BSP-set runs &middot; 1,100 concept verdicts &middot; 270 distinct threat concepts</p>
+      <p>Rebuilt from <code>saes/quarto/analysis</code> on 2026-08-14.</p>
+    </div>
+  </aside>
+
+  <main>
+    <!-- ============================ PANEL ============================ -->
+    <section class="view on" id="v-panel">
+      <p class="eyebrow">Gate G-3A</p>
+      <h2>How every threat concept is carried</h2>
+      <p class="lede">Each row is one trained SAE scored against one BSP set. The verdict rule is a
+        pure function of the stored metrics, so the thresholds below re-classify all 1,100 concepts
+        live &mdash; including the random-model floor the published rule never applied.</p>
+
+      <div class="tiles" id="panelTiles"></div>
+
+      <div class="controls">
+        <div class="ctl">
+          <label for="sfSlider">captured_solo_frac</label>
+          <input type="range" id="sfSlider" min="0.3" max="0.95" step="0.05" value="0.7">
+        </div>
+        <div class="ctl"><label>value</label><span class="val" id="sfVal">0.70</span></div>
+        <div class="ctl">
+          <label for="idSlider">captured_idim</label>
+          <input type="range" id="idSlider" min="1" max="6" step="0.5" value="2">
+        </div>
+        <div class="ctl"><label>value</label><span class="val" id="idVal">2.0</span></div>
+        <div class="ctl">
+          <label for="rcSlider">random-model floor</label>
+          <input type="range" id="rcSlider" min="0" max="0.06" step="0.005" value="0">
+        </div>
+        <div class="ctl"><label>value</label><span class="val" id="rcVal">off</span></div>
+        <div class="ctl">
+          <label>reset</label>
+          <div class="seg"><button id="resetRule" aria-pressed="false">rule 3A.2 as published</button></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>The 17-run panel</h3>
+        <p class="capt">Bar shows the verdict mix (captured / diluted / tiled / absent). <b>geom</b> is
+          <code>(diluted + tiled) / n</code> &mdash; gate G-3A passes at &ge; 0.50. Rows whose verdict mix
+          changes under the current thresholds are marked &Delta;.</p>
+        <div class="legend" id="verdictLegend"></div>
+        <div class="scroller"><table id="panelTable"></table></div>
+        <p class="note" id="panelNote"></p>
+      </div>
+
+      <div class="card">
+        <h3>Where the panel sits on the two concentration axes</h3>
+        <p class="capt">Every concept in the panel, by the two measures rule 3A.2 actually decides on.
+          A run that has genuinely captured its concepts sits top-right.</p>
+        <div id="panelScatterWrap"></div>
+      </div>
+    </section>
+
+    <!-- ============================ CONCEPTS ============================ -->
+    <section class="view" id="v-concepts">
+      <p class="eyebrow">Per-concept explorer</p>
+      <h2>One concept, one dictionary</h2>
+      <p class="lede">Pick a run and read every concept in it. The support curve on the right is the
+        held-out R&sup2; as association-ranked latents are added one at a time &mdash; the shape that
+        separates &ldquo;one latent did the work&rdquo; from &ldquo;sixty latents each did a little&rdquo;.</p>
+
+      <div class="controls">
+        <div class="ctl"><label for="cRun">run &times; bsp set</label><select id="cRun"></select></div>
+        <div class="ctl"><label for="cFam">concept family</label><select id="cFam"></select></div>
+        <div class="ctl"><label for="cVerd">verdict</label><select id="cVerd"></select></div>
+        <div class="ctl"><label for="cSort">sort by</label><select id="cSort"></select></div>
+        <div class="ctl"><label>view</label>
+          <div class="seg"><button data-cv="plot" aria-pressed="true">plot</button><button data-cv="table" aria-pressed="false">table</button></div>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card">
+          <h3>Concentration map</h3>
+          <p class="capt">x = <code>solo_frac</code>, y = <code>asymptote_r2</code>. Dashed lines are the
+            <code>captured</code> concentration threshold and the <code>absent</code> floor. Click a point.</p>
+          <div class="legend" id="cLegend"></div>
+          <div id="cScatter"></div>
+        </div>
+        <div class="card">
+          <h3 id="cDetailTitle">Select a concept</h3>
+          <p class="capt" id="cDetailSub">The curve, the community, and every stored metric.</p>
+          <div id="cCurve"></div>
+          <div id="cMetrics"></div>
+        </div>
+      </div>
+      <div class="card" id="cTableCard" style="display:none">
+        <h3>All concepts in this run</h3>
+        <div class="scroller"><table id="cTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ============================ EFFICIENCY ============================ -->
+    <section class="view" id="v-efficiency">
+      <p class="eyebrow">Basis verdict</p>
+      <h2>What is available versus what the dictionary finds</h2>
+      <p class="lede">The linear probe is the upper bound on what these activations carry
+        (<b>available</b>); the best single SAE latent is what the dictionary surfaces
+        (<b>captured</b>). Efficiency is their ratio, both sides on <code>mcc_at_pref</code>
+        (p_ref = 0.025).</p>
+
+      <div class="controls">
+        <div class="ctl"><label for="eHook">hook</label><select id="eHook"></select></div>
+        <div class="ctl"><label for="eMargin">winner margin</label>
+          <input type="range" id="eMargin" min="0" max="0.2" step="0.01" value="0.05"></div>
+        <div class="ctl"><label>value</label><span class="val" id="eMarginVal">0.05</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Availability &rarr; capture, by concept family</h3>
+        <p class="capt">Open ring = linear probe. Filled dot = best SAE latent. The gap is the wall.
+          Colour is the BSP basis (framing), not quality.</p>
+        <div class="legend" id="eLegend"></div>
+        <div id="eDumbbell"></div>
+      </div>
+
+      <div class="card">
+        <h3>Which framing does the dictionary serve best?</h3>
+        <p class="capt">Per family, the basis with the highest efficiency &mdash; but only when it leads the
+          runner-up by the margin above. Below that, the cell is a tie and the &ldquo;winner&rdquo; is noise.</p>
+        <div class="scroller"><table id="eVerdictTable"></table></div>
+        <p class="note" id="eNote"></p>
+      </div>
+    </section>
+
+    <!-- ============================ CHAMPIONS ============================ -->
+    <section class="view" id="v-champions">
+      <p class="eyebrow">Matched-position control</p>
+      <h2>Is champYb better, or are its positions easier?</h2>
+      <p class="lede">champTa, champVe and champYb each hold ~290k positions but share only
+        <b>88,970</b>. Re-scoring every fc1 SAE on that shared core &mdash; identical boards, identical
+        offered pieces, identical labels &mdash; removes the distributional confound that
+        <code>mcc_at_pref</code> cannot.</p>
+
+      <div class="tiles" id="champTiles"></div>
+
+      <div class="card">
+        <h3>Own distribution &rarr; shared positions</h3>
+        <p class="capt">One line per champion. A crossing means the ranking depends on which positions
+          each champion happens to play; parallel lines mean it does not.</p>
+        <div class="legend" id="chLegend"></div>
+        <div id="chSlopes"></div>
+      </div>
+
+      <div class="card">
+        <h3>champYb's fc1 dictionary against the others</h3>
+        <p class="capt">Best-latent MCC per gorilla category, on each champion's own distribution.</p>
+        <div class="scroller"><table id="chTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ============================ HEALTH ============================ -->
+    <section class="view" id="v-health">
+      <p class="eyebrow">Dictionary health</p>
+      <h2>How much of each dictionary is alive</h2>
+      <p class="lede">Every SAE in the champion era, by dead-feature share against what it recovers.
+        The panel runs used by 3A and by the basis verdict are ringed &mdash; one of them is the worst
+        conv2 dictionary champYb has.</p>
+
+      <div class="controls">
+        <div class="ctl"><label for="hHook">hook</label><select id="hHook"></select></div>
+        <div class="ctl"><label for="hBsp">bsp set</label><select id="hBsp"></select></div>
+        <div class="ctl"><label for="hX">x axis</label><select id="hX"></select></div>
+      </div>
+
+      <div class="card">
+        <h3>Alive fraction versus coverage</h3>
+        <p class="capt">Each dot is one (checkpoint, BSP set) registry row. Ringed = a panel run.
+          Squares = random-model control.</p>
+        <div id="hScatter"></div>
+      </div>
+
+      <div class="card">
+        <h3>Panel runs in full</h3>
+        <div class="scroller"><table id="hTable"></table></div>
+      </div>
+    </section>
+
+    <!-- ============================ REVIEW ============================ -->
+    <section class="view" id="v-review">
+      <p class="eyebrow">Methodological review</p>
+      <h2>What holds, and what does not</h2>
+      <p class="lede">Findings from reading the implementation against the outputs, ordered by how much
+        they move a published conclusion. Each one names the evidence and the cheapest fix.</p>
+      <div id="findings"></div>
+    </section>
+
+    <!-- ============================ GLOSSARY ============================ -->
+    <section class="view" id="v-glossary">
+      <p class="eyebrow">Reference</p>
+      <h2>Every number on this page</h2>
+      <p class="lede">Range, ideal value, and what the number means. Definitions are the ones embedded
+        in the analysis JSONs, so this page and the reports cannot drift.</p>
+      <div class="card"><h3>3A metrics</h3><div class="scroller"><table id="glossTable"></table></div></div>
+      <div class="card"><h3>Verdicts</h3><div class="scroller"><table id="glossVerdict"></table></div></div>
+      <div class="card"><h3>Evaluation metrics</h3><div class="scroller"><table id="glossEval"></table></div></div>
+    </section>
+  </main>
+</div>
+<div id="tip" role="status" aria-live="polite"></div>
+
+<script id="bundle" type="application/json">__DATA__</script>
+<script>
+"use strict";
+const D = JSON.parse(document.getElementById("bundle").textContent);
+const $ = (s, r) => (r || document).querySelector(s);
+const $$ = (s, r) => Array.from((r || document).querySelectorAll(s));
+const NS = "http://www.w3.org/2000/svg";
+const fmt = (v, d) => (v === null || v === undefined || Number.isNaN(v)) ? "–" : (+v).toFixed(d === undefined ? 3 : d);
+const pct = v => (v === null || v === undefined) ? "–" : (100 * v).toFixed(0) + "%";
+const VERDICTS = ["captured", "diluted", "tiled", "absent"];
+const VCOLOR = { captured: "var(--captured)", diluted: "var(--diluted)", tiled: "var(--tiled)", absent: "var(--absent)" };
+const BCOLOR = { gorilla: "var(--gorilla)", hawk: "var(--hawk)", tiger: "var(--tiger)" };
+const CHCOLOR = { Ta: "var(--ch-ta)", Ve: "var(--ch-ve)", Yb: "var(--ch-yb)" };
+
+/* ---------- svg helpers ---------- */
+function el(tag, attrs, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in (attrs || {})) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function svgRoot(host, w, h) {
+  host.innerHTML = "";
+  const s = el("svg", { viewBox: `0 0 ${w} ${h}`, role: "img" });
+  host.appendChild(s);
+  return s;
+}
+function text(p, x, y, str, cls, anchor) {
+  const t = el("text", { x, y, class: cls || "lbl", "text-anchor": anchor || "start" }, p);
+  t.textContent = str;
+  return t;
+}
+const tip = $("#tip");
+function showTip(evt, html) {
+  tip.innerHTML = html;
+  tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  let x = evt.clientX + 14, y = evt.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = evt.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = evt.clientY - r.height - 14;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function hideTip() { tip.style.opacity = 0; }
+function row(k, v) { return `<div class="r"><span>${k}</span><span>${v}</span></div>`; }
+
+/* ---------- the 3A verdict rule, ported from lib/sae/dilution.py ---------- */
+function classify(m, cfg) {
+  if (m.degenerate) return "absent";
+  const gap = m.asymptote_r2 - m.null_r2;
+  if (gap < 0.02 || m.asymptote_r2 < 0.02) return "absent";
+  if (cfg.randomFloor > 0 && m.random_asymptote_r2 !== undefined &&
+      m.asymptote_r2 - m.random_asymptote_r2 < cfg.randomFloor) return "absent";
+  if (m.knee_k <= 2 && m.community_size <= 3) return "captured";
+  if (m.solo_frac >= cfg.soloFrac && (m.intrinsic_dim <= cfg.idim || m.knee_k <= 2)) return "captured";
+  if (m.support_overlap < 0.15 && m.neg_coupling_frac > 0.5) return "tiled";
+  return "diluted";
+}
+const RULE = { soloFrac: 0.70, idim: 2.0, randomFloor: 0 };
+const DEFAULT_RULE = { soloFrac: 0.70, idim: 2.0, randomFloor: 0 };
+
+function tally(run, cfg) {
+  const t = { captured: 0, diluted: 0, tiled: 0, absent: 0, n: 0, changed: 0 };
+  for (const c of run.concepts) {
+    const v = classify(c, cfg);
+    t[v]++; t.n++;
+    if (v !== c.verdict) t.changed++;
+  }
+  t.geom = t.n ? (t.diluted + t.tiled) / t.n : 0;
+  return t;
+}
+
+/* =================================================================
+   01 PANEL
+   ================================================================= */
+function verdictLegend(host, withAbsent) {
+  host.innerHTML = VERDICTS.filter(v => withAbsent || v !== "absent").map(v =>
+    `<span class="chip ${v === "absent" ? "hollow" : ""}"><i class="dot" style="background:${v === "absent" ? "transparent" : VCOLOR[v]}"></i>${v}</span>`
+  ).join("");
+}
+
+function renderPanel() {
+  const rows = D.runs_3a.map(r => ({ r, t: tally(r, RULE) }));
+  const nAll = rows.reduce((a, x) => a + x.t.n, 0);
+  const nChanged = rows.reduce((a, x) => a + x.t.changed, 0);
+  const proceed = rows.filter(x => x.t.geom >= 0.5).length;
+  const withRandom = D.runs_3a.filter(r => r.n_with_random > 0).length;
+
+  $("#panelTiles").innerHTML = [
+    ["runs in panel", D.runs_3a.length, "SAE &times; BSP set"],
+    ["concept verdicts", nAll.toLocaleString(), "over 270 distinct concepts"],
+    ["gate G-3A passes", `${proceed}/${rows.length}`, "geom &ge; 0.50 &rarr; 3C proceeds"],
+    ["random control used", `${withRandom}/${D.runs_3a.length}`, "runs with a live control arm"],
+    ["verdicts changed", nChanged, "vs the published rule"],
+  ].map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+
+  verdictLegend($("#verdictLegend"), true);
+
+  const tb = $("#panelTable");
+  tb.innerHTML = `<thead><tr>
+    <th class="l">run</th><th class="l">champ</th><th class="l">hook</th><th class="l">bsp set</th>
+    <th>n</th><th class="l">mix</th><th>capt</th><th>dilu</th><th>tile</th><th>abs</th>
+    <th>geom</th><th>gate</th><th>mean R&sup2;</th><th>med solo</th><th>&Delta;</th></tr></thead>
+    <tbody>${rows.map(({ r, t }) => {
+      const g = r.gate;
+      const seg = v => t[v] ? `<span class="${v}" style="flex:${t[v]};${v === "absent" ? "" : "background:" + VCOLOR[v]}"></span>` : "";
+      const meanR2 = r.concepts.filter(c => c.asymptote_r2 !== undefined)
+        .reduce((a, c) => a + c.asymptote_r2, 0) / Math.max(1, r.concepts.length);
+      const solos = r.concepts.filter(c => c.solo_frac !== undefined).map(c => c.solo_frac).sort((a, b) => a - b);
+      const medSolo = solos.length ? solos[Math.floor(solos.length / 2)] : null;
+      const pass = t.geom >= 0.5;
+      return `<tr>
+        <td class="l mono" title="${r.run_id}">${r.run_id.slice(0, 26)}</td>
+        <td class="l">${r.champ}</td><td class="l mono">${r.hook}</td>
+        <td class="l mono">${r.bsp_set}</td><td>${t.n}</td>
+        <td class="l"><div class="vbar">${seg("captured")}${seg("diluted")}${seg("tiled")}${seg("absent")}</div></td>
+        <td>${t.captured}</td><td>${t.diluted}</td><td>${t.tiled}</td><td>${t.absent}</td>
+        <td><b>${fmt(t.geom, 2)}</b></td>
+        <td class="l" style="color:${pass ? "var(--good-ink)" : "var(--muted)"}">${pass ? "proceeds" : "deprioritised"}</td>
+        <td>${fmt(meanR2, 3)}</td><td>${fmt(medSolo, 2)}</td>
+        <td>${t.changed ? `<b style="color:var(--tiled)">${t.changed}</b>` : "<span class='dim'>0</span>"}</td>
+      </tr>`;
+    }).join("")}</tbody>`;
+
+  const rcOn = RULE.randomFloor > 0;
+  $("#panelNote").innerHTML = rcOn
+    ? `Random-model floor at ${fmt(RULE.randomFloor, 3)} R&sup2;. It can only act on the
+       ${withRandom} runs that carry a live control arm &mdash; the other
+       ${D.runs_3a.length - withRandom} advertise a control in their metadata but stored no
+       <code>random_asymptote_r2</code>, because the fc1 control SAE has zero alive latents.
+       <button class="flagref" data-goto="F1">see F1</button>`
+    : `The published rule never consults the random-model control. Raise the floor above to see which
+       verdicts survive a dictionary built on an untrained network.
+       <button class="flagref" data-goto="F1">see F1</button>`;
+
+  renderPanelScatter();
+}
+
+function renderPanelScatter() {
+  const host = $("#panelScatterWrap");
+  const W = 900, H = 330, m = { l: 52, r: 16, t: 14, b: 46 };
+  const s = svgRoot(host, W, H);
+  const runs = D.runs_3a;
+  const x = v => m.l + v * (W - m.l - m.r);
+  const y = v => H - m.b - v * (H - m.t - m.b);
+  for (let i = 0; i <= 5; i++) {
+    const gy = y(i / 5);
+    el("line", { class: "gl", x1: m.l, x2: W - m.r, y1: gy, y2: gy }, s);
+    text(s, m.l - 8, gy + 3, (i / 5).toFixed(1), "ax", "end");
+  }
+  for (let i = 0; i <= 5; i++) {
+    const gx = x(i / 5);
+    text(s, gx, H - m.b + 15, (i / 5).toFixed(1), "ax", "middle");
+  }
+  el("line", { class: "bl", x1: m.l, x2: W - m.r, y1: y(0), y2: y(0) }, s);
+  el("line", { class: "ref", x1: x(RULE.soloFrac), x2: x(RULE.soloFrac), y1: m.t, y2: y(0) }, s);
+  text(s, x(RULE.soloFrac) + 5, m.t + 10, `solo_frac ${fmt(RULE.soloFrac, 2)}`, "lbl-s");
+  text(s, m.l, H - 8, "median solo_frac → concentration in one latent", "axtitle");
+  const yt = text(s, 0, 0, "median asymptote R²", "axtitle", "middle");
+  yt.setAttribute("transform", `translate(12,${(m.t + y(0)) / 2}) rotate(-90)`);
+
+  const med = a => { const b = a.slice().sort((p, q) => p - q); return b.length ? b[Math.floor(b.length / 2)] : 0; };
+  runs.forEach(r => {
+    const cs = r.concepts.filter(c => c.solo_frac !== undefined);
+    const sf = med(cs.map(c => c.solo_frac)), r2 = med(cs.map(c => c.asymptote_r2));
+    const t = tally(r, RULE);
+    const g = el("g", { class: "pt" }, s);
+    el("circle", {
+      cx: x(sf), cy: y(r2), r: r.anchored ? 7 : 6,
+      fill: r.hook === "s4.fc1" ? CHCOLOR[r.champ] : "none",
+      stroke: CHCOLOR[r.champ], "stroke-width": 2
+    }, g);
+    if (r.anchored) el("circle", { cx: x(sf), cy: y(r2), r: 10, fill: "none", stroke: CHCOLOR[r.champ], "stroke-width": 1, "stroke-dasharray": "2 2" }, g);
+    g.addEventListener("mousemove", e => showTip(e,
+      `<b>${r.run_id}</b><br>${r.bsp_set}${r.anchored ? " &middot; anchored" : ""}` +
+      row("median solo_frac", fmt(sf, 3)) + row("median R²", fmt(r2, 3)) +
+      row("geometric_frac", fmt(t.geom, 2)) + row("captured", `${t.captured}/${t.n}`)));
+    g.addEventListener("mouseleave", hideTip);
+  });
+  host.insertAdjacentHTML("beforeend",
+    `<div class="legend" style="margin-top:12px">
+      ${["Ta", "Ve", "Yb"].map(c => `<span class="chip"><i class="dot" style="background:${CHCOLOR[c]};border-radius:99px"></i>champ${c}</span>`).join("")}
+      <span class="chip"><i class="dot" style="border-radius:99px;background:var(--muted)"></i>filled = fc1</span>
+      <span class="chip"><i class="dot" style="border-radius:99px;background:transparent;border:2px solid var(--muted)"></i>hollow = conv2</span>
+      <span class="chip">dashed ring = anchored (supervised)</span>
+    </div>`);
+}
+
+/* =================================================================
+   02 CONCEPTS
+   ================================================================= */
+let cState = { run: 0, fam: "all", verdict: "all", sort: "asymptote_r2", sel: null, view: "plot" };
+
+function initConcepts() {
+  const sel = $("#cRun");
+  sel.innerHTML = D.runs_3a.map((r, i) =>
+    `<option value="${i}">${r.champ} ${r.hook.replace("s4.", "")} ${r.bsp_set} — ${r.run_id.split("-")[0]}${r.anchored ? " anch" : ""}</option>`).join("");
+  $("#cVerd").innerHTML = `<option value="all">all</option>` + VERDICTS.map(v => `<option>${v}</option>`).join("");
+  $("#cSort").innerHTML = ["asymptote_r2", "solo_frac", "top_phi", "knee_k", "intrinsic_dim", "base_rate"]
+    .map(k => `<option value="${k}">${k}</option>`).join("");
+  sel.onchange = () => { cState.run = +sel.value; cState.sel = null; refreshFamilies(); renderConcepts(); };
+  $("#cFam").onchange = e => { cState.fam = e.target.value; renderConcepts(); };
+  $("#cVerd").onchange = e => { cState.verdict = e.target.value; renderConcepts(); };
+  $("#cSort").onchange = e => { cState.sort = e.target.value; renderConcepts(); };
+  $$("#v-concepts .seg button").forEach(b => b.onclick = () => {
+    cState.view = b.dataset.cv;
+    $$("#v-concepts .seg button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    $("#cTableCard").style.display = cState.view === "table" ? "" : "none";
+    renderConcepts();
+  });
+  refreshFamilies();
+}
+function refreshFamilies() {
+  const r = D.runs_3a[cState.run];
+  const fams = Array.from(new Set(r.concepts.map(c => c.fam || c.cat))).sort();
+  $("#cFam").innerHTML = `<option value="all">all</option>` + fams.map(f => `<option>${f}</option>`).join("");
+  cState.fam = "all";
+}
+function conceptSet() {
+  const r = D.runs_3a[cState.run];
+  return r.concepts.filter(c => c.asymptote_r2 !== undefined)
+    .filter(c => cState.fam === "all" || (c.fam || c.cat) === cState.fam)
+    .filter(c => cState.verdict === "all" || classify(c, RULE) === cState.verdict);
+}
+function renderConcepts() {
+  const r = D.runs_3a[cState.run], cs = conceptSet();
+  verdictLegend($("#cLegend"), false);
+  const host = $("#cScatter");
+  const W = 520, H = 360, m = { l: 48, r: 14, t: 12, b: 44 };
+  const s = svgRoot(host, W, H);
+  const maxR2 = Math.max(0.25, ...cs.map(c => c.asymptote_r2));
+  const x = v => m.l + v * (W - m.l - m.r);
+  const y = v => H - m.b - (v / maxR2) * (H - m.t - m.b);
+  for (let i = 0; i <= 4; i++) {
+    const gy = m.t + i * (H - m.t - m.b) / 4, val = maxR2 * (1 - i / 4);
+    el("line", { class: "gl", x1: m.l, x2: W - m.r, y1: gy, y2: gy }, s);
+    text(s, m.l - 7, gy + 3, val.toFixed(2), "ax", "end");
+  }
+  for (let i = 0; i <= 4; i++) text(s, x(i / 4), H - m.b + 15, (i / 4).toFixed(2), "ax", "middle");
+  el("line", { class: "bl", x1: m.l, x2: W - m.r, y1: y(0), y2: y(0) }, s);
+  el("line", { class: "ref", x1: x(RULE.soloFrac), x2: x(RULE.soloFrac), y1: m.t, y2: y(0) }, s);
+  text(s, x(RULE.soloFrac) - 4, m.t + 10, "captured →", "lbl-s", "end");
+  if (0.02 < maxR2) {
+    el("line", { class: "ref", x1: m.l, x2: W - m.r, y1: y(0.02), y2: y(0.02) }, s);
+    text(s, W - m.r, y(0.02) - 4, "absent floor", "lbl-s", "end");
+  }
+  text(s, m.l, H - 8, "solo_frac", "axtitle");
+  const yt = text(s, 0, 0, "asymptote R²", "axtitle", "middle");
+  yt.setAttribute("transform", `translate(11,${(m.t + y(0)) / 2}) rotate(-90)`);
+
+  cs.forEach(c => {
+    const v = classify(c, RULE);
+    const g = el("g", { class: "pt" }, s);
+    el("circle", {
+      cx: x(c.solo_frac), cy: y(c.asymptote_r2), r: 5,
+      fill: v === "absent" ? "none" : VCOLOR[v], stroke: "var(--surface)",
+      "stroke-width": 1.5, opacity: .92
+    }, g);
+    if (v === "absent") el("circle", { cx: x(c.solo_frac), cy: y(c.asymptote_r2), r: 5, fill: "none", stroke: "var(--absent)", "stroke-width": 1.5 }, g);
+    g.addEventListener("mousemove", e => showTip(e, `<b>${c.id}</b><br>${c.cat}` +
+      row("verdict", v) + row("asymptote R²", fmt(c.asymptote_r2)) +
+      row("solo_frac", fmt(c.solo_frac)) + row("top |phi|", fmt(Math.abs(c.top_phi))) +
+      row("knee_k", c.knee_k) + row("base rate", fmt(c.base_rate, 4))));
+    g.addEventListener("mouseleave", hideTip);
+    g.addEventListener("click", () => { cState.sel = c.id; renderDetail(); });
+  });
+  if (!cState.sel || !cs.find(c => c.id === cState.sel)) cState.sel = cs.length ? cs[0].id : null;
+  renderDetail();
+  renderConceptTable(cs);
+}
+
+function renderConceptTable(cs) {
+  const k = cState.sort;
+  const sorted = cs.slice().sort((a, b) => (b[k] || 0) - (a[k] || 0));
+  $("#cTable").innerHTML = `<thead><tr><th class="l">bsp</th><th class="l">family</th>
+    <th class="l">verdict</th><th>base</th><th>|phi|</th><th>R&sup2;</th><th>&plusmn;</th><th>null</th>
+    <th>solo</th><th>knee</th><th>comm</th><th>idim</th><th>overlap</th><th>neg</th></tr></thead>
+    <tbody>${sorted.map(c => {
+      const v = classify(c, RULE);
+      return `<tr><td class="l mono">${c.id}</td><td class="l">${c.fam || c.cat}</td>
+      <td class="l"><span class="chip ${v === "absent" ? "hollow" : ""}"><i class="dot" style="background:${v === "absent" ? "transparent" : VCOLOR[v]}"></i>${v}</span></td>
+      <td>${fmt(c.base_rate, 4)}</td><td>${fmt(Math.abs(c.top_phi))}</td><td>${fmt(c.asymptote_r2)}</td>
+      <td class="dim">${fmt(c.asymptote_r2_std)}</td><td class="dim">${fmt(c.null_r2, 4)}</td>
+      <td>${fmt(c.solo_frac, 2)}</td><td>${c.knee_k}</td><td>${c.community_size}</td>
+      <td>${fmt(c.intrinsic_dim, 2)}</td><td>${fmt(c.support_overlap, 2)}</td><td>${fmt(c.neg_coupling_frac, 2)}</td></tr>`;
+    }).join("")}</tbody>`;
+}
+
+function renderDetail() {
+  const r = D.runs_3a[cState.run];
+  const c = r.concepts.find(x => x.id === cState.sel);
+  if (!c) { $("#cCurve").innerHTML = ""; $("#cMetrics").innerHTML = ""; return; }
+  const v = classify(c, RULE);
+  $("#cDetailTitle").textContent = c.id;
+  $("#cDetailSub").innerHTML = `${c.cat} &middot; family <b>${c.fam || "–"}</b> &middot;
+    verdict <span class="chip ${v === "absent" ? "hollow" : ""}"><i class="dot" style="background:${v === "absent" ? "transparent" : VCOLOR[v]}"></i>${v}</span>`;
+
+  const host = $("#cCurve"), W = 520, H = 210, m = { l: 46, r: 16, t: 12, b: 38 };
+  const s = svgRoot(host, W, H);
+  const cur = c.curve || [];
+  const top = Math.max(0.05, ...cur, c.asymptote_r2);
+  const x = i => m.l + (i / Math.max(1, cur.length - 1)) * (W - m.l - m.r);
+  const y = val => H - m.b - (val / top) * (H - m.t - m.b);
+  for (let i = 0; i <= 4; i++) {
+    const gy = m.t + i * (H - m.t - m.b) / 4;
+    el("line", { class: "gl", x1: m.l, x2: W - m.r, y1: gy, y2: gy }, s);
+    text(s, m.l - 7, gy + 3, (top * (1 - i / 4)).toFixed(2), "ax", "end");
+  }
+  el("line", { class: "bl", x1: m.l, x2: W - m.r, y1: y(0), y2: y(0) }, s);
+  [1, 16, 32, 48, 64].filter(k => k <= cur.length).forEach(k =>
+    text(s, x(k - 1), H - m.b + 14, k, "ax", "middle"));
+  text(s, m.l, H - 6, "latents added, ranked by |phi|", "axtitle");
+  if (cur.length) {
+    el("line", { class: "ref", x1: m.l, x2: W - m.r, y1: y(c.asymptote_r2), y2: y(c.asymptote_r2) }, s);
+    text(s, W - m.r, y(c.asymptote_r2) - 5, "asymptote", "lbl-s", "end");
+    const area = el("path", {
+      d: `M${x(0)},${y(0)} ` + cur.map((val, i) => `L${x(i)},${y(val)}`).join(" ") + ` L${x(cur.length - 1)},${y(0)} Z`,
+      fill: VCOLOR[v] === "var(--absent)" ? "var(--absent)" : VCOLOR[v], opacity: .10
+    }, s);
+    el("path", {
+      d: "M" + cur.map((val, i) => `${x(i)},${y(val)}`).join(" L"),
+      fill: "none", stroke: v === "absent" ? "var(--absent)" : VCOLOR[v], "stroke-width": 2,
+      "stroke-linejoin": "round"
+    }, s);
+    const ki = Math.min(cur.length - 1, c.knee_k - 1);
+    el("circle", { cx: x(ki), cy: y(cur[ki]), r: 5, fill: "var(--surface)", stroke: v === "absent" ? "var(--absent)" : VCOLOR[v], "stroke-width": 2 }, s);
+    text(s, x(ki) + 8, y(cur[ki]) - 6, `knee k=${c.knee_k}`, "lbl");
+    el("circle", { cx: x(0), cy: y(cur[0]), r: 4, fill: v === "absent" ? "var(--absent)" : VCOLOR[v] }, s);
+    text(s, x(0) + 7, y(cur[0]) + 13, `solo ${fmt(c.solo_frac, 2)}`, "lbl-s");
+  }
+
+  const M = [
+    ["base_rate", fmt(c.base_rate, 4)], ["top_phi (= MCC)", fmt(c.top_phi)],
+    ["asymptote_r2", fmt(c.asymptote_r2)], ["asymptote_r2_std", fmt(c.asymptote_r2_std)],
+    ["null_r2", fmt(c.null_r2, 4)],
+    ["random_asymptote_r2", c.random_asymptote_r2 === undefined ? "not measured" : fmt(c.random_asymptote_r2)],
+    ["solo_r2", fmt(c.solo_r2)], ["solo_frac", fmt(c.solo_frac)],
+    ["knee_k", c.knee_k], ["community_size", c.community_size],
+    ["intrinsic_dim", fmt(c.intrinsic_dim, 2)], ["support_overlap", fmt(c.support_overlap, 2)],
+    ["neg_coupling_frac", fmt(c.neg_coupling_frac, 2)], ["n_candidates", c.n_candidates],
+    ["n_curve_positives", (c.n_curve_positives || 0).toLocaleString()],
+  ];
+  $("#cMetrics").innerHTML = `<div class="scroller" style="margin-top:14px"><table>
+    <thead><tr><th class="l">metric</th><th>value</th><th class="l">metric</th><th>value</th></tr></thead>
+    <tbody>${Array.from({ length: Math.ceil(M.length / 2) }, (_, i) => {
+      const a = M[i * 2], b = M[i * 2 + 1];
+      return `<tr><td class="l mono">${a[0]}</td><td>${a[1]}</td>
+        <td class="l mono">${b ? b[0] : ""}</td><td>${b ? b[1] : ""}</td></tr>`;
+    }).join("")}</tbody></table></div>`;
+}
+
+/* =================================================================
+   03 EFFICIENCY
+   ================================================================= */
+let eState = { hook: "s4.fc1", margin: 0.05 };
+function initEfficiency() {
+  $("#eHook").innerHTML = ["s4.fc1", "s4.conv2"].map(h => `<option>${h}</option>`).join("");
+  $("#eHook").onchange = e => { eState.hook = e.target.value; renderEfficiency(); };
+  $("#eMargin").oninput = e => {
+    eState.margin = +e.target.value; $("#eMarginVal").textContent = fmt(eState.margin, 2);
+    renderEfficiency();
+  };
+}
+function renderEfficiency() {
+  const packs = D.efficiency.filter(p => p.hook === eState.hook)
+    .sort((a, b) => "TaVeYb".indexOf(a.champ) - "TaVeYb".indexOf(b.champ));
+  $("#eLegend").innerHTML = ["gorilla", "hawk", "tiger"].map(b =>
+    `<span class="chip"><i class="dot" style="background:${BCOLOR[b]};border-radius:99px"></i>${b}</span>`).join("") +
+    `<span class="chip"><i class="dot" style="border-radius:99px;background:transparent;border:2px solid var(--muted)"></i>linear probe (available)</span>
+     <span class="chip"><i class="dot" style="border-radius:99px;background:var(--muted)"></i>best SAE latent (captured)</span>`;
+
+  const FAMS = ["line_threat", "square_threat", "global_threat", "offered_completion", "pool_reasoning"];
+  const host = $("#eDumbbell");
+  const rowH = 20, padTop = 34, headH = 26;
+  const bl = 176, W = 900;
+  let H = 12;
+  const blocks = packs.map(p => {
+    const items = [];
+    FAMS.forEach(f => {
+      ["gorilla", "hawk", "tiger"].forEach(b => {
+        const r = p.per_basis[b] && p.per_basis[b].families[f];
+        if (r) items.push({ f, b, ...r });
+      });
+    });
+    return { p, items };
+  });
+  blocks.forEach(bk => { H += headH + bk.items.length * rowH + padTop; });
+  const s = svgRoot(host, W, H);
+  const x = v => bl + v * (W - bl - 60);
+  let cy = 16;
+  blocks.forEach(bk => {
+    text(s, 0, cy, `champ${bk.p.champ}  ·  ${bk.p.run_id.split("-")[0]}`, "lbl").style.fontWeight = "700";
+    text(s, bl, cy, "0", "ax", "middle");
+    [0.25, 0.5, 0.75, 1].forEach(t => text(s, x(t), cy, t.toFixed(2), "ax", "middle"));
+    cy += 10;
+    const top = cy;
+    [0, .25, .5, .75, 1].forEach(t =>
+      el("line", { class: "gl", x1: x(t), x2: x(t), y1: top, y2: top + bk.items.length * rowH }, s));
+    let last = null;
+    bk.items.forEach((it, i) => {
+      const yy = top + i * rowH + rowH / 2;
+      const col = BCOLOR[it.b];
+      if (it.f !== last) { text(s, 0, yy + 3, it.f, "lbl"); last = it.f; }
+      text(s, 118, yy + 3, it.b, "lbl-s");
+      const lp = it.lp_mcc_at_pref || 0, sae = it.sae_mcc_at_pref || 0;
+      el("line", { x1: x(Math.min(lp, sae)), x2: x(Math.max(lp, sae)), y1: yy, y2: yy, stroke: col, "stroke-width": 2, opacity: .35 }, s);
+      el("circle", { cx: x(lp), cy: yy, r: 5, fill: "var(--surface)", stroke: col, "stroke-width": 2 }, s);
+      const g = el("g", { class: "pt" }, s);
+      el("circle", { cx: x(sae), cy: yy, r: 5, fill: col, stroke: "var(--surface)", "stroke-width": 1.5 }, g);
+      const eff = it.efficiency;
+      text(s, W - 54, yy + 3, eff === null ? "n/a" : (100 * eff).toFixed(0) + "%", "lbl");
+      g.addEventListener("mousemove", e => showTip(e, `<b>${it.f}</b> &middot; ${it.b} &middot; champ${bk.p.champ}` +
+        row("n BSPs", it.n_bsps) + row("LP mcc@pref", fmt(lp)) + row("SAE mcc@pref", fmt(sae)) +
+        row("efficiency", eff === null ? "suppressed (LP below floor)" : fmt(eff, 2)) +
+        row("SAE Youden J", fmt(it.sae_youden_j)) + row("LP Youden J", fmt(it.lp_youden_j)) +
+        row("base rate", fmt(it.base_rate, 3))));
+      g.addEventListener("mouseleave", hideTip);
+    });
+    cy = top + bk.items.length * rowH + padTop;
+  });
+  text(s, bl, H - 6, "mcc_at_pref (p_ref = 0.025)", "axtitle");
+  text(s, W - 54, H - 6, "efficiency", "axtitle");
+
+  // verdict table with margin
+  const FAM3 = ["line_threat", "square_threat", "global_threat"];
+  let ties = 0, calls = 0;
+  const rows = [];
+  packs.forEach(p => FAM3.forEach(f => {
+    const cand = ["gorilla", "hawk", "tiger"]
+      .map(b => ({ b, r: p.per_basis[b] && p.per_basis[b].families[f] }))
+      .filter(o => o.r && o.r.efficiency !== null)
+      .sort((a, b) => b.r.efficiency - a.r.efficiency);
+    if (cand.length < 2) return;
+    calls++;
+    const gap = cand[0].r.efficiency - cand[1].r.efficiency;
+    const decided = gap >= eState.margin;
+    if (!decided) ties++;
+    rows.push({ champ: p.champ, f, cand, gap, decided });
+  }));
+  const wins = {};
+  rows.filter(r => r.decided).forEach(r => wins[r.cand[0].b] = (wins[r.cand[0].b] || 0) + 1);
+  $("#eVerdictTable").innerHTML = `<thead><tr><th class="l">champ</th><th class="l">family</th>
+    <th>gorilla</th><th>hawk</th><th>tiger</th><th>lead</th><th class="l">call</th></tr></thead><tbody>` +
+    rows.map(r => {
+      const get = b => { const o = r.cand.find(c => c.b === b); return o ? (100 * o.r.efficiency).toFixed(0) + "%" : "–"; };
+      const winner = r.cand[0].b;
+      return `<tr><td class="l">champ${r.champ}</td><td class="l">${r.f}</td>
+      ${["gorilla", "hawk", "tiger"].map(b => `<td${b === winner && r.decided ? ' style="font-weight:700"' : ""}>${get(b)}</td>`).join("")}
+      <td>${(100 * r.gap).toFixed(0)}pp</td>
+      <td class="l">${r.decided
+        ? `<span class="chip"><i class="dot" style="background:${BCOLOR[winner]}"></i>${winner}</span>`
+        : `<span class="chip">tie — below margin</span>`}</td></tr>`;
+    }).join("") + "</tbody>";
+  $("#eNote").innerHTML = `At a ${(100 * eState.margin).toFixed(0)}pp margin, <b>${ties} of ${calls}</b>
+    family cells on ${eState.hook} are statistical ties.
+    Decided cells: ${Object.entries(wins).map(([b, n]) => `${b} ${n}`).join(", ") || "none"}.
+    The shipped script reports a winner at any margin, including 0.
+    <button class="flagref" data-goto="F4">see F4</button>`;
+}
+
+/* =================================================================
+   04 CHAMPIONS
+   ================================================================= */
+function renderChampions() {
+  const sp = D.shared_probe;
+  $("#champTiles").innerHTML = [
+    ["shared positions", sp.n_shared.toLocaleString(), "boards all three champions hold"],
+    ["family cells", sp.n_cells, "basis × concept family"],
+    ["ranking flips", sp.ranking_flips.length, `at spread ≥ ${sp.min_spread}`],
+    ["ties", sp.ties.length, "reordered but not separated"],
+    ["label agreement", Object.values(sp.label_agreement).every(Boolean) ? "exact" : "MISMATCH", "same board → same label"],
+  ].map(([k, v, d]) => `<div class="tile"><div class="k">${k}</div><div class="v">${v}</div><div class="d">${d}</div></div>`).join("");
+
+  $("#chLegend").innerHTML = ["Ta", "Ve", "Yb"].map(c =>
+    `<span class="chip"><i class="dot" style="background:${CHCOLOR[c]};border-radius:99px"></i>champ${c}</span>`).join("");
+
+  const bases = Object.keys(sp.per_basis);
+  const cells = [];
+  bases.forEach(b => {
+    const fams = Array.from(new Set(Object.values(sp.per_basis[b]).flatMap(v => Object.keys(v.per_family)))).sort();
+    fams.forEach(f => cells.push({ b, f }));
+  });
+  const cols = 3, cw = 300, ch = 190, gap = 18;
+  const rowsN = Math.ceil(cells.length / cols);
+  const W = cols * cw + (cols - 1) * gap, H = rowsN * ch + (rowsN - 1) * gap;
+  const s = svgRoot($("#chSlopes"), W, H);
+  const reg = D.registry;
+
+  cells.forEach((cell, i) => {
+    const ox = (i % cols) * (cw + gap), oy = Math.floor(i / cols) * (ch + gap);
+    const g = el("g", { transform: `translate(${ox},${oy})` }, s);
+    const m = { l: 42, r: 42, t: 34, b: 26 };
+    const vals = [];
+    ["Ta", "Ve", "Yb"].forEach(c => {
+      const shared = (sp.per_basis[cell.b][c].per_family[cell.f] || {}).mean_mcc_at_pref;
+      const rid = sp.runs[c];
+      const rr = reg.find(x => x.run_id === rid && x.bsp_set === cell.b + c);
+      let own = null;
+      if (rr) {
+        const fam = D.families[cell.b];
+        let num = 0, den = 0;
+        for (const [cat, cv] of Object.entries(rr.per_category)) {
+          const anyBsp = Object.entries(fam).find(([, v]) => v.c === cat);
+          if (anyBsp && anyBsp[1].f === cell.f && cv.mean_mcc_at_pref != null) {
+            num += cv.mean_mcc_at_pref * cv.count; den += cv.count;
+          }
+        }
+        if (den) own = num / den;
+      }
+      vals.push({ c, own, shared });
+    });
+    const all = vals.flatMap(v => [v.own, v.shared]).filter(v => v != null);
+    const lo = 0, hi = Math.max(0.1, ...all) * 1.15;
+    const y = v => ch - m.b - ((v - lo) / (hi - lo)) * (ch - m.t - m.b);
+    text(g, 0, 12, `${cell.b} · ${cell.f}`, "lbl").style.fontWeight = "700";
+    el("line", { class: "bl", x1: m.l, x2: m.l, y1: m.t, y2: ch - m.b }, g);
+    el("line", { class: "bl", x1: cw - m.r, x2: cw - m.r, y1: m.t, y2: ch - m.b }, g);
+    text(g, m.l, ch - 10, "own", "ax", "middle");
+    text(g, cw - m.r, ch - 10, "shared", "ax", "middle");
+    vals.forEach(v => {
+      if (v.own == null || v.shared == null) return;
+      const col = CHCOLOR[v.c];
+      el("line", { x1: m.l, x2: cw - m.r, y1: y(v.own), y2: y(v.shared), stroke: col, "stroke-width": 2 }, g);
+      el("circle", { cx: m.l, cy: y(v.own), r: 4, fill: col, stroke: "var(--surface)", "stroke-width": 1.5 }, g);
+      el("circle", { cx: cw - m.r, cy: y(v.shared), r: 4, fill: col, stroke: "var(--surface)", "stroke-width": 1.5 }, g);
+      text(g, m.l - 6, y(v.own) + 3, v.own.toFixed(2), "lbl-s", "end");
+      text(g, cw - m.r + 6, y(v.shared) + 3, v.shared.toFixed(2), "lbl-s");
+    });
+  });
+
+  const cats = ["threat_line", "threat_square_2x2", "cell_attribute", "cell_occupancy", "game_phase", "offered_piece", "global"];
+  const lp = D.lp.filter(l => l.hook === "s4.fc1" && l.basis === "gorilla");
+  $("#chTable").innerHTML = `<thead><tr><th class="l">gorilla category</th><th>n</th><th>base rate</th>
+    ${["Ta", "Ve", "Yb"].map(c => `<th>${c} MCC</th>`).join("")}
+    ${["Ta", "Ve", "Yb"].map(c => `<th>${c} J</th>`).join("")}
+    ${["Ta", "Ve", "Yb"].map(c => `<th>${c} LP MCC</th>`).join("")}</tr></thead><tbody>` +
+    cats.map(cat => {
+      const cells = ["Ta", "Ve", "Yb"].map(c => {
+        const rr = reg.find(x => x.run_id === sp.runs[c] && x.bsp_set === "gorilla" + c);
+        return rr ? rr.per_category[cat] : null;
+      });
+      const lps = ["Ta", "Ve", "Yb"].map(c => {
+        const l = lp.find(x => x.champ === c); return l ? l.per_category[cat] : null;
+      });
+      const ref = cells.find(Boolean);
+      return `<tr><td class="l mono">${cat}</td><td>${ref ? ref.count : ""}</td>
+        <td class="dim">${ref ? fmt(ref.mean_base_rate, 4) : ""}</td>
+        ${cells.map(v => `<td>${v ? fmt(v.mean_mcc) : "–"}</td>`).join("")}
+        ${cells.map(v => `<td class="dim">${v ? fmt(v.mean_youden_j) : "–"}</td>`).join("")}
+        ${lps.map(v => `<td class="dim">${v ? fmt(v.mean_mcc) : "–"}</td>`).join("")}</tr>`;
+    }).join("") + "</tbody>";
+}
+
+/* =================================================================
+   05 HEALTH
+   ================================================================= */
+let hState = { hook: "all", bsp: "gorilla", x: "dead" };
+const PANEL_RUNS = new Set(D.runs_3a.map(r => r.run_id));
+function initHealth() {
+  $("#hHook").innerHTML = ["all", "s4.fc1", "s4.conv2"].map(v => `<option>${v}</option>`).join("");
+  $("#hBsp").innerHTML = ["gorilla", "hawk", "tiger"].map(v => `<option>${v}</option>`).join("");
+  $("#hX").innerHTML = [["dead", "dead features %"], ["fvu", "FVU (reconstruction)"], ["l0", "L0 sparsity"]]
+    .map(([v, l]) => `<option value="${v}">${l}</option>`).join("");
+  $("#hHook").onchange = e => { hState.hook = e.target.value; renderHealth(); };
+  $("#hBsp").onchange = e => { hState.bsp = e.target.value; renderHealth(); };
+  $("#hX").onchange = e => { hState.x = e.target.value; renderHealth(); };
+}
+function renderHealth() {
+  const rows = D.registry.filter(r => r.bsp_set.startsWith(hState.bsp))
+    .filter(r => hState.hook === "all" || r.hook === hState.hook)
+    .filter(r => r[hState.x] != null && r.mcc != null);
+  const W = 900, H = 380, m = { l: 54, r: 18, t: 14, b: 46 };
+  const s = svgRoot($("#hScatter"), W, H);
+  const xs = rows.map(r => r[hState.x]);
+  const xmin = hState.x === "dead" ? Math.min(80, ...xs) : 0;
+  const xmax = Math.max(...xs) * 1.03;
+  const ymax = Math.max(0.5, ...rows.map(r => r.mcc)) * 1.08;
+  const X = v => m.l + ((v - xmin) / (xmax - xmin)) * (W - m.l - m.r);
+  const Y = v => H - m.b - (v / ymax) * (H - m.t - m.b);
+  for (let i = 0; i <= 5; i++) {
+    const gy = m.t + i * (H - m.t - m.b) / 5;
+    el("line", { class: "gl", x1: m.l, x2: W - m.r, y1: gy, y2: gy }, s);
+    text(s, m.l - 8, gy + 3, (ymax * (1 - i / 5)).toFixed(2), "ax", "end");
+  }
+  for (let i = 0; i <= 5; i++) {
+    const v = xmin + (xmax - xmin) * i / 5;
+    text(s, X(v), H - m.b + 15, hState.x === "dead" ? v.toFixed(0) : v.toFixed(hState.x === "l0" ? 0 : 3), "ax", "middle");
+  }
+  el("line", { class: "bl", x1: m.l, x2: W - m.r, y1: Y(0), y2: Y(0) }, s);
+  text(s, m.l, H - 8, { dead: "dead features (%)", fvu: "FVU", l0: "L0" }[hState.x], "axtitle");
+  const yt = text(s, 0, 0, "coverage MCC", "axtitle", "middle");
+  yt.setAttribute("transform", `translate(12,${(m.t + Y(0)) / 2}) rotate(-90)`);
+
+  rows.forEach(r => {
+    const g = el("g", { class: "pt" }, s);
+    const col = CHCOLOR[r.champ];
+    const panel = PANEL_RUNS.has(r.run_id);
+    if (r.random) {
+      el("rect", { x: X(r[hState.x]) - 4, y: Y(r.mcc) - 4, width: 8, height: 8, fill: "none", stroke: "var(--muted)", "stroke-width": 2 }, g);
+    } else {
+      el("circle", { cx: X(r[hState.x]), cy: Y(r.mcc), r: panel ? 5 : 3.5, fill: col, opacity: panel ? 1 : .5, stroke: "var(--surface)", "stroke-width": 1 }, g);
+      if (panel) el("circle", { cx: X(r[hState.x]), cy: Y(r.mcc), r: 9, fill: "none", stroke: col, "stroke-width": 1.5 }, g);
+    }
+    g.addEventListener("mousemove", e => showTip(e, `<b>${r.run_id}</b><br>${r.bsp_set}` +
+      row("MCC", fmt(r.mcc)) + row("Youden J", fmt(r.j)) + row("MCC@pref", fmt(r.mccp)) +
+      row("dead %", fmt(r.dead, 1)) + row("FVU", fmt(r.fvu, 3)) + row("L0", fmt(r.l0, 1)) +
+      row("alive latents", Math.round(4096 * (1 - r.dead / 100))) +
+      (panel ? "<br><b>panel run</b>" : "")));
+    g.addEventListener("mouseleave", hideTip);
+  });
+  $("#hScatter").insertAdjacentHTML("beforeend",
+    `<div class="legend" style="margin-top:12px">
+      ${["Ta", "Ve", "Yb"].map(c => `<span class="chip"><i class="dot" style="background:${CHCOLOR[c]};border-radius:99px"></i>champ${c}</span>`).join("")}
+      <span class="chip"><i class="dot" style="border-radius:99px;background:transparent;border:2px solid var(--muted)"></i>ringed = panel run</span>
+      <span class="chip"><i class="dot" style="background:transparent;border:2px solid var(--muted)"></i>square = random-model control</span>
+    </div>`);
+
+  const panel = D.registry.filter(r => PANEL_RUNS.has(r.run_id) || r.random);
+  $("#hTable").innerHTML = `<thead><tr><th class="l">run</th><th class="l">bsp</th><th>L0</th>
+    <th>FVU</th><th>dead %</th><th>alive</th><th>MCC</th><th>J</th><th>MCC@pref</th><th>F1</th>
+    <th class="l">cache schema</th></tr></thead><tbody>` +
+    panel.sort((a, b) => a.run_id.localeCompare(b.run_id) || a.bsp_set.localeCompare(b.bsp_set))
+      .map(r => `<tr><td class="l mono">${r.run_id.slice(0, 34)}</td><td class="l mono">${r.bsp_set}</td>
+      <td>${fmt(r.l0, 1)}</td><td>${fmt(r.fvu, 3)}</td>
+      <td${r.dead > 98 ? ' style="color:var(--critical);font-weight:700"' : ""}>${fmt(r.dead, 1)}</td>
+      <td>${Math.round(4096 * (1 - r.dead / 100))}</td>
+      <td>${fmt(r.mcc)}</td><td>${fmt(r.j)}</td><td>${fmt(r.mccp)}</td><td class="dim">${fmt(r.f1)}</td>
+      <td class="l">${r.current_schema ? "current" : "<span style='color:var(--serious)'>stale</span>"}</td></tr>`).join("") +
+    "</tbody>";
+}
+
+/* =================================================================
+   06 REVIEW
+   ================================================================= */
+const FINDINGS = [
+  {
+    id: "F1", sev: "critical", title: "The random-model control is recorded but never used, and at fc1 it does not exist",
+    what: `<code>diagnose_concept</code> computes <code>random_asymptote_r2</code> when a control cache is
+      supplied, but <code>classify</code> never reads it &mdash; the <code>absent</code> arm is decided
+      against a label-permutation null alone. Separately, the fc1 control SAE
+      (<code>R1-champ*random-jumprelu-t64</code>) collapsed to <b>zero alive latents</b>
+      (98.4% dead, the survivors firing on &gt; 99.9% of rows), so 12 of the 17 reports name a
+      <code>random_control</code> in their metadata while storing no control number at all.`,
+    ev: `Measured directly: running the 3A pipeline on the <i>random-model</i> conv2 dictionary with
+      <i>real</i> gorilla labels returns <b>diluted on every threat concept</b> (R&sup2; 0.025&ndash;0.034,
+      above the 0.02 absent floor). A permuted label correctly returns absent (R&sup2; &asymp; &minus;0.001),
+      so the arm works against pure noise but not against the architectural prior.
+      Applying a 0.02 random-control floor to the four runs that do carry the control drops
+      <code>E05-champYb conv2 / tigerYb</code> from geometric_frac <b>1.00 to 0.17</b> &mdash; a gate flip.`,
+    imp: `G-3A currently passes at 0.96&ndash;1.00 on a criterion an <i>untrained network's</i> dictionary
+      also passes. That is the same failure the project already documented for the
+      <code>captured</code> arm on 2026-07-27, on the other arm.`,
+    fix: `Add the control term to <code>classify</code> as rule 3A.3 (<code>absent</code> when
+      <code>asymptote_r2 &minus; random_asymptote_r2 &lt; margin</code>), retrain the fc1 control with
+      TopK or BatchTopK instead of JumpReLU-t64, and make a named-but-missing control a hard error
+      rather than a metadata string. Reclassification needs no GPU.`,
+    go: "panel",
+  },
+  {
+    id: "F2", sev: "serious", title: "The conv2 panel run for champYb is a degenerate dictionary",
+    what: `<code>E05-champYb-batchtopk-k32-exp8-s4.conv2</code> has <b>99.0% dead features</b>
+      (41 alive of 4,096), FVU 0.110 against 0.043 / 0.051 for the same recipe on champTa / champVe,
+      and coverage MCC 0.163 against 0.330 for champYb's own best conv2 SAE (E01).`,
+    ev: `Because only 41 latents are alive, <code>top_k = 64</code> cannot be filled:
+      <code>n_candidates = 41</code> for every concept in that run, against 64 everywhere else.
+      <code>asymptote_r2</code> is therefore measured at a different support and is not comparable
+      across the panel. It is also the one cell where the trained SAE fails the random-control test.`,
+    imp: `Two published cells rest on it: "3A tigerYb conv2 = 100% geometric" and
+      "champYb conv2 efficiency is negligible (0.08&ndash;0.13)". Both describe a broken dictionary,
+      not champYb's conv2 representation.`,
+    fix: `Either report it as a recipe failure (matched-recipe panel, stated as such) or swap the
+      conv2 panel member to champYb's healthiest conv2 run and re-derive. Add an SAE-health gate to
+      both runners: refuse a panel member with dead% above ~98 or alive &lt; top_k.`,
+    go: "health",
+  },
+  {
+    id: "F3", sev: "serious", title: "“diluted” is the residual bucket, not a measurement",
+    what: `<code>diluted</code> is whatever is not absent, not captured and not tiled. Its glossary
+      entry promises “many mutually-overlapping latents”, but nothing in the rule tests that.
+      Four concepts are labelled diluted while their co-firing community is a <i>single latent</i>,
+      which the label directly contradicts.`,
+    ev: `Across 1,100 verdicts: <b>782 diluted, 276 captured, 42 tiled, 0 absent</b>. <code>tiled</code>
+      fires 3.8% of the time and never once on champYb; <code>absent</code> never fires at all. So the
+      four-way verdict is in practice a two-way split, and <code>geometric_frac</code> is exactly
+      <code>1 &minus; captured_frac</code>. Of the 782 diluted concepts, <b>39 have a community of
+      three latents or fewer</b> and <b>61 sit below R&sup2; = 0.05</b>, one notch above the absent
+      floor &mdash; neither matches the "many mutually-overlapping latents" the label promises.`,
+    imp: `The diluted/tiled distinction is what selects the 3C architecture (aggregating readout vs
+      manifold-aware readout). At 4% incidence it cannot carry that decision.`,
+    fix: `Report <code>geometric_frac</code> as <code>1 &minus; captured</code> and stop calling the
+      remainder diluted, or give <code>diluted</code> a positive test on the community
+      (e.g. <code>community_size &ge; 4 AND support_overlap &ge; 0.15</code>) and add a fifth verdict
+      for "concentrated but weak".`,
+    go: "concepts",
+  },
+  {
+    id: "F4", sev: "serious", title: "The hawk-vs-tiger verdict is a coin flip on fc1 and flips with the hook",
+    what: `<code>sae_lp_efficiency.py</code> picks a family winner with <code>max()</code> over three
+      efficiencies, with no effect-size floor and no uncertainty.`,
+    ev: `On champTa/fc1, line_threat efficiency is gorilla 0.41 / hawk 0.42 / tiger 0.41 &mdash; a 1pp
+      lead declared a winner. Raise the margin control on the SAE-vs-probe view to 5pp and most fc1
+      cells become ties. The verdict also inverts by hook: <b>tiger wins every conv2 cell, gorilla or
+      hawk wins every fc1 cell</b>, and fc1 is where this project's best SAEs live.`,
+    imp: `The 2026-05-22 "supervision pivot targets tiger" decision was re-examined precisely to fix
+      an under-powered comparison. The re-run is better controlled but reports rank order without a
+      margin, so it can restate a tie as a decision.`,
+    fix: `Require a pre-registered lead (e.g. 5pp of mcc_at_pref, or a bootstrap CI over the BSPs in
+      the family) before naming a winner; report "tie" otherwise. Report the hook split as the
+      finding it is rather than pooling.`,
+    go: "efficiency",
+  },
+  {
+    id: "F5", sev: "serious", title: "mcc_at_pref is extrapolated 20x on the high-prevalence families",
+    what: `<code>p_ref = 0.025</code> was chosen inside the observed range of the <i>tiger conjunction</i>
+      base rates (0.019&ndash;0.050). It is applied unconditionally, including to
+      <code>tiger_pool_safe_count</code> (base 0.62), <code>tiger_decision_global</code> (0.45),
+      <code>offered_piece</code> (0.50) and <code>game_phase</code> (0.33).`,
+    ev: `Standardisation moves the hawk LP from MCC 0.66 to 0.76 and the tiger LP from 0.54 to 0.40 &mdash;
+      the hawk-vs-tiger gap it is supposed to neutralise is substantially <i>created</i> by it, because
+      tiger's high-prevalence families are pushed 20x down in prevalence and hawk's rare ones are
+      pushed up.`,
+    imp: `Every cross-basis efficiency number depends on a label-shift assumption
+      (class-conditional distributions fixed while the prior moves) that is untested at that distance.`,
+    fix: `Restrict <code>mcc_at_pref</code> to BSPs whose base rate is within, say, [0.005, 0.10];
+      elsewhere report raw MCC and Youden's J and mark the cell as not standardisable. Record the
+      standardisation distance <code>|log(p/p_ref)|</code> next to every standardised number.`,
+    go: "efficiency",
+  },
+  {
+    id: "F6", sev: "warning", title: "The SAE side of every ratio is an in-sample maximum; the probe side is held out",
+    what: `<code>match_features_to_bsps</code> scores all 4,096 latents on all N rows and takes the
+      maximum; <code>linear_probe_baseline.py</code> fits on 80% and reports the held-out 20%.
+      The efficiency ratio therefore divides a selection-inflated numerator by an honest denominator.`,
+    ev: `For a base-rate 0.009 BSP the sampling SE of phi is ~0.006, so the maximum over 4,096
+      independent candidates carries roughly +0.02 MCC of selection bias &mdash; small against
+      champYb's 0.71, large against a 0.10 cell.`,
+    imp: `Efficiency is biased upward, most in exactly the weak cells where the ratio is already
+      least stable.`,
+    fix: `Split-half the SAE side: select the argmax latent on half the rows, score it on the other
+      half. Cheap, and it makes SAE and LP numbers directly comparable for the first time.`,
+    go: "efficiency",
+  },
+  {
+    id: "F7", sev: "warning", title: "champVe's 3A runs used row-wise splits; champTa's and champYb's used orbit-aware splits",
+    what: `<code>orbit_aware_split</code> is <code>false</code> for all <b>seven</b> champVe rows and
+      <code>true</code> for all ten champTa and champYb rows &mdash; no <code>orbit_ids</code> file matches
+      N = 289,795.`,
+    ev: `Positions are deduplicated by exact bytes, so the eight board symmetries survive as separate
+      rows. Without orbit grouping, a position and its rotation can straddle a train/test split, which
+      inflates held-out R&sup2;.`,
+    imp: `champVe's numbers are the optimistic ones. The champYb &gt; champVe headline survives
+      (it is measured against the inflated comparator), but any quantitative Ve-vs-Yb or Ve-vs-Ta
+      statement is measured under two different estimators.`,
+    fix: `Generate <code>orbit_ids-amalgam_ve_unique.pt</code> and re-run the five champVe cells.
+      Everything else is cached; this is minutes of CPU, not GPU.`,
+    go: "panel",
+  },
+  {
+    id: "F8", sev: "warning", title: "242 of 405 champion-era matching caches are on the old metric schema",
+    what: `The registry rows carry <code>coverage_youden_j</code> and <code>coverage_mcc_at_pref</code>,
+      but the <code>*_matching-*.pt</code> caches they were derived from often do not: the backfill's
+      skip condition is keyed on the registry row, so a stale cache under a current row is never
+      repaired.`,
+    ev: `<code>F04-champVe:tigerVe</code> and all three <code>E05-champTa</code> conv2 caches lack
+      <code>youden_j</code>, <code>mcc_at_pref</code> and their argmax indices while their registry
+      rows are complete. 264 registry rows (mostly retired champAa/champS4) are still stale as well.`,
+    imp: `Nothing published today depends on it &mdash; but the planned 3B top-K export reads exactly
+      these caches, and will silently produce partial results.`,
+    fix: `Key the backfill's skip on the cache as well as the row, and add a
+      <code>--verify-caches</code> pass. One line, no recompute for the 163 already-current caches.`,
+    go: "health",
+  },
+  {
+    id: "F9", sev: "warning", title: "MCC, J and MCC@pref are each reported from a different latent",
+    what: `<code>compute_per_category_coverage</code> takes an independent argmax per metric, so the
+      "three numbers reported together" can describe three different features of the same dictionary.`,
+    ev: `On <code>F04-champYb:gorillaYb</code> the MCC-argmax and J-argmax latents agree on only 67%
+      of BSPs, and the reported mean J is 0.030 higher than the J of the MCC-argmax latent.`,
+    imp: `The documented reading &mdash; "MCC-vs-J divergence tells you how much of a gap is
+      prevalence" &mdash; is only valid for one fixed detector. Part of the divergence is feature
+      choice, not prevalence.`,
+    fix: `Also emit <code>youden_j_at_mcc_argmax</code> and <code>mcc_at_pref_at_mcc_argmax</code>;
+      use those for the divergence read and keep the per-metric maxima as separate ceilings.
+      <code>basis_comparison.py</code> already does this correctly &mdash; copy its convention.`,
+    go: "champions",
+  },
+  {
+    id: "F10", sev: "good", title: "What the evidence does support",
+    what: `Three results survive every check above.`,
+    ev: `<b>champYb's fc1 dictionary genuinely captures square threats.</b> Best-latent MCC 0.708 and
+      Youden J 0.979 on 36 BSPs at base rate 0.009; 3A independently gives median <code>top_phi</code>
+      0.584, <code>solo_frac</code> 0.98 and <code>knee_k = 1</code> &mdash; two code paths, same answer.
+      Efficiency against the probe is <b>0.91</b>, against 0.59 for champVe and 0.48 for champTa.<br><br>
+      <b>It is not a distributional artefact.</b> On the 88,970 boards all three champions share &mdash;
+      identical positions, labels verified equal &mdash; the ordering is unchanged and the gap widens
+      (square_threat mcc@pref 0.84 Yb / 0.46 Ve / 0.35 Ta).<br><br>
+      <b>The residual wall is specifically agent-relative.</b> The same champYb dictionary is at
+      geometric_frac 0.96 on tiger and its shared-position tiger scores are the <i>lowest</i> of the
+      three champions. Auxiliary threat supervision moves state-threat concepts into single latents and
+      leaves the me-vs-opponent conjunctions untouched.`,
+    imp: `The clean reading of phase 3: SAE recoverability tracks the <i>model's</i> concept
+      availability, not SAE capacity. Where the training objective puts a concept in the
+      representation, an ordinary unsupervised JumpReLU finds it in one latent.`,
+    fix: `This is the thesis result. It needs the causal test (3B-causal) before it can be stated as
+      "the model uses these features", and a second seed before it is stated at all.`,
+    go: "champions",
+  },
+];
+function renderReview() {
+  $("#findings").innerHTML = FINDINGS.map(f => `
+    <article class="finding" id="${f.id}">
+      <header>
+        <span class="sev ${f.sev}">${f.sev === "good" ? "holds" : f.sev}</span>
+        <h3>${f.title}</h3>
+        <span class="id">${f.id}</span>
+      </header>
+      <dl>
+        <dt>what</dt><dd>${f.what}</dd>
+        <dt>evidence</dt><dd>${f.ev}</dd>
+        <dt>impact</dt><dd>${f.imp}</dd>
+        <dt>fix</dt><dd>${f.fix}</dd>
+      </dl>
+      <p style="margin:12px 0 0"><button class="flagref" data-view="${f.go}">open the ${f.go} view &rarr;</button></p>
+    </article>`).join("");
+}
+
+/* =================================================================
+   07 GLOSSARY
+   ================================================================= */
+function renderGlossary() {
+  const g = D.glossary_3a;
+  $("#glossTable").innerHTML = `<thead><tr><th class="l">metric</th><th class="l">range</th>
+    <th class="l">ideal</th><th class="l">meaning</th></tr></thead><tbody>` +
+    Object.entries(g.metrics).map(([k, v]) =>
+      `<tr><td class="l mono">${k}</td><td class="l dim">${v.range}</td>
+       <td class="l dim">${v.ideal}</td><td class="l" style="white-space:normal;max-width:52ch">${v.means}</td></tr>`).join("") +
+    "</tbody>";
+  $("#glossVerdict").innerHTML = `<thead><tr><th class="l">verdict</th><th class="l">meaning</th></tr></thead><tbody>` +
+    Object.entries(g.verdicts).map(([k, v]) =>
+      `<tr><td class="l"><span class="chip ${k === "absent" ? "hollow" : ""}"><i class="dot" style="background:${k === "absent" ? "transparent" : VCOLOR[k]}"></i>${k}</span></td>
+       <td class="l" style="white-space:normal;max-width:70ch">${v}</td></tr>`).join("") + "</tbody>";
+  const EV = [
+    ["coverage_mcc", "−1…1, 0 = chance", "high", "Mean over BSPs of the best single latent's MCC. Headline metric. Weakly prevalence-dependent — a fixed-quality detector still loses ~25% from p = 0.050 to p = 0.013."],
+    ["coverage_youden_j", "−1…1", "high", "Mean best Youden's J = TPR − FPR. Prevalence-INVARIANT. Misleading alone: a latent firing on half the dataset can score 0.4 while being useless at p = 0.02."],
+    ["coverage_mcc_at_pref", "−1…1", "high", "MCC restated at p_ref = 0.025 from each latent's (TPR, TNR). The only one safe to compare across populations — within its calibrated prevalence range (see F5)."],
+    ["efficiency", "0…1+", "1", "SAE mcc_at_pref ÷ LP mcc_at_pref, per concept family. 1 = the dictionary surfaces all the linearly available signal. Suppressed when the LP is below 0.15."],
+    ["dead_features_pct", "0…100", "low", "Share of dictionary latents that never fire. Above ~98% the effective dictionary is smaller than 3A's top_k = 64."],
+    ["fvu", "0…1", "low", "Fraction of activation variance the SAE fails to reconstruct."],
+    ["base rate", "0…1", "n/a", "P(concept true) in the scored population. Spans 380x across the menu (0.0023…0.8714), which is why every comparison needs it stated."],
+  ];
+  $("#glossEval").innerHTML = `<thead><tr><th class="l">metric</th><th class="l">range</th>
+    <th class="l">ideal</th><th class="l">meaning</th></tr></thead><tbody>` +
+    EV.map(([k, r, i, m]) => `<tr><td class="l mono">${k}</td><td class="l dim">${r}</td>
+      <td class="l dim">${i}</td><td class="l" style="white-space:normal;max-width:52ch">${m}</td></tr>`).join("") +
+    "</tbody>";
+}
+
+/* =================================================================
+   wiring
+   ================================================================= */
+function show(v) {
+  $$(".view").forEach(s => s.classList.toggle("on", s.id === "v-" + v));
+  $$("#nav button").forEach(b => b.setAttribute("aria-current", b.dataset.v === v));
+  if (location.hash !== "#" + v) history.replaceState(null, "", "#" + v);
+  window.scrollTo(0, 0);
+}
+$$("#nav button").forEach(b => b.onclick = () => show(b.dataset.v));
+document.addEventListener("click", e => {
+  const g = e.target.closest("[data-goto]");
+  if (g) { show("review"); const t = $("#" + g.dataset.goto); if (t) t.scrollIntoView({ block: "center" }); }
+  const v = e.target.closest("[data-view]");
+  if (v) show(v.dataset.view);
+});
+
+function syncRule() {
+  $("#sfVal").textContent = fmt(RULE.soloFrac, 2);
+  $("#idVal").textContent = fmt(RULE.idim, 1);
+  $("#rcVal").textContent = RULE.randomFloor > 0 ? fmt(RULE.randomFloor, 3) : "off";
+  const dirty = RULE.soloFrac !== DEFAULT_RULE.soloFrac || RULE.idim !== DEFAULT_RULE.idim || RULE.randomFloor !== 0;
+  $("#resetRule").setAttribute("aria-pressed", !dirty);
+  renderPanel();
+  if ($("#v-concepts").classList.contains("on")) renderConcepts();
+}
+$("#sfSlider").oninput = e => { RULE.soloFrac = +e.target.value; syncRule(); };
+$("#idSlider").oninput = e => { RULE.idim = +e.target.value; syncRule(); };
+$("#rcSlider").oninput = e => { RULE.randomFloor = +e.target.value; syncRule(); };
+$("#resetRule").onclick = () => {
+  Object.assign(RULE, DEFAULT_RULE);
+  $("#sfSlider").value = 0.7; $("#idSlider").value = 2; $("#rcSlider").value = 0;
+  syncRule();
+};
+
+initConcepts(); initEfficiency(); initHealth();
+renderPanel(); renderConcepts(); renderEfficiency(); renderChampions(); renderHealth();
+renderReview(); renderGlossary();
+show((location.hash || "#panel").slice(1));
+addEventListener("hashchange", () => show(location.hash.slice(1)));
+</script>
