@@ -1,0 +1,20 @@
+# K07-champYb-s42: conformance A/B, campaign K. Canonical TopK on conv2.
+# Partner: C01-champYb-s42-topk-k16-exp8-s4.conv2 (best banked champYb conv2)
+# Purpose: updates the best-banked conv2 reference point to canonical form, so
+# 'best conv2 dictionary' is not a legacy-recipe number.
+# Arc: reference conformance -- docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K07-champYb-s42
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 16
+aux_loss_weight: 0.01
+init_mode: decoder_transpose
+dead_window: 0

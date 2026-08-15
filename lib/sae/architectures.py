@@ -26,11 +26,39 @@ class BaseSAE(nn.Module):
         b_dec  : (d_input,)         pre-encoder centering bias / decoder bias
     """
 
-    def __init__(self, d_input: int, d_dict: int, device: str = "cuda"):
+    def __init__(
+        self,
+        d_input: int,
+        d_dict: int,
+        device: str = "cuda",
+        aux_loss_weight: float = 0.0,
+        aux_k: int | None = None,
+        dead_window: int = 0,
+        init_mode: str = "kaiming",
+    ):
         super().__init__()
         self.d_input = d_input
         self.d_dict = d_dict
         self.device_str = device
+        self.init_mode = init_mode
+
+        # Dead-feature revival (Gao et al. 2024). Shared by every variant that
+        # opts in, so a fix lands in all of them at once -- the previous
+        # per-class implementation existed only on TopKSAE, which silently made
+        # every architecture comparison partly a comparison of training
+        # machinery. See docs/diary/2026-08-15_dead-feature-revival.md.
+        self.aux_loss_weight = aux_loss_weight
+        self.aux_k = aux_k
+        self.dead_window = dead_window
+        self._pre_act: torch.Tensor | None = None
+        # Non-persistent: a training-time statistic, deliberately kept out of
+        # state_dict so it cannot break `load_state_dict` on any existing
+        # checkpoint (which is strict by default).
+        self.register_buffer(
+            "_steps_since_fired",
+            torch.zeros(d_dict, dtype=torch.long, device=device),
+            persistent=False,
+        )
 
         # Shared decoder bias (pre-encoder centering)
         self.b_dec = nn.Parameter(torch.zeros(d_input, device=device))
@@ -42,12 +70,38 @@ class BaseSAE(nn.Module):
         # Decoder: d_dict -> d_input
         self.W_dec = nn.Parameter(torch.empty(d_dict, d_input, device=device))
 
-        nn.init.kaiming_uniform_(self.W_enc)
-        nn.init.kaiming_uniform_(self.W_dec)
-
-        # Decoder columns start at unit norm
-        with torch.no_grad():
-            self.W_dec.data = F.normalize(self.W_dec.data, dim=1)
+        # Initialisation. Gao et al. 2024 list TWO dead-latent mitigations and
+        # this is the FIRST of them: "initialize W_enc = W_dec^T". It was absent
+        # from this file entirely until 2026-08-15, for every architecture
+        # including TopK -- which is the most likely reason our dictionaries sit
+        # at 61-99% dead where Gao report 7% at 16M latents.
+        #
+        #   "kaiming"            -- W_enc and W_dec drawn independently. The
+        #                           pre-2026-08-15 behaviour; every config
+        #                           written before that date pins it explicitly
+        #                           so those runs still reproduce.
+        #   "decoder_transpose"  -- Gao et al.: unit-norm the decoder, then set
+        #                           the encoder to its transpose, so every atom
+        #                           starts as its own detector and no column
+        #                           begins in the zero-gradient trap.
+        if init_mode not in ("kaiming", "decoder_transpose"):
+            raise ValueError(
+                f"init_mode must be 'kaiming' or 'decoder_transpose', got {init_mode!r}"
+            )
+        # NOTE ON RNG ORDER: both draws consume the global generator, so the
+        # ORDER of the two kaiming calls changes the values. The legacy path
+        # must keep W_enc first, exactly as before, or seeded reruns of banked
+        # configs would not reproduce.
+        if init_mode == "kaiming":
+            nn.init.kaiming_uniform_(self.W_enc)
+            nn.init.kaiming_uniform_(self.W_dec)
+            with torch.no_grad():
+                self.W_dec.data = F.normalize(self.W_dec.data, dim=1)
+        else:  # decoder_transpose
+            nn.init.kaiming_uniform_(self.W_dec)
+            with torch.no_grad():
+                self.W_dec.data = F.normalize(self.W_dec.data, dim=1)
+                self.W_enc.data = self.W_dec.data.T.contiguous().clone()
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         raise NotImplementedError
@@ -68,6 +122,61 @@ class BaseSAE(nn.Module):
         """Normalize decoder columns to unit norm (call after every optimizer step)."""
         with torch.no_grad():
             self.W_dec.data = F.normalize(self.W_dec.data, dim=1)
+
+    # -- dead-feature revival ------------------------------------------------
+
+    def _update_dead_mask(self, h: torch.Tensor) -> torch.Tensor:
+        """(d_dict,) bool mask of features counted as dead, and tick the counter.
+
+        ``dead_window = 0`` reproduces per-batch aliveness exactly (a feature is
+        dead iff it did not fire in THIS batch) -- the semantics TopKSAE shipped
+        with, kept as the default so existing runs stay reproducible. A positive
+        window is the Gao et al. definition: dead iff it has not fired in the
+        last ``dead_window`` steps. Per-batch aliveness over-counts, because at
+        batch 4096 with k = 32 only B*k of B*d_dict slots can fire at all, so a
+        genuinely healthy but rare feature reads as dead in most batches.
+        """
+        fired = (h > 0).any(dim=0)
+        if self.training:
+            self._steps_since_fired += 1
+            self._steps_since_fired[fired] = 0
+        return self._steps_since_fired > self.dead_window
+
+    def _aux_dead_loss(
+        self, x: torch.Tensor, x_hat: torch.Tensor, h: torch.Tensor, k_aux: int
+    ) -> torch.Tensor:
+        """Gao et al. 2024 auxiliary loss: dead features reconstruct the residual.
+
+        The top ``k_aux`` dead features by pre-activation are decoded and asked
+        to explain what the live reconstruction missed. ``x_hat`` is detached so
+        this term only ever trains the dead columns -- it cannot degrade the
+        main reconstruction path.
+
+        Returns a scalar zero when the term is switched off, when nothing is
+        dead, or when the subclass did not stash ``_pre_act``.
+        """
+        if self.aux_loss_weight == 0.0 or self._pre_act is None:
+            self._pre_act = None
+            return torch.zeros((), device=x.device)
+
+        dead_mask = self._update_dead_mask(h)
+        num_dead = int(dead_mask.sum().item())
+        if num_dead == 0:
+            self._pre_act = None
+            return torch.zeros((), device=x.device)
+
+        dead_pre_act = self._pre_act * dead_mask.float().unsqueeze(0)
+        self._pre_act = None  # free memory
+
+        k = min(int(k_aux), num_dead)
+        topk_vals, topk_idx = torch.topk(dead_pre_act, k, dim=-1)
+        h_dead = torch.zeros_like(dead_pre_act)
+        h_dead.scatter_(-1, topk_idx, topk_vals)
+
+        # No b_dec: it is already accounted for in x_hat.
+        residual = x - x_hat.detach()
+        x_hat_dead = h_dead @ self.W_dec
+        return (residual - x_hat_dead).pow(2).sum(dim=-1).mean()
 
 
 # ---------------------------------------------------------------------------
@@ -133,12 +242,18 @@ class TopKSAE(BaseSAE):
         d_dict: int,
         k: int = 64,
         aux_loss_weight: float = 1e-2,
+        aux_k: int | None = None,
+        dead_window: int = 0,
+        init_mode: str = "decoder_transpose",
         device: str = "cuda",
     ):
-        super().__init__(d_input, d_dict, device)
+        # Canonical Gao et al. 2024 defaults: aux loss ON, W_enc = W_dec^T.
+        super().__init__(
+            d_input, d_dict, device,
+            aux_loss_weight=aux_loss_weight, aux_k=aux_k, dead_window=dead_window,
+            init_mode=init_mode,
+        )
         self.k = k
-        self.aux_loss_weight = aux_loss_weight
-        self._pre_act: torch.Tensor | None = None
 
     def encode(self, x: torch.Tensor) -> torch.Tensor:
         # Apply ReLU first (matches TopK(ReLU(z), k) in the paper)
@@ -153,30 +268,10 @@ class TopKSAE(BaseSAE):
         x, x_hat, h = result["x"], result["x_hat"], result["h"]
         l_reconstruct = (x - x_hat).pow(2).sum(dim=-1).mean()
 
-        # Aux loss: reconstruct residual using dead features (Gao et al. 2024).
-        # Previous version counted dead features — a step function with zero
-        # gradient everywhere, so dead features could never revive.
-        alive_mask = (h > 0).any(dim=0)  # (d_dict,) True if feature fired
-        num_dead = int((~alive_mask).sum().item())
-
-        if num_dead > 0 and self._pre_act is not None:
-            # Mask pre-activations to dead features only
-            dead_pre_act = self._pre_act * (~alive_mask).float().unsqueeze(0)
-
-            # TopK among dead features to select which ones get gradient
-            k_aux = min(self.k, num_dead)
-            topk_vals, topk_idx = torch.topk(dead_pre_act, k_aux, dim=-1)
-            h_dead = torch.zeros_like(dead_pre_act)
-            h_dead.scatter_(-1, topk_idx, topk_vals)
-
-            # Dead features reconstruct the residual (no b_dec — already in x_hat)
-            residual = x - x_hat.detach()
-            x_hat_dead = h_dead @ self.W_dec
-            l_aux = (residual - x_hat_dead).pow(2).sum(dim=-1).mean()
-        else:
-            l_aux = torch.tensor(0.0, device=x.device)
-
-        self._pre_act = None  # free memory
+        # Dead-feature revival, now shared with BatchTopK and JumpReLU. The
+        # default k_aux = k and dead_window = 0 reproduce this class's original
+        # behaviour exactly, so banked TopK results stay reproducible.
+        l_aux = self._aux_dead_loss(x, x_hat, h, self.aux_k or self.k)
 
         loss = l_reconstruct + self.aux_loss_weight * l_aux
         return {
@@ -204,8 +299,25 @@ class BatchTopKSAE(BaseSAE):
     endgame), so per-sample sparsity varies naturally — BatchTopK captures this.
     """
 
-    def __init__(self, d_input: int, d_dict: int, k: int = 64, device: str = "cuda"):
-        super().__init__(d_input, d_dict, device)
+    def __init__(
+        self,
+        d_input: int,
+        d_dict: int,
+        k: int = 64,
+        aux_loss_weight: float = 1e-2,
+        aux_k: int | None = None,
+        dead_window: int = 0,
+        init_mode: str = "decoder_transpose",
+        device: str = "cuda",
+    ):
+        # Canonical Bussmann et al. 2024 defaults. The paper states the
+        # auxiliary loss is "retained" from TopK, so aux ON is the published
+        # form -- it was absent here entirely until 2026-08-15.
+        super().__init__(
+            d_input, d_dict, device,
+            aux_loss_weight=aux_loss_weight, aux_k=aux_k, dead_window=dead_window,
+            init_mode=init_mode,
+        )
         self.k = k
         # Per-feature JumpReLU thresholds; calibrated post-training
         self.register_buffer("_threshold_estimate", torch.zeros(d_dict, device=device))
@@ -217,6 +329,7 @@ class BatchTopKSAE(BaseSAE):
 
         if self.training:
             # Batch-level TopK: keep top B*k activations across the entire batch
+            self._pre_act = F.relu(pre_act)  # for the dead-feature aux loss
             flat = pre_act.reshape(-1)
             total_k = min(B * self.k, flat.numel())
             topk_vals, topk_idx = torch.topk(flat, total_k)
@@ -224,6 +337,7 @@ class BatchTopKSAE(BaseSAE):
             mask.scatter_(0, topk_idx, 1.0)
             h = F.relu(pre_act) * mask.reshape_as(pre_act)
         else:
+            self._pre_act = None
             # Inference: per-feature JumpReLU with calibrated thresholds
             threshold: torch.Tensor = self._threshold_estimate  # type: ignore[assignment]
             h = F.relu(pre_act) * (pre_act > threshold).float()
@@ -267,11 +381,18 @@ class BatchTopKSAE(BaseSAE):
             self.eval()
 
     def compute_loss(self, result: dict) -> dict[str, torch.Tensor]:
-        x, x_hat = result["x"], result["x_hat"]
+        x, x_hat, h = result["x"], result["x_hat"], result["h"]
         l_reconstruct = (x - x_hat).pow(2).sum(dim=-1).mean()
+
+        # Dead-feature revival. OFF by default (aux_loss_weight = 0.0) so every
+        # banked BatchTopK run reproduces bit-for-bit; enable per config.
+        l_aux = self._aux_dead_loss(x, x_hat, h, self.aux_k or self.k)
+
+        loss = l_reconstruct + self.aux_loss_weight * l_aux
         return {
-            "loss": l_reconstruct,
+            "loss": loss,
             "l_reconstruct": l_reconstruct.detach(),
+            "l_aux": l_aux.detach(),
         }
 
 
@@ -393,9 +514,28 @@ class JumpReLUSAE(BaseSAE):
         bandwidth: float = 0.001,
         l0_target: float = 50.0,
         l0_weight: float = 1e-2,
+        aux_loss_weight: float = 0.0,
+        aux_k: int | None = None,
+        dead_window: int = 0,
+        init_mode: str = "decoder_transpose",
         device: str = "cuda",
     ):
-        super().__init__(d_input, d_dict, device)
+        # Rajamanoharan et al. 2024b: "No auxiliary losses, no resampling" --
+        # aux OFF is the PUBLISHED form, not an omission, and the 2026-08-15 A/B
+        # measured adding one as null (+/-0.013). It stays off.
+        #
+        # The init is different: the paper does not specify one, so this axis is
+        # UNDERDETERMINED rather than settled, and our previous independent
+        # kaiming draw was an arbitrary choice rather than the published form.
+        # K05 measured the alternative at +6-8% coverage on all three BSP sets
+        # (gorillaYb 0.424 -> 0.459) with 52% more live latents, so the tied
+        # init is now the default -- a documented CHOICE on an axis the source
+        # leaves open, not a deviation from it.
+        super().__init__(
+            d_input, d_dict, device,
+            aux_loss_weight=aux_loss_weight, aux_k=aux_k, dead_window=dead_window,
+            init_mode=init_mode,
+        )
         self.bandwidth = bandwidth
         self.l0_target = l0_target
         self.l0_weight = l0_weight
@@ -422,8 +562,13 @@ class JumpReLUSAE(BaseSAE):
             mask_soft = torch.sigmoid((z - theta) / self.bandwidth)
             mask = mask_hard + (mask_soft - mask_soft.detach())
             self._z = z  # store for differentiable L0 penalty in compute_loss
+            # ReLU(z), not z: the aux path asks dead columns to reconstruct a
+            # residual, which needs non-negative magnitudes (same convention as
+            # TopKSAE). z itself is signed.
+            self._pre_act = F.relu(z)
         else:
             self._z = None
+            self._pre_act = None
             mask = (z > theta).float()
 
         return z * mask
@@ -449,11 +594,17 @@ class JumpReLUSAE(BaseSAE):
         else:
             l_sparsity = torch.tensor(0.0, device=x.device)
 
-        loss = l_reconstruct + self.l0_weight * l_sparsity
+        # Dead-feature revival. OFF by default (aux_loss_weight = 0.0) so every
+        # banked JumpReLU run reproduces bit-for-bit; enable per config.
+        # k_aux defaults to the L0 target, this variant's analogue of TopK's k.
+        l_aux = self._aux_dead_loss(x, x_hat, h, self.aux_k or int(self.l0_target))
+
+        loss = l_reconstruct + self.l0_weight * l_sparsity + self.aux_loss_weight * l_aux
         return {
             "loss": loss,
             "l_reconstruct": l_reconstruct.detach(),
             "l0": l0_true.detach(),  # true L0 for monitoring
+            "l_aux": l_aux.detach(),
         }
 
 
@@ -604,10 +755,22 @@ class AnchoredJumpReLUSAE(_AnchorMixin, JumpReLUSAE):
         bandwidth: float = 0.001,
         l0_target: float = 50.0,
         l0_weight: float = 1e-2,
+        aux_loss_weight: float = 0.0,
+        aux_k: int | None = None,
+        dead_window: int = 0,
+        # Must track JumpReLUSAE's default, or the anchored variant silently
+        # trains a differently-initialised dictionary than its own base class.
+        init_mode: str = "decoder_transpose",
         device: str = "cuda",
     ):
+        # Keyword form deliberately: this call was positional through `device`,
+        # so adding a base-class parameter before it silently placed `device`
+        # into another slot and every tensor landed on the default device.
         JumpReLUSAE.__init__(
-            self, d_input, d_dict, theta_init, bandwidth, l0_target, l0_weight, device
+            self, d_input=d_input, d_dict=d_dict, theta_init=theta_init,
+            bandwidth=bandwidth, l0_target=l0_target, l0_weight=l0_weight,
+            aux_loss_weight=aux_loss_weight, aux_k=aux_k, dead_window=dead_window,
+            init_mode=init_mode, device=device,
         )
         self._init_anchor(
             anchor_feature_idx, anchor_bsp_idx, anchor_lambda_per_feature, device
@@ -632,9 +795,18 @@ class AnchoredBatchTopKSAE(_AnchorMixin, BatchTopKSAE):
         anchor_bsp_idx,
         anchor_lambda_per_feature,
         k: int = 64,
+        aux_loss_weight: float = 1e-2,
+        aux_k: int | None = None,
+        dead_window: int = 0,
+        init_mode: str = "decoder_transpose",
         device: str = "cuda",
     ):
-        BatchTopKSAE.__init__(self, d_input, d_dict, k, device)
+        # Keyword form: see the note in AnchoredJumpReLUSAE.
+        BatchTopKSAE.__init__(
+            self, d_input=d_input, d_dict=d_dict, k=k,
+            aux_loss_weight=aux_loss_weight, aux_k=aux_k, dead_window=dead_window,
+            init_mode=init_mode, device=device,
+        )
         self._init_anchor(
             anchor_feature_idx, anchor_bsp_idx, anchor_lambda_per_feature, device
         )

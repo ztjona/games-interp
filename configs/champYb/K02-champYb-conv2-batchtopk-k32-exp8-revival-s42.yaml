@@ -1,0 +1,29 @@
+# K02-champYb: E05 with dead-feature revival switched ON. A/B partner of
+# E05-champYb-s42-batchtopk-k32-exp8-s4.conv2 -- the 3A / basis-verdict conv2
+# panel member, and the worst dictionary in the champYb conv2 set (99.0% dead,
+# 41 alive latents, FVU 0.110 against 0.043/0.051 for the same recipe on
+# champTa/champVe). If revival is the cause, this run is the evidence.
+# Rationale: docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K02-champYb-s42
+architecture: batchtopk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+# The change under test; see K01 for why dead_window stays at 0.
+dead_revival: 0.01
+dead_window: 0
+
+# --- Recipe conformance stamp (added 2026-08-15) ---
+# This run was trained BEFORE the canonical-form fix, so its deviations are
+# pinned explicitly here. Defaults are now the published form; without these
+# lines a rerun would train a different (canonical) SAE under the same name.
+# See docs/diary/2026-08-15_dead-feature-revival.md
+init_mode: kaiming            # legacy: W_enc drawn independently
+aux_loss_weight: 0.01        # as-run value (was dead_revival)

@@ -11,3 +11,11 @@ lr: 0.0003
 seed: 42
 log_every: 500
 k: 16
+
+# --- Recipe conformance stamp (added 2026-08-15) ---
+# This run was trained BEFORE the canonical-form fix, so its deviations are
+# pinned explicitly here. Defaults are now the published form; without these
+# lines a rerun would train a different (canonical) SAE under the same name.
+# See docs/diary/2026-08-15_dead-feature-revival.md
+init_mode: kaiming            # legacy: W_enc drawn independently
+aux_loss_weight: 0.0        # legacy: no dead-feature revival

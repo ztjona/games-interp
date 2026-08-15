@@ -1,0 +1,19 @@
+# K04-champYb: conformance A/B, campaign K. Partner of E05-champYb-s42-batchtopk-k32-exp8-s4.conv2.
+# Isolates the FULL canonical form for BatchTopK: aux loss + tied init together.
+# K02 already measured aux alone (FVU 0.108 -> 0.008); this adds the init.
+# Arc: reference conformance -- docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K04-champYb-s42
+architecture: batchtopk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+init_mode: decoder_transpose
+dead_window: 0

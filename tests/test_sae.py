@@ -339,6 +339,180 @@ class TestAuxLossGradients:
             losses["l_aux"].item() == 0.0
         ), "Aux loss should be 0 when all features are alive"
 
+    @pytest.mark.parametrize("arch", ["topk", "batchtopk", "jumprelu"])
+    def test_every_sparse_arch_can_revive_dead_features(self, arch):
+        """Dead-feature revival must exist in EVERY sparse architecture.
+
+        It existed only on TopKSAE until 2026-08-15. BatchTopK and JumpReLU had
+        no such term, and `sae_train.get_arch_kwargs` carried the comment
+        "BatchTopKSAE has no aux_loss_weight parameter" — so an architecture
+        comparison was partly a comparison of training machinery, and the two
+        architectures used as 3A/basis-verdict panel members were the two
+        without the mechanism. This test is the guard: it fails if any sparse
+        variant loses the ability to send gradient to a dead column.
+
+        See docs/diary/2026-08-15_dead-feature-revival.md.
+        """
+        common = dict(d_input=D_INPUT, d_dict=D_DICT, device=DEVICE)
+        if arch == "topk":
+            sae = TopKSAE(k=K, aux_loss_weight=1e-2, **common)
+        elif arch == "batchtopk":
+            sae = BatchTopKSAE(k=K, aux_loss_weight=1e-2, **common)
+        else:
+            sae = JumpReLUSAE(l0_target=float(K), aux_loss_weight=1e-2, **common)
+        sae.train()
+
+        x = _batch()
+        result = sae(x)
+        losses = sae.compute_loss(result)
+        assert "l_aux" in losses, f"{arch} does not report l_aux"
+        losses["loss"].backward()
+
+        dead_mask = ~(result["h"] > 0).any(dim=0)
+        if dead_mask.sum() == 0:
+            pytest.skip(f"No dead features in this {arch} batch")
+
+        grad = sae.W_enc.grad[:, dead_mask].norm().item()
+        assert grad > 0, (
+            f"{arch}: dead columns receive zero gradient (norm={grad:.6f}) — "
+            f"dead features can never revive."
+        )
+
+    def test_jumprelu_revival_is_off_by_default(self):
+        """JumpReLU must NOT get an auxiliary loss by default.
+
+        Rajamanoharan et al. 2024b publish JumpReLU with "No auxiliary losses,
+        no resampling", and report few dead features without them. Adding one
+        would be reporting a JumpReLU result for a variant of JumpReLU — and the
+        2026-08-15 A/B measured the effect as null anyway (K01 vs F04, ±0.013).
+        """
+        sae = JumpReLUSAE(D_INPUT, D_DICT, l0_target=float(K), device=DEVICE)
+        sae.train()
+        losses = sae.compute_loss(sae(_batch()))
+        assert sae.aux_loss_weight == 0.0
+        assert losses["l_aux"].item() == 0.0
+
+    def test_legacy_recipe_remains_reachable(self):
+        """The pre-2026-08-15 recipe must still be expressible, exactly.
+
+        Every config banked before that date pins `init_mode: kaiming` and, for
+        the TopK family, `aux_loss_weight: 0.0`. If those settings stopped
+        working, 235 committed configs would silently reproduce something else.
+        """
+        sae = BatchTopKSAE(D_INPUT, D_DICT, k=K, aux_loss_weight=0.0,
+                           init_mode="kaiming", device=DEVICE)
+        sae.train()
+        losses = sae.compute_loss(sae(_batch()))
+        assert losses["l_aux"].item() == 0.0
+        assert not torch.allclose(sae.W_enc, sae.W_dec.T)
+
+    def test_dead_window_zero_matches_per_batch_aliveness(self):
+        """dead_window = 0 must reproduce the original per-batch semantics.
+
+        A feature is dead iff it did not fire in THIS batch. A positive window
+        is the Gao et al. definition (has not fired in the last N steps).
+        """
+        sae = TopKSAE(D_INPUT, D_DICT, k=K, aux_loss_weight=1e-2, device=DEVICE)
+        sae.train()
+        h = sae.encode(_batch())
+        dead = sae._update_dead_mask(h)
+        assert torch.equal(dead, ~(h > 0).any(dim=0))
+
+    def test_dead_window_requires_sustained_silence(self):
+        """With a window of 2, a feature silent for one step is not yet dead."""
+        sae = TopKSAE(D_INPUT, D_DICT, k=K, aux_loss_weight=1e-2, dead_window=2,
+                      device=DEVICE)
+        sae.train()
+        silent = torch.zeros(4, D_DICT)
+        assert sae._update_dead_mask(silent).sum() == 0, "dead after 1 silent step"
+        assert sae._update_dead_mask(silent).sum() == 0, "dead after 2 silent steps"
+        assert sae._update_dead_mask(silent).sum() == D_DICT, "not dead after 3"
+
+    def test_revival_counter_is_not_in_state_dict(self):
+        """The counter must not break `load_state_dict` on existing checkpoints.
+
+        `lib.sae.train.load_sae` calls load_state_dict in strict mode, so a
+        persistent buffer added here would fail on every checkpoint on disk.
+        """
+        sae = TopKSAE(D_INPUT, D_DICT, k=K, device=DEVICE)
+        assert "_steps_since_fired" not in sae.state_dict()
+
+    def test_defaults_follow_the_sources_where_they_specify(self):
+        """Where a paper specifies a training component, the default must match it.
+
+        Reporting an architecture result while silently training a variant of it
+        is the failure this pins. Sources:
+          TopK      Gao et al. 2024            — aux loss ON, W_enc = W_dec^T
+          BatchTopK Bussmann et al. 2024       — "auxiliary loss (same as TopK)
+                                                  retained"; inherits TopK's setup
+          JumpReLU  Rajamanoharan et al. 2024b — "No auxiliary losses, no
+                                                  resampling". Init UNSPECIFIED,
+                                                  so it is a documented choice
+                                                  (see the next test), not a
+                                                  conformance requirement.
+        """
+        common = dict(d_input=D_INPUT, d_dict=D_DICT, device=DEVICE)
+        topk = TopKSAE(k=K, **common)
+        assert topk.aux_loss_weight > 0, "TopK must default to aux loss ON"
+        assert topk.init_mode == "decoder_transpose"
+
+        bt = BatchTopKSAE(k=K, **common)
+        assert bt.aux_loss_weight > 0, "BatchTopK must default to aux loss ON"
+        assert bt.init_mode == "decoder_transpose"
+
+        jr = JumpReLUSAE(l0_target=float(K), **common)
+        assert jr.aux_loss_weight == 0.0, (
+            "JumpReLU is published WITHOUT an auxiliary loss, and the K01 A/B "
+            "measured adding one as null — it must stay off."
+        )
+
+    def test_jumprelu_init_is_a_recorded_choice_not_a_spec(self):
+        """JumpReLU's init is chosen, not canonical — pin it so it stays deliberate.
+
+        Rajamanoharan et al. 2024b specify no initialisation, so this axis is
+        underdetermined by the source. K05 measured decoder_transpose at +6–8%
+        coverage on all three BSP sets with 52% more live latents, so it is the
+        default — as an explicit choice on an open axis, which is a different
+        claim from conformance and must not be described as one.
+        """
+        jr = JumpReLUSAE(D_INPUT, D_DICT, l0_target=float(K), device=DEVICE)
+        assert jr.init_mode == "decoder_transpose"
+        assert torch.allclose(jr.W_enc, jr.W_dec.T)
+        # and the previous arbitrary draw stays reachable for the banked configs
+        legacy = JumpReLUSAE(D_INPUT, D_DICT, l0_target=float(K),
+                             init_mode="kaiming", device=DEVICE)
+        assert not torch.allclose(legacy.W_enc, legacy.W_dec.T)
+
+    def test_decoder_transpose_init_ties_encoder_to_decoder(self):
+        """`decoder_transpose` must actually set W_enc = W_dec^T at init."""
+        sae = TopKSAE(D_INPUT, D_DICT, k=K, init_mode="decoder_transpose",
+                      device=DEVICE)
+        assert torch.allclose(sae.W_enc, sae.W_dec.T)
+        norms = sae.W_dec.norm(dim=1)
+        assert torch.allclose(norms, torch.ones_like(norms), atol=1e-5)
+
+        legacy = TopKSAE(D_INPUT, D_DICT, k=K, init_mode="kaiming", device=DEVICE)
+        assert not torch.allclose(legacy.W_enc, legacy.W_dec.T)
+
+    def test_kaiming_init_preserves_legacy_rng_order(self):
+        """The legacy path must draw W_enc BEFORE W_dec.
+
+        Both draws consume the global RNG, so swapping the order silently
+        changes every seeded rerun of a banked config.
+        """
+        torch.manual_seed(0)
+        sae = TopKSAE(D_INPUT, D_DICT, k=K, init_mode="kaiming", device=DEVICE)
+        torch.manual_seed(0)
+        expected_enc = torch.empty(D_INPUT, D_DICT)
+        torch.nn.init.kaiming_uniform_(expected_enc)
+        assert torch.allclose(sae.W_enc, expected_enc), (
+            "legacy init no longer draws W_enc first; banked runs will not reproduce"
+        )
+
+    def test_invalid_init_mode_is_rejected(self):
+        with pytest.raises(ValueError, match="init_mode"):
+            TopKSAE(D_INPUT, D_DICT, k=K, init_mode="tied", device=DEVICE)
+
     def test_gated_wgate_receives_reconstruction_gradient(self):
         """W_gate must receive non-zero gradient from the reconstruction loss.
 
@@ -609,6 +783,32 @@ class TestAnchoredSAE:
             f"With λ=0 anchored loss must equal base loss; got base={lb.item()} "
             f"anchored={la.item()}"
         )
+
+    @pytest.mark.parametrize(
+        "anchored_arch,base_arch",
+        [("anchored-jumprelu", "jumprelu"), ("anchored-batchtopk", "batchtopk")],
+    )
+    def test_anchored_defaults_track_their_base_class(self, anchored_arch, base_arch):
+        """An anchored variant must inherit its base's training defaults.
+
+        This is the recurring failure of this codebase in miniature: a mechanism
+        gets added in one place and not the sibling. When JumpReLU's default init
+        changed on 2026-08-15, AnchoredJumpReLU kept the old one and silently
+        trained a differently-initialised dictionary than the base it is supposed
+        to be a supervised version of.
+        """
+        base = ARCHITECTURES[base_arch]
+        anchored = ARCHITECTURES[anchored_arch]
+        import inspect
+
+        bd = inspect.signature(base.__init__).parameters
+        ad = inspect.signature(anchored.__init__).parameters
+        for field in ("init_mode", "aux_loss_weight", "dead_window"):
+            if field in bd and field in ad:
+                assert bd[field].default == ad[field].default, (
+                    f"{anchored_arch}.{field} defaults to {ad[field].default!r} "
+                    f"but {base_arch} defaults to {bd[field].default!r}"
+                )
 
     def test_bce_numerical_correctness(self):
         """l_anchor matches a hand-computed BCE-with-logits on the toy slice."""

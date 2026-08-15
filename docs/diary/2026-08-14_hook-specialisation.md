@@ -1,6 +1,16 @@
 # Hook specialisation: conv2 holds the threat information, fc1 factors it (2026-08-14)
 
 Status: frozen self-contained record. Parent ledger: [`phase-3.md`](phase-3.md).
+
+> **Partial correction (2026-08-15).** The champYb `s4.conv2` **SAE** column
+> below was measured on a collapsed dictionary (§4 caveat). Retrained with
+> dead-feature revival it rises 4–6× on the per-cell families and ~1.5× on the
+> threat families, so conv2 threat efficiency is **0.18–0.19**, not 0.12–0.13.
+> The conclusion is unchanged and in fact strengthened — the threat gap against
+> fc1 (0.62 / 0.91) survives almost intact, and what the broken dictionary hid
+> was conv2's competence on *spatial* concepts. Every LP column, and every
+> conclusion resting on availability, is unaffected. See
+> [`2026-08-15_dead-feature-revival.md`](2026-08-15_dead-feature-revival.md) §4.2.
 Metric definitions: [`../methods-reference.md`](../methods-reference.md) §1.
 Numbers are `[DIRECT]` from `saes/quarto/eval_registry.json` and the
 `*_sae-lp-efficiency.json` reports of the 2026-08-14 basis-verdict run;

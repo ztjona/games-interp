@@ -28,7 +28,23 @@ Options:
     # Architecture-specific hyperparameters
     --l1-weight=<float>     Vanilla: L1 sparsity weight [default: 1e-3]
     --k=<int>               TopK/BatchTopK: number of active features [default: 16]
-    --aux-loss-weight=<f>   TopK/BatchTopK: auxiliary loss weight [default: 1e-2]
+    --aux-loss-weight=<f>   TopK/BatchTopK: dead-feature auxiliary loss weight.
+                            CANONICAL for both (Gao et al. 2024; Bussmann et al.
+                            2024 state it is "retained" from TopK) [default: 1e-2]
+    --dead-revival=<f>      JumpReLU ONLY, and NON-CANONICAL: JumpReLU is published
+                            with "no auxiliary losses, no resampling"
+                            (Rajamanoharan et al. 2024b), and the 2026-08-15 A/B
+                            measured adding one as null. Exists for that experiment
+                            alone; do not enable it for a reported run [default: 0.0]
+    --init-mode=<m>         auto|kaiming|decoder_transpose. `auto` = this
+                            architecture's default: decoder_transpose for the TopK
+                            family (Gao et al. mitigation 1, specified) and for
+                            JumpReLU (NOT specified by its paper -- a documented
+                            choice, worth +6-8% coverage in the 2026-08-15 A/B)
+                            [default: auto]
+    --dead-window=<int>     Steps a feature may go without firing before the aux
+                            loss counts it dead. 0 = per-batch aliveness, the
+                            original TopK semantics [default: 0]
     --gated-l1=<float>      Gated: L1 weight on gate [default: 1e-3]
     --jump-threshold=<f>    JumpReLU: threshold parameter [default: 0.001]
     --l0-target=<float>     JumpReLU: target L0 sparsity [default: 50]
@@ -105,20 +121,57 @@ def parse_args(argv=None):
     return args, None
 
 
+# Default initialisation per architecture. `--init-mode=auto` resolves through
+# this, so the DEFAULT is the published form wherever a paper states one, and any
+# deviation has to be written into the config -- which is what went wrong before
+# 2026-08-15, when the deviation lived in the code and nothing recorded it.
+#
+# NOT all of these are "canonical": the TopK family entries are specified by
+# their papers, the JumpReLU ones are a documented CHOICE on an axis
+# Rajamanoharan et al. 2024b leave open. The distinction is marked per row so a
+# reader is never misled about which is which.
+DEFAULT_INIT = {
+    # specified by the source paper
+    "topk": "decoder_transpose",          # Gao et al. 2024, mitigation (1)
+    "batchtopk": "decoder_transpose",     # Bussmann et al. 2024, inherits TopK
+    "anchored-batchtopk": "decoder_transpose",
+    # CHOSEN, not specified: the paper states no init. K05 measured +6-8%
+    # coverage and +52% live latents against the previous arbitrary kaiming
+    # draw, so the choice is made explicitly and recorded here.
+    "jumprelu": "decoder_transpose",
+    "anchored-jumprelu": "decoder_transpose",
+    # untested on this axis; left at the historical draw
+    "vanilla": "kaiming",
+    "gated": "kaiming",
+    "p-annealing": "kaiming",
+}
+CANONICAL_INIT = DEFAULT_INIT  # backwards-compatible alias
+
+
+def resolve_init_mode(arch: str, requested: str) -> str:
+    """`auto` -> this architecture's default init; otherwise verbatim."""
+    if requested != "auto":
+        return requested
+    return DEFAULT_INIT.get(arch, "kaiming")
+
+
 def get_arch_kwargs(arch: str, args: dict) -> dict:
     """Extract architecture-specific constructor kwargs from args."""
     kwargs = {}
+    init_mode = resolve_init_mode(arch, args.get("--init-mode", "auto"))
+    dead_window = int(args.get("--dead-window", 0))
 
     if arch == "vanilla":
         kwargs["l1_weight"] = float(args["--l1-weight"])
 
-    elif arch == "topk":
+    elif arch in ("topk", "batchtopk"):
         kwargs["k"] = int(args["--k"])
+        # Canonical for BOTH. BatchTopK had no such term at all until
+        # 2026-08-15, which made TopK-vs-BatchTopK partly a comparison of
+        # training machinery -- docs/diary/2026-08-15_dead-feature-revival.md.
         kwargs["aux_loss_weight"] = float(args["--aux-loss-weight"])
-
-    elif arch == "batchtopk":
-        kwargs["k"] = int(args["--k"])
-        # BatchTopKSAE has no aux_loss_weight parameter
+        kwargs["dead_window"] = dead_window
+        kwargs["init_mode"] = init_mode
 
     elif arch == "gated":
         kwargs["l1_weight"] = float(args["--gated-l1"])
@@ -127,6 +180,11 @@ def get_arch_kwargs(arch: str, args: dict) -> dict:
         kwargs["theta_init"] = float(args["--jump-threshold"])
         kwargs["l0_target"] = float(args["--l0-target"])
         # bandwidth, l0_weight use constructor defaults for now
+        # JumpReLU is PUBLISHED without an auxiliary loss; --dead-revival exists
+        # for the conformance experiment only and defaults to 0.0.
+        kwargs["aux_loss_weight"] = float(args["--dead-revival"])
+        kwargs["dead_window"] = dead_window
+        kwargs["init_mode"] = init_mode
 
     elif arch == "p-annealing":
         kwargs["p_start"] = float(args["--p-start"])
@@ -137,8 +195,12 @@ def get_arch_kwargs(arch: str, args: dict) -> dict:
         if arch == "anchored-jumprelu":
             kwargs["theta_init"] = float(args["--jump-threshold"])
             kwargs["l0_target"] = float(args["--l0-target"])
+            kwargs["aux_loss_weight"] = float(args["--dead-revival"])
         else:  # anchored-batchtopk
             kwargs["k"] = int(args["--k"])
+            kwargs["aux_loss_weight"] = float(args["--aux-loss-weight"])
+        kwargs["dead_window"] = dead_window
+        kwargs["init_mode"] = init_mode
         # Anchor mapping is built later in main() once labels + schema are loaded;
         # placeholders here are filled in by main() before SAE instantiation.
 

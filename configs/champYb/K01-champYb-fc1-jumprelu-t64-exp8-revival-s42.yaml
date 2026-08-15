@@ -1,0 +1,34 @@
+# K01-champYb: F04 with dead-feature revival switched ON. A/B partner of
+# F04-champYb-s42-jumprelu-t64-exp8-s4.fc1 -- every other field is identical, so
+# the only difference between the two checkpoints is the Gao et al. 2024
+# auxiliary loss that JumpReLU lacked entirely until 2026-08-15.
+# Rationale: docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K01-champYb-s42
+architecture: jumprelu
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64
+patience: 0
+min_improvement: 0.001
+l0_patience: 0
+l0_min_change: 5.0
+# The change under test. dead_window: 0 keeps TopK's per-batch aliveness, so
+# this run isolates "revival present vs absent" and does not also change the
+# definition of dead.
+dead_revival: 0.01
+dead_window: 0
+
+# --- Recipe conformance stamp (added 2026-08-15) ---
+# This run was trained BEFORE the canonical-form fix, so its deviations are
+# pinned explicitly here. Defaults are now the published form; without these
+# lines a rerun would train a different (canonical) SAE under the same name.
+# See docs/diary/2026-08-15_dead-feature-revival.md
+init_mode: kaiming            # legacy: W_enc drawn independently
