@@ -1,0 +1,30 @@
+# R3-champVerandom: fc1 random-model control, ATTEMPT 2.
+#
+# R1 (JumpReLU t64, kaiming init) is DEGENERATE: 4032/4096 latents never fire
+# and the 64 survivors fire on >99.98% of rows, so ZERO latents are "alive" by
+# the 3A definition and the control produced no number. 13 of 17 3A cells were
+# therefore never tested against a learned-signal floor.
+#
+# Hypothesis: the collapse was caused by the missing tied init, not by JumpReLU
+# per se -- W_enc = W_dec^T is precisely what stops columns starting dead
+# (docs/diary/2026-08-15_dead-feature-revival.md). If so this control is
+# RECIPE-MATCHED to the fc1 panel member, which is strictly better than
+# substituting a different architecture at matched L0.
+experiment: R3-champVerandom-s42
+architecture: jumprelu
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_ve_random_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64
+patience: 0
+min_improvement: 0.001
+l0_patience: 0
+l0_min_change: 5.0
+init_mode: decoder_transpose

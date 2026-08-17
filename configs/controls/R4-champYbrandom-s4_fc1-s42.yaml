@@ -1,0 +1,21 @@
+# R4-champYbrandom: fc1 random-model control, FALLBACK.
+#
+# BatchTopK cannot collapse the way R1 did -- it forces exactly B*k active
+# latents per batch, so no feature can end up firing on every row unless the
+# whole dictionary does. k=64 is L0-MATCHED to the fc1 panel member (F04/K05
+# run at L0 ~ 67), not recipe-matched: use this only if R3 is also degenerate.
+# Canonical form (aux loss on, tied init) per Gao et al. 2024 / Bussmann 2024.
+experiment: R4-champYbrandom-s42
+architecture: batchtopk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_random_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 64
+aux_loss_weight: 0.01
+init_mode: decoder_transpose

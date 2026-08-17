@@ -128705,5 +128705,1835 @@
         }
       }
     }
+  },
+  "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1:gorillaYb": {
+    "timestamp": "2026-08-16T22:19:16.043831",
+    "run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champYbrandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "gorillaYb",
+    "tag": "",
+    "metrics": {
+      "l0": 64.32,
+      "l0_std": 2.78,
+      "fvu": 0.142538,
+      "mse": 0.005287,
+      "dead_features_pct": 95.73,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2299,
+      "num_bsps": 164,
+      "coverage_mcc": 0.1423,
+      "coverage_mcc_above_25": 0.2317,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.076,
+      "min_mcc": 0.0276,
+      "max_mcc": 0.3419,
+      "coverage_youden_j": 0.1641,
+      "median_youden_j": 0.1537,
+      "min_youden_j": 0.0104,
+      "max_youden_j": 0.3491,
+      "mean_base_rate": 0.1263,
+      "median_base_rate": 0.1342,
+      "min_base_rate": 0.0066,
+      "max_base_rate": 0.5374,
+      "frac_bsps_very_rare": 0.3232,
+      "frac_bsps_trivial_f1": 0.0549,
+      "coverage_mcc_at_pref": 0.1208,
+      "median_mcc_at_pref": 0.0956,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.8122,
+      "num_reconstructable_bsps": 103,
+      "fraction_reconstructable": 0.628,
+      "mean_accuracy": 0.8122,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 71,
+        "fraction_features_used_by_best_matches": 0.0173,
+        "mean_bsps_per_used_feature": 2.3099,
+        "max_bsps_per_feature": 25,
+        "num_shared_features": 31,
+        "fraction_shared_features": 0.4366,
+        "num_bsps_with_unique_best_feature": 40,
+        "fraction_bsps_with_unique_best_feature": 0.2439,
+        "num_bsps_with_shared_best_feature": 124,
+        "fraction_bsps_with_shared_best_feature": 0.7561
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3144,
+          "mean_mcc": 0.2343,
+          "median_mcc": 0.2776,
+          "min_mcc": 0.0527,
+          "max_mcc": 0.3419,
+          "sd_mcc": 0.0951,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1412,
+          "mean_mcc_at_pref": 0.1629,
+          "mean_base_rate": 0.1757
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5112,
+          "mean_mcc": 0.1901,
+          "median_mcc": 0.1905,
+          "min_mcc": 0.1443,
+          "max_mcc": 0.226,
+          "sd_mcc": 0.0278,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1447,
+          "mean_mcc_at_pref": 0.1226,
+          "mean_base_rate": 0.3435
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4743,
+          "mean_mcc": 0.1614,
+          "median_mcc": 0.1089,
+          "min_mcc": 0.0924,
+          "max_mcc": 0.2829,
+          "sd_mcc": 0.0862,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2226,
+          "mean_mcc_at_pref": 0.0776,
+          "mean_base_rate": 0.3333
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.4256,
+          "mean_mcc": 0.196,
+          "median_mcc": 0.196,
+          "min_mcc": 0.196,
+          "max_mcc": 0.196,
+          "sd_mcc": 0.0,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2288,
+          "mean_mcc_at_pref": 0.0738,
+          "mean_base_rate": 0.2336
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6695,
+          "mean_mcc": 0.0382,
+          "median_mcc": 0.0311,
+          "min_mcc": 0.0276,
+          "max_mcc": 0.0581,
+          "sd_mcc": 0.0119,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0164,
+          "mean_mcc_at_pref": 0.0109,
+          "mean_base_rate": 0.5037
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0631,
+          "mean_mcc": 0.0567,
+          "median_mcc": 0.0573,
+          "min_mcc": 0.0394,
+          "max_mcc": 0.0716,
+          "sd_mcc": 0.0072,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1893,
+          "mean_mcc_at_pref": 0.0886,
+          "mean_base_rate": 0.0097
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0653,
+          "mean_mcc": 0.061,
+          "median_mcc": 0.0597,
+          "min_mcc": 0.0466,
+          "max_mcc": 0.076,
+          "sd_mcc": 0.0069,
+          "heterogeneous": false,
+          "mean_youden_j": 0.195,
+          "mean_mcc_at_pref": 0.0979,
+          "mean_base_rate": 0.0091
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.2343,
+          "mean_youden_j": 0.1412,
+          "mean_mcc_at_pref": 0.1629,
+          "mean_base_rate": 0.1757,
+          "mean_f1": 0.3144
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.1901,
+          "mean_youden_j": 0.1447,
+          "mean_mcc_at_pref": 0.1226,
+          "mean_base_rate": 0.3435,
+          "mean_f1": 0.5112
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.1614,
+          "mean_youden_j": 0.2226,
+          "mean_mcc_at_pref": 0.0776,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4743
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.196,
+          "mean_youden_j": 0.2288,
+          "mean_mcc_at_pref": 0.0738,
+          "mean_base_rate": 0.2336,
+          "mean_f1": 0.4256
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.0382,
+          "mean_youden_j": 0.0164,
+          "mean_mcc_at_pref": 0.0109,
+          "mean_base_rate": 0.5037,
+          "mean_f1": 0.6695
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.0567,
+          "mean_youden_j": 0.1893,
+          "mean_mcc_at_pref": 0.0886,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.0631
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.061,
+          "mean_youden_j": 0.195,
+          "mean_mcc_at_pref": 0.0979,
+          "mean_base_rate": 0.0091,
+          "mean_f1": 0.0653
+        }
+      }
+    }
+  },
+  "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1:hawkYb": {
+    "timestamp": "2026-08-16T22:19:17.911493",
+    "run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champYbrandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "hawkYb",
+    "tag": "",
+    "metrics": {
+      "l0": 64.32,
+      "l0_std": 2.78,
+      "fvu": 0.142538,
+      "mse": 0.005287,
+      "dead_features_pct": 95.73,
+      "median_feat_freq": 0.0,
+      "coverage": 0.0725,
+      "num_bsps": 173,
+      "coverage_mcc": 0.0631,
+      "coverage_mcc_above_25": 0.0,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0726,
+      "min_mcc": 0.0221,
+      "max_mcc": 0.2218,
+      "coverage_youden_j": 0.207,
+      "median_youden_j": 0.2069,
+      "min_youden_j": 0.1098,
+      "max_youden_j": 0.3168,
+      "mean_base_rate": 0.016,
+      "median_base_rate": 0.0142,
+      "min_base_rate": 0.0023,
+      "max_base_rate": 0.3567,
+      "frac_bsps_very_rare": 0.4393,
+      "frac_bsps_trivial_f1": 0.0,
+      "coverage_mcc_at_pref": 0.0936,
+      "median_mcc_at_pref": 0.095,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.9716,
+      "num_reconstructable_bsps": 64,
+      "fraction_reconstructable": 0.3699,
+      "mean_accuracy": 0.9716,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 65,
+        "fraction_features_used_by_best_matches": 0.0159,
+        "mean_bsps_per_used_feature": 2.6615,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 47,
+        "fraction_shared_features": 0.7231,
+        "num_bsps_with_unique_best_feature": 18,
+        "fraction_bsps_with_unique_best_feature": 0.104,
+        "num_bsps_with_shared_best_feature": 155,
+        "fraction_bsps_with_shared_best_feature": 0.896
+      },
+      "per_category": {
+        "reframed_any_threat": {
+          "count": 10,
+          "mean_f1": 0.1082,
+          "mean_mcc": 0.0804,
+          "median_mcc": 0.0824,
+          "min_mcc": 0.0582,
+          "max_mcc": 0.094,
+          "sd_mcc": 0.0116,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1859,
+          "mean_mcc_at_pref": 0.0694,
+          "mean_base_rate": 0.0347
+        },
+        "reframed_completable": {
+          "count": 40,
+          "mean_f1": 0.0264,
+          "mean_mcc": 0.0351,
+          "median_mcc": 0.0362,
+          "min_mcc": 0.0221,
+          "max_mcc": 0.0474,
+          "sd_mcc": 0.0059,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2041,
+          "mean_mcc_at_pref": 0.0936,
+          "mean_base_rate": 0.0031
+        },
+        "reframed_count": {
+          "count": 40,
+          "mean_f1": 0.0996,
+          "mean_mcc": 0.0815,
+          "median_mcc": 0.0818,
+          "min_mcc": 0.0635,
+          "max_mcc": 0.1037,
+          "sd_mcc": 0.0085,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2124,
+          "mean_mcc_at_pref": 0.0927,
+          "mean_base_rate": 0.0192
+        },
+        "reframed_global": {
+          "count": 2,
+          "mean_f1": 0.4184,
+          "mean_mcc": 0.1854,
+          "median_mcc": 0.149,
+          "min_mcc": 0.149,
+          "max_mcc": 0.2218,
+          "sd_mcc": 0.0364,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2187,
+          "mean_mcc_at_pref": 0.0709,
+          "mean_base_rate": 0.2509
+        },
+        "reframed_sq_any_threat": {
+          "count": 9,
+          "mean_f1": 0.1113,
+          "mean_mcc": 0.0831,
+          "median_mcc": 0.0826,
+          "min_mcc": 0.0762,
+          "max_mcc": 0.0916,
+          "sd_mcc": 0.0058,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1889,
+          "mean_mcc_at_pref": 0.0736,
+          "mean_base_rate": 0.033
+        },
+        "reframed_sq_completable": {
+          "count": 36,
+          "mean_f1": 0.0272,
+          "mean_mcc": 0.0363,
+          "median_mcc": 0.0362,
+          "min_mcc": 0.0284,
+          "max_mcc": 0.0448,
+          "sd_mcc": 0.0044,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2046,
+          "mean_mcc_at_pref": 0.1021,
+          "mean_base_rate": 0.0029
+        },
+        "reframed_sq_count": {
+          "count": 36,
+          "mean_f1": 0.1,
+          "mean_mcc": 0.0839,
+          "median_mcc": 0.0823,
+          "min_mcc": 0.0688,
+          "max_mcc": 0.1069,
+          "sd_mcc": 0.0083,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2165,
+          "mean_mcc_at_pref": 0.0993,
+          "mean_base_rate": 0.0175
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.0608,
+          "mean_youden_j": 0.2058,
+          "mean_mcc_at_pref": 0.0905,
+          "mean_base_rate": 0.0138,
+          "mean_f1": 0.068
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.1854,
+          "mean_youden_j": 0.2187,
+          "mean_mcc_at_pref": 0.0709,
+          "mean_base_rate": 0.2509,
+          "mean_f1": 0.4184
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.0627,
+          "mean_youden_j": 0.2081,
+          "mean_mcc_at_pref": 0.0977,
+          "mean_base_rate": 0.0127,
+          "mean_f1": 0.0689
+        }
+      }
+    }
+  },
+  "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1:tigerYb": {
+    "timestamp": "2026-08-16T22:19:21.569646",
+    "run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champYbrandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "tigerYb",
+    "tag": "",
+    "metrics": {
+      "l0": 64.32,
+      "l0_std": 2.78,
+      "fvu": 0.142538,
+      "mse": 0.005287,
+      "dead_features_pct": 95.73,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2759,
+      "num_bsps": 36,
+      "coverage_mcc": 0.1019,
+      "coverage_mcc_above_25": 0.0556,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0704,
+      "min_mcc": 0.0481,
+      "max_mcc": 0.2519,
+      "coverage_youden_j": 0.1884,
+      "median_youden_j": 0.2043,
+      "min_youden_j": 0.031,
+      "max_youden_j": 0.2602,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.0623,
+      "median_mcc_at_pref": 0.0646,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.7203,
+      "num_reconstructable_bsps": 21,
+      "fraction_reconstructable": 0.5833,
+      "mean_accuracy": 0.7203,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 12,
+        "fraction_features_used_by_best_matches": 0.0029,
+        "mean_bsps_per_used_feature": 3.0,
+        "max_bsps_per_feature": 8,
+        "num_shared_features": 7,
+        "fraction_shared_features": 0.5833,
+        "num_bsps_with_unique_best_feature": 5,
+        "fraction_bsps_with_unique_best_feature": 0.1389,
+        "num_bsps_with_shared_best_feature": 31,
+        "fraction_bsps_with_shared_best_feature": 0.8611
+      },
+      "per_category": {
+        "tiger_decision_global": {
+          "count": 5,
+          "mean_f1": 0.5994,
+          "mean_mcc": 0.1629,
+          "median_mcc": 0.1762,
+          "min_mcc": 0.0883,
+          "max_mcc": 0.2519,
+          "sd_mcc": 0.0608,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1606,
+          "mean_mcc_at_pref": 0.058,
+          "mean_base_rate": 0.4465
+        },
+        "tiger_line_winnable": {
+          "count": 10,
+          "mean_f1": 0.0747,
+          "mean_mcc": 0.0637,
+          "median_mcc": 0.0649,
+          "min_mcc": 0.0481,
+          "max_mcc": 0.0734,
+          "sd_mcc": 0.0071,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2093,
+          "mean_mcc_at_pref": 0.0664,
+          "mean_base_rate": 0.023
+        },
+        "tiger_offered_completing_attr": {
+          "count": 4,
+          "mean_f1": 0.1162,
+          "mean_mcc": 0.0813,
+          "median_mcc": 0.0817,
+          "min_mcc": 0.0748,
+          "max_mcc": 0.0854,
+          "sd_mcc": 0.004,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1944,
+          "mean_mcc_at_pref": 0.0616,
+          "mean_base_rate": 0.0446
+        },
+        "tiger_pool_safe_count": {
+          "count": 4,
+          "mean_f1": 0.7363,
+          "mean_mcc": 0.124,
+          "median_mcc": 0.1084,
+          "min_mcc": 0.102,
+          "max_mcc": 0.1762,
+          "sd_mcc": 0.0303,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0898,
+          "mean_mcc_at_pref": 0.0396,
+          "mean_base_rate": 0.6239
+        },
+        "tiger_pool_winning_count": {
+          "count": 4,
+          "mean_f1": 0.5331,
+          "mean_mcc": 0.2166,
+          "median_mcc": 0.1918,
+          "min_mcc": 0.1762,
+          "max_mcc": 0.2519,
+          "sd_mcc": 0.0331,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2371,
+          "mean_mcc_at_pref": 0.0783,
+          "mean_base_rate": 0.3592
+        },
+        "tiger_square_winnable": {
+          "count": 9,
+          "mean_f1": 0.0719,
+          "mean_mcc": 0.0589,
+          "median_mcc": 0.0587,
+          "min_mcc": 0.0502,
+          "max_mcc": 0.0689,
+          "sd_mcc": 0.0061,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1999,
+          "mean_mcc_at_pref": 0.0634,
+          "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.1629,
+          "mean_youden_j": 0.1606,
+          "mean_mcc_at_pref": 0.058,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.5994
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.0637,
+          "mean_youden_j": 0.2093,
+          "mean_mcc_at_pref": 0.0664,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.0747
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.0813,
+          "mean_youden_j": 0.1944,
+          "mean_mcc_at_pref": 0.0616,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.1162
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.1703,
+          "mean_youden_j": 0.1635,
+          "mean_mcc_at_pref": 0.059,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.6347
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.0589,
+          "mean_youden_j": 0.1999,
+          "mean_mcc_at_pref": 0.0634,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.0719
+        }
+      }
+    }
+  },
+  "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1:gorillaTa": {
+    "timestamp": "2026-08-16T22:26:36.157148",
+    "run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champTarandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "gorillaTa",
+    "tag": "",
+    "metrics": {
+      "l0": 64.12,
+      "l0_std": 1.96,
+      "fvu": 0.155923,
+      "mse": 0.003689,
+      "dead_features_pct": 97.34,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2253,
+      "num_bsps": 164,
+      "coverage_mcc": 0.1203,
+      "coverage_mcc_above_25": 0.128,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0793,
+      "min_mcc": 0.0237,
+      "max_mcc": 0.3321,
+      "coverage_youden_j": 0.1546,
+      "median_youden_j": 0.143,
+      "min_youden_j": 0.0093,
+      "max_youden_j": 0.3363,
+      "mean_base_rate": 0.1238,
+      "median_base_rate": 0.1565,
+      "min_base_rate": 0.0083,
+      "max_base_rate": 0.5491,
+      "frac_bsps_very_rare": 0.3841,
+      "frac_bsps_trivial_f1": 0.0427,
+      "coverage_mcc_at_pref": 0.097,
+      "median_mcc_at_pref": 0.0848,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.8117,
+      "num_reconstructable_bsps": 100,
+      "fraction_reconstructable": 0.6098,
+      "mean_accuracy": 0.8117,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 40,
+        "fraction_features_used_by_best_matches": 0.0098,
+        "mean_bsps_per_used_feature": 4.1,
+        "max_bsps_per_feature": 32,
+        "num_shared_features": 23,
+        "fraction_shared_features": 0.575,
+        "num_bsps_with_unique_best_feature": 17,
+        "fraction_bsps_with_unique_best_feature": 0.1037,
+        "num_bsps_with_shared_best_feature": 147,
+        "fraction_bsps_with_shared_best_feature": 0.8963
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3072,
+          "mean_mcc": 0.1848,
+          "median_mcc": 0.1424,
+          "min_mcc": 0.0681,
+          "max_mcc": 0.3321,
+          "sd_mcc": 0.0852,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1257,
+          "mean_mcc_at_pref": 0.1133,
+          "mean_base_rate": 0.1698
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.5118,
+          "mean_mcc": 0.1711,
+          "median_mcc": 0.1868,
+          "min_mcc": 0.1048,
+          "max_mcc": 0.2226,
+          "sd_mcc": 0.0368,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1321,
+          "mean_mcc_at_pref": 0.0909,
+          "mean_base_rate": 0.3393
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4907,
+          "mean_mcc": 0.185,
+          "median_mcc": 0.1507,
+          "min_mcc": 0.145,
+          "max_mcc": 0.2594,
+          "sd_mcc": 0.0527,
+          "heterogeneous": false,
+          "mean_youden_j": 0.197,
+          "mean_mcc_at_pref": 0.1044,
+          "mean_base_rate": 0.3333
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.4602,
+          "mean_mcc": 0.1976,
+          "median_mcc": 0.1976,
+          "min_mcc": 0.1976,
+          "max_mcc": 0.1976,
+          "sd_mcc": 0.0,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2148,
+          "mean_mcc_at_pref": 0.0895,
+          "mean_base_rate": 0.2754
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6715,
+          "mean_mcc": 0.0406,
+          "median_mcc": 0.0241,
+          "min_mcc": 0.0237,
+          "max_mcc": 0.0667,
+          "sd_mcc": 0.018,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0215,
+          "mean_mcc_at_pref": 0.0128,
+          "mean_base_rate": 0.5057
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0578,
+          "mean_mcc": 0.0543,
+          "median_mcc": 0.0561,
+          "min_mcc": 0.0373,
+          "max_mcc": 0.0652,
+          "sd_mcc": 0.007,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1785,
+          "mean_mcc_at_pref": 0.0853,
+          "mean_base_rate": 0.0097
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0604,
+          "mean_mcc": 0.0576,
+          "median_mcc": 0.0557,
+          "min_mcc": 0.0444,
+          "max_mcc": 0.0835,
+          "sd_mcc": 0.0075,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1992,
+          "mean_mcc_at_pref": 0.0924,
+          "mean_base_rate": 0.0092
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.1848,
+          "mean_youden_j": 0.1257,
+          "mean_mcc_at_pref": 0.1133,
+          "mean_base_rate": 0.1698,
+          "mean_f1": 0.3072
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.1711,
+          "mean_youden_j": 0.1321,
+          "mean_mcc_at_pref": 0.0909,
+          "mean_base_rate": 0.3393,
+          "mean_f1": 0.5118
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.185,
+          "mean_youden_j": 0.197,
+          "mean_mcc_at_pref": 0.1044,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4907
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.1976,
+          "mean_youden_j": 0.2148,
+          "mean_mcc_at_pref": 0.0895,
+          "mean_base_rate": 0.2754,
+          "mean_f1": 0.4602
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.0406,
+          "mean_youden_j": 0.0215,
+          "mean_mcc_at_pref": 0.0128,
+          "mean_base_rate": 0.5057,
+          "mean_f1": 0.6715
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.0543,
+          "mean_youden_j": 0.1785,
+          "mean_mcc_at_pref": 0.0853,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.0578
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.0576,
+          "mean_youden_j": 0.1992,
+          "mean_mcc_at_pref": 0.0924,
+          "mean_base_rate": 0.0092,
+          "mean_f1": 0.0604
+        }
+      }
+    }
+  },
+  "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1:hawkTa": {
+    "timestamp": "2026-08-16T22:26:40.566991",
+    "run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champTarandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "hawkTa",
+    "tag": "",
+    "metrics": {
+      "l0": 64.12,
+      "l0_std": 1.96,
+      "fvu": 0.155923,
+      "mse": 0.003689,
+      "dead_features_pct": 97.34,
+      "median_feat_freq": 0.0,
+      "coverage": 0.0724,
+      "num_bsps": 173,
+      "coverage_mcc": 0.064,
+      "coverage_mcc_above_25": 0.0,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0728,
+      "min_mcc": 0.024,
+      "max_mcc": 0.2107,
+      "coverage_youden_j": 0.199,
+      "median_youden_j": 0.185,
+      "min_youden_j": 0.0909,
+      "max_youden_j": 0.3659,
+      "mean_base_rate": 0.0164,
+      "median_base_rate": 0.0164,
+      "min_base_rate": 0.0027,
+      "max_base_rate": 0.35,
+      "frac_bsps_very_rare": 0.4393,
+      "frac_bsps_trivial_f1": 0.0,
+      "coverage_mcc_at_pref": 0.0921,
+      "median_mcc_at_pref": 0.0926,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.9713,
+      "num_reconstructable_bsps": 56,
+      "fraction_reconstructable": 0.3237,
+      "mean_accuracy": 0.9713,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 35,
+        "fraction_features_used_by_best_matches": 0.0085,
+        "mean_bsps_per_used_feature": 4.9429,
+        "max_bsps_per_feature": 19,
+        "num_shared_features": 27,
+        "fraction_shared_features": 0.7714,
+        "num_bsps_with_unique_best_feature": 8,
+        "fraction_bsps_with_unique_best_feature": 0.0462,
+        "num_bsps_with_shared_best_feature": 165,
+        "fraction_bsps_with_shared_best_feature": 0.9538
+      },
+      "per_category": {
+        "reframed_any_threat": {
+          "count": 10,
+          "mean_f1": 0.1183,
+          "mean_mcc": 0.0865,
+          "median_mcc": 0.0848,
+          "min_mcc": 0.0684,
+          "max_mcc": 0.1006,
+          "sd_mcc": 0.009,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1764,
+          "mean_mcc_at_pref": 0.0746,
+          "mean_base_rate": 0.0345
+        },
+        "reframed_completable": {
+          "count": 40,
+          "mean_f1": 0.0261,
+          "mean_mcc": 0.0346,
+          "median_mcc": 0.0353,
+          "min_mcc": 0.024,
+          "max_mcc": 0.0441,
+          "sd_mcc": 0.0047,
+          "heterogeneous": false,
+          "mean_youden_j": 0.184,
+          "mean_mcc_at_pref": 0.0883,
+          "mean_base_rate": 0.0035
+        },
+        "reframed_count": {
+          "count": 40,
+          "mean_f1": 0.0985,
+          "mean_mcc": 0.0824,
+          "median_mcc": 0.0839,
+          "min_mcc": 0.0643,
+          "max_mcc": 0.0941,
+          "sd_mcc": 0.0073,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1963,
+          "mean_mcc_at_pref": 0.093,
+          "mean_base_rate": 0.0194
+        },
+        "reframed_global": {
+          "count": 2,
+          "mean_f1": 0.4287,
+          "mean_mcc": 0.1857,
+          "median_mcc": 0.1608,
+          "min_mcc": 0.1608,
+          "max_mcc": 0.2107,
+          "sd_mcc": 0.025,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2075,
+          "mean_mcc_at_pref": 0.0851,
+          "mean_base_rate": 0.2588
+        },
+        "reframed_sq_any_threat": {
+          "count": 9,
+          "mean_f1": 0.1157,
+          "mean_mcc": 0.0901,
+          "median_mcc": 0.0853,
+          "min_mcc": 0.0768,
+          "max_mcc": 0.1147,
+          "sd_mcc": 0.011,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1967,
+          "mean_mcc_at_pref": 0.0793,
+          "mean_base_rate": 0.0331
+        },
+        "reframed_sq_completable": {
+          "count": 36,
+          "mean_f1": 0.0261,
+          "mean_mcc": 0.0367,
+          "median_mcc": 0.0359,
+          "min_mcc": 0.0273,
+          "max_mcc": 0.0576,
+          "sd_mcc": 0.0063,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2042,
+          "mean_mcc_at_pref": 0.0974,
+          "mean_base_rate": 0.0032
+        },
+        "reframed_sq_count": {
+          "count": 36,
+          "mean_f1": 0.0977,
+          "mean_mcc": 0.084,
+          "median_mcc": 0.083,
+          "min_mcc": 0.0708,
+          "max_mcc": 0.1086,
+          "sd_mcc": 0.0094,
+          "heterogeneous": false,
+          "mean_youden_j": 0.22,
+          "mean_mcc_at_pref": 0.0985,
+          "mean_base_rate": 0.0178
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.0616,
+          "mean_youden_j": 0.1886,
+          "mean_mcc_at_pref": 0.0889,
+          "mean_base_rate": 0.014,
+          "mean_f1": 0.0685
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.1857,
+          "mean_youden_j": 0.2075,
+          "mean_mcc_at_pref": 0.0851,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.4287
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.0637,
+          "mean_youden_j": 0.2104,
+          "mean_mcc_at_pref": 0.0959,
+          "mean_base_rate": 0.013,
+          "mean_f1": 0.0679
+        }
+      }
+    }
+  },
+  "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1:tigerTa": {
+    "timestamp": "2026-08-16T22:26:42.150774",
+    "run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champTarandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "tigerTa",
+    "tag": "",
+    "metrics": {
+      "l0": 64.12,
+      "l0_std": 1.96,
+      "fvu": 0.155923,
+      "mse": 0.003689,
+      "dead_features_pct": 97.34,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2899,
+      "num_bsps": 36,
+      "coverage_mcc": 0.1111,
+      "coverage_mcc_above_25": 0.0,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0803,
+      "min_mcc": 0.055,
+      "max_mcc": 0.2388,
+      "coverage_youden_j": 0.177,
+      "median_youden_j": 0.1909,
+      "min_youden_j": 0.0496,
+      "max_youden_j": 0.2785,
+      "mean_base_rate": 0.192,
+      "median_base_rate": 0.0277,
+      "min_base_rate": 0.0224,
+      "max_base_rate": 0.8794,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.0705,
+      "median_mcc_at_pref": 0.068,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.8469,
+      "num_reconstructable_bsps": 18,
+      "fraction_reconstructable": 0.5,
+      "mean_accuracy": 0.8469,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 10,
+        "fraction_features_used_by_best_matches": 0.0024,
+        "mean_bsps_per_used_feature": 3.6,
+        "max_bsps_per_feature": 16,
+        "num_shared_features": 6,
+        "fraction_shared_features": 0.6,
+        "num_bsps_with_unique_best_feature": 4,
+        "fraction_bsps_with_unique_best_feature": 0.1111,
+        "num_bsps_with_shared_best_feature": 32,
+        "fraction_bsps_with_shared_best_feature": 0.8889
+      },
+      "per_category": {
+        "tiger_decision_global": {
+          "count": 5,
+          "mean_f1": 0.6029,
+          "mean_mcc": 0.1748,
+          "median_mcc": 0.1969,
+          "min_mcc": 0.1158,
+          "max_mcc": 0.2388,
+          "sd_mcc": 0.0471,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1602,
+          "mean_mcc_at_pref": 0.0738,
+          "mean_base_rate": 0.4549
+        },
+        "tiger_line_winnable": {
+          "count": 10,
+          "mean_f1": 0.0962,
+          "mean_mcc": 0.0688,
+          "median_mcc": 0.0682,
+          "min_mcc": 0.055,
+          "max_mcc": 0.0803,
+          "sd_mcc": 0.0074,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1794,
+          "mean_mcc_at_pref": 0.0669,
+          "mean_base_rate": 0.0265
+        },
+        "tiger_offered_completing_attr": {
+          "count": 4,
+          "mean_f1": 0.1414,
+          "mean_mcc": 0.0903,
+          "median_mcc": 0.0915,
+          "min_mcc": 0.0825,
+          "max_mcc": 0.0949,
+          "sd_mcc": 0.0046,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1784,
+          "mean_mcc_at_pref": 0.0654,
+          "mean_base_rate": 0.0508
+        },
+        "tiger_pool_safe_count": {
+          "count": 4,
+          "mean_f1": 0.733,
+          "mean_mcc": 0.1426,
+          "median_mcc": 0.1236,
+          "min_mcc": 0.1158,
+          "max_mcc": 0.1969,
+          "sd_mcc": 0.032,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1029,
+          "mean_mcc_at_pref": 0.052,
+          "mean_base_rate": 0.6274
+        },
+        "tiger_pool_winning_count": {
+          "count": 4,
+          "mean_f1": 0.5292,
+          "mean_mcc": 0.215,
+          "median_mcc": 0.1969,
+          "min_mcc": 0.1899,
+          "max_mcc": 0.2388,
+          "sd_mcc": 0.0218,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2249,
+          "mean_mcc_at_pref": 0.0934,
+          "mean_base_rate": 0.3599
+        },
+        "tiger_square_winnable": {
+          "count": 9,
+          "mean_f1": 0.094,
+          "mean_mcc": 0.072,
+          "median_mcc": 0.0726,
+          "min_mcc": 0.062,
+          "max_mcc": 0.0874,
+          "sd_mcc": 0.0068,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1946,
+          "mean_mcc_at_pref": 0.073,
+          "mean_base_rate": 0.0243
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.1748,
+          "mean_youden_j": 0.1602,
+          "mean_mcc_at_pref": 0.0738,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.6029
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.0688,
+          "mean_youden_j": 0.1794,
+          "mean_mcc_at_pref": 0.0669,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.0962
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.0903,
+          "mean_youden_j": 0.1784,
+          "mean_mcc_at_pref": 0.0654,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.1414
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.1788,
+          "mean_youden_j": 0.1639,
+          "mean_mcc_at_pref": 0.0727,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.6311
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.072,
+          "mean_youden_j": 0.1946,
+          "mean_mcc_at_pref": 0.073,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.094
+        }
+      }
+    }
+  },
+  "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1:gorillaVe": {
+    "timestamp": "2026-08-16T22:26:56.243096",
+    "run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champVerandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "gorillaVe",
+    "tag": "",
+    "metrics": {
+      "l0": 64.07,
+      "l0_std": 1.61,
+      "fvu": 0.166141,
+      "mse": 0.003931,
+      "dead_features_pct": 97.9,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2209,
+      "num_bsps": 164,
+      "coverage_mcc": 0.0983,
+      "coverage_mcc_above_25": 0.061,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0676,
+      "min_mcc": 0.0179,
+      "max_mcc": 0.3211,
+      "coverage_youden_j": 0.1244,
+      "median_youden_j": 0.1245,
+      "min_youden_j": 0.0064,
+      "max_youden_j": 0.2638,
+      "mean_base_rate": 0.1227,
+      "median_base_rate": 0.1493,
+      "min_base_rate": 0.0077,
+      "max_base_rate": 0.5509,
+      "frac_bsps_very_rare": 0.4268,
+      "frac_bsps_trivial_f1": 0.0427,
+      "coverage_mcc_at_pref": 0.0781,
+      "median_mcc_at_pref": 0.077,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.7095,
+      "num_reconstructable_bsps": 1,
+      "fraction_reconstructable": 0.0061,
+      "mean_accuracy": 0.7095,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 33,
+        "fraction_features_used_by_best_matches": 0.0081,
+        "mean_bsps_per_used_feature": 4.9697,
+        "max_bsps_per_feature": 48,
+        "num_shared_features": 18,
+        "fraction_shared_features": 0.5455,
+        "num_bsps_with_unique_best_feature": 15,
+        "fraction_bsps_with_unique_best_feature": 0.0915,
+        "num_bsps_with_shared_best_feature": 149,
+        "fraction_bsps_with_shared_best_feature": 0.9085
+      },
+      "per_category": {
+        "cell_attribute": {
+          "count": 64,
+          "mean_f1": 0.3027,
+          "mean_mcc": 0.1399,
+          "median_mcc": 0.1154,
+          "min_mcc": 0.0537,
+          "max_mcc": 0.3211,
+          "sd_mcc": 0.0747,
+          "heterogeneous": false,
+          "mean_youden_j": 0.101,
+          "mean_mcc_at_pref": 0.0745,
+          "mean_base_rate": 0.1683
+        },
+        "cell_occupancy": {
+          "count": 16,
+          "mean_f1": 0.512,
+          "mean_mcc": 0.1439,
+          "median_mcc": 0.1392,
+          "min_mcc": 0.0774,
+          "max_mcc": 0.2273,
+          "sd_mcc": 0.0396,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0968,
+          "mean_mcc_at_pref": 0.0639,
+          "mean_base_rate": 0.3376
+        },
+        "game_phase": {
+          "count": 3,
+          "mean_f1": 0.4906,
+          "mean_mcc": 0.1545,
+          "median_mcc": 0.1202,
+          "min_mcc": 0.1144,
+          "max_mcc": 0.2289,
+          "sd_mcc": 0.0526,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1611,
+          "mean_mcc_at_pref": 0.0902,
+          "mean_base_rate": 0.3333
+        },
+        "global": {
+          "count": 1,
+          "mean_f1": 0.4427,
+          "mean_mcc": 0.1889,
+          "median_mcc": 0.1889,
+          "min_mcc": 0.1889,
+          "max_mcc": 0.1889,
+          "sd_mcc": 0.0,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1465,
+          "mean_mcc_at_pref": 0.0766,
+          "mean_base_rate": 0.2588
+        },
+        "offered_piece": {
+          "count": 4,
+          "mean_f1": 0.6692,
+          "mean_mcc": 0.0319,
+          "median_mcc": 0.0325,
+          "min_mcc": 0.0179,
+          "max_mcc": 0.0399,
+          "sd_mcc": 0.0085,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0137,
+          "mean_mcc_at_pref": 0.0096,
+          "mean_base_rate": 0.5033
+        },
+        "threat_line": {
+          "count": 40,
+          "mean_f1": 0.0512,
+          "mean_mcc": 0.0511,
+          "median_mcc": 0.0511,
+          "min_mcc": 0.032,
+          "max_mcc": 0.0755,
+          "sd_mcc": 0.0086,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1483,
+          "mean_mcc_at_pref": 0.0827,
+          "mean_base_rate": 0.0091
+        },
+        "threat_square_2x2": {
+          "count": 36,
+          "mean_f1": 0.0563,
+          "mean_mcc": 0.0566,
+          "median_mcc": 0.0561,
+          "min_mcc": 0.041,
+          "max_mcc": 0.0774,
+          "sd_mcc": 0.0075,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1605,
+          "mean_mcc_at_pref": 0.0925,
+          "mean_base_rate": 0.0089
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.1399,
+          "mean_youden_j": 0.101,
+          "mean_mcc_at_pref": 0.0745,
+          "mean_base_rate": 0.1683,
+          "mean_f1": 0.3027
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.1439,
+          "mean_youden_j": 0.0968,
+          "mean_mcc_at_pref": 0.0639,
+          "mean_base_rate": 0.3376,
+          "mean_f1": 0.512
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.1545,
+          "mean_youden_j": 0.1611,
+          "mean_mcc_at_pref": 0.0902,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4906
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.1889,
+          "mean_youden_j": 0.1465,
+          "mean_mcc_at_pref": 0.0766,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.4427
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.0319,
+          "mean_youden_j": 0.0137,
+          "mean_mcc_at_pref": 0.0096,
+          "mean_base_rate": 0.5033,
+          "mean_f1": 0.6692
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.0511,
+          "mean_youden_j": 0.1483,
+          "mean_mcc_at_pref": 0.0827,
+          "mean_base_rate": 0.0091,
+          "mean_f1": 0.0512
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.0566,
+          "mean_youden_j": 0.1605,
+          "mean_mcc_at_pref": 0.0925,
+          "mean_base_rate": 0.0089,
+          "mean_f1": 0.0563
+        }
+      }
+    }
+  },
+  "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1:hawkVe": {
+    "timestamp": "2026-08-16T22:26:58.955646",
+    "run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champVerandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "hawkVe",
+    "tag": "",
+    "metrics": {
+      "l0": 64.07,
+      "l0_std": 1.61,
+      "fvu": 0.166141,
+      "mse": 0.003931,
+      "dead_features_pct": 97.9,
+      "median_feat_freq": 0.0,
+      "coverage": 0.067,
+      "num_bsps": 173,
+      "coverage_mcc": 0.0603,
+      "coverage_mcc_above_25": 0.0,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0692,
+      "min_mcc": 0.0224,
+      "max_mcc": 0.203,
+      "coverage_youden_j": 0.1629,
+      "median_youden_j": 0.1593,
+      "min_youden_j": 0.0909,
+      "max_youden_j": 0.2537,
+      "mean_base_rate": 0.0154,
+      "median_base_rate": 0.0153,
+      "min_base_rate": 0.0027,
+      "max_base_rate": 0.34,
+      "frac_bsps_very_rare": 0.4393,
+      "frac_bsps_trivial_f1": 0.0,
+      "coverage_mcc_at_pref": 0.0901,
+      "median_mcc_at_pref": 0.089,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.0,
+      "num_reconstructable_bsps": 0,
+      "fraction_reconstructable": 0.0,
+      "mean_accuracy": 0.0,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 21,
+        "fraction_features_used_by_best_matches": 0.0051,
+        "mean_bsps_per_used_feature": 8.2381,
+        "max_bsps_per_feature": 28,
+        "num_shared_features": 17,
+        "fraction_shared_features": 0.8095,
+        "num_bsps_with_unique_best_feature": 4,
+        "fraction_bsps_with_unique_best_feature": 0.0231,
+        "num_bsps_with_shared_best_feature": 169,
+        "fraction_bsps_with_shared_best_feature": 0.9769
+      },
+      "per_category": {
+        "reframed_any_threat": {
+          "count": 10,
+          "mean_f1": 0.1097,
+          "mean_mcc": 0.0786,
+          "median_mcc": 0.0784,
+          "min_mcc": 0.0667,
+          "max_mcc": 0.0851,
+          "sd_mcc": 0.0057,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1386,
+          "mean_mcc_at_pref": 0.0694,
+          "mean_base_rate": 0.0329
+        },
+        "reframed_completable": {
+          "count": 40,
+          "mean_f1": 0.0219,
+          "mean_mcc": 0.032,
+          "median_mcc": 0.0313,
+          "min_mcc": 0.0224,
+          "max_mcc": 0.0436,
+          "sd_mcc": 0.0052,
+          "heterogeneous": false,
+          "mean_youden_j": 0.153,
+          "mean_mcc_at_pref": 0.0856,
+          "mean_base_rate": 0.0033
+        },
+        "reframed_count": {
+          "count": 40,
+          "mean_f1": 0.0894,
+          "mean_mcc": 0.0762,
+          "median_mcc": 0.0765,
+          "min_mcc": 0.0459,
+          "max_mcc": 0.1038,
+          "sd_mcc": 0.0097,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1633,
+          "mean_mcc_at_pref": 0.0892,
+          "mean_base_rate": 0.018
+        },
+        "reframed_global": {
+          "count": 2,
+          "mean_f1": 0.4159,
+          "mean_mcc": 0.1753,
+          "median_mcc": 0.1476,
+          "min_mcc": 0.1476,
+          "max_mcc": 0.203,
+          "sd_mcc": 0.0277,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1441,
+          "mean_mcc_at_pref": 0.0741,
+          "mean_base_rate": 0.2478
+        },
+        "reframed_sq_any_threat": {
+          "count": 9,
+          "mean_f1": 0.1126,
+          "mean_mcc": 0.0832,
+          "median_mcc": 0.0846,
+          "min_mcc": 0.0704,
+          "max_mcc": 0.0902,
+          "sd_mcc": 0.0062,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1485,
+          "mean_mcc_at_pref": 0.0745,
+          "mean_base_rate": 0.032
+        },
+        "reframed_sq_completable": {
+          "count": 36,
+          "mean_f1": 0.0232,
+          "mean_mcc": 0.0341,
+          "median_mcc": 0.033,
+          "min_mcc": 0.0254,
+          "max_mcc": 0.0484,
+          "sd_mcc": 0.0049,
+          "heterogeneous": false,
+          "mean_youden_j": 0.167,
+          "mean_mcc_at_pref": 0.0952,
+          "mean_base_rate": 0.003
+        },
+        "reframed_sq_count": {
+          "count": 36,
+          "mean_f1": 0.0936,
+          "mean_mcc": 0.083,
+          "median_mcc": 0.0828,
+          "min_mcc": 0.0666,
+          "max_mcc": 0.1152,
+          "sd_mcc": 0.0096,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1806,
+          "mean_mcc_at_pref": 0.1015,
+          "mean_base_rate": 0.0164
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.0568,
+          "mean_youden_j": 0.156,
+          "mean_mcc_at_pref": 0.0854,
+          "mean_base_rate": 0.0131,
+          "mean_f1": 0.0617
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.1753,
+          "mean_youden_j": 0.1441,
+          "mean_mcc_at_pref": 0.0741,
+          "mean_base_rate": 0.2478,
+          "mean_f1": 0.4159
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.0613,
+          "mean_youden_j": 0.171,
+          "mean_mcc_at_pref": 0.0957,
+          "mean_base_rate": 0.0122,
+          "mean_f1": 0.0644
+        }
+      }
+    }
+  },
+  "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1:tigerVe": {
+    "timestamp": "2026-08-16T22:27:00.098670",
+    "run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "checkpoint": "saes/quarto/R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1.pt",
+    "architecture": "jumprelu",
+    "experiment": "R3-champVerandom-s42",
+    "game": "quarto",
+    "hook": "s4.fc1",
+    "bsp_set": "tigerVe",
+    "tag": "",
+    "metrics": {
+      "l0": 64.07,
+      "l0_std": 1.61,
+      "fvu": 0.166141,
+      "mse": 0.003931,
+      "dead_features_pct": 97.9,
+      "median_feat_freq": 0.0,
+      "coverage": 0.2852,
+      "num_bsps": 36,
+      "coverage_mcc": 0.0971,
+      "coverage_mcc_above_25": 0.0,
+      "coverage_mcc_above_50": 0.0,
+      "median_mcc": 0.0719,
+      "min_mcc": 0.0537,
+      "max_mcc": 0.2104,
+      "coverage_youden_j": 0.1289,
+      "median_youden_j": 0.1373,
+      "min_youden_j": 0.0323,
+      "max_youden_j": 0.1768,
+      "mean_base_rate": 0.1902,
+      "median_base_rate": 0.0257,
+      "min_base_rate": 0.0213,
+      "max_base_rate": 0.8808,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.0632,
+      "median_mcc_at_pref": 0.0651,
+      "p_ref": 0.025,
+      "board_reconstruction": 0.0,
+      "num_reconstructable_bsps": 0,
+      "fraction_reconstructable": 0.0,
+      "mean_accuracy": 0.0,
+      "feature_sharing": {
+        "num_features_used_by_best_matches": 14,
+        "fraction_features_used_by_best_matches": 0.0034,
+        "mean_bsps_per_used_feature": 2.5714,
+        "max_bsps_per_feature": 9,
+        "num_shared_features": 5,
+        "fraction_shared_features": 0.3571,
+        "num_bsps_with_unique_best_feature": 9,
+        "fraction_bsps_with_unique_best_feature": 0.25,
+        "num_bsps_with_shared_best_feature": 27,
+        "fraction_bsps_with_shared_best_feature": 0.75
+      },
+      "per_category": {
+        "tiger_decision_global": {
+          "count": 5,
+          "mean_f1": 0.6004,
+          "mean_mcc": 0.1492,
+          "median_mcc": 0.1683,
+          "min_mcc": 0.0856,
+          "max_mcc": 0.2104,
+          "sd_mcc": 0.0508,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1113,
+          "mean_mcc_at_pref": 0.06,
+          "mean_base_rate": 0.4515
+        },
+        "tiger_line_winnable": {
+          "count": 10,
+          "mean_f1": 0.0877,
+          "mean_mcc": 0.0639,
+          "median_mcc": 0.0635,
+          "min_mcc": 0.0537,
+          "max_mcc": 0.073,
+          "sd_mcc": 0.0051,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1342,
+          "mean_mcc_at_pref": 0.064,
+          "mean_base_rate": 0.0249
+        },
+        "tiger_offered_completing_attr": {
+          "count": 4,
+          "mean_f1": 0.1376,
+          "mean_mcc": 0.0853,
+          "median_mcc": 0.0859,
+          "min_mcc": 0.0692,
+          "max_mcc": 0.0941,
+          "sd_mcc": 0.0097,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1313,
+          "mean_mcc_at_pref": 0.0634,
+          "mean_base_rate": 0.0473
+        },
+        "tiger_pool_safe_count": {
+          "count": 4,
+          "mean_f1": 0.7334,
+          "mean_mcc": 0.1121,
+          "median_mcc": 0.0922,
+          "min_mcc": 0.0856,
+          "max_mcc": 0.1683,
+          "sd_mcc": 0.033,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0721,
+          "mean_mcc_at_pref": 0.0403,
+          "mean_base_rate": 0.6291
+        },
+        "tiger_pool_winning_count": {
+          "count": 4,
+          "mean_f1": 0.5348,
+          "mean_mcc": 0.1857,
+          "median_mcc": 0.1683,
+          "min_mcc": 0.1594,
+          "max_mcc": 0.2104,
+          "sd_mcc": 0.0222,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1584,
+          "mean_mcc_at_pref": 0.0792,
+          "mean_base_rate": 0.3573
+        },
+        "tiger_square_winnable": {
+          "count": 9,
+          "mean_f1": 0.0848,
+          "mean_mcc": 0.0643,
+          "median_mcc": 0.0674,
+          "min_mcc": 0.0555,
+          "max_mcc": 0.0733,
+          "sd_mcc": 0.0068,
+          "heterogeneous": false,
+          "mean_youden_j": 0.144,
+          "mean_mcc_at_pref": 0.0672,
+          "mean_base_rate": 0.0228
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.1492,
+          "mean_youden_j": 0.1113,
+          "mean_mcc_at_pref": 0.06,
+          "mean_base_rate": 0.4515,
+          "mean_f1": 0.6004
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.0639,
+          "mean_youden_j": 0.1342,
+          "mean_mcc_at_pref": 0.064,
+          "mean_base_rate": 0.0249,
+          "mean_f1": 0.0877
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.0853,
+          "mean_youden_j": 0.1313,
+          "mean_mcc_at_pref": 0.0634,
+          "mean_base_rate": 0.0473,
+          "mean_f1": 0.1376
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.1489,
+          "mean_youden_j": 0.1153,
+          "mean_mcc_at_pref": 0.0598,
+          "mean_base_rate": 0.4932,
+          "mean_f1": 0.6341
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.0643,
+          "mean_youden_j": 0.144,
+          "mean_mcc_at_pref": 0.0672,
+          "mean_base_rate": 0.0228,
+          "mean_f1": 0.0848
+        }
+      }
+    }
   }
 }

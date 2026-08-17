@@ -93,9 +93,17 @@ try {
     # CLI warns and falls back to the permutation null, recording
     # random_control: null -- the weaker null is never silently assumed.
     $RANDOM_CONTROLS = @{
-        'Ta|s4.fc1'   = 'R1-champTarandom-s42-jumprelu-t64-exp8-s4.fc1'
-        'Ve|s4.fc1'   = 'R1-champVerandom-s42-jumprelu-t64-exp8-s4.fc1'
-        'Yb|s4.fc1'   = 'R1-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1'
+        # R1 -> R3 (2026-08-16). R1 was DEGENERATE: 4032/4096 latents never
+        # fired and the 64 survivors fired on >99.98% of rows, so ZERO latents
+        # were alive by the diagnostic's own definition and the control
+        # produced no number -- 13 of 17 cells were named as controlled while
+        # never being tested. Root cause was the missing tied init, not
+        # JumpReLU: R3 is the SAME recipe plus W_enc = W_dec^T and has 190
+        # alive latents. So the control stays recipe-matched to the fc1 panel
+        # member and differs only in that the network is untrained.
+        'Ta|s4.fc1'   = 'R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1'
+        'Ve|s4.fc1'   = 'R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1'
+        'Yb|s4.fc1'   = 'R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1'
         'Ta|s4.conv2' = 'R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2'
         'Ve|s4.conv2' = 'R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2'
         'Yb|s4.conv2' = 'R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2'
@@ -124,6 +132,26 @@ try {
 
     # Need the checkpoint + BSP labels. The _h code cache is NOT required up front:
     # if a prior cleanup deleted it, we regenerate it from the checkpoint below.
+    # --- Control usability gate --------------------------------------------
+    # A control that TRAINS is not a control that WORKS. R1 trained fine and
+    # contributed nothing, and nothing in this runner noticed, so 13 of 17
+    # cells reported n_absent = 0 -- which read as "no concept failed" when it
+    # meant "the test never ran". Fail loudly here instead: `spread` and
+    # `captured` are only meaningful once `absent` can fire.
+    Write-Host "`n[gate] Checking every random-model control is usable..."
+    $ctlCkpts = @($RANDOM_CONTROLS.Values | Sort-Object -Unique |
+        ForEach-Object { "saes/$GAME/$_.pt" } | Where-Object { Test-Path $_ })
+    if ($ctlCkpts) {
+        python scripts/check_control_usable.py @ctlCkpts
+        if ($LASTEXITCODE -ne 0) {
+            throw ("One or more random-model controls are UNUSABLE (fewer alive " +
+                   "latents than top_k). Rule 3A.3's learned-signal floor cannot " +
+                   "fire for those cells, so the gate would be provisional. " +
+                   "Retrain the control before running 3A.")
+        }
+    }
+    else { throw "No random-model control checkpoints found on disk." }
+
     # Resolve each entry's random-model control the same way the exec loop does,
     # so the pre-flight reports the SAME pairing that will actually be used.
     function Resolve-Control([string]$rid, [string]$fallback) {
