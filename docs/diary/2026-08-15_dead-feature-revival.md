@@ -297,10 +297,17 @@ weakening the check.
 
 ### 7.2 Campaign K in full [DIRECT]
 
-champYb, seed 42, one seed throughout. `coverage_mcc` per BSP set; `alive` and
-FVU are eval-time; `d_input = 512`, so **effective expansion = alive / 512** —
-the number that says whether a nominally 8× overcomplete dictionary is
-overcomplete at all.
+champYb. `alive` and FVU are eval-time; `d_input = 512`, so **effective
+expansion = alive / 512** — the number that says whether a nominally 8×
+overcomplete dictionary is overcomplete at all.
+
+⚠️ **The gorilla / hawk / tiger columns below are whole-basis `coverage_mcc` and
+must NOT be used to compare runs.** They are retained only as a coarse
+health/regression signal (did this run collapse?), because that is a
+within-run reading. Every comparison in this entry is made in §7.3 on the
+**concept-family** rollup. A whole-basis mean over gorilla is 39%
+`cell_attribute` and 46% threats, so it can move for reasons unrelated to the
+concepts under study — see the correction notice in §7.3(c).
 
 **s4.fc1**
 
@@ -323,6 +330,20 @@ overcomplete at all.
 | E05 | BatchTopK k32, legacy | 0.163 | 0.079 | 0.128 | 0.1100 | 42 | 0.08× |
 | K02 | BatchTopK + aux only | 0.343 | 0.114 | 0.111 | 0.0081 | 158 | 0.31× |
 | K04 | BatchTopK k32, canonical | **0.367** | **0.119** | 0.115 | 0.0066 | 174 | 0.34× |
+
+**Seed replication** (conditions carrying a load-bearing comparison; whole-basis
+figures, health signal only):
+
+| condition | gorillaYb s42 / s43 / s44 | mean | sd |
+|---|---|---:|---:|
+| K03 TopK fc1 canonical | 0.500 · 0.507 · 0.495 | 0.501 | 0.005 |
+| K05 JumpReLU fc1 + init | 0.459 · 0.462 · 0.463 | 0.462 | 0.002 |
+| K06 TopK conv2 canonical | 0.312 · 0.327 · 0.318 | 0.319 | 0.006 |
+| K04 BatchTopK conv2 canonical | 0.367 · 0.368 · 0.365 | 0.367 | 0.001 |
+
+Seed noise is 0.001–0.006, so single-seed campaign-K results were safe — now
+demonstrated rather than assumed. The per-family seed sds in §7.3 are the ones
+that govern whether a family-level gap is real.
 
 ### 7.3 Three findings [AI-REASONED PROVISIONAL ANALYSIS]
 
@@ -348,17 +369,68 @@ the phenomenon 3A exists to measure, showing up here as a side effect of an
 initialisation change. It is a candidate handle on dilution that costs one
 training run to manipulate.
 
-**(c) The conv2 architecture ranking reverses under conformance.** At matched
-k = 32, matched recipe:
+**(c) The conv2 architecture ranking reverses under conformance — on the cell
+families. On threats the reversal is real but an order of magnitude smaller.**
 
-| | gorilla | hawk |
-|---|---:|---:|
-| legacy: TopK vs BatchTopK | **0.330** vs 0.163 | **0.102** vs 0.079 |
-| canonical: TopK vs BatchTopK | 0.312 vs **0.367** | 0.098 vs **0.119** |
+⚠️ **The first version of this section compared whole-basis `coverage_mcc`,
+which this project forbids** (`CLAUDE.md`: "whole-basis averages are not
+interpretable"; `methods-reference.md` §2: "a basis is a packaging convention;
+a CATEGORY is the analysis unit"). Holding the basis fixed across the two arms
+is not a defence: gorilla is 39% `cell_attribute` and 46% threats, so a
+whole-basis number can be carried entirely by families the research is not
+about. It was. Corrected below; all numbers are **means over 3 seeds** (42/43/44)
+and **micro-averaged over BSPs within a family**, which is what
+`aggregate_per_category_by_family` computes.
 
-The "TopK beats BatchTopK on conv2" result was an artefact of BatchTopK missing
-the auxiliary loss its own paper specifies. On fc1 the ranking survives — TopK
-0.500 vs JumpReLU 0.459 — but the gap halves (was 0.502 vs 0.424).
+**conv2, k = 32, canonical vs canonical — BatchTopK (K04) minus TopK (K06)**
+
+| basis / family | n BSPs | K04 | K06 | gap | seed sd |
+|---|---:|---:|---:|---:|---:|
+| gorilla/`board_attribute` | 64 | 0.643 | 0.556 | **+0.088** | 0.011 |
+| gorilla/`board_occupancy` | 16 | 0.526 | 0.451 | **+0.075** | 0.019 |
+| gorilla/`line_threat` | 40 | 0.114 | 0.099 | +0.014 | 0.002 |
+| gorilla/`square_threat` | 36 | 0.109 | 0.096 | +0.014 | 0.002 |
+| hawk/`line_threat` | 90 | 0.119 | 0.102 | +0.017 | 0.001 |
+| hawk/`square_threat` | 81 | 0.114 | 0.097 | +0.017 | 0.002 |
+| tiger/`line_threat` | 10 | 0.092 | 0.071 | +0.020 | 0.004 |
+| tiger/`square_threat` | 9 | 0.092 | 0.071 | +0.021 | 0.004 |
+| tiger/`offered_completion` | 4 | 0.139 | 0.086 | +0.053 | 0.015 |
+| gorilla/`game_phase` | 3 | 0.219 | 0.264 | −0.045 | 0.069 |
+| gorilla/`offered_piece_attr` | 4 | 0.289 | 0.316 | −0.027 | 0.050 |
+| tiger/`pool_reasoning` | 8 | 0.202 | 0.218 | −0.017 | 0.056 |
+
+BatchTopK wins **every threat family** (+0.014 to +0.021, 5–10× the seed sd) and
+wins the cell families by 4–6× as much. So the reversal is genuine and
+consistent, but its magnitude lives in `board_attribute` and `board_occupancy`.
+The three cells where TopK leads are the smallest families (n = 3, 4, 8) and
+carry the largest seed sd (0.050–0.069) — noise, not signal.
+
+**fc1, canonical vs canonical — TopK (K03) minus JumpReLU (K05)**
+
+| basis / family | n BSPs | K03 | K05 | gap | seed sd |
+|---|---:|---:|---:|---:|---:|
+| gorilla/`offered_piece_attr` | 4 | 0.488 | 0.245 | +0.242 | 0.049 |
+| gorilla/`game_phase` | 3 | 0.409 | 0.222 | +0.187 | 0.045 |
+| gorilla/`board_attribute` | 64 | 0.403 | 0.357 | +0.046 | 0.003 |
+| gorilla/`board_occupancy` | 16 | 0.389 | 0.345 | +0.044 | 0.007 |
+| gorilla/`line_threat` | 40 | 0.476 | 0.455 | +0.021 | 0.012 |
+| gorilla/`square_threat` | 36 | 0.768 | 0.754 | +0.014 | 0.009 |
+| hawk/`line_threat` | 90 | 0.374 | 0.369 | +0.004 | 0.007 |
+| hawk/`square_threat` | 81 | 0.541 | 0.543 | **−0.002** | 0.004 |
+| tiger/`line_threat` | 10 | 0.175 | 0.172 | +0.004 | 0.009 |
+| tiger/`square_threat` | 9 | 0.248 | 0.266 | **−0.018** | 0.009 |
+| tiger/`offered_completion` | 4 | 0.213 | 0.295 | **−0.082** | 0.025 |
+
+**"TopK beats JumpReLU on fc1" is RETRACTED as a statement about threat
+concepts.** TopK's whole-basis lead is carried by `offered_piece_attr` (+0.242,
+n = 4, and the known F1 ≈ 0.667 trivial-baseline family), `game_phase` (+0.187,
+n = 3) and the cell families. On the threat families the two are **tied** —
+hawk square −0.002, hawk line +0.004, tiger line +0.004 — and **JumpReLU leads
+on the agent-relative ones** (tiger square −0.018, tiger `offered_completion`
+−0.082).
+
+That matters for the panel: F04/K05 (JumpReLU) is the fc1 panel member, and on
+the concepts this project is about it is not the weaker architecture.
 
 ### 7.4 What this means for the banked results
 

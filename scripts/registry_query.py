@@ -260,6 +260,13 @@ def cmd_top(args: dict[str, Any]) -> None:
           "divergence flags base-rate effects.")
     print("(F1) = literature comparison only -- never rank on it. J is blank "
           "until a run is re-evaluated.")
+    print()
+    print("!! These are WHOLE-BASIS means: a within-run health/ranking signal,")
+    print("   NOT a basis for comparing two runs. A gorilla mean is 39%")
+    print("   cell_attribute and 46% threats, so a gap between two runs here can")
+    print("   sit entirely in families you do not care about -- which is exactly")
+    print("   how the 2026-08-15 campaign-K architecture comparison went wrong.")
+    print("   To COMPARE runs:  registry_query.py family <run_id> --bsps=<set>")
 
 
 def cmd_get(args: dict[str, Any]) -> None:

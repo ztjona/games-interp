@@ -1,0 +1,21 @@
+# K03-champYb: conformance A/B, campaign K. Partner of F01-champYb-s42-topk-k32-exp8-s4.fc1.
+# Isolates the ENCODER INIT alone: F01 already had the aux loss, so the only
+# difference here is W_enc = W_dec^T (Gao et al. 2024 mitigation 1).
+# Seed replicate s43 of the s42 condition (same K03 condition,
+# only the seed varies -- Quarto-specifications.md 218).
+# Arc: reference conformance -- docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K03-champYb-s43
+architecture: topk
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 43
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+init_mode: decoder_transpose
+dead_window: 0

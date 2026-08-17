@@ -2,6 +2,20 @@
 
 From 2026-04-24 onward, follow-up SAE runs use prefixed experiment IDs:
 
+**Three naming levels, deliberately separate** (settled 2026-08-15, because
+"3B.0A" welded a phase number to a sub-item letter and collided with this one):
+
+| level | what it names | examples |
+|---|---|---|
+| **phase** | a research phase | `3A`, `3B`, `3C`, `3D` |
+| **track** | instrument work that must precede a phase | `instrument/metrics`, `instrument/conformance` |
+| **campaign** | the `{Major}` letter of a run-id — registered *in this file* | `A`…`K` |
+
+A campaign that is not listed below does not exist. Campaign `K` was minted on
+2026-08-15 and initially recorded only in a diary, which is the same
+"convention in one place, deviation in another" failure the conformance track
+was about.
+
 - Format: `{Major}{Minor}-{tag}-s{seed}`
 - `Major`: campaign family (`A`, `B`, `C`, ...)
 - `Minor`: zero-padded condition index inside that campaign (`01`, `02`, ...)
@@ -84,3 +98,39 @@ Uses `conv2_512_amalgam_random_activations.pt` (trained model epoch 0).
 | `G03` | batchtopk | k=32, exp8 | C04 | `G03-c2random-s42-batchtopk-k32-exp8-conv2` |
 | `G04` | topk | k=64, exp16 | D02 | `G04-c2random-s42-topk-k64-exp16-conv2` |
 | `G05` | batchtopk | k=64, exp16 | D04 | `G05-c2random-s42-batchtopk-k64-exp16-conv2` |
+
+## Campaign K — reference conformance A/B (2026-08-15)
+
+Track: **`instrument/conformance`**. Full record and results:
+[`../../docs/diary/2026-08-15_dead-feature-revival.md`](../../docs/diary/2026-08-15_dead-feature-revival.md).
+
+Why it exists: dead-feature revival (Gao et al. 2024 auxiliary loss) was
+implemented **only on `TopKSAE`**, and `W_enc = W_dec^T` init — Gao's *first*
+listed mitigation — was absent from every architecture. So an architecture
+comparison was partly a comparison of training machinery. Campaign K measures
+what changes when each architecture is trained in its published form.
+
+Configs live in `configs/champYb/` (not here) because every member is a champYb
+A/B partner of an existing champYb run. All are `exp8`, `lr 3e-4`,
+`25 000 batches`, `batch 4096`, `dead_window 0`.
+
+| ID | Arch / hook | Change vs partner | Partner | Seeds |
+|---|---|---|---|---|
+| `K01` | jumprelu / `s4.fc1` | + aux loss (**non-canonical** probe) | `F04-champYb` | 42 |
+| `K02` | batchtopk / `s4.conv2` | + aux loss only | `E05-champYb` | 42 |
+| `K03` | topk / `s4.fc1` | + tied init (→ fully canonical) | `F01-champYb` | 42, 43, 44 |
+| `K04` | batchtopk / `s4.conv2` | + aux + tied init (→ fully canonical) | `E05-champYb` | 42, 43, 44 |
+| `K05` | jumprelu / `s4.fc1` | + tied init (a **choice**, see below) | `F04-champYb` | 42, 43, 44 |
+| `K06` | topk / `s4.conv2` | + tied init (→ fully canonical) | `E01-champYb` | 42, 43, 44 |
+| `K07` | topk / `s4.conv2` k=16 | + tied init (→ fully canonical) | `C01-champYb` | 42 |
+
+Seeds 43/44 were run only for the four conditions carrying a load-bearing
+comparison (the conv2 rank reversal `K04` vs `K06`, and the fc1 ranking `K03`
+vs `K05`), per the rule that seed replication is required where a margin is thin
+or a claim inverts a previous result — not for every cell.
+
+`K05` is not a conformance fix: Rajamanoharan et al. 2024b specify **no** init
+for JumpReLU, so that axis is underdetermined and `decoder_transpose` is a
+recorded choice made on K05's evidence. Its auxiliary loss stays **off**, which
+*is* specified. See `DEFAULT_INIT` in `sae_train.py` — deliberately not named
+`CANONICAL_INIT`, because only the TopK-family rows are canonical.

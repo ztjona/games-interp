@@ -74,6 +74,7 @@ from lib.sae import load_checkpoint, load_activation_data
 from lib.sae.architectures import BatchTopKSAE
 from lib.sae.eval import (
     FeatureBSPMatching,
+    aggregate_per_category_by_family,
     match_features_to_bsps,
     compute_coverage,
     compute_feature_sharing,
@@ -475,6 +476,18 @@ def cmd_evaluate(args: dict) -> None:
         metrics["feature_sharing"] = feature_sharing
         if per_category:
             metrics["per_category"] = per_category
+            # Store the CONCEPT-FAMILY rollup as a first-class block. Whole-basis
+            # scalars (coverage_mcc and friends) are a within-run health signal
+            # only: a gorilla mean is 39% cell_attribute and 46% threats, so
+            # comparing two runs on it can move for reasons unrelated to the
+            # concepts under study -- which is exactly what happened to the
+            # campaign-K architecture comparison on 2026-08-15. Making the family
+            # rollup as convenient as the scalar is what stops the scalar being
+            # reached for. See docs/methods-reference.md S2 and CLAUDE.md.
+            if bsp_schema:
+                family = aggregate_per_category_by_family(per_category, bsp_schema)
+                if family:
+                    metrics["per_family"] = family
 
         # Anchored diagonal: per-anchor F1/MCC/lift on the (feature, bsp)
         # pair that was supervised at training time.  Read constructor_kwargs

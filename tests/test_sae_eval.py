@@ -895,3 +895,40 @@ class TestMatchingMemoryFootprint:
         assert "fires = (h > 0).float()" not in src, (
             "compute_board_reconstruction materialises a full (N, d_dict) copy "
             "of h to read single columns")
+
+
+class TestFamilyRollupIsFirstClass:
+    """`per_family` must be stored, so the family rollup is as reachable as the
+    whole-basis scalar.
+
+    Guards the 2026-08-15 error: campaign-K compared runs on `coverage_mcc`,
+    a whole-basis mean that is 39% cell_attribute on gorilla, and both
+    architecture claims changed once the comparison was made per concept family.
+    The scalar is a within-run health signal; the family rollup is the
+    comparison unit. See CLAUDE.md and docs/methods-reference.md S2.
+    """
+
+    def test_sae_eval_emits_per_family(self):
+        """The metrics assembly must roll per_category up into per_family."""
+        import re
+        from pathlib import Path
+
+        src = Path(__file__).parent.parent / "sae_eval.py"
+        text = src.read_text(encoding="utf-8")
+        assert "aggregate_per_category_by_family" in text, (
+            "sae_eval.py no longer builds the concept-family rollup; the "
+            "whole-basis scalar becomes the only convenient number again."
+        )
+        assert re.search(r'metrics\[["\']per_family["\']\]', text), (
+            "sae_eval.py does not store metrics['per_family']"
+        )
+
+    def test_registry_query_warns_against_whole_basis_comparison(self):
+        from pathlib import Path
+
+        src = Path(__file__).parent.parent / "scripts" / "registry_query.py"
+        text = src.read_text(encoding="utf-8").lower()
+        assert "whole-basis" in text and "not a basis for comparing" in text, (
+            "registry_query.py `top` no longer warns that its columns are "
+            "whole-basis means and must not be used to compare runs."
+        )

@@ -1,0 +1,23 @@
+# K06-champYb-s42: conformance A/B, campaign K. Canonical TopK on conv2.
+# Partner: E01-champYb-s42-topk-k32-exp8-s4.conv2 (banked, kaiming init)
+# Purpose: the conv2 ARCHITECTURE comparison at matched k=32, both canonical:
+# K06 (TopK) vs K04 (BatchTopK). Without this, K04 0.367 vs C01 0.333 is
+# canonical-vs-legacy and settles nothing.
+# Seed replicate s43 of the s42 condition (same K06 condition,
+# only the seed varies -- Quarto-specifications.md 218).
+# Arc: reference conformance -- docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K06-champYb-s43
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 43
+log_every: 500
+k: 32
+aux_loss_weight: 0.01
+init_mode: decoder_transpose
+dead_window: 0

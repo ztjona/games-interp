@@ -1,0 +1,25 @@
+# K05-champYb: conformance A/B, campaign K. Partner of F04-champYb-s42-jumprelu-t64-exp8-s4.fc1.
+# Isolates the init for JumpReLU. NOTE: NON-CANONICAL -- Rajamanoharan et al.
+# 2024b specify no tied init. Run as an experiment only; must not become a default.
+# Seed replicate s43 of the s42 condition (same K05 condition,
+# only the seed varies -- Quarto-specifications.md 218).
+# Arc: reference conformance -- docs/diary/2026-08-15_dead-feature-revival.md
+experiment: K05-champYb-s43
+architecture: jumprelu
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 43
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64
+patience: 0
+min_improvement: 0.001
+l0_patience: 0
+l0_min_change: 5.0
+init_mode: decoder_transpose
+dead_window: 0
