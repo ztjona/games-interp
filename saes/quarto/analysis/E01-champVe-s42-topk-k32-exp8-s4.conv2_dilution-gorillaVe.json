@@ -26,6 +26,7 @@
       "n_splits": 5,
       "n_perm": 5,
       "absent_margin": 0.02,
+      "random_margin": 0.02,
       "absent_floor": 0.02,
       "captured_k": 2,
       "captured_size": 3,
@@ -33,7 +34,7 @@
       "captured_idim": 2.0,
       "tile_overlap": 0.15,
       "tile_neg_frac": 0.5,
-      "rule_version": "3A.2",
+      "rule_version": "3A.3",
       "seed": 0
     }
   },
@@ -129,6 +130,16 @@
         "ideal": "flat after k=1",
         "means": "The restricted-R2 support curve: entry k is the held-out R2 using the k best-associated latents. A steep early rise then a plateau = concentrated; a long slow climb = diluted."
       },
+      "random_asymptote_r2": {
+        "range": "<=1",
+        "ideal": "far BELOW asymptote_r2",
+        "means": "The same restricted-R2 asymptote computed on an SAE trained on an UNTRAINED network's activations, row-aligned to the same positions. The learned-signal floor: asymptote_r2 minus this is what the TRAINED model contributes over the architectural prior. Absent when no usable control existed for that run -- check random_control_applied before reading any verdict as tested."
+      },
+      "random_control_applied": {
+        "range": "true/false",
+        "ideal": "true",
+        "means": "Whether the random-model floor was actually applied to this concept. FALSE means the verdict rests on the permutation null alone and is PROVISIONAL: the permutation null cannot distinguish learned structure from the architectural prior. A control named in a report's metadata is not enough -- the fc1 control SAE has zero alive latents and contributed no number."
+      },
       "geometric_frac": {
         "range": "0..1",
         "ideal": "n/a -- this is the gate quantity",
@@ -136,27 +147,29 @@
       }
     },
     "verdicts": {
-      "absent": "The codes carry no more signal about the concept than the null. The information is not in this dictionary at all -- an architecture change on the same activations cannot recover it (change the hook, or use E2E / supervision).",
+      "absent": "The codes carry no more signal about the concept than the floor -- either the permutation null (the signal is not real) or, where a random-model SAE control was measured, that control (the signal is real but NOT LEARNED: a dictionary trained on an untrained network recovers the concept just as well). Not a capacity problem: change the hook, or go E2E / supervised.",
       "captured": "Recovered by a small, low-dimensional set of latents. The SAE already has this concept cleanly; nothing to fix.",
-      "diluted": "Recoverable, but only by aggregating MANY MUTUALLY-OVERLAPPING latents (feature splitting). The information IS present -- an aggregating or hierarchical readout can recover it. One of the two GEOMETRIC verdicts.",
-      "tiled": "Recoverable, but spread over NEAR-DISJOINT, COMPETING latents (a shattered manifold). Needs a manifold-aware or bilinear readout. The other GEOMETRIC verdict."
+      "spread": "Recoverable from the dictionary, and demonstrably better than both floors, but NOT concentrated: no single latent carries most of it. This is the GEOMETRIC verdict and the H10 outcome -- the information is present and the flat dictionary is not presenting it in one atom, so the fix is an architecture change rather than a dead end. Replaces the former diluted/tiled pair as of rule 3A.3: the test that separated them fired only on 2-latent communities with a single negative edge, and the underlying statistic does not discriminate captured from spread at any scope (see `classify`).",
+      "diluted": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable only by aggregating many mutually-overlapping latents.",
+      "tiled": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable but spread over near-disjoint, competing latents. The test for it was not measuring that; see `classify`."
     }
   },
   "gate_g3a": {
     "n_threat_bsps": 76,
-    "n_diluted": 74,
-    "n_tiled": 2,
+    "n_spread": 76,
     "n_captured": 0,
     "n_absent": 0,
+    "n_random_control_applied": 76,
+    "random_control_coverage": 1.0,
     "geometric_frac": 1.0,
-    "verdict": "3C-proceeds"
+    "verdict": "3C-proceeds",
+    "gate_is_provisional": false
   },
   "category_summary": {
     "threat_line": {
       "absent": 0,
       "captured": 0,
-      "diluted": 38,
-      "tiled": 2,
+      "spread": 40,
       "n": 40,
       "mean_asymptote_r2": 0.0993,
       "mean_solo_frac": 0.1436,
@@ -175,8 +188,7 @@
     "threat_square_2x2": {
       "absent": 0,
       "captured": 0,
-      "diluted": 36,
-      "tiled": 0,
+      "spread": 36,
       "n": 36,
       "mean_asymptote_r2": 0.1061,
       "mean_solo_frac": 0.1431,
@@ -283,7 +295,8 @@
         0.1064
       ],
       "random_asymptote_r2": 0.0244,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 81,
@@ -374,7 +387,8 @@
         0.0989
       ],
       "random_asymptote_r2": 0.0247,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 82,
@@ -465,7 +479,8 @@
         0.0955
       ],
       "random_asymptote_r2": 0.0233,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 83,
@@ -556,7 +571,8 @@
         0.1056
       ],
       "random_asymptote_r2": 0.0333,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 84,
@@ -647,7 +663,8 @@
         0.1074
       ],
       "random_asymptote_r2": 0.0289,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 85,
@@ -738,7 +755,8 @@
         0.0891
       ],
       "random_asymptote_r2": 0.0327,
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 86,
@@ -829,7 +847,8 @@
         0.1092
       ],
       "random_asymptote_r2": 0.0262,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 87,
@@ -920,7 +939,8 @@
         0.0972
       ],
       "random_asymptote_r2": 0.0279,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 88,
@@ -1011,7 +1031,8 @@
         0.1072
       ],
       "random_asymptote_r2": 0.0314,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 89,
@@ -1102,7 +1123,8 @@
         0.1029
       ],
       "random_asymptote_r2": 0.0335,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 90,
@@ -1193,7 +1215,8 @@
         0.1058
       ],
       "random_asymptote_r2": 0.0248,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 91,
@@ -1284,7 +1307,8 @@
         0.0941
       ],
       "random_asymptote_r2": 0.0271,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 92,
@@ -1375,7 +1399,8 @@
         0.1138
       ],
       "random_asymptote_r2": 0.0208,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 93,
@@ -1466,7 +1491,8 @@
         0.0882
       ],
       "random_asymptote_r2": 0.031,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 94,
@@ -1557,7 +1583,8 @@
         0.1007
       ],
       "random_asymptote_r2": 0.016,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 95,
@@ -1648,7 +1675,8 @@
         0.1139
       ],
       "random_asymptote_r2": 0.0301,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 96,
@@ -1739,7 +1767,8 @@
         0.1073
       ],
       "random_asymptote_r2": 0.0274,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 97,
@@ -1830,7 +1859,8 @@
         0.0932
       ],
       "random_asymptote_r2": 0.02,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 98,
@@ -1921,7 +1951,8 @@
         0.0926
       ],
       "random_asymptote_r2": 0.0223,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 99,
@@ -2012,7 +2043,8 @@
         0.1088
       ],
       "random_asymptote_r2": 0.0339,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 100,
@@ -2103,7 +2135,8 @@
         0.0979
       ],
       "random_asymptote_r2": 0.028,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 101,
@@ -2194,7 +2227,8 @@
         0.0965
       ],
       "random_asymptote_r2": 0.0292,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 102,
@@ -2285,7 +2319,8 @@
         0.0931
       ],
       "random_asymptote_r2": 0.0327,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 103,
@@ -2376,7 +2411,8 @@
         0.1006
       ],
       "random_asymptote_r2": 0.0296,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 104,
@@ -2467,7 +2503,8 @@
         0.107
       ],
       "random_asymptote_r2": 0.0282,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 105,
@@ -2558,7 +2595,8 @@
         0.0948
       ],
       "random_asymptote_r2": 0.026,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 106,
@@ -2649,7 +2687,8 @@
         0.1046
       ],
       "random_asymptote_r2": 0.0243,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 107,
@@ -2740,7 +2779,8 @@
         0.1102
       ],
       "random_asymptote_r2": 0.0311,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 108,
@@ -2831,7 +2871,8 @@
         0.1143
       ],
       "random_asymptote_r2": 0.0244,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 109,
@@ -2922,7 +2963,8 @@
         0.0969
       ],
       "random_asymptote_r2": 0.0204,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 110,
@@ -3013,7 +3055,8 @@
         0.1065
       ],
       "random_asymptote_r2": 0.0203,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 111,
@@ -3104,7 +3147,8 @@
         0.1088
       ],
       "random_asymptote_r2": 0.0257,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 112,
@@ -3195,7 +3239,8 @@
         0.0894
       ],
       "random_asymptote_r2": 0.0272,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 113,
@@ -3286,7 +3331,8 @@
         0.0908
       ],
       "random_asymptote_r2": 0.0288,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 114,
@@ -3377,7 +3423,8 @@
         0.0831
       ],
       "random_asymptote_r2": 0.0279,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 115,
@@ -3468,7 +3515,8 @@
         0.0834
       ],
       "random_asymptote_r2": 0.0333,
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 116,
@@ -3559,7 +3607,8 @@
         0.0859
       ],
       "random_asymptote_r2": 0.0262,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 117,
@@ -3650,7 +3699,8 @@
         0.0979
       ],
       "random_asymptote_r2": 0.0245,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 118,
@@ -3741,7 +3791,8 @@
         0.0861
       ],
       "random_asymptote_r2": 0.021,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 119,
@@ -3832,7 +3883,8 @@
         0.0851
       ],
       "random_asymptote_r2": 0.0249,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 120,
@@ -3923,7 +3975,8 @@
         0.1013
       ],
       "random_asymptote_r2": 0.0244,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 121,
@@ -4014,7 +4067,8 @@
         0.0975
       ],
       "random_asymptote_r2": 0.0271,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 122,
@@ -4105,7 +4159,8 @@
         0.1075
       ],
       "random_asymptote_r2": 0.0284,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 123,
@@ -4196,7 +4251,8 @@
         0.111
       ],
       "random_asymptote_r2": 0.0387,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 124,
@@ -4287,7 +4343,8 @@
         0.0984
       ],
       "random_asymptote_r2": 0.026,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 125,
@@ -4378,7 +4435,8 @@
         0.0973
       ],
       "random_asymptote_r2": 0.034,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 126,
@@ -4469,7 +4527,8 @@
         0.0948
       ],
       "random_asymptote_r2": 0.0265,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 127,
@@ -4560,7 +4619,8 @@
         0.1065
       ],
       "random_asymptote_r2": 0.0356,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 128,
@@ -4651,7 +4711,8 @@
         0.1085
       ],
       "random_asymptote_r2": 0.0247,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 129,
@@ -4742,7 +4803,8 @@
         0.1051
       ],
       "random_asymptote_r2": 0.0235,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 130,
@@ -4833,7 +4895,8 @@
         0.1091
       ],
       "random_asymptote_r2": 0.024,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 131,
@@ -4924,7 +4987,8 @@
         0.1272
       ],
       "random_asymptote_r2": 0.0363,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 132,
@@ -5015,7 +5079,8 @@
         0.1101
       ],
       "random_asymptote_r2": 0.031,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 133,
@@ -5106,7 +5171,8 @@
         0.1021
       ],
       "random_asymptote_r2": 0.0246,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 134,
@@ -5197,7 +5263,8 @@
         0.1002
       ],
       "random_asymptote_r2": 0.0353,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 135,
@@ -5288,7 +5355,8 @@
         0.1161
       ],
       "random_asymptote_r2": 0.0344,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 136,
@@ -5379,7 +5447,8 @@
         0.0955
       ],
       "random_asymptote_r2": 0.0283,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 137,
@@ -5470,7 +5539,8 @@
         0.0997
       ],
       "random_asymptote_r2": 0.0307,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 138,
@@ -5561,7 +5631,8 @@
         0.1022
       ],
       "random_asymptote_r2": 0.0295,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 139,
@@ -5652,7 +5723,8 @@
         0.105
       ],
       "random_asymptote_r2": 0.0306,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 140,
@@ -5743,7 +5815,8 @@
         0.1124
       ],
       "random_asymptote_r2": 0.0275,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 141,
@@ -5834,7 +5907,8 @@
         0.1043
       ],
       "random_asymptote_r2": 0.0312,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 142,
@@ -5925,7 +5999,8 @@
         0.1076
       ],
       "random_asymptote_r2": 0.0272,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 143,
@@ -6016,7 +6091,8 @@
         0.1167
       ],
       "random_asymptote_r2": 0.0346,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 144,
@@ -6107,7 +6183,8 @@
         0.1032
       ],
       "random_asymptote_r2": 0.0251,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 145,
@@ -6198,7 +6275,8 @@
         0.1038
       ],
       "random_asymptote_r2": 0.0312,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 146,
@@ -6289,7 +6367,8 @@
         0.0993
       ],
       "random_asymptote_r2": 0.0262,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 147,
@@ -6380,7 +6459,8 @@
         0.1047
       ],
       "random_asymptote_r2": 0.034,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 148,
@@ -6471,7 +6551,8 @@
         0.103
       ],
       "random_asymptote_r2": 0.0256,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 149,
@@ -6562,7 +6643,8 @@
         0.1012
       ],
       "random_asymptote_r2": 0.0318,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 150,
@@ -6653,7 +6735,8 @@
         0.107
       ],
       "random_asymptote_r2": 0.0283,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 151,
@@ -6744,7 +6827,8 @@
         0.1177
       ],
       "random_asymptote_r2": 0.0348,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 152,
@@ -6835,7 +6919,8 @@
         0.1092
       ],
       "random_asymptote_r2": 0.0258,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 153,
@@ -6926,7 +7011,8 @@
         0.1048
       ],
       "random_asymptote_r2": 0.0305,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 154,
@@ -7017,7 +7103,8 @@
         0.1092
       ],
       "random_asymptote_r2": 0.0231,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     },
     {
       "bsp_index": 155,
@@ -7108,7 +7195,8 @@
         0.1199
       ],
       "random_asymptote_r2": 0.0307,
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": true
     }
   ]
 }

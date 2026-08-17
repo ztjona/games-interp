@@ -5,7 +5,7 @@ Two layers:
      metrics dict, so the four branches are pinned directly and deterministically.
   2. diagnose_concept() end-to-end on synthetic planted concepts -- confirms the
      metrics that feed classify() come out with the right qualitative shape for
-     captured / absent / tiled structure.
+     captured / absent / spread structure.
 """
 
 import sys
@@ -26,6 +26,7 @@ from lib.sae.dilution import (
     participation_ratio,
     solo_frac_of,
 )
+from scripts.dilution_diagnostic import VERDICTS  # noqa: E402
 
 
 CFG = DilutionConfig(max_rows=10_000)  # small; tests use N <= 6000
@@ -57,21 +58,23 @@ def test_classify_captured():
     assert classify(m, CFG) == "captured"
 
 
-def test_classify_tiled():
+def test_classify_tiled_shape_is_now_spread():
+    """Rule 3A.3 collapsed diluted/tiled into `spread`; the shape still must not
+    be read as captured or absent."""
     m = _metrics(support_overlap=0.05, neg_coupling_frac=0.7)
-    assert classify(m, CFG) == "tiled"
+    assert classify(m, CFG) == "spread"
 
 
-def test_classify_diluted():
+def test_classify_spread():
     # recoverable, many latents, overlapping supports, mixed-sign couplings
     m = _metrics(support_overlap=0.4, neg_coupling_frac=0.3, knee_k=12)
-    assert classify(m, CFG) == "diluted"
+    assert classify(m, CFG) == "spread"
 
 
-def test_classify_diluted_not_tiled_when_overlap_high():
-    # negative couplings alone must NOT trigger tiled if supports overlap
+def test_classify_spread_regardless_of_overlap():
+    # Pre-3A.3 this distinguished diluted from tiled; both are now `spread`.
     m = _metrics(support_overlap=0.5, neg_coupling_frac=0.8)
-    assert classify(m, CFG) == "diluted"
+    assert classify(m, CFG) == "spread"
 
 
 # --- 1b. rule 3A.2 calibration ------------------------------------------------
@@ -98,23 +101,23 @@ def test_classify_captured_via_knee_despite_large_community():
     assert classify(m, CFG) == "captured"
 
 
-def test_classify_still_diluted_when_signal_is_spread():
+def test_classify_still_spread_when_signal_is_spread():
     """The unsupervised shape must NOT drift to captured: no single latent
     dominates and the community spans several effective dimensions."""
     m = _metrics(asymptote_r2=0.38, null_r2=0.0, knee_k=8, community_size=10,
                  intrinsic_dim=2.99, solo_frac=0.22)
-    assert classify(m, CFG) == "diluted"
+    assert classify(m, CFG) == "spread"
 
 
 def test_classify_high_solo_frac_but_high_dim_is_not_captured():
     """Both halves of the new condition are required."""
     m = _metrics(solo_frac=0.95, intrinsic_dim=6.0)
-    assert classify(m, CFG) == "diluted"
+    assert classify(m, CFG) == "spread"
 
 
 def test_classify_low_dim_but_low_solo_frac_is_not_captured():
     m = _metrics(solo_frac=0.30, intrinsic_dim=1.0)
-    assert classify(m, CFG) == "diluted"
+    assert classify(m, CFG) == "spread"
 
 
 def test_rule_3a1_captured_verdicts_are_preserved():
@@ -153,7 +156,10 @@ def test_glossary_covers_every_reported_metric_and_verdict():
     reported = set(m) - {"verdict", "base_rate", "n_candidates", "solo_r2",
                          "random_asymptote_r2"}
     assert reported <= set(GLOSSARY), f"missing from GLOSSARY: {reported - set(GLOSSARY)}"
-    assert set(VERDICT_GLOSSARY) == {"absent", "captured", "diluted", "tiled"}
+    # `diluted`/`tiled` are retained as RETIRED entries so a pre-3A.3
+    # report stays readable; the live set is three-way.
+    assert {"absent", "captured", "spread"} <= set(VERDICT_GLOSSARY)
+    assert set(VERDICTS) == {"absent", "captured", "spread"}
 
 
 # --- 2. diagnose_concept() end-to-end -----------------------------------------
@@ -187,7 +193,7 @@ def test_diagnose_absent_independent():
     assert m["verdict"] == "absent"
 
 
-def test_diagnose_tiled_disjoint_latents():
+def test_diagnose_disjoint_latents_is_geometric():
     rng = np.random.default_rng(2)
     N, d = 6000, 40
     y = (rng.random(N) < 0.5).astype(np.float32)
@@ -203,7 +209,7 @@ def test_diagnose_tiled_disjoint_latents():
     m = diagnose_concept(torch.tensor(h), torch.tensor(y), CFG)
     assert m["asymptote_r2"] - m["null_r2"] > 0.2   # recoverable in aggregate
     assert m["support_overlap"] < 0.2               # disjoint supports
-    assert m["verdict"] in ("tiled", "diluted")     # geometric, not captured/absent
+    assert m["verdict"] == "spread"     # geometric, not captured/absent
     assert m["verdict"] != "captured"
 
 
@@ -361,3 +367,85 @@ def test_diagnose_row_subsample_is_deterministic():
     m1 = diagnose_concept(torch.tensor(h), torch.tensor(y), cfg)
     m2 = diagnose_concept(torch.tensor(h), torch.tensor(y), cfg)
     assert m1 == m2
+
+
+# ---------------------------------------------------------------------------
+# Rule 3A.3: the learned-signal floor, and the diluted/tiled collapse
+# ---------------------------------------------------------------------------
+
+
+def _metrics(**over):
+    """A concept that is clearly present and clearly NOT concentrated."""
+    base = dict(
+        asymptote_r2=0.30, null_r2=0.00, solo_frac=0.20, knee_k=20,
+        community_size=12, intrinsic_dim=5.0, support_overlap=0.10,
+        neg_coupling_frac=0.60,
+    )
+    base.update(over)
+    return base
+
+
+def test_random_control_floor_turns_unlearned_signal_into_absent():
+    """A concept a RANDOM-model dictionary recovers equally well is not learned.
+
+    The permutation null cannot catch this: it shuffles the labels but leaves
+    the dictionary intact, so it tests "is the signal real", not "is it
+    learned". Measured 2026-08-14, the random-model conv2 dictionary scores
+    R2 0.025-0.034 on every real gorilla threat, so under rule 3A.2 an
+    untrained network passed gate G-3A at 100%.
+    """
+    cfg = DilutionConfig()
+    # trained 0.30 vs random 0.29 -> the model contributed 0.01, below the floor
+    assert classify(_metrics(random_asymptote_r2=0.29), cfg) == "absent"
+    # trained 0.30 vs random 0.05 -> a real learned margin
+    assert classify(_metrics(random_asymptote_r2=0.05), cfg) == "spread"
+
+
+def test_missing_random_control_does_not_silently_pass():
+    """No control number => the floor cannot fire, and that must be visible.
+
+    12 of 17 reports on 2026-08-14 named a random control in their metadata
+    while storing no number, because the fc1 control SAE has zero alive
+    latents. The verdict is then provisional, not tested.
+    """
+    cfg = DilutionConfig()
+    m = _metrics()  # no random_asymptote_r2 key at all
+    assert classify(m, cfg) == "spread"
+    assert m.get("random_control_applied") is None
+
+
+def test_verdicts_are_three_way_at_rule_3A3():
+    """diluted/tiled are collapsed into `spread`.
+
+    The tiling test fired 42/1100 times and EVERY firing had community_size==2
+    with one negative edge -- a coin flip on the sign of a single partial
+    correlation. Rescoping to the candidate list does not help: mean pairwise
+    Jaccard is ~0.10 for captured concepts and ~0.10 for spread ones.
+    """
+    cfg = DilutionConfig()
+    assert cfg.rule_version == "3A.3"
+    seen = {
+        classify(_metrics(asymptote_r2=0.001, null_r2=0.0), cfg),      # absent
+        classify(_metrics(solo_frac=0.95, intrinsic_dim=1.0), cfg),    # captured
+        classify(_metrics(), cfg),                                     # spread
+    }
+    assert seen == {"absent", "captured", "spread"}
+    # the old tiling signature must no longer produce a separate label
+    tiled_shaped = _metrics(support_overlap=0.0, neg_coupling_frac=1.0,
+                            community_size=2)
+    assert classify(tiled_shaped, cfg) == "spread"
+
+
+def test_captured_still_wins_over_the_random_floor_ordering():
+    """A concept that clears the floor AND is concentrated is `captured`."""
+    cfg = DilutionConfig()
+    m = _metrics(solo_frac=0.95, intrinsic_dim=1.0, random_asymptote_r2=0.05)
+    assert classify(m, cfg) == "captured"
+
+
+def test_random_floor_precedes_captured():
+    """Not-learned beats concentrated: a concept the random dictionary also
+    recovers is `absent` even if one latent carries all of it."""
+    cfg = DilutionConfig()
+    m = _metrics(solo_frac=0.99, intrinsic_dim=1.0, random_asymptote_r2=0.295)
+    assert classify(m, cfg) == "absent"

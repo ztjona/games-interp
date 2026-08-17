@@ -382,6 +382,7 @@ python scripts/dilution_diagnostic.py reclassify saes/quarto/analysis/*_dilution
 | **G11** | The epiphenomenality risk (Balogh & Jelasity): a probe can decode a concept the model never *uses*. **Decodability ≠ causality.** |
 | **G-3A** | `geometric_frac ≥ 0.50` over a run's threat BSPs → 3C proceeds; else 3C deprioritised in favour of hooks / E2E. 3B runs regardless. |
 | **G-3C** | Beat I04 tigerVe, or close ≥50% of the threat SAE/LP gap, over 3 seeds, with the random control unchanged and centred cross-seed feature-overlap stability. |
+| **HP-canonical** | **Before any 3C baseline claim**, the (k, expansion) optimum must be shown to lie INSIDE the swept range *under canonical recipes*, measured **per concept family**. Opened 2026-08-16; see §6. |
 
 Full hypothesis table with current status: [`../RESEARCH-STATUS.md`](../RESEARCH-STATUS.md).
 
@@ -398,3 +399,60 @@ Full hypothesis table with current status: [`../RESEARCH-STATUS.md`](../RESEARCH
    restating definitions.
 6. A pre-registered gate must be shown able to **fail**: run the positive control
    and confirm the rule classifies it as designed before reading the gate.
+
+
+## 6. HP-canonical — the open hyperparameter gate (2026-08-16)
+
+**Status: OPEN.** Blocks 3C baseline claims only; 3A and 3B proceed.
+
+### 6.1 What is settled
+
+**Convergence.** 11 of 232 runs early-stopped — all `jumprelu-t32`,
+`vanilla-l1_0001` or `batchtopk-k16` seed replicates, and **no panel member or
+headline run**. That is a per-run fact and recipe-independent, so it is closed
+and stays closed.
+
+### 6.2 What is open, and why the existing sweeps do not answer it
+
+The sweeps on disk were run on **pre-conformance recipes** (see
+[`diary/2026-08-15_dead-feature-revival.md`](diary/2026-08-15_dead-feature-revival.md)),
+and the canonical points show the curves change *shape*, not just level:
+
+| conv2 TopK, gorillaYb | k=16 | k=32 | k=48 | k=64 | k=96 |
+|---|---:|---:|---:|---:|---:|
+| legacy (kaiming init) | 0.333 | 0.330 | 0.329 | 0.306 | 0.278 |
+| canonical (tied init) | 0.269 | **0.319** | — | — | — |
+
+Legacy declines from k=16, so the optimum reads as at-or-below the low edge.
+Canonical *rises* 0.269 → 0.319, so the optimum may be at k=48 or beyond, where
+no canonical run exists. The fc1 expansion sweep has the same defect for a
+sharper reason: it was JumpReLU with the kaiming init, and the tied init is
+precisely the mechanism that stops columns dying — the legacy trend had alive
+latents *shrinking* as expansion grew (266 → 184 from exp8 to exp64).
+
+**Second defect: those curves are whole-basis numbers.** Per §2 and `CLAUDE.md`,
+a whole-basis mean cannot support a comparison — the best `k` for cell concepts
+need not be the best `k` for threats. The redo must be reported **per concept
+family**.
+
+### 6.3 What closes it
+
+Four canonical runs, reported per family:
+
+| run | purpose |
+|---|---|
+| conv2 TopK canonical, k=48 | complete the sparsity curve above the current canonical maximum |
+| conv2 TopK canonical, k=64 | confirm the turn-over |
+| fc1 JumpReLU canonical, exp16 | complete the expansion curve |
+| fc1 JumpReLU canonical, exp32 | confirm the turn-over |
+
+Plus seed replicates on whichever setting comes out closest to the optimum, per
+the replication rule (§ replicate where a margin is thin or a claim inverts a
+previous result). Estimated ~1 h wall clock across three GPUs.
+
+### 6.4 Why it is a gate rather than a task
+
+**G-3C** is "beat I04 tigerVe 0.255, or close ≥50% of the threat SAE/LP gap". If
+the unsupervised baseline is under-tuned, that criterion is too easy and any
+geometry-aware 3C variant clears it for the wrong reason. HP-canonical exists so
+the baseline cannot be silently weak at the moment 3C is judged against it.

@@ -4,17 +4,15 @@ Given a trained SAE's cached codes ``h`` of shape (N, d_dict) and a binary
 BSP label vector ``y`` of shape (N,), decide how the concept ``y`` is carried
 in the SAE dictionary:
 
-    absent    -- the codes carry no more signal about y than a permutation null
-                 (or a random-model SAE control); the concept is not present in
-                 dictionary-accessible form.
+    absent    -- the codes carry no more signal about y than a floor: the
+                 permutation null (not real) or, where measured, a random-model
+                 SAE control (real but NOT LEARNED).
     captured  -- the concept is recovered by a small, low-dimensional set of
                  latents (clean monosemantic-ish capture).
-    diluted   -- the concept is recoverable but only by aggregating many
-                 mutually-overlapping latents (feature splitting / dilution);
-                 the co-firing community is large with mixed-sign couplings.
-    tiled     -- the concept is recoverable but spread over near-disjoint,
-                 competing latents (shattered / tiled manifold); the community
-                 has low support overlap and predominantly negative couplings.
+    spread    -- recoverable and above both floors, but no single latent carries
+                 most of it. The GEOMETRIC verdict. Replaces the diluted/tiled
+                 pair at rule 3A.3; see ``classify`` for why that split was not
+                 measurable with the statistics available.
 
 The design and thresholds are documented in
 ``docs/diary/2026-07-21_3A-dilution-diagnostic.md``. All functions here operate
@@ -93,6 +91,14 @@ class DilutionConfig:
 
     # verdict thresholds
     absent_margin: float = 0.02  # real_R2 - null_R2 below this -> absent
+    # A SECOND floor, against the random-model SAE rather than the permutation
+    # null. The permutation null only destroys the concept's association; it
+    # leaves the dictionary's own structure intact, so it answers "is this
+    # signal real?" and NOT "is this signal learned?". Measured 2026-08-14: the
+    # random-model conv2 dictionary scores R2 0.025-0.034 on every real gorilla
+    # threat -- above absent_floor -- so under rule 3A.2 an UNTRAINED network
+    # passed gate G-3A at 100%. This floor is what makes the gate a test.
+    random_margin: float = 0.02  # real_R2 - random_model_R2 below this -> absent
     absent_floor: float = 0.02   # asymptotic R2 below this -> absent
     captured_k: int = 2          # knee at or below this many latents -> captured
     captured_size: int = 3       # community at or below this size -> captured
@@ -103,8 +109,9 @@ class DilutionConfig:
 
     # Bumped whenever ``classify`` changes, so a stored verdict can always be
     # traced to the rule that produced it. 3A.1 = original (knee_k AND
-    # community_size only); 3A.2 = adds the solo_frac/intrinsic_dim path.
-    rule_version: str = "3A.2"
+    # community_size only); 3A.2 = adds the solo_frac/intrinsic_dim path;
+    # 3A.3 = adds the random-model floor and collapses diluted/tiled -> spread.
+    rule_version: str = "3A.3"
 
     seed: int = 0
 
@@ -255,6 +262,26 @@ GLOSSARY: dict[str, dict[str, str]] = {
                  "the k best-associated latents. A steep early rise then a plateau = "
                  "concentrated; a long slow climb = diluted.",
     },
+    "random_asymptote_r2": {
+        "range": "<=1",
+        "ideal": "far BELOW asymptote_r2",
+        "means": "The same restricted-R2 asymptote computed on an SAE trained on an "
+                 "UNTRAINED network's activations, row-aligned to the same positions. "
+                 "The learned-signal floor: asymptote_r2 minus this is what the "
+                 "TRAINED model contributes over the architectural prior. Absent when "
+                 "no usable control existed for that run -- check "
+                 "random_control_applied before reading any verdict as tested.",
+    },
+    "random_control_applied": {
+        "range": "true/false",
+        "ideal": "true",
+        "means": "Whether the random-model floor was actually applied to this "
+                 "concept. FALSE means the verdict rests on the permutation null "
+                 "alone and is PROVISIONAL: the permutation null cannot distinguish "
+                 "learned structure from the architectural prior. A control named in "
+                 "a report's metadata is not enough -- the fc1 control SAE has zero "
+                 "alive latents and contributed no number.",
+    },
     "geometric_frac": {
         "range": "0..1",
         "ideal": "n/a -- this is the gate quantity",
@@ -266,18 +293,29 @@ GLOSSARY: dict[str, dict[str, str]] = {
 }
 
 VERDICT_GLOSSARY: dict[str, str] = {
-    "absent": "The codes carry no more signal about the concept than the null. The "
-              "information is not in this dictionary at all -- an architecture change "
-              "on the same activations cannot recover it (change the hook, or use E2E "
-              "/ supervision).",
+    "absent": "The codes carry no more signal about the concept than the floor -- "
+              "either the permutation null (the signal is not real) or, where a "
+              "random-model SAE control was measured, that control (the signal is "
+              "real but NOT LEARNED: a dictionary trained on an untrained network "
+              "recovers the concept just as well). Not a capacity problem: change "
+              "the hook, or go E2E / supervised.",
     "captured": "Recovered by a small, low-dimensional set of latents. The SAE already "
                 "has this concept cleanly; nothing to fix.",
-    "diluted": "Recoverable, but only by aggregating MANY MUTUALLY-OVERLAPPING latents "
-               "(feature splitting). The information IS present -- an aggregating or "
-               "hierarchical readout can recover it. One of the two GEOMETRIC verdicts.",
-    "tiled": "Recoverable, but spread over NEAR-DISJOINT, COMPETING latents (a "
-             "shattered manifold). Needs a manifold-aware or bilinear readout. The "
-             "other GEOMETRIC verdict.",
+    "spread": "Recoverable from the dictionary, and demonstrably better than both "
+              "floors, but NOT concentrated: no single latent carries most of it. "
+              "This is the GEOMETRIC verdict and the H10 outcome -- the information "
+              "is present and the flat dictionary is not presenting it in one atom, "
+              "so the fix is an architecture change rather than a dead end. "
+              "Replaces the former diluted/tiled pair as of rule 3A.3: the test "
+              "that separated them fired only on 2-latent communities with a single "
+              "negative edge, and the underlying statistic does not discriminate "
+              "captured from spread at any scope (see `classify`).",
+    # Retired, retained so a pre-3A.3 report is still readable.
+    "diluted": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable "
+               "only by aggregating many mutually-overlapping latents.",
+    "tiled": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable "
+             "but spread over near-disjoint, competing latents. The test for it was "
+             "not measuring that; see `classify`.",
 }
 
 
@@ -645,7 +683,33 @@ def classify(metrics: dict, cfg: DilutionConfig) -> str:
     the numbers in ``metrics`` and the thresholds in ``cfg`` -- auditable, and
     re-runnable on a stored report without touching the SAE codes.
 
-    Rule 3A.2. The ``captured`` branch has two *sufficient* conditions:
+    Rule 3A.3. Two changes from 3A.2, both recorded in
+    ``docs/diary/2026-08-16_rule-3A3.md``:
+
+    **(1) A random-model floor.** ``absent`` now also fires when the concept is
+    no more recoverable from this dictionary than from one trained on an
+    UNTRAINED network's activations. The permutation null cannot do this job: it
+    shuffles the labels but leaves the dictionary's structure intact, so it
+    tests "is this signal real?", not "is this signal LEARNED?". Measured
+    2026-08-14, the random-model conv2 dictionary returns ``diluted`` on every
+    real gorilla threat concept (R2 0.025-0.034, above ``absent_floor``), i.e.
+    an untrained network passed gate G-3A at 100%. The floor only applies when
+    ``random_asymptote_r2`` is present; when it is absent the verdict is
+    provisional and ``random_control_applied`` records that.
+
+    **(2) ``diluted`` and ``tiled`` are collapsed into ``spread``.** The tiling
+    test (``support_overlap < tau AND neg_coupling_frac > 0.5``) fired 42 times
+    in 1,100 verdicts and *every* firing had ``community_size == 2`` with
+    exactly one negative edge -- a Bernoulli on the sign of a single partial
+    correlation, not a measurement of tiling. Rescoping the same statistics to
+    the full candidate list does not rescue it: mean pairwise Jaccard is
+    ~0.10 for CAPTURED gorilla concepts and ~0.10 for spread tiger concepts, so
+    the statistic does not discriminate at either scope. Separating "diluted"
+    from "tiled" needs a new statistic validated on a planted positive control
+    (y = OR of k disjoint latents must come out tiled); until that exists,
+    claiming the distinction would be reporting noise as a finding.
+
+    The ``captured`` branch has two *sufficient* conditions:
 
       (a) knee_k <= captured_k AND community_size <= captured_size   [3A.1]
       (b) solo_frac >= captured_solo_frac
@@ -676,16 +740,20 @@ def classify(metrics: dict, cfg: DilutionConfig) -> str:
     gap = metrics["asymptote_r2"] - metrics["null_r2"]
     if gap < cfg.absent_margin or metrics["asymptote_r2"] < cfg.absent_floor:
         return "absent"
+    # The learned-signal floor. Only applies where a random-model control was
+    # actually measured -- a control named in metadata but never computed (the
+    # fc1 case, where the control SAE has zero alive latents) must NOT be
+    # silently treated as a pass.
+    rand = metrics.get("random_asymptote_r2")
+    if rand is not None and metrics["asymptote_r2"] - rand < cfg.random_margin:
+        return "absent"
     if metrics["knee_k"] <= cfg.captured_k and metrics["community_size"] <= cfg.captured_size:
         return "captured"
     if solo_frac_of(metrics) >= cfg.captured_solo_frac and (
             metrics["intrinsic_dim"] <= cfg.captured_idim
             or metrics["knee_k"] <= cfg.captured_k):
         return "captured"
-    if (metrics["support_overlap"] < cfg.tile_overlap
-            and metrics["neg_coupling_frac"] > cfg.tile_neg_frac):
-        return "tiled"
-    return "diluted"
+    return "spread"
 
 
 class RankingCache:
@@ -757,6 +825,7 @@ def diagnose_concept(
             "support_overlap": 0.0, "singleton_community": True,
             "intrinsic_dim": 0.0, "n_curve_rows": 0, "n_curve_positives": 0,
             "top_phi": 0.0, "curve": [], "orbit_aware_split": False,
+            "random_control_applied": False,
         }
         metrics["verdict"] = "absent"
         return metrics
@@ -827,6 +896,12 @@ def diagnose_concept(
         "curve": r2["curve"],
     }
 
+    # False until a control number is actually produced. A control that was
+    # supplied but yielded nothing -- the fc1 case, where the random-model SAE
+    # has ZERO alive latents so `select_concept_features` returns empty -- must
+    # not read as "tested and passed". Rule 3A.3 keys the learned-signal floor
+    # on the presence of the number, and the gate reports the coverage.
+    metrics["random_control_applied"] = False
     if h_random is not None:
         # Same two-stage treatment, on the SAME rows, so the control is
         # row-aligned with the real measurement.
@@ -841,6 +916,7 @@ def diagnose_concept(
             rcols = rcols if rows_b is None else rcols[rows_b]
             rr = restricted_r2_curve(rcols, y_np, np.arange(len(ro)), cfg, groups=groups)
             metrics["random_asymptote_r2"] = rr["asymptote_r2"]
+            metrics["random_control_applied"] = True
 
     metrics["verdict"] = classify(metrics, cfg)
     return metrics

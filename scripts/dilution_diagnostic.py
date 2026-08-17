@@ -76,7 +76,10 @@ from lib.sae.dilution import (
 AUTO_MARKERS = ("threat", "winnable", "completable", "completing",
                 "reframed_count", "reframed_sq_count", "any_threat")
 
-VERDICTS = ("absent", "captured", "diluted", "tiled")
+VERDICTS = ("absent", "captured", "spread")
+# Pre-3A.3 verdicts, still countable when summarising an old report
+# that has not been reclassified yet.
+LEGACY_VERDICTS = ("diluted", "tiled")
 
 
 def load_h(cache_dir: Path, run_id: str) -> torch.Tensor:
@@ -116,7 +119,7 @@ def summarize(concepts):
         cat = c["category"]
         d = cat_summary.setdefault(cat, {v: 0 for v in VERDICTS})
         d["n"] = d.get("n", 0) + 1
-        d[c["verdict"]] += 1
+        d[c["verdict"]] = d.get(c["verdict"], 0) + 1
     for cat, d in cat_summary.items():
         members = [c for c in concepts
                    if c["category"] == cat and "asymptote_r2" in c]
@@ -145,16 +148,26 @@ def summarize(concepts):
             d["heterogeneous"] = bool(vals[-1] - vals[0] > 0.30)
 
     n_threat = len(concepts)
-    n_geo = sum(1 for c in concepts if c["verdict"] in ("diluted", "tiled"))
+    # `spread` is the geometric verdict; the retired diluted/tiled labels are
+    # still counted here so a not-yet-reclassified report summarises correctly.
+    n_geo = sum(1 for c in concepts
+                if c["verdict"] in ("spread", "diluted", "tiled"))
     geo_frac = n_geo / n_threat if n_threat else 0.0
+    # How many verdicts were actually tested against the LEARNED-signal floor.
+    # A gate read on concepts that never met a random-model control is
+    # provisional, and this is what says so.
+    n_tested = sum(1 for c in concepts if c.get("random_control_applied"))
     gate = {
         "n_threat_bsps": n_threat,
-        "n_diluted": sum(1 for c in concepts if c["verdict"] == "diluted"),
-        "n_tiled": sum(1 for c in concepts if c["verdict"] == "tiled"),
+        "n_spread": n_geo,
         "n_captured": sum(1 for c in concepts if c["verdict"] == "captured"),
         "n_absent": sum(1 for c in concepts if c["verdict"] == "absent"),
+        "n_random_control_applied": n_tested,
+        "random_control_coverage": round(n_tested / n_threat, 4) if n_threat else 0.0,
         "geometric_frac": round(geo_frac, 4),
         "verdict": "3C-proceeds" if geo_frac >= 0.5 else "3C-deprioritized",
+        # A gate whose learned-signal floor never fired is not a test of it.
+        "gate_is_provisional": n_tested < n_threat,
     }
     return cat_summary, gate
 
@@ -173,7 +186,12 @@ def reclassify_report(path: Path, cfg: DilutionConfig, dry_run: bool) -> dict:
     changes, concepts = [], report["concepts"]
     for c in concepts:
         if c.get("degenerate") or "asymptote_r2" not in c:
+            c.setdefault("random_control_applied", False)
             continue
+        # Reports written before rule 3A.3 have no such flag; derive it from
+        # whether a control number was actually stored, so the gate's
+        # random_control_coverage is honest for legacy reports too.
+        c["random_control_applied"] = c.get("random_asymptote_r2") is not None
         old = c["verdict"]
         new = classify(c, cfg)
         if new != old:
@@ -331,13 +349,14 @@ def _print_summary(result):
     print(f"N={s['n_samples']}  d_dict={s['d_dict']}  "
           f"random_control={s['random_control']}")
     print("=" * 78)
-    print(f"{'category':<32}{'n':>3}{'capt':>5}{'dilu':>5}{'tile':>5}"
+    print(f"{'category':<32}{'n':>3}{'capt':>7}{'spread':>7}"
           f"{'abs':>5}{'meanR2':>8}{'solo':>7}{'|phi|':>7}{'sd':>6}")
     print("-" * 78)
     for cat in sorted(result["category_summary"]):
         d = result["category_summary"][cat]
-        print(f"{cat:<32}{d['n']:>3}{d['captured']:>5}{d['diluted']:>5}"
-              f"{d['tiled']:>5}{d['absent']:>5}{d['mean_asymptote_r2']:>8.3f}"
+        spread = (d.get('spread', 0) + d.get('diluted', 0) + d.get('tiled', 0))
+        print(f"{cat:<32}{d['n']:>3}{d['captured']:>7}{spread:>7}"
+              f"{d['absent']:>5}{d['mean_asymptote_r2']:>8.3f}"
               f"{d.get('mean_solo_frac', 0.0):>7.2f}"
               f"{d.get('mean_top_phi', 0.0):>7.3f}{d.get('sd_top_phi', 0.0):>6.3f}")
     print("-" * 78)
@@ -348,9 +367,15 @@ def _print_summary(result):
             print(f"HETEROGENEOUS {cat}: |phi| {lo['top_phi']:.2f} ({lo['bsp_id']})"
                   f" .. {hi['top_phi']:.2f} ({hi['bsp_id']}) -- the category mean is"
                   f" not representative; read per-BSP.")
-    print(f"Gate G-3A: {g['n_diluted']} diluted + {g['n_tiled']} tiled "
-          f"of {g['n_threat_bsps']} threat BSPs -> geometric_frac="
-          f"{g['geometric_frac']:.2f} -> {g['verdict']}")
+    print(f"Gate G-3A: {g.get('n_spread', 0)} spread of {g['n_threat_bsps']} "
+          f"threat BSPs -> geometric_frac={g['geometric_frac']:.2f} -> {g['verdict']}")
+    cov = g.get("random_control_coverage")
+    if g.get("gate_is_provisional"):
+        print(f"!! PROVISIONAL: only {g.get('n_random_control_applied', 0)}/"
+              f"{g['n_threat_bsps']} concepts ({cov:.0%}) were tested against a "
+              f"random-model control. Without it `absent` only means 'not real', "
+              f"never 'not learned' -- an untrained network's dictionary scores "
+              f"R2 0.025-0.034 on these concepts.")
     print("meanR2 = mean asymptote_r2 (total recoverable signal); "
           "solo = mean solo_frac")
     print("(full metric glossary is embedded in the output JSON under 'glossary')")

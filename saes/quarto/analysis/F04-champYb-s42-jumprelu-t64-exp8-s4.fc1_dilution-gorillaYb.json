@@ -26,6 +26,7 @@
       "n_splits": 5,
       "n_perm": 5,
       "absent_margin": 0.02,
+      "random_margin": 0.02,
       "absent_floor": 0.02,
       "captured_k": 2,
       "captured_size": 3,
@@ -33,7 +34,7 @@
       "captured_idim": 2.0,
       "tile_overlap": 0.15,
       "tile_neg_frac": 0.5,
-      "rule_version": "3A.2",
+      "rule_version": "3A.3",
       "seed": 0
     }
   },
@@ -129,6 +130,16 @@
         "ideal": "flat after k=1",
         "means": "The restricted-R2 support curve: entry k is the held-out R2 using the k best-associated latents. A steep early rise then a plateau = concentrated; a long slow climb = diluted."
       },
+      "random_asymptote_r2": {
+        "range": "<=1",
+        "ideal": "far BELOW asymptote_r2",
+        "means": "The same restricted-R2 asymptote computed on an SAE trained on an UNTRAINED network's activations, row-aligned to the same positions. The learned-signal floor: asymptote_r2 minus this is what the TRAINED model contributes over the architectural prior. Absent when no usable control existed for that run -- check random_control_applied before reading any verdict as tested."
+      },
+      "random_control_applied": {
+        "range": "true/false",
+        "ideal": "true",
+        "means": "Whether the random-model floor was actually applied to this concept. FALSE means the verdict rests on the permutation null alone and is PROVISIONAL: the permutation null cannot distinguish learned structure from the architectural prior. A control named in a report's metadata is not enough -- the fc1 control SAE has zero alive latents and contributed no number."
+      },
       "geometric_frac": {
         "range": "0..1",
         "ideal": "n/a -- this is the gate quantity",
@@ -136,27 +147,29 @@
       }
     },
     "verdicts": {
-      "absent": "The codes carry no more signal about the concept than the null. The information is not in this dictionary at all -- an architecture change on the same activations cannot recover it (change the hook, or use E2E / supervision).",
+      "absent": "The codes carry no more signal about the concept than the floor -- either the permutation null (the signal is not real) or, where a random-model SAE control was measured, that control (the signal is real but NOT LEARNED: a dictionary trained on an untrained network recovers the concept just as well). Not a capacity problem: change the hook, or go E2E / supervised.",
       "captured": "Recovered by a small, low-dimensional set of latents. The SAE already has this concept cleanly; nothing to fix.",
-      "diluted": "Recoverable, but only by aggregating MANY MUTUALLY-OVERLAPPING latents (feature splitting). The information IS present -- an aggregating or hierarchical readout can recover it. One of the two GEOMETRIC verdicts.",
-      "tiled": "Recoverable, but spread over NEAR-DISJOINT, COMPETING latents (a shattered manifold). Needs a manifold-aware or bilinear readout. The other GEOMETRIC verdict."
+      "spread": "Recoverable from the dictionary, and demonstrably better than both floors, but NOT concentrated: no single latent carries most of it. This is the GEOMETRIC verdict and the H10 outcome -- the information is present and the flat dictionary is not presenting it in one atom, so the fix is an architecture change rather than a dead end. Replaces the former diluted/tiled pair as of rule 3A.3: the test that separated them fired only on 2-latent communities with a single negative edge, and the underlying statistic does not discriminate captured from spread at any scope (see `classify`).",
+      "diluted": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable only by aggregating many mutually-overlapping latents.",
+      "tiled": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable but spread over near-disjoint, competing latents. The test for it was not measuring that; see `classify`."
     }
   },
   "gate_g3a": {
     "n_threat_bsps": 76,
-    "n_diluted": 8,
-    "n_tiled": 0,
+    "n_spread": 8,
     "n_captured": 68,
     "n_absent": 0,
+    "n_random_control_applied": 0,
+    "random_control_coverage": 0.0,
     "geometric_frac": 0.1053,
-    "verdict": "3C-deprioritized"
+    "verdict": "3C-deprioritized",
+    "gate_is_provisional": true
   },
   "category_summary": {
     "threat_line": {
       "absent": 0,
       "captured": 32,
-      "diluted": 8,
-      "tiled": 0,
+      "spread": 8,
       "n": 40,
       "mean_asymptote_r2": 0.5324,
       "mean_solo_frac": 0.8165,
@@ -175,8 +188,7 @@
     "threat_square_2x2": {
       "absent": 0,
       "captured": 36,
-      "diluted": 0,
-      "tiled": 0,
+      "spread": 0,
       "n": 36,
       "mean_asymptote_r2": 0.819,
       "mean_solo_frac": 0.9829,
@@ -282,7 +294,8 @@
         0.68,
         0.68
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 81,
@@ -372,7 +385,8 @@
         0.7793,
         0.7793
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 82,
@@ -462,7 +476,8 @@
         0.6934,
         0.6934
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 83,
@@ -552,7 +567,8 @@
         0.6873,
         0.6873
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 84,
@@ -642,7 +658,8 @@
         0.6471,
         0.6471
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 85,
@@ -732,7 +749,8 @@
         0.5887,
         0.5888
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 86,
@@ -822,7 +840,8 @@
         0.6935,
         0.6936
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 87,
@@ -912,7 +931,8 @@
         0.6211,
         0.6212
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 88,
@@ -1002,7 +1022,8 @@
         0.6372,
         0.6372
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 89,
@@ -1092,7 +1113,8 @@
         0.6876,
         0.6876
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 90,
@@ -1182,7 +1204,8 @@
         0.6588,
         0.6588
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 91,
@@ -1272,7 +1295,8 @@
         0.5993,
         0.5993
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 92,
@@ -1362,7 +1386,8 @@
         0.6914,
         0.6914
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 93,
@@ -1452,7 +1477,8 @@
         0.6748,
         0.6748
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 94,
@@ -1542,7 +1568,8 @@
         0.671,
         0.6712
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 95,
@@ -1632,7 +1659,8 @@
         0.6998,
         0.6998
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 96,
@@ -1722,7 +1750,8 @@
         0.7017,
         0.7018
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 97,
@@ -1812,7 +1841,8 @@
         0.6793,
         0.6793
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 98,
@@ -1902,7 +1932,8 @@
         0.6183,
         0.6184
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 99,
@@ -1992,7 +2023,8 @@
         0.5255,
         0.5255
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 100,
@@ -2082,7 +2114,8 @@
         0.6568,
         0.6568
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 101,
@@ -2172,7 +2205,8 @@
         0.5683,
         0.5684
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 102,
@@ -2262,7 +2296,8 @@
         0.6595,
         0.6596
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 103,
@@ -2352,7 +2387,8 @@
         0.555,
         0.555
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 104,
@@ -2442,7 +2478,8 @@
         0.6163,
         0.6163
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 105,
@@ -2532,7 +2569,8 @@
         0.7027,
         0.7027
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 106,
@@ -2622,7 +2660,8 @@
         0.7082,
         0.7082
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 107,
@@ -2712,7 +2751,8 @@
         0.6654,
         0.6655
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 108,
@@ -2802,7 +2842,8 @@
         0.5498,
         0.5498
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 109,
@@ -2892,7 +2933,8 @@
         0.6471,
         0.6471
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 110,
@@ -2982,7 +3024,8 @@
         0.5906,
         0.5905
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 111,
@@ -3072,7 +3115,8 @@
         0.6049,
         0.605
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 112,
@@ -3162,7 +3206,8 @@
         0.0443,
         0.0443
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 113,
@@ -3252,7 +3297,8 @@
         0.0436,
         0.0438
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 114,
@@ -3342,7 +3388,8 @@
         0.1663,
         0.1663
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 115,
@@ -3432,7 +3479,8 @@
         0.0595,
         0.0594
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 116,
@@ -3522,7 +3570,8 @@
         0.054,
         0.0541
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 117,
@@ -3612,7 +3661,8 @@
         0.0424,
         0.0424
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 118,
@@ -3702,7 +3752,8 @@
         0.0798,
         0.0799
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 119,
@@ -3792,7 +3843,8 @@
         0.0467,
         0.047
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 120,
@@ -3882,7 +3934,8 @@
         0.8742,
         0.8742
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 121,
@@ -3972,7 +4025,8 @@
         0.8111,
         0.8111
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 122,
@@ -4062,7 +4116,8 @@
         0.8373,
         0.8373
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 123,
@@ -4152,7 +4207,8 @@
         0.9178,
         0.9178
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 124,
@@ -4242,7 +4298,8 @@
         0.7449,
         0.7449
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 125,
@@ -4332,7 +4389,8 @@
         0.8033,
         0.8033
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 126,
@@ -4422,7 +4480,8 @@
         0.8115,
         0.8115
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 127,
@@ -4512,7 +4571,8 @@
         0.8472,
         0.8472
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 128,
@@ -4602,7 +4662,8 @@
         0.8019,
         0.802
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 129,
@@ -4692,7 +4753,8 @@
         0.8651,
         0.8651
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 130,
@@ -4782,7 +4844,8 @@
         0.8532,
         0.8532
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 131,
@@ -4872,7 +4935,8 @@
         0.8794,
         0.8794
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 132,
@@ -4962,7 +5026,8 @@
         0.8573,
         0.8573
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 133,
@@ -5052,7 +5117,8 @@
         0.8026,
         0.8026
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 134,
@@ -5142,7 +5208,8 @@
         0.6587,
         0.659
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 135,
@@ -5232,7 +5299,8 @@
         0.6948,
         0.6949
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 136,
@@ -5322,7 +5390,8 @@
         0.7046,
         0.7046
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 137,
@@ -5412,7 +5481,8 @@
         0.7115,
         0.7115
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 138,
@@ -5502,7 +5572,8 @@
         0.8298,
         0.8298
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 139,
@@ -5592,7 +5663,8 @@
         0.7323,
         0.7327
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 140,
@@ -5682,7 +5754,8 @@
         0.7198,
         0.7198
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 141,
@@ -5772,7 +5845,8 @@
         0.8438,
         0.8438
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 142,
@@ -5862,7 +5936,8 @@
         0.8702,
         0.8702
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 143,
@@ -5952,7 +6027,8 @@
         0.9357,
         0.9357
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 144,
@@ -6042,7 +6118,8 @@
         0.9029,
         0.9029
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 145,
@@ -6132,7 +6209,8 @@
         0.8725,
         0.8725
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 146,
@@ -6222,7 +6300,8 @@
         0.7962,
         0.7963
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 147,
@@ -6312,7 +6391,8 @@
         0.8257,
         0.8257
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 148,
@@ -6402,7 +6482,8 @@
         0.8643,
         0.8643
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 149,
@@ -6492,7 +6573,8 @@
         0.8047,
         0.8047
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 150,
@@ -6582,7 +6664,8 @@
         0.7428,
         0.7428
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 151,
@@ -6672,7 +6755,8 @@
         0.7183,
         0.7183
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 152,
@@ -6762,7 +6846,8 @@
         0.8837,
         0.8839
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 153,
@@ -6852,7 +6937,8 @@
         0.8957,
         0.8957
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 154,
@@ -6942,7 +7028,8 @@
         0.8405,
         0.8405
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     },
     {
       "bsp_index": 155,
@@ -7032,7 +7119,8 @@
         0.9291,
         0.9291
       ],
-      "verdict": "captured"
+      "verdict": "captured",
+      "random_control_applied": false
     }
   ]
 }

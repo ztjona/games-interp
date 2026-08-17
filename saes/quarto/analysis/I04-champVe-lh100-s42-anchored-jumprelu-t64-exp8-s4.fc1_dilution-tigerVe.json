@@ -27,6 +27,7 @@
       "n_splits": 5,
       "n_perm": 5,
       "absent_margin": 0.02,
+      "random_margin": 0.02,
       "absent_floor": 0.02,
       "captured_k": 2,
       "captured_size": 3,
@@ -34,7 +35,7 @@
       "captured_idim": 2.0,
       "tile_overlap": 0.15,
       "tile_neg_frac": 0.5,
-      "rule_version": "3A.2",
+      "rule_version": "3A.3",
       "seed": 0
     }
   },
@@ -130,6 +131,16 @@
         "ideal": "flat after k=1",
         "means": "The restricted-R2 support curve: entry k is the held-out R2 using the k best-associated latents. A steep early rise then a plateau = concentrated; a long slow climb = diluted."
       },
+      "random_asymptote_r2": {
+        "range": "<=1",
+        "ideal": "far BELOW asymptote_r2",
+        "means": "The same restricted-R2 asymptote computed on an SAE trained on an UNTRAINED network's activations, row-aligned to the same positions. The learned-signal floor: asymptote_r2 minus this is what the TRAINED model contributes over the architectural prior. Absent when no usable control existed for that run -- check random_control_applied before reading any verdict as tested."
+      },
+      "random_control_applied": {
+        "range": "true/false",
+        "ideal": "true",
+        "means": "Whether the random-model floor was actually applied to this concept. FALSE means the verdict rests on the permutation null alone and is PROVISIONAL: the permutation null cannot distinguish learned structure from the architectural prior. A control named in a report's metadata is not enough -- the fc1 control SAE has zero alive latents and contributed no number."
+      },
       "geometric_frac": {
         "range": "0..1",
         "ideal": "n/a -- this is the gate quantity",
@@ -137,27 +148,29 @@
       }
     },
     "verdicts": {
-      "absent": "The codes carry no more signal about the concept than the null. The information is not in this dictionary at all -- an architecture change on the same activations cannot recover it (change the hook, or use E2E / supervision).",
+      "absent": "The codes carry no more signal about the concept than the floor -- either the permutation null (the signal is not real) or, where a random-model SAE control was measured, that control (the signal is real but NOT LEARNED: a dictionary trained on an untrained network recovers the concept just as well). Not a capacity problem: change the hook, or go E2E / supervised.",
       "captured": "Recovered by a small, low-dimensional set of latents. The SAE already has this concept cleanly; nothing to fix.",
-      "diluted": "Recoverable, but only by aggregating MANY MUTUALLY-OVERLAPPING latents (feature splitting). The information IS present -- an aggregating or hierarchical readout can recover it. One of the two GEOMETRIC verdicts.",
-      "tiled": "Recoverable, but spread over NEAR-DISJOINT, COMPETING latents (a shattered manifold). Needs a manifold-aware or bilinear readout. The other GEOMETRIC verdict."
+      "spread": "Recoverable from the dictionary, and demonstrably better than both floors, but NOT concentrated: no single latent carries most of it. This is the GEOMETRIC verdict and the H10 outcome -- the information is present and the flat dictionary is not presenting it in one atom, so the fix is an architecture change rather than a dead end. Replaces the former diluted/tiled pair as of rule 3A.3: the test that separated them fired only on 2-latent communities with a single negative edge, and the underlying statistic does not discriminate captured from spread at any scope (see `classify`).",
+      "diluted": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable only by aggregating many mutually-overlapping latents.",
+      "tiled": "RETIRED at rule 3A.3 -- now reported as `spread`. Meant: recoverable but spread over near-disjoint, competing latents. The test for it was not measuring that; see `classify`."
     }
   },
   "gate_g3a": {
     "n_threat_bsps": 23,
-    "n_diluted": 18,
-    "n_tiled": 5,
+    "n_spread": 23,
     "n_captured": 0,
     "n_absent": 0,
+    "n_random_control_applied": 0,
+    "random_control_coverage": 0.0,
     "geometric_frac": 1.0,
-    "verdict": "3C-proceeds"
+    "verdict": "3C-proceeds",
+    "gate_is_provisional": true
   },
   "category_summary": {
     "tiger_offered_completing_attr": {
       "absent": 0,
       "captured": 0,
-      "diluted": 4,
-      "tiled": 0,
+      "spread": 4,
       "n": 4,
       "mean_asymptote_r2": 0.3532,
       "mean_solo_frac": 0.6259,
@@ -176,8 +189,7 @@
     "tiger_line_winnable": {
       "absent": 0,
       "captured": 0,
-      "diluted": 5,
-      "tiled": 5,
+      "spread": 10,
       "n": 10,
       "mean_asymptote_r2": 0.1931,
       "mean_solo_frac": 0.228,
@@ -196,8 +208,7 @@
     "tiger_square_winnable": {
       "absent": 0,
       "captured": 0,
-      "diluted": 9,
-      "tiled": 0,
+      "spread": 9,
       "n": 9,
       "mean_asymptote_r2": 0.3617,
       "mean_solo_frac": 0.1878,
@@ -303,7 +314,8 @@
         0.3923,
         0.3924
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 6,
@@ -393,7 +405,8 @@
         0.341,
         0.3419
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 7,
@@ -483,7 +496,8 @@
         0.3653,
         0.3654
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 8,
@@ -573,7 +587,8 @@
         0.3132,
         0.3131
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 9,
@@ -663,7 +678,8 @@
         0.1865,
         0.1864
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 10,
@@ -753,7 +769,8 @@
         0.2295,
         0.2297
       ],
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 11,
@@ -843,7 +860,8 @@
         0.227,
         0.2271
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 12,
@@ -933,7 +951,8 @@
         0.2246,
         0.2247
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 13,
@@ -1023,7 +1042,8 @@
         0.2175,
         0.2178
       ],
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 14,
@@ -1113,7 +1133,8 @@
         0.2253,
         0.2255
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 15,
@@ -1203,7 +1224,8 @@
         0.2276,
         0.2277
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 16,
@@ -1293,7 +1315,8 @@
         0.1987,
         0.1989
       ],
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 17,
@@ -1383,7 +1406,8 @@
         0.0912,
         0.0912
       ],
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 18,
@@ -1473,7 +1497,8 @@
         0.1023,
         0.1022
       ],
-      "verdict": "tiled"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 19,
@@ -1563,7 +1588,8 @@
         0.3496,
         0.3499
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 20,
@@ -1653,7 +1679,8 @@
         0.3556,
         0.3558
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 21,
@@ -1743,7 +1770,8 @@
         0.3137,
         0.3138
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 22,
@@ -1833,7 +1861,8 @@
         0.4043,
         0.4048
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 23,
@@ -1923,7 +1952,8 @@
         0.3902,
         0.3908
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 24,
@@ -2013,7 +2043,8 @@
         0.3606,
         0.3605
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 25,
@@ -2103,7 +2134,8 @@
         0.3556,
         0.3558
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 26,
@@ -2193,7 +2225,8 @@
         0.3873,
         0.3873
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     },
     {
       "bsp_index": 27,
@@ -2283,7 +2316,8 @@
         0.3364,
         0.3362
       ],
-      "verdict": "diluted"
+      "verdict": "spread",
+      "random_control_applied": false
     }
   ]
 }
