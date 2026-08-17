@@ -1,0 +1,26 @@
+# K10-champYb-s42: HP-canonical gate, campaign K. fc1 JumpReLU canonical exp16 -- the expansion curve under the tied init.
+# Closes the open question in docs/methods-reference.md S6: the (k, expansion)
+# optimum must be shown to lie INSIDE the swept range UNDER CANONICAL RECIPES.
+# The legacy sweeps declined monotonically from the low edge, but canonical TopK
+# conv2 RISES (k16 0.269 -> k32 0.319), so the curves differ in shape and the
+# canonical optimum is unmeasured above k=32 / exp8.
+# Report PER CONCEPT FAMILY -- the legacy curves were whole-basis.
+experiment: K10-champYb-s42
+architecture: jumprelu
+game: quarto
+hook: s4.fc1
+data: data/quarto/s4.fc1_amalgam_yb_activations.pt
+expansion: 16
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+jump_threshold: 0.001
+l0_target: 64
+patience: 0
+min_improvement: 0.001
+l0_patience: 0
+l0_min_change: 5.0
+init_mode: decoder_transpose
+dead_window: 0

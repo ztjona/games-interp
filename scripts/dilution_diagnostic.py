@@ -166,6 +166,22 @@ def summarize(concepts):
         "random_control_coverage": round(n_tested / n_threat, 4) if n_threat else 0.0,
         "geometric_frac": round(geo_frac, 4),
         "verdict": "3C-proceeds" if geo_frac >= 0.5 else "3C-deprioritized",
+        # WHY a cell is deprioritized, because the single geometric_frac
+        # threshold collapses two OPPOSITE outcomes into one string:
+        #   "captured" -- the concepts are already cleanly recovered, so there
+        #                 is nothing for a geometry-aware variant to fix. Good.
+        #   "absent"   -- the concepts are not recoverable from this dictionary
+        #                 at all (or not above the learned-signal floor), so no
+        #                 architecture change on these activations can help.
+        # Reading a bare "3C-deprioritized" without this is how a success and a
+        # dead end get filed as the same result.
+        "deprioritized_because": (
+            None if geo_frac >= 0.5
+            else "captured"
+            if sum(1 for c in concepts if c["verdict"] == "captured")
+            >= sum(1 for c in concepts if c["verdict"] == "absent")
+            else "absent"
+        ),
         # A gate whose learned-signal floor never fired is not a test of it.
         "gate_is_provisional": n_tested < n_threat,
     }

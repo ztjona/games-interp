@@ -10,7 +10,7 @@
       "tiger_offered_completing_attr",
       "tiger_square_winnable"
     ],
-    "random_control": "R1-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "random_control": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
     "orbit_aware_split": true,
     "config": {
       "top_k": 64,
@@ -160,11 +160,12 @@
     "n_spread": 22,
     "n_captured": 1,
     "n_absent": 0,
-    "n_random_control_applied": 0,
-    "random_control_coverage": 0.0,
+    "n_random_control_applied": 23,
+    "random_control_coverage": 1.0,
     "geometric_frac": 0.9565,
     "verdict": "3C-proceeds",
-    "gate_is_provisional": true
+    "deprioritized_because": null,
+    "gate_is_provisional": false
   },
   "category_summary": {
     "tiger_offered_completing_attr": {
@@ -314,8 +315,9 @@
         0.4622,
         0.4621
       ],
-      "verdict": "captured",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0443,
+      "verdict": "captured"
     },
     {
       "bsp_index": 6,
@@ -405,8 +407,9 @@
         0.4083,
         0.4083
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0482,
+      "verdict": "spread"
     },
     {
       "bsp_index": 7,
@@ -496,8 +499,9 @@
         0.4819,
         0.4822
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0525,
+      "verdict": "spread"
     },
     {
       "bsp_index": 8,
@@ -587,8 +591,9 @@
         0.5126,
         0.5125
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0538,
+      "verdict": "spread"
     },
     {
       "bsp_index": 9,
@@ -678,8 +683,9 @@
         0.4233,
         0.4235
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0268,
+      "verdict": "spread"
     },
     {
       "bsp_index": 10,
@@ -769,8 +775,9 @@
         0.4441,
         0.4442
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0335,
+      "verdict": "spread"
     },
     {
       "bsp_index": 11,
@@ -860,8 +867,9 @@
         0.4335,
         0.4335
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0314,
+      "verdict": "spread"
     },
     {
       "bsp_index": 12,
@@ -951,8 +959,9 @@
         0.4352,
         0.4352
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0278,
+      "verdict": "spread"
     },
     {
       "bsp_index": 13,
@@ -1042,8 +1051,9 @@
         0.3828,
         0.3827
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0212,
+      "verdict": "spread"
     },
     {
       "bsp_index": 14,
@@ -1133,8 +1143,9 @@
         0.535,
         0.5351
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0356,
+      "verdict": "spread"
     },
     {
       "bsp_index": 15,
@@ -1224,8 +1235,9 @@
         0.5669,
         0.5668
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0424,
+      "verdict": "spread"
     },
     {
       "bsp_index": 16,
@@ -1315,8 +1327,9 @@
         0.3987,
         0.3994
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0205,
+      "verdict": "spread"
     },
     {
       "bsp_index": 17,
@@ -1406,8 +1419,9 @@
         0.1061,
         0.106
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0373,
+      "verdict": "spread"
     },
     {
       "bsp_index": 18,
@@ -1497,8 +1511,9 @@
         0.1146,
         0.1146
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0406,
+      "verdict": "spread"
     },
     {
       "bsp_index": 19,
@@ -1588,8 +1603,9 @@
         0.5214,
         0.5215
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0245,
+      "verdict": "spread"
     },
     {
       "bsp_index": 20,
@@ -1679,8 +1695,9 @@
         0.569,
         0.569
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0364,
+      "verdict": "spread"
     },
     {
       "bsp_index": 21,
@@ -1770,8 +1787,9 @@
         0.523,
         0.5229
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0301,
+      "verdict": "spread"
     },
     {
       "bsp_index": 22,
@@ -1861,8 +1879,9 @@
         0.5357,
         0.5357
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0336,
+      "verdict": "spread"
     },
     {
       "bsp_index": 23,
@@ -1952,8 +1971,9 @@
         0.6307,
         0.6307
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0396,
+      "verdict": "spread"
     },
     {
       "bsp_index": 24,
@@ -2043,8 +2063,9 @@
         0.5551,
         0.5552
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0358,
+      "verdict": "spread"
     },
     {
       "bsp_index": 25,
@@ -2134,8 +2155,9 @@
         0.5265,
         0.5265
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.027,
+      "verdict": "spread"
     },
     {
       "bsp_index": 26,
@@ -2225,8 +2247,9 @@
         0.5727,
         0.5733
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0359,
+      "verdict": "spread"
     },
     {
       "bsp_index": 27,
@@ -2316,8 +2339,9 @@
         0.5107,
         0.5106
       ],
-      "verdict": "spread",
-      "random_control_applied": false
+      "random_control_applied": true,
+      "random_asymptote_r2": 0.0296,
+      "verdict": "spread"
     }
   ]
 }

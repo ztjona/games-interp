@@ -21,7 +21,17 @@
   Launch:        runners\launch.ps1 3A-dilution
   Dry-run:       pwsh -File runners\3A-dilution.ps1 -DryRun
 #>
-param([switch]$DryRun)
+param(
+    [switch]$DryRun,
+    # Substring filter over the "run_id|bsps" entries below. Partial re-runs
+    # are first-class because every `_h` is now cached, so re-running a few
+    # cells is minutes of CPU rather than the 2h12m a full pass costs. Doing it
+    # by hand instead means retyping the random-control mapping, which is
+    # exactly how a cell ends up silently uncontrolled.
+    #   -Only champVe        re-run every champVe cell
+    #   -Only K04            re-run only the new conv2 panel member
+    [string]$Only = ''
+)
 
 $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
@@ -76,7 +86,16 @@ try {
         'F04-champYb-s42-jumprelu-t64-exp8-s4.fc1|tigerYb|none',
         'F04-champYb-s42-jumprelu-t64-exp8-s4.fc1|gorillaYb|none',
         'F04-champYb-s42-jumprelu-t64-exp8-s4.fc1|hawkYb|none',
-        'E05-champYb-s42-batchtopk-k32-exp8-s4.conv2|tigerYb|none',
+        # E05 -> K04 (2026-08-17). E05 is a COLLAPSED dictionary: 99.0% dead,
+        # 41 alive latents (fewer than TOPK=64, so it could not even fill the
+        # candidate list), FVU 0.110 against 0.043/0.051 for the same recipe on
+        # champTa/champVe, and ranked 10th of 11 champYb conv2 runs. Its 3A
+        # verdict of 0.17 "(absent)" described the broken dictionary, not
+        # champYb's conv2 representation. K04 is the same recipe trained in
+        # canonical form: FVU 0.0066, 174 alive, and it beats every other
+        # canonical conv2 run on the threat families (seed-verified, n=3).
+        'K04-champYb-s42-batchtopk-k32-exp8-s4.conv2|tigerYb|none',
+        'K04-champYb-s42-batchtopk-k32-exp8-s4.conv2|gorillaYb|none',
         'I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1|tigerYb|none'
     )
 
@@ -151,6 +170,13 @@ try {
         }
     }
     else { throw "No random-model control checkpoints found on disk." }
+
+    if ($Only) {
+        $before = $RUNS.Count
+        $RUNS = @($RUNS | Where-Object { $_ -like "*$Only*" })
+        if (-not $RUNS) { throw "-Only '$Only' matched none of the $before panel entries." }
+        Write-Host "  -Only '$Only': $($RUNS.Count) of $before panel entries selected."
+    }
 
     # Resolve each entry's random-model control the same way the exec loop does,
     # so the pre-flight reports the SAME pairing that will actually be used.
@@ -233,58 +259,14 @@ try {
             $runnable.Count, ((Get-Date) - $runStart))
 
     Write-Host "`nWriting combined gate summary..."
-    $agg = @'
-import json, glob
-from statistics import median
-
-out = "saes/quarto/analysis/3A_gate_summary.json"
-rows = []
-for p in sorted(glob.glob("saes/quarto/analysis/*_dilution-*.json")):
-    with open(p) as f: d = json.load(f)
-    s, g = d["summary"], d["gate_g3a"]
-    cs = [c for c in d["concepts"] if "asymptote_r2" in c]
-    # Continuous companions to the 4-way verdict. The verdict is a thresholded
-    # view; these are the quantities to report and plot, because they separate
-    # unsupervised from anchored without depending on any threshold.
-    rows.append({"run_id": s["run_id"], "bsp_set": s["bsp_set"],
-                 "rule_version": s["config"].get("rule_version", "3A.1"),
-                 "random_control": s.get("random_control"),
-                 "n_threat_bsps": g["n_threat_bsps"], "n_diluted": g["n_diluted"],
-                 "n_tiled": g["n_tiled"], "n_captured": g["n_captured"],
-                 "n_absent": g["n_absent"], "geometric_frac": g["geometric_frac"],
-                 "median_solo_frac": round(median([c.get("solo_frac", 0.0) for c in cs]), 4) if cs else 0.0,
-                 "median_intrinsic_dim": round(median([c["intrinsic_dim"] for c in cs]), 4) if cs else 0.0,
-                 "median_top_phi": round(median([abs(c["top_phi"]) for c in cs]), 4) if cs else 0.0,
-                 "mean_asymptote_r2": round(sum(c["asymptote_r2"] for c in cs) / len(cs), 4) if cs else 0.0,
-                 "verdict": g["verdict"]})
-json.dump({"runs": rows}, open(out, "w"), indent=2, sort_keys=True)
-
-hdr = f"{'run_id':<50}{'bsps':<11}{'geom':>6}{'solo':>6}{'idim':>6}{'|phi|':>7}{'R2':>7}  verdict"
-print(hdr); print("-" * len(hdr))
-for r in rows:
-    print(f"{r['run_id'][:49]:<50}{r['bsp_set']:<11}{r['geometric_frac']:>6.2f}"
-          f"{r['median_solo_frac']:>6.2f}{r['median_intrinsic_dim']:>6.2f}"
-          f"{r['median_top_phi']:>7.3f}{r['mean_asymptote_r2']:>7.3f}  {r['verdict']}")
-stale = {r["rule_version"] for r in rows}
-if stale != {"3A.2"}:
-    print(f"\nWARNING: mixed verdict rules across reports {sorted(stale)}. "
-          f"Run: python scripts/dilution_diagnostic.py reclassify "
-          f"saes/quarto/analysis/*_dilution-*.json")
-if any(r["random_control"] is None for r in rows):
-    print("\nNOTE: some runs used the permutation null, not a random-model SAE "
-          "control. 'absent' verdicts from those runs are provisional "
-          "(see runners/3A-dilution.ps1 $RANDOM_CONTROLS).")
-print("\nSaved:", out)
-print("geom = (diluted+tiled)/threat BSPs; solo = median share of recoverable")
-print("signal in ONE latent; idim = median effective dims; R2 = mean total")
-print("recoverable signal. Full glossary: 'glossary' key in each report JSON.")
-'@
-    # CAPTURE then Write-Host: Start-Transcript does not record stdout from a
-    # script piped into `python -`, so on 2026-08-13 this table -- the combined
-    # gate summary, the single most useful output of the whole runner -- was
-    # absent from the log even though the JSON was written correctly.
-    $aggOut = $agg | python -
+    # Was an inline heredoc until 2026-08-17, when it still read the
+    # `n_diluted`/`n_tiled` gate keys that rule 3A.3 removed -- so the runner
+    # completed all 17 cells in 2h12m and then died on the last line. Logic that
+    # can break a run belongs in a tested entry point (lessons.md 3.1); the
+    # runner only sequences and checks the exit code.
+    $aggOut = python scripts/summarize_3a_gate.py --game=$GAME --expect-rule=3A.3 2>&1
     $aggOut | ForEach-Object { Write-Host $_ }
+    if ($LASTEXITCODE -ne 0) { throw "Gate summary failed (exit $LASTEXITCODE)." }
 
     Write-Host "`nEmitting stage plan..."
     $files = @(Get-ChildItem "$ANALYSIS/*_dilution-*.json" | ForEach-Object { $_.FullName })

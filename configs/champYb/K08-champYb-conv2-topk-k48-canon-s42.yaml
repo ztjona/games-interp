@@ -1,0 +1,22 @@
+# K08-champYb-s42: HP-canonical gate, campaign K. conv2 TopK canonical k=48 -- above the current canonical maximum.
+# Closes the open question in docs/methods-reference.md S6: the (k, expansion)
+# optimum must be shown to lie INSIDE the swept range UNDER CANONICAL RECIPES.
+# The legacy sweeps declined monotonically from the low edge, but canonical TopK
+# conv2 RISES (k16 0.269 -> k32 0.319), so the curves differ in shape and the
+# canonical optimum is unmeasured above k=32 / exp8.
+# Report PER CONCEPT FAMILY -- the legacy curves were whole-basis.
+experiment: K08-champYb-s42
+architecture: topk
+game: quarto
+hook: s4.conv2
+data: data/quarto/s4.conv2_amalgam_yb_activations.pt
+expansion: 8
+batch_size: 4096
+num_batches: 25000
+lr: 0.0003
+seed: 42
+log_every: 500
+k: 48
+aux_loss_weight: 0.01
+init_mode: decoder_transpose
+dead_window: 0

@@ -449,3 +449,51 @@ def test_random_floor_precedes_captured():
     cfg = DilutionConfig()
     m = _metrics(solo_frac=0.99, intrinsic_dim=1.0, random_asymptote_r2=0.295)
     assert classify(m, cfg) == "absent"
+
+
+def test_gate_summary_handles_both_rule_versions(tmp_path):
+    """The combined summary must not crash on either gate schema.
+
+    On 2026-08-17 `runners/3A-dilution.ps1` finished all 17 cells and then died
+    writing the summary, because its inline script still read the `n_diluted` /
+    `n_tiled` keys that rule 3A.3 replaced with `n_spread`. The logic now lives
+    in scripts/summarize_3a_gate.py so it can be tested; this is that test.
+    """
+    import json
+    import subprocess
+    import sys as _sys
+
+    analysis = tmp_path / "saes" / "quarto" / "analysis"
+    analysis.mkdir(parents=True)
+
+    def _report(name, gate):
+        base = {
+            "summary": {"run_id": name, "bsp_set": "gorillaYb",
+                        "config": {"rule_version": gate.pop("_rule")}},
+            "gate_g3a": gate,
+            "concepts": [{"bsp_id": "x", "asymptote_r2": 0.3, "solo_frac": 0.2,
+                          "intrinsic_dim": 4.0, "top_phi": 0.3,
+                          "verdict": "spread"}],
+        }
+        (analysis / f"{name}_dilution-gorillaYb.json").write_text(json.dumps(base))
+
+    # pre-3A.3 schema
+    _report("legacy-run", {"_rule": "3A.2", "n_threat_bsps": 10, "n_diluted": 6,
+                           "n_tiled": 1, "n_captured": 3, "n_absent": 0,
+                           "geometric_frac": 0.7, "verdict": "3C-proceeds"})
+    # current schema
+    _report("current-run", {"_rule": "3A.3", "n_threat_bsps": 10, "n_spread": 7,
+                            "n_captured": 3, "n_absent": 0, "geometric_frac": 0.7,
+                            "verdict": "3C-proceeds",
+                            "random_control_coverage": 1.0,
+                            "gate_is_provisional": False})
+
+    script = PROJECT_ROOT / "scripts" / "summarize_3a_gate.py"
+    r = subprocess.run([_sys.executable, str(script)], cwd=tmp_path,
+                       capture_output=True, text=True)
+    assert r.returncode == 0, f"summary crashed:\n{r.stdout}\n{r.stderr}"
+    out = json.loads((analysis / "3A_gate_summary.json").read_text())
+    got = {row["run_id"]: row["n_spread"] for row in out["runs"]}
+    assert got == {"legacy-run": 7, "current-run": 7}, got
+    # a stale rule must be reported, not silently accepted
+    assert "3A.2" in r.stdout and "reclassify" in r.stdout
