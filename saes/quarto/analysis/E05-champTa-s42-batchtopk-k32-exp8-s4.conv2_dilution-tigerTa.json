@@ -2343,5 +2343,37 @@
       "random_asymptote_r2": 0.0461,
       "verdict": "spread"
     }
-  ]
+  ],
+  "family_summary": {
+    "offered_completion": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 4,
+      "n": 4,
+      "n_spread": 4,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.1868,
+      "mean_solo_frac": 0.3098
+    },
+    "line_threat": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 10,
+      "n": 10,
+      "n_spread": 10,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.0846,
+      "mean_solo_frac": 0.2464
+    },
+    "square_threat": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 9,
+      "n": 9,
+      "n_spread": 9,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.0821,
+      "mean_solo_frac": 0.233
+    }
+  }
 }

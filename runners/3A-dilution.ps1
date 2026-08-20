@@ -157,19 +157,26 @@ try {
     # cells reported n_absent = 0 -- which read as "no concept failed" when it
     # meant "the test never ran". Fail loudly here instead: `spread` and
     # `captured` are only meaningful once `absent` can fire.
-    Write-Host "`n[gate] Checking every random-model control is usable..."
-    $ctlCkpts = @($RANDOM_CONTROLS.Values | Sort-Object -Unique |
+    Write-Host "`n[gate] Checking every SAE is usable (panel members AND controls)..."
+    # Applies to BOTH roles because both have failed. E05-champYb was a PANEL
+    # MEMBER with 41 alive latents -- fewer than TOPK -- so its candidate list
+    # could not be filled and its verdict described the collapsed dictionary
+    # rather than the champion; nothing in this runner noticed for weeks.
+    # Gating only the controls would leave that hole open.
+    $panelIds = @($RUNS | ForEach-Object { ($_ -split '\|')[0] } | Sort-Object -Unique)
+    $ckpts = @(($panelIds + @($RANDOM_CONTROLS.Values)) | Sort-Object -Unique |
         ForEach-Object { "saes/$GAME/$_.pt" } | Where-Object { Test-Path $_ })
-    if ($ctlCkpts) {
-        python scripts/check_control_usable.py @ctlCkpts
+    if ($ckpts) {
+        python scripts/check_sae_usable.py --top-k=$TOPK @ckpts
         if ($LASTEXITCODE -ne 0) {
-            throw ("One or more random-model controls are UNUSABLE (fewer alive " +
-                   "latents than top_k). Rule 3A.3's learned-signal floor cannot " +
-                   "fire for those cells, so the gate would be provisional. " +
-                   "Retrain the control before running 3A.")
+            throw ("One or more SAEs are UNUSABLE (fewer alive latents than " +
+                   "top_k=$TOPK). A control that cannot fill the candidate list " +
+                   "makes rule 3A.3's learned-signal floor unfirable; a PANEL " +
+                   "MEMBER that cannot fill it is measured at a smaller support " +
+                   "than every other cell. Fix the dictionary before running 3A.")
         }
     }
-    else { throw "No random-model control checkpoints found on disk." }
+    else { throw "No SAE checkpoints found on disk for this panel." }
 
     if ($Only) {
         $before = $RUNS.Count

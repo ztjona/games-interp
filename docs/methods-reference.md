@@ -382,7 +382,7 @@ python scripts/dilution_diagnostic.py reclassify saes/quarto/analysis/*_dilution
 | **G11** | The epiphenomenality risk (Balogh & Jelasity): a probe can decode a concept the model never *uses*. **Decodability ≠ causality.** |
 | **G-3A** | `geometric_frac ≥ 0.50` over a run's threat BSPs → 3C proceeds; else 3C deprioritised in favour of hooks / E2E. 3B runs regardless. |
 | **G-3C** | Beat I04 tigerVe, or close ≥50% of the threat SAE/LP gap, over 3 seeds, with the random control unchanged and centred cross-seed feature-overlap stability. |
-| **HP-canonical** | **Before any 3C baseline claim**, the (k, expansion) optimum must be shown to lie INSIDE the swept range *under canonical recipes*, measured **per concept family**. Opened 2026-08-16; see §6. |
+| **HP-canonical** | **CLOSED 2026-08-17.** Both axes have interior optima under canonical recipes — conv2 k=32, fc1 exp32 — so the swept ranges are wide enough. Opened 2026-08-16; see §6. |
 
 Full hypothesis table with current status: [`../RESEARCH-STATUS.md`](../RESEARCH-STATUS.md).
 
@@ -401,9 +401,12 @@ Full hypothesis table with current status: [`../RESEARCH-STATUS.md`](../RESEARCH
    and confirm the rule classifies it as designed before reading the gate.
 
 
-## 6. HP-canonical — the open hyperparameter gate (2026-08-16)
+## 6. HP-canonical — the hyperparameter gate (opened 2026-08-16, CLOSED 2026-08-17)
 
-**Status: OPEN.** Blocks 3C baseline claims only; 3A and 3B proceed.
+**Status: CLOSED.** Both axes have interior optima under canonical recipes, so the
+swept ranges are wide enough and the settings in use sit at or adjacent to the
+optimum. Result table in §6.5; full record in
+[`diary/2026-08-17_3A-gate-readable.md`](diary/2026-08-17_3A-gate-readable.md) §4.
 
 ### 6.1 What is settled
 
@@ -456,3 +459,27 @@ previous result). Estimated ~1 h wall clock across three GPUs.
 the unsupervised baseline is under-tuned, that criterion is too easy and any
 geometry-aware 3C variant clears it for the wrong reason. HP-canonical exists so
 the baseline cannot be silently weak at the moment 3C is judged against it.
+
+### 6.5 Result [DIRECT] — champYb, gorillaYb
+
+| conv2 sparsity (TopK, exp8) | k=16 | k=32 | k=48 | k=64 |
+|---|---:|---:|---:|---:|
+| legacy | 0.333 | 0.330 | 0.329 | 0.306 |
+| **canonical** | 0.269 | **0.312** | 0.293 | 0.290 |
+
+| fc1 expansion (JumpReLU t64) | exp8 | exp16 | exp32 | exp64 |
+|---|---:|---:|---:|---:|
+| legacy | 0.424 | 0.407 | 0.385 | 0.327 |
+| **canonical** | 0.459 | 0.455 | **0.475** | 0.461 |
+
+Legacy declined monotonically on both axes, implying the optimum lay *outside*
+the swept range. Canonical peaks **inside** it on both. The conformance fix did
+not merely shift the curves' level, it changed their **shape** — which is why
+the pre-conformance sweeps could not answer this and why the gate was opened
+rather than closed by inspection.
+
+**Corollary — capacity is not the binding constraint.** Across an 8x larger
+dictionary (4,096 -> 32,768 slots) alive latents move 350 -> 400 and effective
+expansion 0.68x -> 0.78x, never reaching 1x, for +0.016 then -0.014 coverage. On
+conv2, k=16 has the MOST alive latents (364) and the WORST coverage (0.269). The
+residual wall cannot be attacked by enlarging the dictionary.

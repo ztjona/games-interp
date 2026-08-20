@@ -7199,5 +7199,27 @@
       "random_asymptote_r2": 0.029,
       "verdict": "captured"
     }
-  ]
+  ],
+  "family_summary": {
+    "line_threat": {
+      "absent": 6,
+      "captured": 32,
+      "spread": 2,
+      "n": 40,
+      "n_spread": 2,
+      "geometric_frac": 0.05,
+      "mean_asymptote_r2": 0.5324,
+      "mean_solo_frac": 0.8165
+    },
+    "square_threat": {
+      "absent": 0,
+      "captured": 36,
+      "spread": 0,
+      "n": 36,
+      "n_spread": 0,
+      "geometric_frac": 0.0,
+      "mean_asymptote_r2": 0.819,
+      "mean_solo_frac": 0.9829
+    }
+  }
 }

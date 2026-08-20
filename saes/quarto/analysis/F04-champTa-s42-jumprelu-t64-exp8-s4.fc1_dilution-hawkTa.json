@@ -16019,5 +16019,27 @@
       "random_asymptote_r2": 0.0496,
       "verdict": "spread"
     }
-  ]
+  ],
+  "family_summary": {
+    "line_threat": {
+      "absent": 1,
+      "captured": 0,
+      "spread": 89,
+      "n": 90,
+      "n_spread": 89,
+      "geometric_frac": 0.9889,
+      "mean_asymptote_r2": 0.1661,
+      "mean_solo_frac": 0.3832
+    },
+    "square_threat": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 81,
+      "n": 81,
+      "n_spread": 81,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.2549,
+      "mean_solo_frac": 0.4947
+    }
+  }
 }

@@ -60,7 +60,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import torch
 from docopt import docopt
 
-from lib.sae.eval import resolve_schema_path
+from lib.sae.eval import category_families, resolve_schema_path
 from lib.sae.dilution import (
     GLOSSARY,
     VERDICT_GLOSSARY,
@@ -108,11 +108,20 @@ def is_auto_category(cat: str) -> bool:
     return any(mark in cat for mark in AUTO_MARKERS)
 
 
-def summarize(concepts):
-    """(category_summary, gate_g3a) from a list of diagnosed concepts.
+def summarize(concepts, cat_fam=None):
+    """(category_summary, family_summary, gate_g3a) from diagnosed concepts.
 
     Shared by ``run`` and ``reclassify_report`` so a re-verdict cannot drift
     from a fresh run.
+
+    ``cat_fam`` maps category -> concept family (from the schema's stamp). With
+    it, the report also carries a CONCEPT-FAMILY rollup. Without that rollup the
+    only cross-cell number is ``geometric_frac``, which is computed over a whole
+    basis -- and the bases partition the threat menu differently (gorilla 76 =
+    40 line + 36 square; hawk 171 = 90 + 81; tiger 23 = 10 + 9 + 4), so
+    comparing bases on it compares partitions as much as dictionaries. Same
+    error the campaign-K architecture comparison made on 2026-08-15; see
+    CLAUDE.md, "never compare two runs on a whole-basis scalar".
     """
     cat_summary = {}
     for c in concepts:
@@ -146,6 +155,28 @@ def summarize(concepts):
             # Flag a category whose members disagree enough that the mean is
             # not a fair summary of any of them.
             d["heterogeneous"] = bool(vals[-1] - vals[0] > 0.30)
+
+    # Concept-family rollup: the unit that IS comparable across bases.
+    family_summary = {}
+    if cat_fam:
+        for c in concepts:
+            fam = cat_fam.get(c["category"])
+            if not fam:
+                continue
+            d = family_summary.setdefault(fam, {v: 0 for v in VERDICTS})
+            d["n"] = d.get("n", 0) + 1
+            d[c["verdict"]] = d.get(c["verdict"], 0) + 1
+        for fam, d in family_summary.items():
+            geo = sum(d.get(v, 0) for v in ("spread", "diluted", "tiled"))
+            d["n_spread"] = geo
+            d["geometric_frac"] = round(geo / d["n"], 4) if d["n"] else 0.0
+            members = [c for c in concepts
+                       if cat_fam.get(c["category"]) == fam and "asymptote_r2" in c]
+            if members:
+                d["mean_asymptote_r2"] = round(
+                    sum(c["asymptote_r2"] for c in members) / len(members), 4)
+                d["mean_solo_frac"] = round(
+                    sum(c.get("solo_frac", 0.0) for c in members) / len(members), 4)
 
     n_threat = len(concepts)
     # `spread` is the geometric verdict; the retired diluted/tiled labels are
@@ -185,7 +216,7 @@ def summarize(concepts):
         # A gate whose learned-signal floor never fired is not a test of it.
         "gate_is_provisional": n_tested < n_threat,
     }
-    return cat_summary, gate
+    return cat_summary, family_summary, gate
 
 
 def reclassify_report(path: Path, cfg: DilutionConfig, dry_run: bool) -> dict:
@@ -215,8 +246,20 @@ def reclassify_report(path: Path, cfg: DilutionConfig, dry_run: bool) -> dict:
         c["verdict"] = new
 
     old_gate = report.get("gate_g3a", {})
-    cat_summary, gate = summarize(concepts)
-    report["category_summary"], report["gate_g3a"] = cat_summary, gate
+    # Resolve the schema so a re-verdict gains the family rollup too, rather
+    # than only fresh runs having it.
+    cat_fam = {}
+    sp = resolve_schema_path(Path("data") / report["summary"].get("game", "quarto"),
+                             report["summary"]["bsp_set"])
+    if sp:
+        with open(sp) as f:
+            cat_fam = {k: v["concept_family"]
+                       for k, v in category_families(json.load(f)).items()
+                       if v.get("concept_family")}
+    cat_summary, family_summary, gate = summarize(concepts, cat_fam)
+    report["category_summary"] = cat_summary
+    report["family_summary"] = family_summary
+    report["gate_g3a"] = gate
     report["summary"]["config"] = cfg.to_dict()
     report["glossary"] = {"metrics": GLOSSARY, "verdicts": VERDICT_GLOSSARY}
 
@@ -336,7 +379,10 @@ def run(run_id, game, bsps, categories, random_run_id, cfg, quiet, orbit_spec="a
         concepts.append({"bsp_index": idx, "bsp_id": b["id"],
                          "category": b["category"], **m})
 
-    cat_summary, gate = summarize(concepts)
+    cat_fam = {k: v["concept_family"]
+               for k, v in category_families(schema).items()
+               if v.get("concept_family")}
+    cat_summary, family_summary, gate = summarize(concepts, cat_fam)
 
     result = {
         "summary": {
@@ -350,6 +396,7 @@ def run(run_id, game, bsps, categories, random_run_id, cfg, quiet, orbit_spec="a
         "glossary": {"metrics": GLOSSARY, "verdicts": VERDICT_GLOSSARY},
         "gate_g3a": gate,
         "category_summary": cat_summary,
+        "family_summary": family_summary,
         "concepts": concepts,
     }
 

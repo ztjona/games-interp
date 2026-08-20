@@ -1,13 +1,22 @@
-"""Is a random-model control SAE usable as a 3A learned-signal floor?
+"""Is an SAE usable by the 3A diagnostic -- as a panel member OR as a control?
 
-A control that trains without error can still contribute nothing. `R1-champ*random`
-(JumpReLU t64, kaiming init) has 4032/4096 latents that never fire and 64 that
-fire on >99.98% of rows, so ZERO latents fall inside the diagnostic's alive band
-and `select_concept_features` returns an empty candidate list -- the control was
-named in 13 of 17 reports and produced no number in any of them.
+An SAE that trains without error can still be unusable, and this has bitten
+BOTH roles:
 
-This applies the diagnostic's OWN alive definition, so "usable" here means
-exactly what rule 3A.3 needs and nothing looser.
+  * as a CONTROL -- `R1-champ*random` (JumpReLU t64, kaiming init) had 4032/4096
+    latents that never fire and 64 firing on >99.98% of rows, so ZERO fell in the
+    alive band. It was named in 13 of 17 reports and produced no number in any.
+  * as a PANEL MEMBER -- `E05-champYb` had 41 alive latents, FEWER than
+    `top_k = 64`, so its candidate list could not be filled and its
+    `asymptote_r2` was measured at a smaller support than every other cell. Its
+    verdict described the collapsed dictionary, not the champion.
+
+The bar is the same in both roles and is not arbitrary: the diagnostic ranks
+`top_k` candidates, so a dictionary with fewer alive latents than `top_k`
+cannot answer the question being asked of it. FVU is printed alongside for
+judgement (E05 sat at 0.110 against 0.043/0.051 for the same recipe on its
+sibling champions) but is NOT gated on, because a defensible absolute threshold
+would differ per hook and architecture.
 
 Usage:
     check_control_usable.py <checkpoint>... [options]
@@ -22,6 +31,7 @@ Options:
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 
@@ -40,12 +50,21 @@ def main() -> int:
     cache_dir = ROOT / "saes" / args["--game"] / "cache"
 
     worst = 0
-    print(f"{'control':<52}{'alive':>7}{'dead%':>8}{'fire>99.9%':>12}  verdict")
+    reg_path = ROOT / "saes" / args["--game"] / "eval_registry.json"
+    reg = json.loads(reg_path.read_text(encoding="utf-8")) if reg_path.exists() else {}
+
+    def fvu_of(run_id):
+        for k, v in reg.items():
+            if k.split(":")[0] == run_id:
+                return (v.get("metrics") or {}).get("fvu")
+        return None
+
+    print(f"{'sae':<52}{'alive':>7}{'dead%':>8}{'fire>99.9%':>12}{'FVU':>8}  verdict")
     for raw in args["<checkpoint>"]:
         run_id = Path(raw).stem
         h_path = cache_dir / f"{run_id}_h.pt"
         if not h_path.exists():
-            print(f"{run_id[:51]:<52}{'-':>7}{'-':>8}{'-':>12}  NO _h CACHE "
+            print(f"{run_id[:51]:<52}{'-':>7}{'-':>8}{'-':>12}{'-':>8}  NO _h CACHE "
                   f"(run sae_eval first)")
             worst = max(worst, 2)
             continue
@@ -61,8 +80,9 @@ def main() -> int:
         verdict = ("USABLE" if ok else
                    "UNUSABLE: alive < top_k, the control cannot fill the "
                    "candidate list")
+        fvu = fvu_of(run_id)
         print(f"{run_id[:51]:<52}{alive:>7}{100*never/h.shape[1]:>8.1f}"
-              f"{always:>12}  {verdict}")
+              f"{always:>12}{'     -  ' if fvu is None else f'{fvu:>8.4f}'}  {verdict}")
         worst = max(worst, 0 if ok else 1)
         del h, rc
     return worst
