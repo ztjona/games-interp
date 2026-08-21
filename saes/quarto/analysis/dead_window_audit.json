@@ -1,0 +1,41 @@
+{
+  "F04-champYb-s42-jumprelu-t64-exp8-s4.fc1": {
+    "d_dict": 4096,
+    "n_batches": 72,
+    "never_fires_anywhere": 93.09,
+    "windows": {
+      "1": 93.5,
+      "2": 93.48,
+      "5": 93.42,
+      "10": 93.37,
+      "25": 93.25,
+      "50": 93.09
+    }
+  },
+  "K03-champYb-s42-topk-k32-exp8-s4.fc1": {
+    "d_dict": 4096,
+    "n_batches": 72,
+    "never_fires_anywhere": 54.54,
+    "windows": {
+      "1": 85.21,
+      "2": 83.39,
+      "5": 79.86,
+      "10": 76.0,
+      "25": 67.35,
+      "50": 56.79
+    }
+  },
+  "K04-champYb-s42-batchtopk-k32-exp8-s4.conv2": {
+    "d_dict": 4096,
+    "n_batches": 72,
+    "never_fires_anywhere": 95.73,
+    "windows": {
+      "1": 95.75,
+      "2": 95.75,
+      "5": 95.74,
+      "10": 95.74,
+      "25": 95.73,
+      "50": 95.73
+    }
+  }
+}

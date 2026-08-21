@@ -77,15 +77,32 @@ across its three framings:
 **The residual wall is a framing effect, not a concept effect.** On champYb's
 fc1 dictionary, `square_threat` is **fully captured under gorilla (0.00) and
 almost fully under hawk (0.12), and fully geometric under tiger (1.00)** — the
-*same 2×2-square game fact*, in the same dictionary, on the same positions. The
-difference is only whether the BSP is phrased as a state fact ("this square is a
-threat") or agent-relatively ("I can win this square").
+*same 2x2-square game fact*, in the same dictionary, on the same positions.
 
-That is a much sharper claim than "tiger concepts are harder". Tiger is not a
-different set of concepts; for line and square it is the *same* concepts with
-the agent's own position folded in. So what the flat dictionary fails to
-isolate is specifically **the conjunction of a board fact with the agent's
-relation to it**.
+**What separates them is LOGICAL FORM, not the offered piece.** This entry
+originally said the wall was "the conjunction of a board fact with the agent's
+relation to it". That is wrong, and the table refutes it: **hawk uses the
+offered piece too**, and hawk is captured. Reading the definitions in
+`scripts/games/quarto.py`:
+
+| basis | example | inputs | logical form |
+|---|---|---|---|
+| gorilla | `row_2_threat_tall` | board only | 3 cells match `tall` AND 1 empty |
+| hawk | `row_0_completable_tall` | board + offered | (threat in `tall`) AND (offered is `tall`) |
+| tiger | `tiger_line_row_0_winnable` | board + offered | exactly 1 empty AND **EXISTS attr** in {size, colour, shape, hole}: all 4 (3 placed + offered in the gap) share it |
+
+- **hawk is attribute-INDEXED.** Fix `tall`; both conjuncts are separately
+  detectable, so a dictionary can spend one latent per conjunct and the
+  conjunction is close to linear in them. Factorable.
+- **tiger is attribute-QUANTIFIED.** An existential over four attribute-specific
+  joint conditions, each depending on *which* cell is empty. There is no fixed
+  attribute to key a latent on.
+
+So the residual wall is **a disjunction over attributes of a joint
+board x piece condition** -- a form that does not factor into a product of
+simple detectors. Prediction this makes: a per-attribute decomposition of tiger
+(`tiger_line_row_0_winnable_tall`, ...) should be CAPTURED like hawk. If it is
+not, the disjunction is not the mechanism and this reading is wrong.
 
 Three supporting observations:
 
