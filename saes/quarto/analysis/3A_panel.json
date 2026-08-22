@@ -1,104 +1,104 @@
 {
   "health_floor_alive": 64,
-  "needs_encode": [
-    "C01-champTa-s42-topk-k16-exp8-s4.conv2",
-    "E03-champYb-s42-topk-k64-exp8-s4.conv2",
-    "E04-champTa-s42-topk-k96-exp8-s4.conv2",
-    "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
-    "E06-champYb-s42-batchtopk-k64-exp8-s4.conv2",
-    "F00-champYb-s42-batchtopk-k16-exp8-s4.fc1",
-    "F01-champYb-s42-topk-k32-exp8-s4.fc1",
-    "F02-champTa-s42-topk-k64-exp8-s4.fc1",
-    "F02-champYb-s42-topk-k64-exp8-s4.fc1",
-    "F03-champTa-s42-batchtopk-k32-exp8-s4.fc1",
-    "F03-champYb-s42-batchtopk-k32-exp8-s4.fc1",
-    "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
-    "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
-    "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
-    "H05-champTa-s42-batchtopk-k32-exp32-s4.conv2"
-  ],
+  "health_measured_with": "lib.sae.dilution.RankingCache (same definition as the diagnostic)",
+  "needs_encode": [],
   "panel": {
     "Ta/s4.conv2/gorilla": [
       {
-        "alive": 222,
+        "alive": 219,
+        "alive_source": "measured",
         "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1293
       },
       {
-        "alive": 107,
+        "alive": 104,
+        "alive_source": "measured",
         "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
         "threat_mcc": 0.1275
       },
       {
         "alive": 337,
+        "alive_source": "measured",
         "run_id": "E04-champTa-s42-topk-k96-exp8-s4.conv2",
         "threat_mcc": 0.1198
       }
     ],
     "Ta/s4.conv2/hawk": [
       {
-        "alive": 222,
+        "alive": 219,
+        "alive_source": "measured",
         "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1384
       },
       {
-        "alive": 107,
+        "alive": 104,
+        "alive_source": "measured",
         "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
         "threat_mcc": 0.1374
       },
       {
-        "alive": 1568,
+        "alive": 2443,
+        "alive_source": "measured",
         "run_id": "E01-champTa-s42-topk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1322
       }
     ],
     "Ta/s4.conv2/tiger": [
       {
-        "alive": 1568,
+        "alive": 2443,
+        "alive_source": "measured",
         "run_id": "E01-champTa-s42-topk-k32-exp8-s4.conv2",
         "threat_mcc": 0.193
       },
       {
-        "alive": 1698,
+        "alive": 2420,
+        "alive_source": "measured",
         "run_id": "C01-champTa-s42-topk-k16-exp8-s4.conv2",
         "threat_mcc": 0.1906
       },
       {
-        "alive": 84,
+        "alive": 79,
+        "alive_source": "measured",
         "run_id": "H05-champTa-s42-batchtopk-k32-exp32-s4.conv2",
         "threat_mcc": 0.144
       }
     ],
     "Ta/s4.fc1/gorilla": [
       {
-        "alive": 335,
+        "alive": 319,
+        "alive_source": "measured",
         "run_id": "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1",
         "threat_mcc": 0.2071
       },
       {
-        "alive": 284,
+        "alive": 263,
+        "alive_source": "measured",
         "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
         "threat_mcc": 0.205
       },
       {
-        "alive": 229,
+        "alive": 199,
+        "alive_source": "measured",
         "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
         "threat_mcc": 0.2008
       }
     ],
     "Ta/s4.fc1/hawk": [
       {
-        "alive": 335,
+        "alive": 319,
+        "alive_source": "measured",
         "run_id": "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1",
         "threat_mcc": 0.2401
       },
       {
-        "alive": 284,
+        "alive": 263,
+        "alive_source": "measured",
         "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
         "threat_mcc": 0.2353
       },
       {
-        "alive": 229,
+        "alive": 199,
+        "alive_source": "measured",
         "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
         "threat_mcc": 0.2304
       }
@@ -106,225 +106,272 @@
     "Ta/s4.fc1/tiger": [
       {
         "alive": 123,
+        "alive_source": "measured",
         "run_id": "F03-champTa-s42-batchtopk-k32-exp8-s4.fc1",
         "threat_mcc": 0.2572
       },
       {
-        "alive": 438,
+        "alive": 430,
+        "alive_source": "measured",
         "run_id": "F02-champTa-s42-topk-k64-exp8-s4.fc1",
         "threat_mcc": 0.2538
       },
       {
-        "alive": 284,
+        "alive": 263,
+        "alive_source": "measured",
         "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
         "threat_mcc": 0.243
       }
     ],
     "Ve/s4.conv2/gorilla": [
       {
-        "alive": 147,
+        "alive": 131,
+        "alive_source": "measured",
         "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1178
       },
       {
-        "alive": 424,
+        "alive": 479,
+        "alive_source": "measured",
         "run_id": "E02-champVe-s42-topk-k48-exp8-s4.conv2",
         "threat_mcc": 0.1128
       },
       {
-        "alive": 354,
+        "alive": 367,
+        "alive_source": "measured",
         "run_id": "E03-champVe-s42-topk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1121
       }
     ],
     "Ve/s4.conv2/hawk": [
       {
-        "alive": 147,
+        "alive": 131,
+        "alive_source": "measured",
         "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1252
       },
       {
-        "alive": 70,
+        "alive": 66,
+        "alive_source": "measured",
         "run_id": "E05-champVe-s42-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1183
       },
       {
-        "alive": 354,
+        "alive": 367,
+        "alive_source": "measured",
         "run_id": "E03-champVe-s42-topk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1175
       }
     ],
     "Ve/s4.conv2/tiger": [
       {
-        "alive": 286,
+        "alive": 272,
+        "alive_source": "measured",
         "run_id": "E04-champVe-s42-topk-k96-exp8-s4.conv2",
         "threat_mcc": 0.1631
       },
       {
-        "alive": 70,
+        "alive": 66,
+        "alive_source": "measured",
         "run_id": "E05-champVe-s42-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1517
       },
       {
-        "alive": 147,
+        "alive": 131,
+        "alive_source": "measured",
         "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1461
       }
     ],
     "Ve/s4.fc1/gorilla": [
       {
-        "alive": 787,
+        "alive": 844,
+        "alive_source": "measured",
         "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
         "threat_mcc": 0.2834
       },
       {
-        "alive": 333,
+        "alive": 322,
+        "alive_source": "measured",
         "run_id": "F04-champVe-s42-jumprelu-t64-exp8-s4.fc1",
         "threat_mcc": 0.2828
       },
       {
-        "alive": 303,
+        "alive": 289,
+        "alive_source": "measured",
         "run_id": "H01-champVe-s42-jumprelu-t64-exp16-s4.fc1",
         "threat_mcc": 0.2701
       }
     ],
     "Ve/s4.fc1/hawk": [
       {
-        "alive": 333,
+        "alive": 322,
+        "alive_source": "measured",
         "run_id": "F04-champVe-s42-jumprelu-t64-exp8-s4.fc1",
         "threat_mcc": 0.2869
       },
       {
-        "alive": 787,
+        "alive": 844,
+        "alive_source": "measured",
         "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
         "threat_mcc": 0.2847
       },
       {
-        "alive": 303,
+        "alive": 289,
+        "alive_source": "measured",
         "run_id": "H01-champVe-s42-jumprelu-t64-exp16-s4.fc1",
         "threat_mcc": 0.2784
       }
     ],
     "Ve/s4.fc1/tiger": [
       {
-        "alive": 787,
+        "alive": 844,
+        "alive_source": "measured",
         "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
         "threat_mcc": 0.2822
       },
       {
         "alive": 74,
+        "alive_source": "measured",
         "run_id": "F00-champVe-s42-batchtopk-k16-exp8-s4.fc1",
         "threat_mcc": 0.2799
       },
       {
-        "alive": 363,
+        "alive": 346,
+        "alive_source": "measured",
         "run_id": "F02-champVe-s42-topk-k64-exp8-s4.fc1",
         "threat_mcc": 0.2699
       }
     ],
     "Yb/s4.conv2/gorilla": [
       {
-        "alive": 185,
+        "alive": 173,
+        "alive_source": "measured",
         "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1149
       },
       {
-        "alive": 158,
+        "alive": 147,
+        "alive_source": "measured",
         "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1109
       },
       {
-        "alive": 189,
+        "alive": 174,
+        "alive_source": "measured",
         "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1047
       }
     ],
     "Yb/s4.conv2/hawk": [
       {
-        "alive": 185,
+        "alive": 173,
+        "alive_source": "measured",
         "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1187
       },
       {
-        "alive": 158,
+        "alive": 147,
+        "alive_source": "measured",
         "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.114
       },
       {
-        "alive": 189,
+        "alive": 174,
+        "alive_source": "measured",
         "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1066
       }
     ],
     "Yb/s4.conv2/tiger": [
       {
-        "alive": 185,
+        "alive": 173,
+        "alive_source": "measured",
         "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
         "threat_mcc": 0.1295
       },
       {
-        "alive": 85,
-        "run_id": "E06-champYb-s42-batchtopk-k64-exp8-s4.conv2",
-        "threat_mcc": 0.1159
-      },
-      {
-        "alive": 364,
+        "alive": 369,
+        "alive_source": "measured",
         "run_id": "K07-champYb-s42-topk-k16-exp8-s4.conv2",
         "threat_mcc": 0.1157
+      },
+      {
+        "alive": 230,
+        "alive_source": "measured",
+        "run_id": "C01-champYb-s42-topk-k16-exp8-s4.conv2",
+        "threat_mcc": 0.1083
       }
     ],
     "Yb/s4.fc1/gorilla": [
       {
-        "alive": 687,
+        "alive": 690,
+        "alive_source": "measured",
         "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
         "threat_mcc": 0.6206
       },
       {
-        "alive": 590,
+        "alive": 589,
+        "alive_source": "measured",
         "run_id": "F01-champYb-s42-topk-k32-exp8-s4.fc1",
         "threat_mcc": 0.6098
       },
       {
-        "alive": 382,
+        "alive": 329,
+        "alive_source": "measured",
         "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
         "threat_mcc": 0.603
       }
     ],
     "Yb/s4.fc1/hawk": [
       {
-        "alive": 687,
+        "alive": 690,
+        "alive_source": "measured",
         "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
         "threat_mcc": 0.4564
       },
       {
-        "alive": 359,
+        "alive": 303,
+        "alive_source": "measured",
         "run_id": "K05-champYb-s44-jumprelu-t64-exp8-s4.fc1",
         "threat_mcc": 0.456
       },
       {
-        "alive": 382,
+        "alive": 329,
+        "alive_source": "measured",
         "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
         "threat_mcc": 0.4557
       }
     ],
     "Yb/s4.fc1/tiger": [
       {
-        "alive": 77,
+        "alive": 76,
+        "alive_source": "measured",
         "run_id": "F00-champYb-s42-batchtopk-k16-exp8-s4.fc1",
         "threat_mcc": 0.3137
       },
       {
-        "alive": 162,
+        "alive": 160,
+        "alive_source": "measured",
         "run_id": "F03-champYb-s42-batchtopk-k32-exp8-s4.fc1",
         "threat_mcc": 0.2887
       },
       {
-        "alive": 376,
+        "alive": 358,
+        "alive_source": "measured",
         "run_id": "F02-champYb-s42-topk-k64-exp8-s4.fc1",
         "threat_mcc": 0.2762
       }
     ]
   },
+  "rejected_on_measured_health": [
+    {
+      "alive_estimate": 85,
+      "alive_measured": 38,
+      "cell": "Yb/s4.conv2/tiger",
+      "run_id": "E06-champYb-s42-batchtopk-k64-exp8-s4.conv2"
+    }
+  ],
   "selected_on": "mean MCC over threat families, BSP-weighted",
   "top_n": 3
 }

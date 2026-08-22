@@ -376,6 +376,44 @@ BINARY_ATTRS = {
     "with_hole": ("hole", "WITH_HOLE", "WITHOUT_HOLE"),
 }
 
+# NEGATIVE_ATTRS: the four attribute poles ``BINARY_ATTRS`` does NOT probe.
+#
+# Quarto's win condition is "all four share SOME attribute VALUE" -- LITTLE wins
+# exactly as WHITE does. But every gorilla/hawk threat BSP is keyed on the
+# POSITIVE pole only (``completable_tall``, never ``completable_little``), so
+# hawk can express only half the threat menu. Measured on champYb (296,045
+# positions, 10 lines) on 2026-08-21: ``hawk => tiger`` with ZERO
+# counterexamples, and 32,408 of tiger's 68,041 line positives -- 47.6% -- are
+# wins hawk cannot state. See docs/diary/2026-08-21_3A-residuals-and-handoff.md
+# §6.
+#
+# ``hen`` is these four poles packaged as a NEW basis that mirrors hawk category
+# for category. It is deliberately NOT an extension of hawk: adding BSPs to hawk
+# would silently change every banked hawk number. With hen on disk,
+# ``tiger == OR(hawk UNION hen)`` becomes a checkable identity
+# (tests/test_bsp_logic.py::TestHenNegativePoles) and the polarity hypothesis
+# becomes testable -- if tiger's uncaptured half is specifically the
+# negative-pole wins, hen is markedly less captured than hawk on the same
+# dictionary.
+#
+# bsp_suffix -> (metadata_key, value that counts as 1)
+NEGATIVE_ATTRS = {
+    "little": ("size", "LITTLE"),
+    "white": ("coloration", "WHITE"),
+    "circle": ("shape", "CIRCLE"),
+    "without_hole": ("hole", "WITHOUT_HOLE"),
+}
+
+# Every attribute POLE, positive and negative, in the one shape the threat
+# helpers need: suffix -> (metadata_key, value). The positive half is
+# byte-identical to BINARY_ATTRS' first two fields, so routing the shared
+# helpers through here leaves every gorilla/hawk label unchanged.
+ATTR_POLES_POSITIVE: dict[str, tuple[str, str]] = {
+    sfx: (mk, pos) for sfx, (mk, pos, _neg) in BINARY_ATTRS.items()
+}
+
+ATTR_POLES: dict[str, tuple[str, str]] = {**ATTR_POLES_POSITIVE, **NEGATIVE_ATTRS}
+
 
 # Named BSP sets (animal → list of categories). Each set is intended to be
 # evaluated as a unit; the union (337) is a *menu*, not a usable set, because
@@ -400,6 +438,19 @@ BSP_SETS: dict[str, list[str]] = {
         "reframed_sq_completable",
         "reframed_sq_any_threat",
         "reframed_global",
+    ],
+    # hen mirrors hawk category-for-category on the NEGATIVE attribute poles
+    # (LITTLE / WHITE / CIRCLE / WITHOUT_HOLE). Matched-pair design: identical
+    # logical form, only the polarity differs, so hawk-vs-hen isolates polarity
+    # the way nothing else in the menu can. See NEGATIVE_ATTRS above.
+    "hen": [
+        "neg_count",
+        "neg_completable",
+        "neg_any_threat",
+        "neg_sq_count",
+        "neg_sq_completable",
+        "neg_sq_any_threat",
+        "neg_global",
     ],
     "tiger": [
         # Agent-relative threats — see
@@ -448,12 +499,18 @@ CONCEPT_FAMILIES: dict[str, tuple[str, str]] = {
     "reframed_count": ("line_threat", "state"),
     "reframed_any_threat": ("line_threat", "state_any"),
     "reframed_completable": ("line_threat", "agent_relative"),
+    "neg_count": ("line_threat", "state"),
+    "neg_any_threat": ("line_threat", "state_any"),
+    "neg_completable": ("line_threat", "agent_relative"),
     "tiger_line_winnable": ("line_threat", "agent_relative"),
     # --- square_threat: the same fact for 2x2 squares ------------------------
     "threat_square_2x2": ("square_threat", "state"),
     "reframed_sq_count": ("square_threat", "state"),
     "reframed_sq_any_threat": ("square_threat", "state_any"),
     "reframed_sq_completable": ("square_threat", "agent_relative"),
+    "neg_sq_count": ("square_threat", "state"),
+    "neg_sq_any_threat": ("square_threat", "state_any"),
+    "neg_sq_completable": ("square_threat", "agent_relative"),
     "tiger_square_winnable": ("square_threat", "agent_relative"),
     # --- global_threat: whole-board summary of the above ---------------------
     # gorilla ``global`` = "an immediate winning placement exists"; hawk
@@ -462,6 +519,7 @@ CONCEPT_FAMILIES: dict[str, tuple[str, str]] = {
     # Same axis (one number for the whole board), three levels of agency.
     "global": ("global_threat", "state"),
     "reframed_global": ("global_threat", "state_any"),
+    "neg_global": ("global_threat", "state_any"),
     "tiger_decision_global": ("global_threat", "agent_relative"),
     # --- offered_piece: what the piece in hand IS vs what it DOES ------------
     # Deliberately two families. ``offered_piece`` is a raw 4-bit readout of the
@@ -761,6 +819,100 @@ def get_all_bsp_definitions() -> list[dict]:
         }
     )
 
+    # ── Hen BSPs (the NEGATIVE attribute poles) ───────────────────────────
+    # A category-for-category mirror of hawk on LITTLE / WHITE / CIRCLE /
+    # WITHOUT_HOLE. Same logical form, opposite polarity -- so hawk-vs-hen on
+    # one dictionary isolates polarity, and OR(hawk, hen) reconstructs tiger's
+    # line/square win conditions exactly. See NEGATIVE_ATTRS.
+
+    # Negative count: >=3 pieces in line share the negative pole (40)
+    for line_type, line_idx, cells_coords in lines:
+        for suffix, (meta_key, neg_val) in NEGATIVE_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"{line_type}_{line_idx}_count_ge3_{suffix}",
+                    "description": f"{line_type.capitalize()} {line_idx}: >=3 occupied cells are {neg_val}",
+                    "type": "binary",
+                    "category": "neg_count",
+                }
+            )
+
+    # Negative completable: threat in the negative pole AND offered matches (40)
+    for line_type, line_idx, cells_coords in lines:
+        for suffix, (meta_key, neg_val) in NEGATIVE_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"{line_type}_{line_idx}_completable_{suffix}",
+                    "description": f"{line_type.capitalize()} {line_idx}: threat in {neg_val} AND offered piece is {neg_val}",
+                    "type": "binary",
+                    "category": "neg_completable",
+                }
+            )
+
+    # Negative any-threat: any NEGATIVE pole threatens this line (10)
+    for line_type, line_idx, cells_coords in lines:
+        bsps.append(
+            {
+                "id": f"{line_type}_{line_idx}_neg_any_threat",
+                "description": f"{line_type.capitalize()} {line_idx}: at least one NEGATIVE attribute pole has a threat pattern",
+                "type": "binary",
+                "category": "neg_any_threat",
+            }
+        )
+
+    # Negative square count (36)
+    for top_r, left_c in squares:
+        for suffix, (meta_key, neg_val) in NEGATIVE_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"square_{top_r}_{left_c}_count_ge3_{suffix}",
+                    "description": f"2x2 at ({top_r},{left_c}): >=3 occupied cells are {neg_val}",
+                    "type": "binary",
+                    "category": "neg_sq_count",
+                }
+            )
+
+    # Negative square completable (36)
+    for top_r, left_c in squares:
+        for suffix, (meta_key, neg_val) in NEGATIVE_ATTRS.items():
+            bsps.append(
+                {
+                    "id": f"square_{top_r}_{left_c}_completable_{suffix}",
+                    "description": f"2x2 at ({top_r},{left_c}): threat in {neg_val} AND offered piece is {neg_val}",
+                    "type": "binary",
+                    "category": "neg_sq_completable",
+                }
+            )
+
+    # Negative square any-threat (9)
+    for top_r, left_c in squares:
+        bsps.append(
+            {
+                "id": f"square_{top_r}_{left_c}_neg_any_threat",
+                "description": f"2x2 at ({top_r},{left_c}): at least one NEGATIVE attribute pole has a threat pattern",
+                "type": "binary",
+                "category": "neg_sq_any_threat",
+            }
+        )
+
+    # Negative global (2)
+    bsps.append(
+        {
+            "id": "board_neg_threat_exists",
+            "description": "At least one NEGATIVE-pole threat exists on any line or 2x2 square",
+            "type": "binary",
+            "category": "neg_global",
+        }
+    )
+    bsps.append(
+        {
+            "id": "board_neg_completable_exists",
+            "description": "At least one NEGATIVE-pole threat is completable with the offered piece",
+            "type": "binary",
+            "category": "neg_global",
+        }
+    )
+
     # ── Tiger BSPs (agent-relative; see 2026-05-22_reframings-audit-tiger.md) ──
 
     # tiger_decision_global (5)
@@ -967,6 +1119,13 @@ def _compute_single_bsp(
     if "completable_" in bsp_id and bsp_id.startswith(("row_", "col_", "diag_")):
         return _compute_line_completable(bsp_id, cells, offered)
 
+    # Any NEGATIVE-pole threat in line — e.g. "row_0_neg_any_threat" (hen).
+    # MUST precede the hawk branch below: "row_0_neg_any_threat" also ends with
+    # "_any_threat", so the hawk pattern would swallow it and silently return
+    # the POSITIVE-pole answer.
+    if bsp_id.endswith("_neg_any_threat") and bsp_id.startswith(("row_", "col_", "diag_")):
+        return _compute_line_any_threat(bsp_id, cells, poles=NEGATIVE_ATTRS)
+
     # Any threat in line — e.g. "row_0_any_threat"
     if bsp_id.endswith("_any_threat") and bsp_id.startswith(("row_", "col_", "diag_")):
         return _compute_line_any_threat(bsp_id, cells)
@@ -981,6 +1140,11 @@ def _compute_single_bsp(
     if bsp_id.startswith("square_") and "completable_" in bsp_id:
         return _compute_square_completable(bsp_id, cells, offered)
 
+    # Any NEGATIVE-pole threat in square (hen) — must precede the hawk branch,
+    # which matches on the substring "any_threat" and would swallow this id.
+    if bsp_id.startswith("square_") and "neg_any_threat" in bsp_id:
+        return _compute_square_any_threat(bsp_id, cells, poles=NEGATIVE_ATTRS)
+
     # Any threat in square — e.g. "square_0_0_any_threat"
     if bsp_id.startswith("square_") and "any_threat" in bsp_id:
         return _compute_square_any_threat(bsp_id, cells)
@@ -991,6 +1155,13 @@ def _compute_single_bsp(
 
     if bsp_id == "board_completable_exists":
         return _compute_board_completable_exists(cells, offered)
+
+    # Board-level hen globals (NEGATIVE poles)
+    if bsp_id == "board_neg_threat_exists":
+        return _compute_board_threat_exists(cells, poles=NEGATIVE_ATTRS)
+
+    if bsp_id == "board_neg_completable_exists":
+        return _compute_board_completable_exists(cells, offered, poles=NEGATIVE_ATTRS)
 
     # Offered piece — e.g. "offered_tall", "offered_with_hole"
     if bsp_id.startswith("offered_"):
@@ -1375,11 +1546,11 @@ def _compute_line_count_ge3(bsp_id: str, cells: dict) -> float:
     # "diag_main_count_ge3_with_hole" -> [0]='diag', [1]='main', [2]='count', [3]='ge3', [4:]='with_hole'
     suffix = "_".join(parts[4:])
     coords = _parse_line_coords(parts)
-    if coords is None or suffix not in BINARY_ATTRS:
+    if coords is None or suffix not in ATTR_POLES:
         return 0.0
 
-    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
-    matching, _ = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    meta_key, pole_val = ATTR_POLES[suffix]
+    matching, _ = _count_matching_in_line(coords, meta_key, pole_val, cells)
     return 1.0 if matching >= 3 else 0.0
 
 
@@ -1392,24 +1563,27 @@ def _compute_line_completable(bsp_id: str, cells: dict, offered: dict) -> float:
     # "row_0_completable_tall" -> [0]='row', [1]='0', [2]='completable', [3:]='tall'
     suffix = "_".join(parts[3:])
     coords = _parse_line_coords(parts)
-    if coords is None or suffix not in BINARY_ATTRS:
+    if coords is None or suffix not in ATTR_POLES:
         return 0.0
 
-    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+    meta_key, pole_val = ATTR_POLES[suffix]
 
     # Check threat first
-    matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
     if not (matching == 3 and empty == 1):
         return 0.0
 
     # Check offered piece has the attribute
-    return 1.0 if offered.get(meta_key, "") == pos_val else 0.0
+    return 1.0 if offered.get(meta_key, "") == pole_val else 0.0
 
 
-def _compute_line_any_threat(bsp_id: str, cells: dict) -> float:
-    """Any attribute creates a threat in this line.
+def _compute_line_any_threat(bsp_id: str, cells: dict, poles: dict | None = None) -> float:
+    """Any attribute pole creates a threat in this line.
 
-    E.g. "row_0_any_threat": row 0 has a threat for at least one of tall/black/square/with_hole.
+    E.g. "row_0_any_threat": row 0 has a threat for at least one of
+    tall/black/square/with_hole. With ``poles=NEGATIVE_ATTRS`` this is hen's
+    "row_0_neg_any_threat" -- the same question over LITTLE/WHITE/CIRCLE/
+    WITHOUT_HOLE. Defaults to the positive poles, so hawk is unchanged.
     """
     parts = bsp_id.split("_")
     # "row_0_any_threat" -> [0]='row', [1]='0', [2]='any', [3]='threat'
@@ -1417,8 +1591,8 @@ def _compute_line_any_threat(bsp_id: str, cells: dict) -> float:
     if coords is None:
         return 0.0
 
-    for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
-        matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    for meta_key, pole_val in (poles or ATTR_POLES_POSITIVE).values():
+        matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
         if matching == 3 and empty == 1:
             return 1.0
     return 0.0
@@ -1436,11 +1610,11 @@ def _compute_square_count_ge3(bsp_id: str, cells: dict) -> float:
     # "square_0_0_count_ge3_tall" -> [0]='square', [1]='0', [2]='0', [3]='count', [4]='ge3', [5:]='tall'
     suffix = "_".join(parts[5:])
     coords = _parse_square_coords(parts)
-    if coords is None or suffix not in BINARY_ATTRS:
+    if coords is None or suffix not in ATTR_POLES:
         return 0.0
 
-    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
-    matching, _ = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    meta_key, pole_val = ATTR_POLES[suffix]
+    matching, _ = _count_matching_in_line(coords, meta_key, pole_val, cells)
     return 1.0 if matching >= 3 else 0.0
 
 
@@ -1453,24 +1627,24 @@ def _compute_square_completable(bsp_id: str, cells: dict, offered: dict) -> floa
     # "square_0_0_completable_tall" -> [0]='square', [1]='0', [2]='0', [3]='completable', [4:]='tall'
     suffix = "_".join(parts[4:])
     coords = _parse_square_coords(parts)
-    if coords is None or suffix not in BINARY_ATTRS:
+    if coords is None or suffix not in ATTR_POLES:
         return 0.0
 
-    meta_key, pos_val, _ = BINARY_ATTRS[suffix]
+    meta_key, pole_val = ATTR_POLES[suffix]
 
     # Check threat first
-    matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
     if not (matching == 3 and empty == 1):
         return 0.0
 
     # Check offered piece has the attribute
-    return 1.0 if offered.get(meta_key, "") == pos_val else 0.0
+    return 1.0 if offered.get(meta_key, "") == pole_val else 0.0
 
 
-def _compute_square_any_threat(bsp_id: str, cells: dict) -> float:
-    """Any attribute creates a threat in this 2x2 square.
+def _compute_square_any_threat(bsp_id: str, cells: dict, poles: dict | None = None) -> float:
+    """Any attribute pole creates a threat in this 2x2 square.
 
-    E.g. "square_0_0_any_threat": 2x2 at (0,0) has a threat for any attribute.
+    ``poles=NEGATIVE_ATTRS`` gives hen's "square_r_c_neg_any_threat".
     """
     parts = bsp_id.split("_")
     # "square_0_0_any_threat" -> [0]='square', [1]='0', [2]='0', [3]='any', [4]='threat'
@@ -1478,8 +1652,8 @@ def _compute_square_any_threat(bsp_id: str, cells: dict) -> float:
     if coords is None:
         return 0.0
 
-    for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
-        matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+    for meta_key, pole_val in (poles or ATTR_POLES_POSITIVE).values():
+        matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
         if matching == 3 and empty == 1:
             return 1.0
     return 0.0
@@ -1508,36 +1682,46 @@ _ALL_SQUARE_COORDS = [
 ]
 
 
-def _compute_board_threat_exists(cells: dict) -> float:
-    """At least one line or 2x2 square has a threat for any attribute."""
+def _compute_board_threat_exists(cells: dict, poles: dict | None = None) -> float:
+    """At least one line or 2x2 square has a threat for any attribute pole.
+
+    ``poles=NEGATIVE_ATTRS`` gives hen's "board_neg_threat_exists".
+    """
+    poles = poles or ATTR_POLES_POSITIVE
     for _, _, coords in _ALL_LINE_COORDS:
-        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
-            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        for meta_key, pole_val in poles.values():
+            matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
             if matching == 3 and empty == 1:
                 return 1.0
     for _, _, coords in _ALL_SQUARE_COORDS:
-        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
-            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        for meta_key, pole_val in poles.values():
+            matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
             if matching == 3 and empty == 1:
                 return 1.0
     return 0.0
 
 
-def _compute_board_completable_exists(cells: dict, offered: dict) -> float:
-    """At least one line or 2x2 square has a threat completable with the offered piece."""
+def _compute_board_completable_exists(
+    cells: dict, offered: dict, poles: dict | None = None
+) -> float:
+    """At least one line or 2x2 square has a threat completable with the offered piece.
+
+    ``poles=NEGATIVE_ATTRS`` gives hen's "board_neg_completable_exists".
+    """
     if not offered:
         return 0.0
+    poles = poles or ATTR_POLES_POSITIVE
     for _, _, coords in _ALL_LINE_COORDS:
-        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
-            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        for meta_key, pole_val in poles.values():
+            matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
             if matching == 3 and empty == 1:
-                if offered.get(meta_key, "") == pos_val:
+                if offered.get(meta_key, "") == pole_val:
                     return 1.0
     for _, _, coords in _ALL_SQUARE_COORDS:
-        for suffix, (meta_key, pos_val, _) in BINARY_ATTRS.items():
-            matching, empty = _count_matching_in_line(coords, meta_key, pos_val, cells)
+        for meta_key, pole_val in poles.values():
+            matching, empty = _count_matching_in_line(coords, meta_key, pole_val, cells)
             if matching == 3 and empty == 1:
-                if offered.get(meta_key, "") == pos_val:
+                if offered.get(meta_key, "") == pole_val:
                     return 1.0
     return 0.0
 

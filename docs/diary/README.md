@@ -5,7 +5,7 @@ is the companion to the top-level docs:
 
 - [`../../RESEARCH-STATUS.md`](../../RESEARCH-STATUS.md) — current phase, hypothesis status, headline numbers.
 - [`../../Quarto-specifications.md`](../../Quarto-specifications.md) — game, model, hooks, dataset catalog, naming.
-- [`../BSP-schema-summary.md`](../BSP-schema-summary.md) — BSP schema for gorilla / hawk / tiger.
+- [`../BSP-schema-summary.md`](../BSP-schema-summary.md) — BSP schema for gorilla / hawk / hen / tiger.
 - [`../../CLAUDE.md`](../../CLAUDE.md) — agent operating instructions and pipeline gotchas.
 
 The top-level docs stay **short and current**. Specifics — full tables,

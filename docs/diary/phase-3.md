@@ -143,6 +143,42 @@ anchored I04 control) and regenerates a missing `_h` via `sae_eval --force`
 `_parse_run_id` fixed for namespaced hooks (`s4.fc1`/`s4.conv2`; were
 `hook=null` in `shipped_saes.jsonl`).
 
+### 2026-08-21 - 3A residuals closed; `hen` built; rule 3A.4
+
+Two entries, one day. Morning: the three residuals from 2026-08-17 measured -
+[`2026-08-21_3A-residuals-and-handoff.md`](2026-08-21_3A-residuals-and-handoff.md).
+Afternoon: its handoff executed -
+[`2026-08-21_hen-basis-and-rule-3A4.md`](2026-08-21_hen-basis-and-rule-3A4.md).
+
+- **`solo_frac` is NOT bimodal - RETRACTED.** 69 category medians form a
+  continuum (13 above 0.8, 36 below 0.4, **20 in between**). The 0.70 threshold
+  discretises rather than discovers, which makes an uncertainty band required.
+- **Per-concept verdicts flip 12-17% on seed alone**, against coverage-metric
+  seed sd of 0.001-0.006 - thresholding amplifies seed noise ~10x. The
+  aggregate G-3A tally is robust; single-seed per-concept verdicts are not
+  quotable.
+- **`dead_features_pct` overstates TopK deadness by 31 pp** (85.2% reported vs
+  54.5% never-firing) and is exact for JumpReLU/BatchTopK. TopK dictionaries
+  ARE overcomplete (3.64x); the others are not. The metric is not comparable
+  across architectures.
+- **`hen` built and verified**: 173 BSPs on the four NEGATIVE attribute poles,
+  mirroring hawk category-for-category. `tiger == OR(hawk UNION hen)` holds with
+  **zero violations** on all three champions (~290k positions each), and
+  **47.8-48.7% of tiger's positives are wins hawk cannot express**. So the
+  gorilla/hawk threat menu was only ever half the menu.
+- **Rule 3A.4** adds a stability band over EVERY threshold `classify` crosses,
+  not just the `captured` one - because all four of K04's measured seed flips
+  went through the learned-signal floor with `solo_frac` never moving. It marks
+  the anchored champYb positive control `[0.17, 0.96]`, i.e. undetermined.
+- **Two handoff claims corrected**: the 15 `_h` encodes were NOT done (nor were
+  the 4 anchored controls - the prune's rationale string described an intention,
+  not its plan), and `check_sae_usable.py` exits 2 on a missing cache while the
+  runner gated before regenerating. The panel runner now encodes first.
+
+Operational: `runners/3A-dilution.ps1 -Panel [-WithHen]` runs the 76-entry panel
+(54 panel + 18 hen + 4 anchored controls over 37 checkpoints) from
+`scripts/build_3a_panel_runlist.py`. Not yet launched.
+
 ## Pointers
 
 - Literature base: 5 papers ingested 2026-06-09 (tags in founding note);

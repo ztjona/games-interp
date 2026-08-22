@@ -17252,9 +17252,9 @@
     }
   },
   "E04-champTa-s42-topk-k96-exp8-s4.conv2:gorillaTa": {
-    "timestamp": "2026-08-12T23:36:57.711040",
+    "timestamp": "2026-08-21T17:55:38.533672",
     "run_id": "E04-champTa-s42-topk-k96-exp8-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\E04-champTa-s42-topk-k96-exp8-s4.conv2.pt",
+    "checkpoint": "saes/quarto/E04-champTa-s42-topk-k96-exp8-s4.conv2.pt",
     "architecture": "topk",
     "experiment": "E04-champTa-s42",
     "game": "quarto",
@@ -17396,6 +17396,85 @@
           "mean_youden_j": 0.5163,
           "mean_mcc_at_pref": 0.2128,
           "mean_base_rate": 0.0092
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.4062,
+          "mean_youden_j": 0.434,
+          "mean_mcc_at_pref": 0.2159,
+          "mean_base_rate": 0.1698,
+          "mean_f1": 0.4925
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.3662,
+          "mean_youden_j": 0.3582,
+          "mean_mcc_at_pref": 0.1808,
+          "mean_base_rate": 0.3393,
+          "mean_f1": 0.5843
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.2075,
+          "mean_youden_j": 0.2787,
+          "mean_mcc_at_pref": 0.0952,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4666
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.1646,
+          "mean_youden_j": 0.1721,
+          "mean_mcc_at_pref": 0.0629,
+          "mean_base_rate": 0.2754,
+          "mean_f1": 0.4352
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.3541,
+          "mean_youden_j": 0.3272,
+          "mean_mcc_at_pref": 0.1656,
+          "mean_base_rate": 0.5057,
+          "mean_f1": 0.6755
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.1067,
+          "mean_youden_j": 0.429,
+          "mean_mcc_at_pref": 0.1677,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.0677
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.1331,
+          "mean_youden_j": 0.5163,
+          "mean_mcc_at_pref": 0.2128,
+          "mean_base_rate": 0.0092,
+          "mean_f1": 0.0796
         }
       }
     }
@@ -17699,9 +17778,9 @@
     }
   },
   "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2:gorillaTa": {
-    "timestamp": "2026-08-12T23:38:41.515857",
+    "timestamp": "2026-08-21T17:56:20.539053",
     "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\E06-champTa-s42-batchtopk-k64-exp8-s4.conv2.pt",
+    "checkpoint": "saes/quarto/E06-champTa-s42-batchtopk-k64-exp8-s4.conv2.pt",
     "architecture": "batchtopk",
     "experiment": "E06-champTa-s42",
     "game": "quarto",
@@ -17843,6 +17922,85 @@
           "mean_youden_j": 0.5668,
           "mean_mcc_at_pref": 0.2242,
           "mean_base_rate": 0.0092
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.4657,
+          "mean_youden_j": 0.5892,
+          "mean_mcc_at_pref": 0.2279,
+          "mean_base_rate": 0.1698,
+          "mean_f1": 0.5386
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.6074,
+          "mean_youden_j": 0.6209,
+          "mean_mcc_at_pref": 0.2522,
+          "mean_base_rate": 0.3393,
+          "mean_f1": 0.7399
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.2128,
+          "mean_youden_j": 0.309,
+          "mean_mcc_at_pref": 0.1035,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4925
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.2395,
+          "mean_youden_j": 0.2628,
+          "mean_mcc_at_pref": 0.0822,
+          "mean_base_rate": 0.2754,
+          "mean_f1": 0.4972
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.461,
+          "mean_youden_j": 0.4373,
+          "mean_mcc_at_pref": 0.2226,
+          "mean_base_rate": 0.5057,
+          "mean_f1": 0.7058
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.1165,
+          "mean_youden_j": 0.4955,
+          "mean_mcc_at_pref": 0.1831,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.0711
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.1404,
+          "mean_youden_j": 0.5668,
+          "mean_mcc_at_pref": 0.2242,
+          "mean_base_rate": 0.0092,
+          "mean_f1": 0.0837
         }
       }
     }
@@ -20910,9 +21068,9 @@
     }
   },
   "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2:hawkTa": {
-    "timestamp": "2026-08-12T23:38:44.700049",
+    "timestamp": "2026-08-21T17:56:23.720022",
     "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\E06-champTa-s42-batchtopk-k64-exp8-s4.conv2.pt",
+    "checkpoint": "saes/quarto/E06-champTa-s42-batchtopk-k64-exp8-s4.conv2.pt",
     "architecture": "batchtopk",
     "experiment": "E06-champTa-s42",
     "game": "quarto",
@@ -21054,6 +21212,45 @@
           "mean_youden_j": 0.5526,
           "mean_mcc_at_pref": 0.2173,
           "mean_base_rate": 0.0178
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.1284,
+          "mean_youden_j": 0.5189,
+          "mean_mcc_at_pref": 0.1974,
+          "mean_base_rate": 0.014,
+          "mean_f1": 0.0905
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.2351,
+          "mean_youden_j": 0.2499,
+          "mean_mcc_at_pref": 0.0978,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.4657
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.1471,
+          "mean_youden_j": 0.5862,
+          "mean_mcc_at_pref": 0.234,
+          "mean_base_rate": 0.013,
+          "mean_f1": 0.1009
         }
       }
     }
@@ -22739,9 +22936,9 @@
     }
   },
   "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1:gorillaTa": {
-    "timestamp": "2026-08-12T23:46:01.993577",
+    "timestamp": "2026-08-21T18:03:42.758629",
     "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
+    "checkpoint": "saes/quarto/H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
     "architecture": "jumprelu",
     "experiment": "H01-champTa-s42",
     "game": "quarto",
@@ -22884,13 +23081,92 @@
           "mean_mcc_at_pref": 0.3651,
           "mean_base_rate": 0.0092
         }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.4218,
+          "mean_youden_j": 0.3991,
+          "mean_mcc_at_pref": 0.233,
+          "mean_base_rate": 0.1698,
+          "mean_f1": 0.5
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.4343,
+          "mean_youden_j": 0.3628,
+          "mean_mcc_at_pref": 0.257,
+          "mean_base_rate": 0.3393,
+          "mean_f1": 0.5859
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.3794,
+          "mean_youden_j": 0.4573,
+          "mean_mcc_at_pref": 0.242,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.6104
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.3444,
+          "mean_youden_j": 0.3814,
+          "mean_mcc_at_pref": 0.234,
+          "mean_base_rate": 0.2754,
+          "mean_f1": 0.5516
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.1492,
+          "mean_youden_j": 0.0979,
+          "mean_mcc_at_pref": 0.0648,
+          "mean_base_rate": 0.5057,
+          "mean_f1": 0.6721
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.1698,
+          "mean_youden_j": 0.5626,
+          "mean_mcc_at_pref": 0.2615,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.1189
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.2403,
+          "mean_youden_j": 0.669,
+          "mean_mcc_at_pref": 0.3651,
+          "mean_base_rate": 0.0092,
+          "mean_f1": 0.1856
+        }
       }
     }
   },
   "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2:gorillaTa": {
-    "timestamp": "2026-08-12T23:57:53.533331",
+    "timestamp": "2026-08-21T18:07:22.238118",
     "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H04-champTa-s42-batchtopk-k32-exp16-s4.conv2.pt",
+    "checkpoint": "saes/quarto/H04-champTa-s42-batchtopk-k32-exp16-s4.conv2.pt",
     "architecture": "batchtopk",
     "experiment": "H04-champTa-s42",
     "game": "quarto",
@@ -23033,13 +23309,92 @@
           "mean_mcc_at_pref": 0.2073,
           "mean_base_rate": 0.0092
         }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.6033,
+          "mean_youden_j": 0.7355,
+          "mean_mcc_at_pref": 0.3013,
+          "mean_base_rate": 0.1698,
+          "mean_f1": 0.6562
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.7389,
+          "mean_youden_j": 0.7276,
+          "mean_mcc_at_pref": 0.4227,
+          "mean_base_rate": 0.3393,
+          "mean_f1": 0.8222
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.1496,
+          "mean_youden_j": 0.2588,
+          "mean_mcc_at_pref": 0.086,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4771
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.2351,
+          "mean_youden_j": 0.2497,
+          "mean_mcc_at_pref": 0.0868,
+          "mean_base_rate": 0.2754,
+          "mean_f1": 0.4667
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.5095,
+          "mean_youden_j": 0.4903,
+          "mean_mcc_at_pref": 0.253,
+          "mean_base_rate": 0.5057,
+          "mean_f1": 0.7087
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.1236,
+          "mean_youden_j": 0.5452,
+          "mean_mcc_at_pref": 0.1948,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.0644
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.1288,
+          "mean_youden_j": 0.5572,
+          "mean_mcc_at_pref": 0.2073,
+          "mean_base_rate": 0.0092,
+          "mean_f1": 0.0699
+        }
       }
     }
   },
   "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1:gorillaTa": {
-    "timestamp": "2026-08-12T23:48:42.734385",
+    "timestamp": "2026-08-21T18:06:04.021968",
     "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H02-champTa-s42-jumprelu-t64-exp32-s4.fc1.pt",
+    "checkpoint": "saes/quarto/H02-champTa-s42-jumprelu-t64-exp32-s4.fc1.pt",
     "architecture": "jumprelu",
     "experiment": "H02-champTa-s42",
     "game": "quarto",
@@ -23181,6 +23536,85 @@
           "mean_youden_j": 0.6862,
           "mean_mcc_at_pref": 0.3596,
           "mean_base_rate": 0.0092
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.447,
+          "mean_youden_j": 0.4693,
+          "mean_mcc_at_pref": 0.2364,
+          "mean_base_rate": 0.1698,
+          "mean_f1": 0.5216
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.5099,
+          "mean_youden_j": 0.4766,
+          "mean_mcc_at_pref": 0.2677,
+          "mean_base_rate": 0.3393,
+          "mean_f1": 0.6531
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.3301,
+          "mean_youden_j": 0.3583,
+          "mean_mcc_at_pref": 0.1887,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.5861
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.3627,
+          "mean_youden_j": 0.405,
+          "mean_mcc_at_pref": 0.1977,
+          "mean_base_rate": 0.2754,
+          "mean_f1": 0.5631
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.1517,
+          "mean_youden_j": 0.1149,
+          "mean_mcc_at_pref": 0.0645,
+          "mean_base_rate": 0.5057,
+          "mean_f1": 0.6719
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.1671,
+          "mean_youden_j": 0.5685,
+          "mean_mcc_at_pref": 0.2573,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.1155
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.2338,
+          "mean_youden_j": 0.6862,
+          "mean_mcc_at_pref": 0.3596,
+          "mean_base_rate": 0.0092,
+          "mean_f1": 0.171
         }
       }
     }
@@ -24419,9 +24853,9 @@
     }
   },
   "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1:hawkTa": {
-    "timestamp": "2026-08-12T23:46:07.900345",
+    "timestamp": "2026-08-21T18:03:45.442136",
     "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
+    "checkpoint": "saes/quarto/H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
     "architecture": "jumprelu",
     "experiment": "H01-champTa-s42",
     "game": "quarto",
@@ -24564,13 +24998,52 @@
           "mean_mcc_at_pref": 0.3912,
           "mean_base_rate": 0.0178
         }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.1976,
+          "mean_youden_j": 0.6152,
+          "mean_mcc_at_pref": 0.2958,
+          "mean_base_rate": 0.014,
+          "mean_f1": 0.1589
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.3185,
+          "mean_youden_j": 0.3548,
+          "mean_mcc_at_pref": 0.1744,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.5078
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.2751,
+          "mean_youden_j": 0.7358,
+          "mean_mcc_at_pref": 0.4154,
+          "mean_base_rate": 0.013,
+          "mean_f1": 0.2249
+        }
       }
     }
   },
   "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1:hawkTa": {
-    "timestamp": "2026-08-12T23:48:52.233900",
+    "timestamp": "2026-08-21T18:06:07.238989",
     "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H02-champTa-s42-jumprelu-t64-exp32-s4.fc1.pt",
+    "checkpoint": "saes/quarto/H02-champTa-s42-jumprelu-t64-exp32-s4.fc1.pt",
     "architecture": "jumprelu",
     "experiment": "H02-champTa-s42",
     "game": "quarto",
@@ -24712,6 +25185,45 @@
           "mean_youden_j": 0.709,
           "mean_mcc_at_pref": 0.3866,
           "mean_base_rate": 0.0178
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.1931,
+          "mean_youden_j": 0.6227,
+          "mean_mcc_at_pref": 0.2903,
+          "mean_base_rate": 0.014,
+          "mean_f1": 0.1504
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.3364,
+          "mean_youden_j": 0.3808,
+          "mean_mcc_at_pref": 0.1597,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.514
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.2693,
+          "mean_youden_j": 0.7481,
+          "mean_mcc_at_pref": 0.4069,
+          "mean_base_rate": 0.013,
+          "mean_f1": 0.2118
         }
       }
     }
@@ -24866,9 +25378,9 @@
     }
   },
   "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2:hawkTa": {
-    "timestamp": "2026-08-12T23:57:59.666964",
+    "timestamp": "2026-08-21T18:07:24.456232",
     "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H04-champTa-s42-batchtopk-k32-exp16-s4.conv2.pt",
+    "checkpoint": "saes/quarto/H04-champTa-s42-batchtopk-k32-exp16-s4.conv2.pt",
     "architecture": "batchtopk",
     "experiment": "H04-champTa-s42",
     "game": "quarto",
@@ -25010,6 +25522,45 @@
           "mean_youden_j": 0.5681,
           "mean_mcc_at_pref": 0.2096,
           "mean_base_rate": 0.0178
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.1341,
+          "mean_youden_j": 0.5513,
+          "mean_mcc_at_pref": 0.1997,
+          "mean_base_rate": 0.014,
+          "mean_f1": 0.0857
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.2387,
+          "mean_youden_j": 0.2442,
+          "mean_mcc_at_pref": 0.0976,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.4383
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.1385,
+          "mean_youden_j": 0.5711,
+          "mean_mcc_at_pref": 0.2174,
+          "mean_base_rate": 0.013,
+          "mean_f1": 0.0886
         }
       }
     }
@@ -26545,9 +27096,9 @@
     }
   },
   "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1:tigerTa": {
-    "timestamp": "2026-08-12T23:46:12.302496",
+    "timestamp": "2026-08-21T18:03:46.868589",
     "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
+    "checkpoint": "saes/quarto/H01-champTa-s42-jumprelu-t64-exp16-s4.fc1.pt",
     "architecture": "jumprelu",
     "experiment": "H01-champTa-s42",
     "game": "quarto",
@@ -26676,6 +27227,64 @@
           "mean_youden_j": 0.4821,
           "mean_mcc_at_pref": 0.2496,
           "mean_base_rate": 0.0243
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.3465,
+          "mean_youden_j": 0.3404,
+          "mean_mcc_at_pref": 0.181,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.655
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.184,
+          "mean_youden_j": 0.4187,
+          "mean_mcc_at_pref": 0.1795,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.1905
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.2525,
+          "mean_youden_j": 0.349,
+          "mean_mcc_at_pref": 0.1897,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.288
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.3648,
+          "mean_youden_j": 0.3417,
+          "mean_mcc_at_pref": 0.1615,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.6794
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.2468,
+          "mean_youden_j": 0.4821,
+          "mean_mcc_at_pref": 0.2496,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.2612
         }
       }
     }
@@ -27089,9 +27698,9 @@
     }
   },
   "H05-champTa-s42-batchtopk-k32-exp32-s4.conv2:tigerTa": {
-    "timestamp": "2026-08-13T00:01:21.221439",
+    "timestamp": "2026-08-21T18:12:36.656442",
     "run_id": "H05-champTa-s42-batchtopk-k32-exp32-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\H05-champTa-s42-batchtopk-k32-exp32-s4.conv2.pt",
+    "checkpoint": "saes/quarto/H05-champTa-s42-batchtopk-k32-exp32-s4.conv2.pt",
     "architecture": "batchtopk",
     "experiment": "H05-champTa-s42",
     "game": "quarto",
@@ -27220,6 +27829,64 @@
           "mean_youden_j": 0.392,
           "mean_mcc_at_pref": 0.1278,
           "mean_base_rate": 0.0243
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.1763,
+          "mean_youden_j": 0.177,
+          "mean_mcc_at_pref": 0.0686,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.617
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.137,
+          "mean_youden_j": 0.4084,
+          "mean_mcc_at_pref": 0.1331,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.1062
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.1615,
+          "mean_youden_j": 0.3272,
+          "mean_mcc_at_pref": 0.1163,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.1854
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.1806,
+          "mean_youden_j": 0.1808,
+          "mean_mcc_at_pref": 0.0701,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.6431
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.1262,
+          "mean_youden_j": 0.392,
+          "mean_mcc_at_pref": 0.1278,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.0965
         }
       }
     }
@@ -30831,9 +31498,9 @@
     }
   },
   "I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1:tigerTa": {
-    "timestamp": "2026-08-13T00:17:14.041744",
+    "timestamp": "2026-08-21T18:54:19.360858",
     "run_id": "I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
+    "checkpoint": "saes/quarto/I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "architecture": "anchored-jumprelu",
     "experiment": "I04-champTa-lh100-s43",
     "game": "quarto",
@@ -30962,6 +31629,64 @@
           "mean_youden_j": 0.5923,
           "mean_mcc_at_pref": 0.2483,
           "mean_base_rate": 0.0243
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.6348,
+          "mean_youden_j": 0.7067,
+          "mean_mcc_at_pref": 0.428,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.7912
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.2052,
+          "mean_youden_j": 0.5249,
+          "mean_mcc_at_pref": 0.1999,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.2023
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.4916,
+          "mean_youden_j": 0.5316,
+          "mean_mcc_at_pref": 0.4288,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.4878
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.6245,
+          "mean_youden_j": 0.6986,
+          "mean_mcc_at_pref": 0.4441,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.7993
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.2458,
+          "mean_youden_j": 0.5923,
+          "mean_mcc_at_pref": 0.2483,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.2558
         }
       },
       "anchored_diagonal": {
@@ -57733,7 +58458,7 @@
     }
   },
   "I03-champVe-lh030-s43-anchored-jumprelu-t64-exp8-s4.fc1:gorillaVe": {
-    "timestamp": "2026-07-27T12:54:36.265413",
+    "timestamp": "2026-08-21T18:53:37.209486",
     "run_id": "I03-champVe-lh030-s43-anchored-jumprelu-t64-exp8-s4.fc1",
     "checkpoint": "saes/quarto/I03-champVe-lh030-s43-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "architecture": "anchored-jumprelu",
@@ -57757,6 +58482,19 @@
       "median_mcc": 0.3445,
       "min_mcc": 0.0953,
       "max_mcc": 0.9367,
+      "coverage_youden_j": 0.629,
+      "median_youden_j": 0.6874,
+      "min_youden_j": 0.0793,
+      "max_youden_j": 0.9555,
+      "mean_base_rate": 0.1227,
+      "median_base_rate": 0.1493,
+      "min_base_rate": 0.0077,
+      "max_base_rate": 0.5509,
+      "frac_bsps_very_rare": 0.4268,
+      "frac_bsps_trivial_f1": 0.0427,
+      "coverage_mcc_at_pref": 0.3306,
+      "median_mcc_at_pref": 0.301,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8568,
       "num_reconstructable_bsps": 139,
       "fraction_reconstructable": 0.8476,
@@ -57864,6 +58602,85 @@
           "mean_youden_j": 0.844,
           "mean_mcc_at_pref": 0.48,
           "mean_base_rate": 0.0089
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.4391,
+          "mean_youden_j": 0.4902,
+          "mean_mcc_at_pref": 0.2348,
+          "mean_base_rate": 0.1683,
+          "mean_f1": 0.503
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.5816,
+          "mean_youden_j": 0.5912,
+          "mean_mcc_at_pref": 0.3257,
+          "mean_base_rate": 0.3376,
+          "mean_f1": 0.7297
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.5429,
+          "mean_youden_j": 0.7107,
+          "mean_mcc_at_pref": 0.3479,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.676
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.564,
+          "mean_youden_j": 0.6336,
+          "mean_mcc_at_pref": 0.3218,
+          "mean_base_rate": 0.2588,
+          "mean_f1": 0.6805
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.1919,
+          "mean_youden_j": 0.1278,
+          "mean_mcc_at_pref": 0.1647,
+          "mean_base_rate": 0.5033,
+          "mean_f1": 0.6698
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.2397,
+          "mean_youden_j": 0.7166,
+          "mean_mcc_at_pref": 0.3671,
+          "mean_base_rate": 0.0091,
+          "mean_f1": 0.1632
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.3182,
+          "mean_youden_j": 0.844,
+          "mean_mcc_at_pref": 0.48,
+          "mean_base_rate": 0.0089,
+          "mean_f1": 0.2334
         }
       },
       "anchored_diagonal": {
@@ -58070,20 +58887,7 @@
             "mean_f1_lift": 0.00461986567825079
           }
         }
-      },
-      "coverage_youden_j": 0.629,
-      "median_youden_j": 0.6874,
-      "min_youden_j": 0.0793,
-      "max_youden_j": 0.9555,
-      "mean_base_rate": 0.1227,
-      "median_base_rate": 0.1493,
-      "min_base_rate": 0.0077,
-      "max_base_rate": 0.5509,
-      "frac_bsps_very_rare": 0.4268,
-      "frac_bsps_trivial_f1": 0.0427,
-      "coverage_mcc_at_pref": 0.3306,
-      "median_mcc_at_pref": 0.301,
-      "p_ref": 0.025
+      }
     }
   },
   "J02-champVe-lh010-s42-anchored-batchtopk-k16-exp8-s4.fc1:gorillaVe": {
@@ -77538,7 +78342,7 @@
     }
   },
   "I04-champVe-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1:tigerVe": {
-    "timestamp": "2026-07-27T12:52:17.933243",
+    "timestamp": "2026-08-21T18:55:02.885504",
     "run_id": "I04-champVe-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1",
     "checkpoint": "saes/quarto/I04-champVe-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "architecture": "anchored-jumprelu",
@@ -77562,6 +78366,19 @@
       "median_mcc": 0.4368,
       "min_mcc": 0.1866,
       "max_mcc": 0.7206,
+      "coverage_youden_j": 0.6357,
+      "median_youden_j": 0.6105,
+      "min_youden_j": 0.4822,
+      "max_youden_j": 0.778,
+      "mean_base_rate": 0.1902,
+      "median_base_rate": 0.0257,
+      "min_base_rate": 0.0213,
+      "max_base_rate": 0.8808,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.3779,
+      "median_mcc_at_pref": 0.3803,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8072,
       "num_reconstructable_bsps": 26,
       "fraction_reconstructable": 0.7222,
@@ -77656,6 +78473,64 @@
           "mean_youden_j": 0.6696,
           "mean_mcc_at_pref": 0.3988,
           "mean_base_rate": 0.0228
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.6506,
+          "mean_youden_j": 0.7174,
+          "mean_mcc_at_pref": 0.4369,
+          "mean_base_rate": 0.4515,
+          "mean_f1": 0.8032
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.2119,
+          "mean_youden_j": 0.5334,
+          "mean_mcc_at_pref": 0.212,
+          "mean_base_rate": 0.0249,
+          "mean_f1": 0.2023
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.5524,
+          "mean_youden_j": 0.5456,
+          "mean_mcc_at_pref": 0.4957,
+          "mean_base_rate": 0.0473,
+          "mean_f1": 0.552
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.6431,
+          "mean_youden_j": 0.7195,
+          "mean_mcc_at_pref": 0.4658,
+          "mean_base_rate": 0.4932,
+          "mean_f1": 0.8136
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.3904,
+          "mean_youden_j": 0.6696,
+          "mean_mcc_at_pref": 0.3988,
+          "mean_base_rate": 0.0228,
+          "mean_f1": 0.3872
         }
       },
       "anchored_diagonal": {
@@ -77868,20 +78743,7 @@
             "mean_f1_lift": 0.19490168988704681
           }
         }
-      },
-      "coverage_youden_j": 0.6357,
-      "median_youden_j": 0.6105,
-      "min_youden_j": 0.4822,
-      "max_youden_j": 0.778,
-      "mean_base_rate": 0.1902,
-      "median_base_rate": 0.0257,
-      "min_base_rate": 0.0213,
-      "max_base_rate": 0.8808,
-      "frac_bsps_very_rare": 0.0,
-      "frac_bsps_trivial_f1": 0.2222,
-      "coverage_mcc_at_pref": 0.3779,
-      "median_mcc_at_pref": 0.3803,
-      "p_ref": 0.025
+      }
     }
   },
   "I04-champVe-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1:tigerVe": {
@@ -83061,9 +83923,9 @@
     }
   },
   "E03-champYb-s42-topk-k64-exp8-s4.conv2:gorillaYb": {
-    "timestamp": "2026-07-23T16:15:01.441199",
+    "timestamp": "2026-08-21T17:54:51.411178",
     "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
-    "checkpoint": "saes\\quarto\\E03-champYb-s42-topk-k64-exp8-s4.conv2.pt",
+    "checkpoint": "saes/quarto/E03-champYb-s42-topk-k64-exp8-s4.conv2.pt",
     "architecture": "topk",
     "experiment": "E03-champYb-s42",
     "game": "quarto",
@@ -83078,22 +83940,26 @@
       "dead_features_pct": 95.39,
       "median_feat_freq": 0.0,
       "coverage": 0.3436,
-      "coverage_above_50": 0.378,
-      "coverage_above_75": 0.0183,
       "num_bsps": 164,
-      "min_f1": 0.0512,
-      "max_f1": 0.9466,
-      "median_f1": 0.4158,
       "coverage_mcc": 0.3061,
       "coverage_mcc_above_25": 0.4878,
       "coverage_mcc_above_50": 0.2622,
       "median_mcc": 0.2274,
       "min_mcc": 0.0668,
       "max_mcc": 0.9298,
-      "coverage_f1_lift": 0.1425,
-      "coverage_f1_lift_above_10": 0.378,
-      "coverage_f1_lift_above_25": 0.2317,
-      "median_f1_lift": 0.0647,
+      "coverage_youden_j": 0.4098,
+      "median_youden_j": 0.386,
+      "min_youden_j": 0.1075,
+      "max_youden_j": 0.962,
+      "mean_base_rate": 0.1263,
+      "median_base_rate": 0.1342,
+      "min_base_rate": 0.0066,
+      "max_base_rate": 0.5374,
+      "frac_bsps_very_rare": 0.3232,
+      "frac_bsps_trivial_f1": 0.0549,
+      "coverage_mcc_at_pref": 0.2733,
+      "median_mcc_at_pref": 0.1877,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8044,
       "num_reconstructable_bsps": 57,
       "fraction_reconstructable": 0.3476,
@@ -83114,79 +83980,172 @@
         "cell_attribute": {
           "count": 64,
           "mean_f1": 0.5761,
-          "min_f1": 0.3567,
-          "max_f1": 0.9466,
-          "median_f1": 0.5688,
           "mean_mcc": 0.509,
           "median_mcc": 0.5059,
-          "mean_f1_lift": 0.2788,
+          "min_mcc": 0.2274,
+          "max_mcc": 0.9298,
+          "sd_mcc": 0.1574,
+          "heterogeneous": true,
+          "mean_youden_j": 0.4784,
+          "mean_mcc_at_pref": 0.3771,
           "mean_base_rate": 0.1757
         },
         "cell_occupancy": {
           "count": 16,
           "mean_f1": 0.5796,
-          "min_f1": 0.4499,
-          "max_f1": 0.6597,
-          "median_f1": 0.5863,
           "mean_mcc": 0.4987,
           "median_mcc": 0.5093,
-          "mean_f1_lift": 0.0722,
+          "min_mcc": 0.39,
+          "max_mcc": 0.5875,
+          "sd_mcc": 0.058,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3845,
+          "mean_mcc_at_pref": 0.4652,
           "mean_base_rate": 0.3435
         },
         "game_phase": {
           "count": 3,
           "mean_f1": 0.4795,
-          "min_f1": 0.084,
-          "max_f1": 0.7385,
-          "median_f1": 0.616,
           "mean_mcc": 0.232,
           "median_mcc": 0.1566,
-          "mean_f1_lift": 0.0298,
+          "min_mcc": 0.0804,
+          "max_mcc": 0.4591,
+          "sd_mcc": 0.1636,
+          "heterogeneous": true,
+          "mean_youden_j": 0.2662,
+          "mean_mcc_at_pref": 0.1059,
           "mean_base_rate": 0.3333
         },
         "global": {
           "count": 1,
           "mean_f1": 0.3786,
-          "min_f1": 0.3786,
-          "max_f1": 0.3786,
-          "median_f1": 0.3786,
           "mean_mcc": 0.1391,
           "median_mcc": 0.1391,
-          "mean_f1_lift": 0.0,
+          "min_mcc": 0.1391,
+          "max_mcc": 0.1391,
+          "sd_mcc": 0.0,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1098,
+          "mean_mcc_at_pref": 0.0578,
           "mean_base_rate": 0.2336
         },
         "offered_piece": {
           "count": 4,
           "mean_f1": 0.67,
-          "min_f1": 0.6616,
-          "max_f1": 0.6796,
-          "median_f1": 0.6687,
           "mean_mcc": 0.2207,
           "median_mcc": 0.2084,
-          "mean_f1_lift": 0.0001,
+          "min_mcc": 0.1572,
+          "max_mcc": 0.2705,
+          "sd_mcc": 0.0429,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2182,
+          "mean_mcc_at_pref": 0.0709,
           "mean_base_rate": 0.5037
         },
         "threat_line": {
           "count": 40,
           "mean_f1": 0.0766,
-          "min_f1": 0.0512,
-          "max_f1": 0.0948,
-          "median_f1": 0.0767,
           "mean_mcc": 0.105,
           "median_mcc": 0.1029,
-          "mean_f1_lift": 0.0573,
+          "min_mcc": 0.0668,
+          "max_mcc": 0.1392,
+          "sd_mcc": 0.018,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3782,
+          "mean_mcc_at_pref": 0.1646,
           "mean_base_rate": 0.0097
         },
         "threat_square_2x2": {
           "count": 36,
           "mean_f1": 0.0733,
-          "min_f1": 0.0543,
-          "max_f1": 0.0953,
-          "median_f1": 0.0714,
           "mean_mcc": 0.1034,
           "median_mcc": 0.1032,
-          "mean_f1_lift": 0.0552,
+          "min_mcc": 0.0669,
+          "max_mcc": 0.1492,
+          "sd_mcc": 0.0193,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3759,
+          "mean_mcc_at_pref": 0.1667,
           "mean_base_rate": 0.0091
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.509,
+          "mean_youden_j": 0.4784,
+          "mean_mcc_at_pref": 0.3771,
+          "mean_base_rate": 0.1757,
+          "mean_f1": 0.5761
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.4987,
+          "mean_youden_j": 0.3845,
+          "mean_mcc_at_pref": 0.4652,
+          "mean_base_rate": 0.3435,
+          "mean_f1": 0.5796
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.232,
+          "mean_youden_j": 0.2662,
+          "mean_mcc_at_pref": 0.1059,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.4795
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.1391,
+          "mean_youden_j": 0.1098,
+          "mean_mcc_at_pref": 0.0578,
+          "mean_base_rate": 0.2336,
+          "mean_f1": 0.3786
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.2207,
+          "mean_youden_j": 0.2182,
+          "mean_mcc_at_pref": 0.0709,
+          "mean_base_rate": 0.5037,
+          "mean_f1": 0.67
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.105,
+          "mean_youden_j": 0.3782,
+          "mean_mcc_at_pref": 0.1646,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.0766
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.1034,
+          "mean_youden_j": 0.3759,
+          "mean_mcc_at_pref": 0.1667,
+          "mean_base_rate": 0.0091,
+          "mean_f1": 0.0733
         }
       }
     }
@@ -83978,9 +84937,9 @@
     }
   },
   "F01-champYb-s42-topk-k32-exp8-s4.fc1:gorillaYb": {
-    "timestamp": "2026-07-23T16:26:49.741786",
+    "timestamp": "2026-08-21T17:58:53.275541",
     "run_id": "F01-champYb-s42-topk-k32-exp8-s4.fc1",
-    "checkpoint": "saes\\quarto\\F01-champYb-s42-topk-k32-exp8-s4.fc1.pt",
+    "checkpoint": "saes/quarto/F01-champYb-s42-topk-k32-exp8-s4.fc1.pt",
     "architecture": "topk",
     "experiment": "F01-champYb-s42",
     "game": "quarto",
@@ -83995,22 +84954,26 @@
       "dead_features_pct": 85.6,
       "median_feat_freq": 0.0,
       "coverage": 0.5232,
-      "coverage_above_50": 0.4817,
-      "coverage_above_75": 0.1524,
       "num_bsps": 164,
-      "min_f1": 0.0802,
-      "max_f1": 0.9887,
-      "median_f1": 0.4931,
       "coverage_mcc": 0.5023,
       "coverage_mcc_above_25": 0.9451,
       "coverage_mcc_above_50": 0.4146,
       "median_mcc": 0.4582,
       "min_mcc": 0.0812,
       "max_mcc": 0.9886,
-      "coverage_f1_lift": 0.3227,
-      "coverage_f1_lift_above_10": 0.6768,
-      "coverage_f1_lift_above_25": 0.4695,
-      "median_f1_lift": 0.2229,
+      "coverage_youden_j": 0.5948,
+      "median_youden_j": 0.4413,
+      "min_youden_j": 0.1415,
+      "max_youden_j": 0.997,
+      "mean_base_rate": 0.1263,
+      "median_base_rate": 0.1342,
+      "min_base_rate": 0.0066,
+      "max_base_rate": 0.5374,
+      "frac_bsps_very_rare": 0.3232,
+      "frac_bsps_trivial_f1": 0.0549,
+      "coverage_mcc_at_pref": 0.4978,
+      "median_mcc_at_pref": 0.3475,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8733,
       "num_reconstructable_bsps": 163,
       "fraction_reconstructable": 0.9939,
@@ -84031,79 +84994,172 @@
         "cell_attribute": {
           "count": 64,
           "mean_f1": 0.444,
-          "min_f1": 0.312,
-          "max_f1": 0.9212,
-          "median_f1": 0.4355,
           "mean_mcc": 0.4002,
           "median_mcc": 0.3823,
-          "mean_f1_lift": 0.1468,
+          "min_mcc": 0.2464,
+          "max_mcc": 0.9072,
+          "sd_mcc": 0.1105,
+          "heterogeneous": true,
+          "mean_youden_j": 0.3137,
+          "mean_mcc_at_pref": 0.2938,
           "mean_base_rate": 0.1757
         },
         "cell_occupancy": {
           "count": 16,
           "mean_f1": 0.5357,
-          "min_f1": 0.3989,
-          "max_f1": 0.6552,
-          "median_f1": 0.5247,
           "mean_mcc": 0.3865,
           "median_mcc": 0.3438,
-          "mean_f1_lift": 0.0333,
+          "min_mcc": 0.2216,
+          "max_mcc": 0.6147,
+          "sd_mcc": 0.0981,
+          "heterogeneous": true,
+          "mean_youden_j": 0.2853,
+          "mean_mcc_at_pref": 0.2754,
           "mean_base_rate": 0.3435
         },
         "game_phase": {
           "count": 3,
           "mean_f1": 0.6019,
-          "min_f1": 0.3157,
-          "max_f1": 0.8804,
-          "median_f1": 0.6096,
           "mean_mcc": 0.4674,
           "median_mcc": 0.3393,
-          "mean_f1_lift": 0.1543,
+          "min_mcc": 0.332,
+          "max_mcc": 0.7308,
+          "sd_mcc": 0.1863,
+          "heterogeneous": true,
+          "mean_youden_j": 0.4585,
+          "mean_mcc_at_pref": 0.291,
           "mean_base_rate": 0.3333
         },
         "global": {
           "count": 1,
           "mean_f1": 0.4057,
-          "min_f1": 0.4057,
-          "max_f1": 0.4057,
-          "median_f1": 0.4057,
           "mean_mcc": 0.2685,
           "median_mcc": 0.2685,
-          "mean_f1_lift": 0.027,
+          "min_mcc": 0.2685,
+          "max_mcc": 0.2685,
+          "sd_mcc": 0.0,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2362,
+          "mean_mcc_at_pref": 0.1692,
           "mean_base_rate": 0.2336
         },
         "offered_piece": {
           "count": 4,
           "mean_f1": 0.755,
-          "min_f1": 0.6681,
-          "max_f1": 0.9178,
-          "median_f1": 0.6737,
           "mean_mcc": 0.5532,
           "median_mcc": 0.4651,
-          "mean_f1_lift": 0.0865,
+          "min_mcc": 0.3777,
+          "max_mcc": 0.8335,
+          "sd_mcc": 0.1713,
+          "heterogeneous": true,
+          "mean_youden_j": 0.5287,
+          "mean_mcc_at_pref": 0.2481,
           "mean_base_rate": 0.5037
         },
         "threat_line": {
           "count": 40,
           "mean_f1": 0.4247,
-          "min_f1": 0.0802,
-          "max_f1": 0.846,
-          "median_f1": 0.4187,
           "mean_mcc": 0.4809,
           "median_mcc": 0.505,
-          "mean_f1_lift": 0.4055,
+          "min_mcc": 0.0812,
+          "max_mcc": 0.8536,
+          "sd_mcc": 0.2097,
+          "heterogeneous": true,
+          "mean_youden_j": 0.8594,
+          "mean_mcc_at_pref": 0.6218,
           "mean_base_rate": 0.0097
         },
         "threat_square_2x2": {
           "count": 36,
           "mean_f1": 0.7387,
-          "min_f1": 0.4138,
-          "max_f1": 0.9887,
-          "median_f1": 0.7312,
           "mean_mcc": 0.7626,
           "median_mcc": 0.7536,
-          "mean_f1_lift": 0.7206,
+          "min_mcc": 0.5035,
+          "max_mcc": 0.9886,
+          "sd_mcc": 0.088,
+          "heterogeneous": true,
+          "mean_youden_j": 0.9669,
+          "mean_mcc_at_pref": 0.8754,
           "mean_base_rate": 0.0091
+        }
+      },
+      "per_family": {
+        "board_attribute": {
+          "count": 64,
+          "categories": [
+            "cell_attribute"
+          ],
+          "mean_mcc": 0.4002,
+          "mean_youden_j": 0.3137,
+          "mean_mcc_at_pref": 0.2938,
+          "mean_base_rate": 0.1757,
+          "mean_f1": 0.444
+        },
+        "board_occupancy": {
+          "count": 16,
+          "categories": [
+            "cell_occupancy"
+          ],
+          "mean_mcc": 0.3865,
+          "mean_youden_j": 0.2853,
+          "mean_mcc_at_pref": 0.2754,
+          "mean_base_rate": 0.3435,
+          "mean_f1": 0.5357
+        },
+        "game_phase": {
+          "count": 3,
+          "categories": [
+            "game_phase"
+          ],
+          "mean_mcc": 0.4674,
+          "mean_youden_j": 0.4585,
+          "mean_mcc_at_pref": 0.291,
+          "mean_base_rate": 0.3333,
+          "mean_f1": 0.6019
+        },
+        "global_threat": {
+          "count": 1,
+          "categories": [
+            "global"
+          ],
+          "mean_mcc": 0.2685,
+          "mean_youden_j": 0.2362,
+          "mean_mcc_at_pref": 0.1692,
+          "mean_base_rate": 0.2336,
+          "mean_f1": 0.4057
+        },
+        "offered_piece_attr": {
+          "count": 4,
+          "categories": [
+            "offered_piece"
+          ],
+          "mean_mcc": 0.5532,
+          "mean_youden_j": 0.5287,
+          "mean_mcc_at_pref": 0.2481,
+          "mean_base_rate": 0.5037,
+          "mean_f1": 0.755
+        },
+        "line_threat": {
+          "count": 40,
+          "categories": [
+            "threat_line"
+          ],
+          "mean_mcc": 0.4809,
+          "mean_youden_j": 0.8594,
+          "mean_mcc_at_pref": 0.6218,
+          "mean_base_rate": 0.0097,
+          "mean_f1": 0.4247
+        },
+        "square_threat": {
+          "count": 36,
+          "categories": [
+            "threat_square_2x2"
+          ],
+          "mean_mcc": 0.7626,
+          "mean_youden_j": 0.9669,
+          "mean_mcc_at_pref": 0.8754,
+          "mean_base_rate": 0.0091,
+          "mean_f1": 0.7387
         }
       }
     }
@@ -84389,7 +85445,7 @@
     }
   },
   "C01-champYb-s42-topk-k16-exp8-s4.conv2:tigerYb": {
-    "timestamp": "2026-07-23T18:35:34.840947",
+    "timestamp": "2026-08-22T11:25:39.707918",
     "run_id": "C01-champYb-s42-topk-k16-exp8-s4.conv2",
     "checkpoint": "saes/quarto/C01-champYb-s42-topk-k16-exp8-s4.conv2.pt",
     "architecture": "topk",
@@ -84406,22 +85462,26 @@
       "dead_features_pct": 94.46,
       "median_feat_freq": 0.0,
       "coverage": 0.2815,
-      "coverage_above_50": 0.25,
-      "coverage_above_75": 0.1389,
       "num_bsps": 36,
-      "min_f1": 0.075,
-      "max_f1": 0.9313,
-      "median_f1": 0.0942,
       "coverage_mcc": 0.1505,
       "coverage_mcc_above_25": 0.1389,
       "coverage_mcc_above_50": 0.1389,
       "median_mcc": 0.0709,
       "min_mcc": 0.0511,
       "max_mcc": 0.6403,
-      "coverage_f1_lift": 0.0329,
-      "coverage_f1_lift_above_10": 0.0278,
-      "coverage_f1_lift_above_25": 0.0,
-      "median_f1_lift": 0.0365,
+      "coverage_youden_j": 0.1827,
+      "median_youden_j": 0.1134,
+      "min_youden_j": 0.0606,
+      "max_youden_j": 0.684,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.1267,
+      "median_mcc_at_pref": 0.0643,
+      "p_ref": 0.025,
       "board_reconstruction": 0.6105,
       "num_reconstructable_bsps": 16,
       "fraction_reconstructable": 0.4444,
@@ -84442,68 +85502,138 @@
         "tiger_decision_global": {
           "count": 5,
           "mean_f1": 0.6006,
-          "min_f1": 0.2271,
-          "max_f1": 0.9313,
-          "median_f1": 0.6354,
           "mean_mcc": 0.3055,
           "median_mcc": 0.1344,
-          "mean_f1_lift": 0.0269,
+          "min_mcc": 0.1074,
+          "max_mcc": 0.6132,
+          "sd_mcc": 0.2273,
+          "heterogeneous": true,
+          "mean_youden_j": 0.2995,
+          "mean_mcc_at_pref": 0.2237,
           "mean_base_rate": 0.4465
         },
         "tiger_line_winnable": {
           "count": 10,
           "mean_f1": 0.0863,
-          "min_f1": 0.075,
-          "max_f1": 0.095,
-          "median_f1": 0.0866,
           "mean_mcc": 0.0632,
           "median_mcc": 0.0656,
-          "mean_f1_lift": 0.0413,
+          "min_mcc": 0.0511,
+          "max_mcc": 0.0721,
+          "sd_mcc": 0.0072,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1188,
+          "mean_mcc_at_pref": 0.0659,
           "mean_base_rate": 0.023
         },
         "tiger_offered_completing_attr": {
           "count": 4,
           "mean_f1": 0.1207,
-          "min_f1": 0.1181,
-          "max_f1": 0.1238,
-          "median_f1": 0.1188,
           "mean_mcc": 0.0721,
           "median_mcc": 0.071,
-          "mean_f1_lift": 0.0353,
+          "min_mcc": 0.0681,
+          "max_mcc": 0.0763,
+          "sd_mcc": 0.003,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0905,
+          "mean_mcc_at_pref": 0.0552,
           "mean_base_rate": 0.0446
         },
         "tiger_pool_safe_count": {
           "count": 4,
           "mean_f1": 0.7423,
-          "min_f1": 0.2271,
-          "max_f1": 0.9313,
-          "median_f1": 0.8886,
           "mean_mcc": 0.475,
           "median_mcc": 0.5522,
-          "mean_f1_lift": 0.0254,
+          "min_mcc": 0.1074,
+          "max_mcc": 0.6403,
+          "sd_mcc": 0.2145,
+          "heterogeneous": true,
+          "mean_youden_j": 0.5278,
+          "mean_mcc_at_pref": 0.4333,
           "mean_base_rate": 0.6239
         },
         "tiger_pool_winning_count": {
           "count": 4,
           "mean_f1": 0.5117,
-          "min_f1": 0.2271,
-          "max_f1": 0.6354,
-          "median_f1": 0.5528,
           "mean_mcc": 0.1208,
           "median_mcc": 0.1091,
-          "mean_f1_lift": 0.0,
+          "min_mcc": 0.1074,
+          "max_mcc": 0.1344,
+          "sd_mcc": 0.0125,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0722,
+          "mean_mcc_at_pref": 0.0501,
           "mean_base_rate": 0.3592
         },
         "tiger_square_winnable": {
           "count": 9,
           "mean_f1": 0.0857,
-          "min_f1": 0.0763,
-          "max_f1": 0.0907,
-          "median_f1": 0.0871,
           "mean_mcc": 0.0651,
           "median_mcc": 0.0656,
-          "mean_f1_lift": 0.0436,
+          "min_mcc": 0.0559,
+          "max_mcc": 0.0719,
+          "sd_mcc": 0.0046,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1257,
+          "mean_mcc_at_pref": 0.0701,
           "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.3055,
+          "mean_youden_j": 0.2995,
+          "mean_mcc_at_pref": 0.2237,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.6006
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.0632,
+          "mean_youden_j": 0.1188,
+          "mean_mcc_at_pref": 0.0659,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.0863
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.0721,
+          "mean_youden_j": 0.0905,
+          "mean_mcc_at_pref": 0.0552,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.1207
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.2979,
+          "mean_youden_j": 0.3,
+          "mean_mcc_at_pref": 0.2417,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.627
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.0651,
+          "mean_youden_j": 0.1257,
+          "mean_mcc_at_pref": 0.0701,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.0857
         }
       }
     }
@@ -85142,7 +86272,7 @@
     }
   },
   "E03-champYb-s42-topk-k64-exp8-s4.conv2:hawkYb": {
-    "timestamp": "2026-07-23T18:36:37.638538",
+    "timestamp": "2026-08-21T17:54:53.102139",
     "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
     "checkpoint": "saes/quarto/E03-champYb-s42-topk-k64-exp8-s4.conv2.pt",
     "architecture": "topk",
@@ -85159,22 +86289,26 @@
       "dead_features_pct": 95.39,
       "median_feat_freq": 0.0,
       "coverage": 0.0917,
-      "coverage_above_50": 0.0058,
-      "coverage_above_75": 0.0,
       "num_bsps": 173,
-      "min_f1": 0.0184,
-      "max_f1": 0.5257,
-      "median_f1": 0.1065,
       "coverage_mcc": 0.1066,
       "coverage_mcc_above_25": 0.0,
       "coverage_mcc_above_50": 0.0,
       "median_mcc": 0.1164,
       "min_mcc": 0.0395,
       "max_mcc": 0.1949,
-      "coverage_f1_lift": 0.0615,
-      "coverage_f1_lift_above_10": 0.2023,
-      "coverage_f1_lift_above_25": 0.0,
-      "median_f1_lift": 0.0731,
+      "coverage_youden_j": 0.3657,
+      "median_youden_j": 0.3556,
+      "min_youden_j": 0.1159,
+      "max_youden_j": 0.5927,
+      "mean_base_rate": 0.016,
+      "median_base_rate": 0.0142,
+      "min_base_rate": 0.0023,
+      "max_base_rate": 0.3567,
+      "frac_bsps_very_rare": 0.4393,
+      "frac_bsps_trivial_f1": 0.0,
+      "coverage_mcc_at_pref": 0.1606,
+      "median_mcc_at_pref": 0.1652,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8215,
       "num_reconstructable_bsps": 3,
       "fraction_reconstructable": 0.0173,
@@ -85195,79 +86329,132 @@
         "reframed_any_threat": {
           "count": 10,
           "mean_f1": 0.1578,
-          "min_f1": 0.1459,
-          "max_f1": 0.1649,
-          "median_f1": 0.1612,
           "mean_mcc": 0.133,
           "median_mcc": 0.1327,
-          "mean_f1_lift": 0.0907,
+          "min_mcc": 0.1145,
+          "max_mcc": 0.1452,
+          "sd_mcc": 0.0084,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2585,
+          "mean_mcc_at_pref": 0.1148,
           "mean_base_rate": 0.0347
         },
         "reframed_completable": {
           "count": 40,
           "mean_f1": 0.028,
-          "min_f1": 0.0184,
-          "max_f1": 0.0344,
-          "median_f1": 0.0282,
           "mean_mcc": 0.0601,
           "median_mcc": 0.0606,
-          "mean_f1_lift": 0.0219,
+          "min_mcc": 0.0426,
+          "max_mcc": 0.0791,
+          "sd_mcc": 0.0097,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3907,
+          "mean_mcc_at_pref": 0.1648,
           "mean_base_rate": 0.0031
         },
         "reframed_count": {
           "count": 40,
           "mean_f1": 0.1363,
-          "min_f1": 0.0976,
-          "max_f1": 0.1886,
-          "median_f1": 0.1345,
           "mean_mcc": 0.1497,
           "median_mcc": 0.1508,
-          "mean_f1_lift": 0.0986,
+          "min_mcc": 0.0962,
+          "max_mcc": 0.1949,
+          "sd_mcc": 0.0245,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3723,
+          "mean_mcc_at_pref": 0.1702,
           "mean_base_rate": 0.0192
         },
         "reframed_global": {
           "count": 2,
           "mean_f1": 0.3936,
-          "min_f1": 0.2614,
-          "max_f1": 0.5257,
-          "median_f1": 0.2614,
           "mean_mcc": 0.1426,
           "median_mcc": 0.1168,
-          "mean_f1_lift": 0.004,
+          "min_mcc": 0.1168,
+          "max_mcc": 0.1683,
+          "sd_mcc": 0.0257,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1174,
+          "mean_mcc_at_pref": 0.0592,
           "mean_base_rate": 0.2509
         },
         "reframed_sq_any_threat": {
           "count": 9,
           "mean_f1": 0.1507,
-          "min_f1": 0.1388,
-          "max_f1": 0.1733,
-          "median_f1": 0.1446,
           "mean_mcc": 0.1292,
           "median_mcc": 0.1279,
-          "mean_f1_lift": 0.0867,
+          "min_mcc": 0.1102,
+          "max_mcc": 0.1557,
+          "sd_mcc": 0.0122,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2556,
+          "mean_mcc_at_pref": 0.1142,
           "mean_base_rate": 0.033
         },
         "reframed_sq_completable": {
           "count": 36,
           "mean_f1": 0.0261,
-          "min_f1": 0.0198,
-          "max_f1": 0.0324,
-          "median_f1": 0.026,
           "mean_mcc": 0.0579,
           "median_mcc": 0.0586,
-          "mean_f1_lift": 0.0204,
+          "min_mcc": 0.0395,
+          "max_mcc": 0.0795,
+          "sd_mcc": 0.0098,
+          "heterogeneous": false,
+          "mean_youden_j": 0.4033,
+          "mean_mcc_at_pref": 0.1645,
           "mean_base_rate": 0.0029
         },
         "reframed_sq_count": {
           "count": 36,
           "mean_f1": 0.1284,
-          "min_f1": 0.0774,
-          "max_f1": 0.1682,
-          "median_f1": 0.1285,
           "mean_mcc": 0.1443,
           "median_mcc": 0.1451,
-          "mean_f1_lift": 0.0941,
+          "min_mcc": 0.079,
+          "max_mcc": 0.1906,
+          "sd_mcc": 0.0261,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3639,
+          "mean_mcc_at_pref": 0.1712,
           "mean_base_rate": 0.0175
+        }
+      },
+      "per_family": {
+        "line_threat": {
+          "count": 90,
+          "categories": [
+            "reframed_any_threat",
+            "reframed_completable",
+            "reframed_count"
+          ],
+          "mean_mcc": 0.108,
+          "mean_youden_j": 0.3678,
+          "mean_mcc_at_pref": 0.1616,
+          "mean_base_rate": 0.0138,
+          "mean_f1": 0.0906
+        },
+        "global_threat": {
+          "count": 2,
+          "categories": [
+            "reframed_global"
+          ],
+          "mean_mcc": 0.1426,
+          "mean_youden_j": 0.1174,
+          "mean_mcc_at_pref": 0.0592,
+          "mean_base_rate": 0.2509,
+          "mean_f1": 0.3936
+        },
+        "square_threat": {
+          "count": 81,
+          "categories": [
+            "reframed_sq_any_threat",
+            "reframed_sq_completable",
+            "reframed_sq_count"
+          ],
+          "mean_mcc": 0.1042,
+          "mean_youden_j": 0.3694,
+          "mean_mcc_at_pref": 0.1619,
+          "mean_base_rate": 0.0127,
+          "mean_f1": 0.0854
         }
       }
     }
@@ -85798,7 +86985,7 @@
     }
   },
   "E06-champYb-s42-batchtopk-k64-exp8-s4.conv2:tigerYb": {
-    "timestamp": "2026-07-23T18:37:03.702746",
+    "timestamp": "2026-08-21T17:57:06.789190",
     "run_id": "E06-champYb-s42-batchtopk-k64-exp8-s4.conv2",
     "checkpoint": "saes/quarto/E06-champYb-s42-batchtopk-k64-exp8-s4.conv2.pt",
     "architecture": "batchtopk",
@@ -85815,22 +87002,26 @@
       "dead_features_pct": 97.92,
       "median_feat_freq": 0.0,
       "coverage": 0.2944,
-      "coverage_above_50": 0.25,
-      "coverage_above_75": 0.1111,
       "num_bsps": 36,
-      "min_f1": 0.0783,
-      "max_f1": 0.9313,
-      "median_f1": 0.1,
       "coverage_mcc": 0.1299,
       "coverage_mcc_above_25": 0.1111,
       "coverage_mcc_above_50": 0.0,
       "median_mcc": 0.1053,
       "min_mcc": 0.0206,
       "max_mcc": 0.3264,
-      "coverage_f1_lift": 0.0458,
-      "coverage_f1_lift_above_10": 0.0833,
-      "coverage_f1_lift_above_25": 0.0,
-      "median_f1_lift": 0.0463,
+      "coverage_youden_j": 0.2709,
+      "median_youden_j": 0.2986,
+      "min_youden_j": 0.0008,
+      "max_youden_j": 0.4048,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.09,
+      "median_mcc_at_pref": 0.1022,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8232,
       "num_reconstructable_bsps": 31,
       "fraction_reconstructable": 0.8611,
@@ -85851,68 +87042,138 @@
         "tiger_decision_global": {
           "count": 5,
           "mean_f1": 0.6199,
-          "min_f1": 0.331,
-          "max_f1": 0.9313,
-          "median_f1": 0.6864,
           "mean_mcc": 0.167,
           "median_mcc": 0.2167,
-          "mean_f1_lift": 0.0462,
+          "min_mcc": 0.0206,
+          "max_mcc": 0.3264,
+          "sd_mcc": 0.1205,
+          "heterogeneous": true,
+          "mean_youden_j": 0.1816,
+          "mean_mcc_at_pref": 0.0618,
           "mean_base_rate": 0.4465
         },
         "tiger_line_winnable": {
           "count": 10,
           "mean_f1": 0.0898,
-          "min_f1": 0.0783,
-          "max_f1": 0.1008,
-          "median_f1": 0.0903,
           "mean_mcc": 0.106,
           "median_mcc": 0.1044,
-          "mean_f1_lift": 0.0449,
+          "min_mcc": 0.0896,
+          "max_mcc": 0.1264,
+          "sd_mcc": 0.0125,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3355,
+          "mean_mcc_at_pref": 0.1107,
           "mean_base_rate": 0.023
         },
         "tiger_offered_completing_attr": {
           "count": 4,
           "mean_f1": 0.1348,
-          "min_f1": 0.1282,
-          "max_f1": 0.138,
-          "median_f1": 0.1355,
           "mean_mcc": 0.1082,
           "median_mcc": 0.1027,
-          "mean_f1_lift": 0.0495,
+          "min_mcc": 0.102,
+          "max_mcc": 0.1196,
+          "sd_mcc": 0.007,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2487,
+          "mean_mcc_at_pref": 0.0818,
           "mean_base_rate": 0.0446
         },
         "tiger_pool_safe_count": {
           "count": 4,
           "mean_f1": 0.7429,
-          "min_f1": 0.331,
-          "max_f1": 0.9313,
-          "median_f1": 0.8143,
           "mean_mcc": 0.0776,
           "median_mcc": 0.0326,
-          "mean_f1_lift": 0.0261,
+          "min_mcc": 0.0282,
+          "max_mcc": 0.2167,
+          "sd_mcc": 0.0803,
+          "heterogeneous": false,
+          "mean_youden_j": 0.0819,
+          "mean_mcc_at_pref": 0.0302,
           "mean_base_rate": 0.6239
         },
         "tiger_pool_winning_count": {
           "count": 4,
           "mean_f1": 0.5748,
-          "min_f1": 0.331,
-          "max_f1": 0.6864,
-          "median_f1": 0.6,
           "mean_mcc": 0.2807,
           "median_mcc": 0.2582,
-          "mean_f1_lift": 0.0631,
+          "min_mcc": 0.2167,
+          "max_mcc": 0.3264,
+          "sd_mcc": 0.0457,
+          "heterogeneous": false,
+          "mean_youden_j": 0.2922,
+          "mean_mcc_at_pref": 0.0975,
           "mean_base_rate": 0.3592
         },
         "tiger_square_winnable": {
           "count": 9,
           "mean_f1": 0.088,
-          "min_f1": 0.0808,
-          "max_f1": 0.1,
-          "median_f1": 0.0881,
           "mean_mcc": 0.1018,
           "median_mcc": 0.1048,
-          "mean_f1_lift": 0.0459,
+          "min_mcc": 0.0878,
+          "max_mcc": 0.1154,
+          "sd_mcc": 0.0075,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3332,
+          "mean_mcc_at_pref": 0.1097,
           "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.167,
+          "mean_youden_j": 0.1816,
+          "mean_mcc_at_pref": 0.0618,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.6199
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.106,
+          "mean_youden_j": 0.3355,
+          "mean_mcc_at_pref": 0.1107,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.0898
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.1082,
+          "mean_youden_j": 0.2487,
+          "mean_mcc_at_pref": 0.0818,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.1348
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.1792,
+          "mean_youden_j": 0.187,
+          "mean_mcc_at_pref": 0.0639,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.6588
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.1018,
+          "mean_youden_j": 0.3332,
+          "mean_mcc_at_pref": 0.1097,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.088
         }
       }
     }
@@ -86431,7 +87692,7 @@
     }
   },
   "F00-champYb-s42-batchtopk-k16-exp8-s4.fc1:tigerYb": {
-    "timestamp": "2026-07-23T18:37:15.261126",
+    "timestamp": "2026-08-21T17:58:12.133006",
     "run_id": "F00-champYb-s42-batchtopk-k16-exp8-s4.fc1",
     "checkpoint": "saes/quarto/F00-champYb-s42-batchtopk-k16-exp8-s4.fc1.pt",
     "architecture": "batchtopk",
@@ -86448,22 +87709,26 @@
       "dead_features_pct": 98.12,
       "median_feat_freq": 0.0,
       "coverage": 0.4065,
-      "coverage_above_50": 0.25,
-      "coverage_above_75": 0.1111,
       "num_bsps": 36,
-      "min_f1": 0.1268,
-      "max_f1": 0.9314,
-      "median_f1": 0.3223,
       "coverage_mcc": 0.3049,
       "coverage_mcc_above_25": 0.7222,
       "coverage_mcc_above_50": 0.0,
       "median_mcc": 0.3402,
       "min_mcc": 0.0645,
       "max_mcc": 0.4734,
-      "coverage_f1_lift": 0.1578,
-      "coverage_f1_lift_above_10": 0.6667,
-      "coverage_f1_lift_above_25": 0.1944,
-      "median_f1_lift": 0.1898,
+      "coverage_youden_j": 0.56,
+      "median_youden_j": 0.6305,
+      "min_youden_j": 0.0546,
+      "max_youden_j": 0.9138,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.2593,
+      "median_mcc_at_pref": 0.2591,
+      "p_ref": 0.025,
       "board_reconstruction": 0.812,
       "num_reconstructable_bsps": 36,
       "fraction_reconstructable": 1.0,
@@ -86484,68 +87749,138 @@
         "tiger_decision_global": {
           "count": 5,
           "mean_f1": 0.6418,
-          "min_f1": 0.4409,
-          "max_f1": 0.9314,
-          "median_f1": 0.6597,
           "mean_mcc": 0.2546,
           "median_mcc": 0.3402,
-          "mean_f1_lift": 0.0681,
+          "min_mcc": 0.0645,
+          "max_mcc": 0.4205,
+          "sd_mcc": 0.1445,
+          "heterogeneous": true,
+          "mean_youden_j": 0.2482,
+          "mean_mcc_at_pref": 0.135,
           "mean_base_rate": 0.4465
         },
         "tiger_line_winnable": {
           "count": 10,
           "mean_f1": 0.2105,
-          "min_f1": 0.1268,
-          "max_f1": 0.2879,
-          "median_f1": 0.2108,
           "mean_mcc": 0.2592,
           "median_mcc": 0.2655,
-          "mean_f1_lift": 0.1656,
+          "min_mcc": 0.123,
+          "max_mcc": 0.3416,
+          "sd_mcc": 0.0754,
+          "heterogeneous": false,
+          "mean_youden_j": 0.6186,
+          "mean_mcc_at_pref": 0.2695,
           "mean_base_rate": 0.023
         },
         "tiger_offered_completing_attr": {
           "count": 4,
           "mean_f1": 0.3445,
-          "min_f1": 0.2851,
-          "max_f1": 0.3768,
-          "median_f1": 0.3406,
           "mean_mcc": 0.3993,
           "median_mcc": 0.3993,
-          "mean_f1_lift": 0.2591,
+          "min_mcc": 0.3462,
+          "max_mcc": 0.4271,
+          "sd_mcc": 0.0325,
+          "heterogeneous": false,
+          "mean_youden_j": 0.768,
+          "mean_mcc_at_pref": 0.3115,
           "mean_base_rate": 0.0446
         },
         "tiger_pool_safe_count": {
           "count": 4,
           "mean_f1": 0.7703,
-          "min_f1": 0.4409,
-          "max_f1": 0.9314,
-          "median_f1": 0.8142,
           "mean_mcc": 0.1597,
           "median_mcc": 0.0982,
-          "mean_f1_lift": 0.0535,
+          "min_mcc": 0.09,
+          "max_mcc": 0.3493,
+          "sd_mcc": 0.1096,
+          "heterogeneous": false,
+          "mean_youden_j": 0.1815,
+          "mean_mcc_at_pref": 0.0802,
           "mean_base_rate": 0.6239
         },
         "tiger_pool_winning_count": {
           "count": 4,
           "mean_f1": 0.5843,
-          "min_f1": 0.4409,
-          "max_f1": 0.6597,
-          "median_f1": 0.5815,
           "mean_mcc": 0.3885,
           "median_mcc": 0.3686,
-          "mean_f1_lift": 0.0726,
+          "min_mcc": 0.3493,
+          "max_mcc": 0.4205,
+          "sd_mcc": 0.0304,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3392,
+          "mean_mcc_at_pref": 0.2145,
           "mean_base_rate": 0.3592
         },
         "tiger_square_winnable": {
           "count": 9,
           "mean_f1": 0.2803,
-          "min_f1": 0.1391,
-          "max_f1": 0.4114,
-          "median_f1": 0.2879,
           "mean_mcc": 0.3691,
           "median_mcc": 0.3813,
-          "mean_f1_lift": 0.2382,
+          "min_mcc": 0.2203,
+          "max_mcc": 0.4734,
+          "sd_mcc": 0.0668,
+          "heterogeneous": false,
+          "mean_youden_j": 0.8422,
+          "mean_mcc_at_pref": 0.3933,
           "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.2546,
+          "mean_youden_j": 0.2482,
+          "mean_mcc_at_pref": 0.135,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.6418
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.2592,
+          "mean_youden_j": 0.6186,
+          "mean_mcc_at_pref": 0.2695,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.2105
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.3993,
+          "mean_youden_j": 0.768,
+          "mean_mcc_at_pref": 0.3115,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.3445
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.2741,
+          "mean_youden_j": 0.2603,
+          "mean_mcc_at_pref": 0.1473,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.6773
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.3691,
+          "mean_youden_j": 0.8422,
+          "mean_mcc_at_pref": 0.3933,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.2803
         }
       }
     }
@@ -87064,7 +88399,7 @@
     }
   },
   "F03-champYb-s42-batchtopk-k32-exp8-s4.fc1:tigerYb": {
-    "timestamp": "2026-07-23T18:37:41.140771",
+    "timestamp": "2026-08-21T18:01:43.108182",
     "run_id": "F03-champYb-s42-batchtopk-k32-exp8-s4.fc1",
     "checkpoint": "saes/quarto/F03-champYb-s42-batchtopk-k32-exp8-s4.fc1.pt",
     "architecture": "batchtopk",
@@ -87081,22 +88416,26 @@
       "dead_features_pct": 96.04,
       "median_feat_freq": 0.0,
       "coverage": 0.4136,
-      "coverage_above_50": 0.25,
-      "coverage_above_75": 0.1111,
       "num_bsps": 36,
-      "min_f1": 0.1189,
-      "max_f1": 0.9314,
-      "median_f1": 0.3452,
       "coverage_mcc": 0.2838,
       "coverage_mcc_above_25": 0.6389,
       "coverage_mcc_above_50": 0.0,
       "median_mcc": 0.338,
       "min_mcc": 0.0612,
       "max_mcc": 0.4535,
-      "coverage_f1_lift": 0.1649,
-      "coverage_f1_lift_above_10": 0.6944,
-      "coverage_f1_lift_above_25": 0.25,
-      "median_f1_lift": 0.172,
+      "coverage_youden_j": 0.4885,
+      "median_youden_j": 0.433,
+      "min_youden_j": 0.0547,
+      "max_youden_j": 0.8609,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.2361,
+      "median_mcc_at_pref": 0.208,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8219,
       "num_reconstructable_bsps": 35,
       "fraction_reconstructable": 0.9722,
@@ -87117,74 +88456,144 @@
         "tiger_decision_global": {
           "count": 5,
           "mean_f1": 0.652,
-          "min_f1": 0.4384,
-          "max_f1": 0.9314,
-          "median_f1": 0.6965,
           "mean_mcc": 0.2508,
           "median_mcc": 0.3456,
-          "mean_f1_lift": 0.0783,
+          "min_mcc": 0.0612,
+          "max_mcc": 0.4159,
+          "sd_mcc": 0.1476,
+          "heterogeneous": true,
+          "mean_youden_j": 0.2694,
+          "mean_mcc_at_pref": 0.126,
           "mean_base_rate": 0.4465
         },
         "tiger_line_winnable": {
           "count": 10,
           "mean_f1": 0.1854,
-          "min_f1": 0.1189,
-          "max_f1": 0.2924,
-          "median_f1": 0.161,
           "mean_mcc": 0.1974,
           "median_mcc": 0.162,
-          "mean_f1_lift": 0.1404,
+          "min_mcc": 0.13,
+          "max_mcc": 0.3642,
+          "sd_mcc": 0.0804,
+          "heterogeneous": false,
+          "mean_youden_j": 0.4832,
+          "mean_mcc_at_pref": 0.2054,
           "mean_base_rate": 0.023
         },
         "tiger_offered_completing_attr": {
           "count": 4,
           "mean_f1": 0.2899,
-          "min_f1": 0.2792,
-          "max_f1": 0.3009,
-          "median_f1": 0.2887,
           "mean_mcc": 0.3422,
           "median_mcc": 0.3343,
-          "mean_f1_lift": 0.2045,
+          "min_mcc": 0.3255,
+          "max_mcc": 0.3591,
+          "sd_mcc": 0.0131,
+          "heterogeneous": false,
+          "mean_youden_j": 0.7205,
+          "mean_mcc_at_pref": 0.264,
           "mean_base_rate": 0.0446
         },
         "tiger_pool_safe_count": {
           "count": 4,
           "mean_f1": 0.7699,
-          "min_f1": 0.4384,
-          "max_f1": 0.9314,
-          "median_f1": 0.8146,
           "mean_mcc": 0.151,
           "median_mcc": 0.0848,
-          "mean_f1_lift": 0.053,
+          "min_mcc": 0.0823,
+          "max_mcc": 0.3463,
+          "sd_mcc": 0.1128,
+          "heterogeneous": false,
+          "mean_youden_j": 0.182,
+          "mean_mcc_at_pref": 0.074,
           "mean_base_rate": 0.6239
         },
         "tiger_pool_winning_count": {
           "count": 4,
           "mean_f1": 0.6131,
-          "min_f1": 0.4384,
-          "max_f1": 0.7012,
-          "median_f1": 0.6159,
           "mean_mcc": 0.3821,
           "median_mcc": 0.3557,
-          "mean_f1_lift": 0.1014,
+          "min_mcc": 0.3463,
+          "max_mcc": 0.4159,
+          "sd_mcc": 0.0313,
+          "heterogeneous": false,
+          "mean_youden_j": 0.3877,
+          "mean_mcc_at_pref": 0.1901,
           "mean_base_rate": 0.3592
         },
         "tiger_square_winnable": {
           "count": 9,
           "mean_f1": 0.3427,
-          "min_f1": 0.2139,
-          "max_f1": 0.3895,
-          "median_f1": 0.3518,
           "mean_mcc": 0.3875,
           "median_mcc": 0.3861,
-          "mean_f1_lift": 0.3006,
+          "min_mcc": 0.3211,
+          "max_mcc": 0.4535,
+          "sd_mcc": 0.0454,
+          "heterogeneous": false,
+          "mean_youden_j": 0.694,
+          "mean_mcc_at_pref": 0.4112,
           "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.2508,
+          "mean_youden_j": 0.2694,
+          "mean_mcc_at_pref": 0.126,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.652
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.1974,
+          "mean_youden_j": 0.4832,
+          "mean_mcc_at_pref": 0.2054,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.1854
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.3422,
+          "mean_youden_j": 0.7205,
+          "mean_mcc_at_pref": 0.264,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.2899
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.2666,
+          "mean_youden_j": 0.2848,
+          "mean_mcc_at_pref": 0.1321,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.6915
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.3875,
+          "mean_youden_j": 0.694,
+          "mean_mcc_at_pref": 0.4112,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.3427
         }
       }
     }
   },
   "F02-champYb-s42-topk-k64-exp8-s4.fc1:tigerYb": {
-    "timestamp": "2026-07-23T18:37:41.201315",
+    "timestamp": "2026-08-21T18:00:14.471236",
     "run_id": "F02-champYb-s42-topk-k64-exp8-s4.fc1",
     "checkpoint": "saes/quarto/F02-champYb-s42-topk-k64-exp8-s4.fc1.pt",
     "architecture": "topk",
@@ -87201,22 +88610,26 @@
       "dead_features_pct": 90.82,
       "median_feat_freq": 0.0,
       "coverage": 0.3967,
-      "coverage_above_50": 0.3611,
-      "coverage_above_75": 0.1389,
       "num_bsps": 36,
-      "min_f1": 0.113,
-      "max_f1": 0.9316,
-      "median_f1": 0.2341,
       "coverage_mcc": 0.3355,
       "coverage_mcc_above_25": 0.5556,
       "coverage_mcc_above_50": 0.1944,
       "median_mcc": 0.2514,
       "min_mcc": 0.1432,
       "max_mcc": 0.6429,
-      "coverage_f1_lift": 0.148,
-      "coverage_f1_lift_above_10": 0.75,
-      "coverage_f1_lift_above_25": 0.1111,
-      "median_f1_lift": 0.139,
+      "coverage_youden_j": 0.5792,
+      "median_youden_j": 0.5795,
+      "min_youden_j": 0.4473,
+      "max_youden_j": 0.6813,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.242,
+      "median_mcc_at_pref": 0.2342,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8319,
       "num_reconstructable_bsps": 35,
       "fraction_reconstructable": 0.9722,
@@ -87237,68 +88650,138 @@
         "tiger_decision_global": {
           "count": 5,
           "mean_f1": 0.7369,
-          "min_f1": 0.5321,
-          "max_f1": 0.9316,
-          "median_f1": 0.7183,
           "mean_mcc": 0.5482,
           "median_mcc": 0.5574,
-          "mean_f1_lift": 0.1631,
+          "min_mcc": 0.4836,
+          "max_mcc": 0.6166,
+          "sd_mcc": 0.0523,
+          "heterogeneous": false,
+          "mean_youden_j": 0.618,
+          "mean_mcc_at_pref": 0.2884,
           "mean_base_rate": 0.4465
         },
         "tiger_line_winnable": {
           "count": 10,
           "mean_f1": 0.171,
-          "min_f1": 0.113,
-          "max_f1": 0.2017,
-          "median_f1": 0.1747,
           "mean_mcc": 0.1786,
           "median_mcc": 0.1776,
-          "mean_f1_lift": 0.1261,
+          "min_mcc": 0.1432,
+          "max_mcc": 0.2023,
+          "sd_mcc": 0.0158,
+          "heterogeneous": false,
+          "mean_youden_j": 0.5353,
+          "mean_mcc_at_pref": 0.1854,
           "mean_base_rate": 0.023
         },
         "tiger_offered_completing_attr": {
           "count": 4,
           "mean_f1": 0.217,
-          "min_f1": 0.1955,
-          "max_f1": 0.2304,
-          "median_f1": 0.2206,
           "mean_mcc": 0.2633,
           "median_mcc": 0.2702,
-          "mean_f1_lift": 0.1317,
+          "min_mcc": 0.2278,
+          "max_mcc": 0.2816,
+          "sd_mcc": 0.0209,
+          "heterogeneous": false,
+          "mean_youden_j": 0.6,
+          "mean_mcc_at_pref": 0.2014,
           "mean_base_rate": 0.0446
         },
         "tiger_pool_safe_count": {
           "count": 4,
           "mean_f1": 0.8108,
-          "min_f1": 0.5321,
-          "max_f1": 0.9316,
-          "median_f1": 0.8841,
           "mean_mcc": 0.5456,
           "median_mcc": 0.4935,
-          "mean_f1_lift": 0.094,
+          "min_mcc": 0.4836,
+          "max_mcc": 0.6429,
+          "sd_mcc": 0.0639,
+          "heterogeneous": false,
+          "mean_youden_j": 0.6722,
+          "mean_mcc_at_pref": 0.3006,
           "mean_base_rate": 0.6239
         },
         "tiger_pool_winning_count": {
           "count": 4,
           "mean_f1": 0.6566,
-          "min_f1": 0.5321,
-          "max_f1": 0.7183,
-          "median_f1": 0.6626,
           "mean_mcc": 0.5408,
           "median_mcc": 0.4988,
-          "mean_f1_lift": 0.1449,
+          "min_mcc": 0.4935,
+          "max_mcc": 0.5901,
+          "sd_mcc": 0.0448,
+          "heterogeneous": false,
+          "mean_youden_j": 0.5567,
+          "mean_mcc_at_pref": 0.287,
           "mean_base_rate": 0.3592
         },
         "tiger_square_winnable": {
           "count": 9,
           "mean_f1": 0.2388,
-          "min_f1": 0.2246,
-          "max_f1": 0.2528,
-          "median_f1": 0.2418,
           "mean_mcc": 0.2392,
           "median_mcc": 0.2417,
-          "mean_f1_lift": 0.1967,
+          "min_mcc": 0.212,
+          "max_mcc": 0.2536,
+          "sd_mcc": 0.0141,
+          "heterogeneous": false,
+          "mean_youden_j": 0.5658,
+          "mean_mcc_at_pref": 0.251,
           "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.5482,
+          "mean_youden_j": 0.618,
+          "mean_mcc_at_pref": 0.2884,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.7369
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.1786,
+          "mean_youden_j": 0.5353,
+          "mean_mcc_at_pref": 0.1854,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.171
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.2633,
+          "mean_youden_j": 0.6,
+          "mean_mcc_at_pref": 0.2014,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.217
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.5432,
+          "mean_youden_j": 0.6144,
+          "mean_mcc_at_pref": 0.2938,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.7337
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.2392,
+          "mean_youden_j": 0.5658,
+          "mean_mcc_at_pref": 0.251,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.2388
         }
       }
     }
@@ -89352,9 +90835,9 @@
     }
   },
   "I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1:tigerYb": {
-    "timestamp": "2026-07-24T13:55:08.477274",
+    "timestamp": "2026-08-21T18:55:52.887686",
     "run_id": "I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
+    "checkpoint": "saes/quarto/I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1.pt",
     "architecture": "anchored-jumprelu",
     "experiment": "I04-champYb-lh100-s42",
     "game": "quarto",
@@ -89376,6 +90859,19 @@
       "median_mcc": 0.7643,
       "min_mcc": 0.1847,
       "max_mcc": 0.8822,
+      "coverage_youden_j": 0.7497,
+      "median_youden_j": 0.7822,
+      "min_youden_j": 0.5128,
+      "max_youden_j": 0.8725,
+      "mean_base_rate": 0.188,
+      "median_base_rate": 0.0243,
+      "min_base_rate": 0.0186,
+      "max_base_rate": 0.8714,
+      "frac_bsps_very_rare": 0.0,
+      "frac_bsps_trivial_f1": 0.2222,
+      "coverage_mcc_at_pref": 0.6637,
+      "median_mcc_at_pref": 0.7,
+      "p_ref": 0.025,
       "board_reconstruction": 0.8465,
       "num_reconstructable_bsps": 28,
       "fraction_reconstructable": 0.7778,
@@ -89470,6 +90966,64 @@
           "mean_youden_j": 0.7686,
           "mean_mcc_at_pref": 0.8098,
           "mean_base_rate": 0.0215
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.7468,
+          "mean_youden_j": 0.806,
+          "mean_mcc_at_pref": 0.5458,
+          "mean_base_rate": 0.4465,
+          "mean_f1": 0.8527
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.6016,
+          "mean_youden_j": 0.6348,
+          "mean_mcc_at_pref": 0.608,
+          "mean_base_rate": 0.023,
+          "mean_f1": 0.6008
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.8537,
+          "mean_youden_j": 0.8137,
+          "mean_mcc_at_pref": 0.8238,
+          "mean_base_rate": 0.0446,
+          "mean_f1": 0.8587
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.7397,
+          "mean_youden_j": 0.805,
+          "mean_mcc_at_pref": 0.5624,
+          "mean_base_rate": 0.4916,
+          "mean_f1": 0.8612
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.8012,
+          "mean_youden_j": 0.7686,
+          "mean_mcc_at_pref": 0.8098,
+          "mean_base_rate": 0.0215,
+          "mean_f1": 0.8045
         }
       },
       "anchored_diagonal": {
@@ -89682,20 +91236,7 @@
             "mean_f1_lift": 0.24886241555213928
           }
         }
-      },
-      "coverage_youden_j": 0.7497,
-      "median_youden_j": 0.7822,
-      "min_youden_j": 0.5128,
-      "max_youden_j": 0.8725,
-      "mean_base_rate": 0.188,
-      "median_base_rate": 0.0243,
-      "min_base_rate": 0.0186,
-      "max_base_rate": 0.8714,
-      "frac_bsps_very_rare": 0.0,
-      "frac_bsps_trivial_f1": 0.2222,
-      "coverage_mcc_at_pref": 0.6637,
-      "median_mcc_at_pref": 0.7,
-      "p_ref": 0.025
+      }
     }
   },
   "I04-champYb-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1:gorillaYb": {
@@ -115649,9 +117190,9 @@
     }
   },
   "C01-champTa-s42-topk-k16-exp8-s4.conv2:tigerTa": {
-    "timestamp": "2026-08-12T23:33:39.664941",
+    "timestamp": "2026-08-21T17:54:06.237458",
     "run_id": "C01-champTa-s42-topk-k16-exp8-s4.conv2",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\C01-champTa-s42-topk-k16-exp8-s4.conv2.pt",
+    "checkpoint": "saes/quarto/C01-champTa-s42-topk-k16-exp8-s4.conv2.pt",
     "architecture": "topk",
     "experiment": "C01-champTa-s42",
     "game": "quarto",
@@ -115780,6 +117321,64 @@
           "mean_youden_j": 0.2173,
           "mean_mcc_at_pref": 0.1464,
           "mean_base_rate": 0.0243
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.4016,
+          "mean_youden_j": 0.311,
+          "mean_mcc_at_pref": 0.2164,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.5922
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.1371,
+          "mean_youden_j": 0.1977,
+          "mean_mcc_at_pref": 0.1337,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.1584
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.1645,
+          "mean_youden_j": 0.2163,
+          "mean_mcc_at_pref": 0.1221,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.209
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.398,
+          "mean_youden_j": 0.3204,
+          "mean_mcc_at_pref": 0.1965,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.6297
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.1444,
+          "mean_youden_j": 0.2173,
+          "mean_mcc_at_pref": 0.1464,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.1609
         }
       }
     }
@@ -116873,9 +118472,9 @@
     }
   },
   "F02-champTa-s42-topk-k64-exp8-s4.fc1:tigerTa": {
-    "timestamp": "2026-08-12T23:42:43.949298",
+    "timestamp": "2026-08-21T17:59:35.243837",
     "run_id": "F02-champTa-s42-topk-k64-exp8-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\F02-champTa-s42-topk-k64-exp8-s4.fc1.pt",
+    "checkpoint": "saes/quarto/F02-champTa-s42-topk-k64-exp8-s4.fc1.pt",
     "architecture": "topk",
     "experiment": "F02-champTa-s42",
     "game": "quarto",
@@ -117005,13 +118604,71 @@
           "mean_mcc_at_pref": 0.2336,
           "mean_base_rate": 0.0243
         }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.4486,
+          "mean_youden_j": 0.3852,
+          "mean_mcc_at_pref": 0.3264,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.6843
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.1894,
+          "mean_youden_j": 0.3849,
+          "mean_mcc_at_pref": 0.1849,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.1904
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.2226,
+          "mean_youden_j": 0.2698,
+          "mean_mcc_at_pref": 0.1667,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.263
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.4526,
+          "mean_youden_j": 0.3909,
+          "mean_mcc_at_pref": 0.3175,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.7244
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.2309,
+          "mean_youden_j": 0.4268,
+          "mean_mcc_at_pref": 0.2336,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.2454
+        }
       }
     }
   },
   "F03-champTa-s42-batchtopk-k32-exp8-s4.fc1:tigerTa": {
-    "timestamp": "2026-08-12T23:43:43.582727",
+    "timestamp": "2026-08-21T18:00:58.999465",
     "run_id": "F03-champTa-s42-batchtopk-k32-exp8-s4.fc1",
-    "checkpoint": "E:\\ZTJONA\\games-interp\\saes\\quarto\\F03-champTa-s42-batchtopk-k32-exp8-s4.fc1.pt",
+    "checkpoint": "saes/quarto/F03-champTa-s42-batchtopk-k32-exp8-s4.fc1.pt",
     "architecture": "batchtopk",
     "experiment": "F03-champTa-s42",
     "game": "quarto",
@@ -117140,6 +118797,64 @@
           "mean_youden_j": 0.607,
           "mean_mcc_at_pref": 0.2503,
           "mean_base_rate": 0.0243
+        }
+      },
+      "per_family": {
+        "global_threat": {
+          "count": 5,
+          "categories": [
+            "tiger_decision_global"
+          ],
+          "mean_mcc": 0.4103,
+          "mean_youden_j": 0.3618,
+          "mean_mcc_at_pref": 0.2068,
+          "mean_base_rate": 0.4549,
+          "mean_f1": 0.68
+        },
+        "line_threat": {
+          "count": 10,
+          "categories": [
+            "tiger_line_winnable"
+          ],
+          "mean_mcc": 0.1963,
+          "mean_youden_j": 0.4629,
+          "mean_mcc_at_pref": 0.1915,
+          "mean_base_rate": 0.0265,
+          "mean_f1": 0.1865
+        },
+        "offered_completion": {
+          "count": 4,
+          "categories": [
+            "tiger_offered_completing_attr"
+          ],
+          "mean_mcc": 0.241,
+          "mean_youden_j": 0.3956,
+          "mean_mcc_at_pref": 0.1764,
+          "mean_base_rate": 0.0508,
+          "mean_f1": 0.2655
+        },
+        "pool_reasoning": {
+          "count": 8,
+          "categories": [
+            "tiger_pool_safe_count",
+            "tiger_pool_winning_count"
+          ],
+          "mean_mcc": 0.4053,
+          "mean_youden_j": 0.3658,
+          "mean_mcc_at_pref": 0.1944,
+          "mean_base_rate": 0.4936,
+          "mean_f1": 0.711
+        },
+        "square_threat": {
+          "count": 9,
+          "categories": [
+            "tiger_square_winnable"
+          ],
+          "mean_mcc": 0.2471,
+          "mean_youden_j": 0.607,
+          "mean_mcc_at_pref": 0.2503,
+          "mean_base_rate": 0.0243,
+          "mean_f1": 0.198
         }
       }
     }

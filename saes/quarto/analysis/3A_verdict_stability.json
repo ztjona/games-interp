@@ -1,20 +1,54 @@
 {
-  "K03 TopK fc1": {
-    "flip_rate": 0.11842105263157894,
-    "n": 76,
-    "per_seed": {
+  "K03-champYb-sSEED-topk-k32-exp8-s4.fc1|gorillaYb": {
+    "flip_rate": 0.1184,
+    "geometric_frac_per_seed": {
       "42": 0.1579,
       "43": 0.1316,
       "44": 0.1842
+    },
+    "geometric_frac_range": 0.0526,
+    "n_concepts": 76,
+    "n_flips": 9,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.3762,
+      "mean": 0.048,
+      "median": 0.004,
+      "p90": 0.1683
     }
   },
-  "K04 BatchTopK conv2": {
-    "flip_rate": 0.17391304347826086,
-    "n": 23,
-    "per_seed": {
+  "K04-champYb-sSEED-batchtopk-k32-exp8-s4.conv2|tigerYb": {
+    "flip_rate": 0.1739,
+    "geometric_frac_per_seed": {
       "42": 1.0,
       "43": 0.8696,
       "44": 0.8696
+    },
+    "geometric_frac_range": 0.1304,
+    "n_concepts": 23,
+    "n_flips": 4,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.1467,
+      "mean": 0.0665,
+      "median": 0.0613,
+      "p90": 0.1223
     }
+  },
+  "_pooled_solo_frac_seed_sd": {
+    "in_use": 0.0523,
+    "max": 0.3762,
+    "mean": 0.0523,
+    "median": 0.0135,
+    "n_concepts": 99,
+    "p90": 0.1502
   }
 }

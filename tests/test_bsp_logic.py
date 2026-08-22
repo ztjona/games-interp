@@ -189,8 +189,9 @@ class TestQuartoBSPs:
         """Test that get_all_bsp_definitions returns expected count and structure."""
         bsps = get_all_bsp_definitions()
 
-        assert len(bsps) == 373, (
-            "Should have 373 total BSPs (164 gorilla + 173 hawk + 36 tiger)"
+        assert len(bsps) == 546, (
+            "Should have 546 total BSPs "
+            "(164 gorilla + 173 hawk + 36 tiger + 173 hen)"
         )
 
         # Check all BSPs are binary
@@ -227,6 +228,14 @@ class TestQuartoBSPs:
             "tiger_square_winnable": 9,
             "tiger_pool_winning_count": 4,
             "tiger_pool_safe_count": 4,
+            # hen -- hawk's shape on the NEGATIVE attribute poles
+            "neg_count": 40,
+            "neg_completable": 40,
+            "neg_any_threat": 10,
+            "neg_sq_count": 36,
+            "neg_sq_completable": 36,
+            "neg_sq_any_threat": 9,
+            "neg_global": 2,
         }
 
         assert categories == expected_counts, f"Category counts mismatch: {categories}"
@@ -834,3 +843,168 @@ class TestRunnerVariableHygiene:
             "one assignment silently clobbers the other:\n  "
             + "\n  ".join(f"{f}: {c}" for f, c in offenders.items())
         )
+
+
+class TestHenNegativePoles:
+    """`hen` -- the four attribute poles gorilla/hawk never probed.
+
+    Quarto is won by four pieces sharing *a value* of an attribute, and LITTLE
+    wins exactly as TALL does. Every gorilla/hawk threat BSP is keyed on the
+    POSITIVE pole only, so hawk can state only half the threat menu: measured on
+    champYb (296,045 positions), `hawk => tiger` with zero counterexamples and
+    47.6% of tiger's line positives are wins hawk cannot express. `hen` mirrors
+    hawk on the negative poles, which makes `tiger == OR(hawk UNION hen)` a
+    checkable identity -- the guard below.
+
+    Record: docs/diary/2026-08-21_3A-residuals-and-handoff.md §6.
+    """
+
+    LINES = ([f"row_{i}" for i in range(4)]
+             + [f"col_{i}" for i in range(4)]
+             + ["diag_main", "diag_anti"])
+    SQUARES = [f"square_{r}_{c}" for r in range(3) for c in range(3)]
+    POS = ("tall", "black", "square", "with_hole")
+    NEG = ("little", "white", "circle", "without_hole")
+
+    @staticmethod
+    def _board(pieces, offered):
+        """`pieces` maps (r, c) -> (size, coloration, shape, hole)."""
+        cells = {}
+        for (r, c), (size, col, shape, hole) in pieces.items():
+            cells[f"{r}_{c}_occupied"] = True
+            cells[f"{r}_{c}_size"] = size
+            cells[f"{r}_{c}_coloration"] = col
+            cells[f"{r}_{c}_shape"] = shape
+            cells[f"{r}_{c}_hole"] = hole
+        return {"n_pieces": len(pieces), "cells": cells, "offered_piece": offered}
+
+    def test_hen_mirrors_hawk_category_for_category(self):
+        """Matched-pair design: identical shape, only the polarity differs."""
+        from games.quarto import BSP_SETS
+
+        bsps = get_all_bsp_definitions()
+        counts = {}
+        for b in bsps:
+            counts[b["category"]] = counts.get(b["category"], 0) + 1
+
+        hawk_shape = sorted(counts[c] for c in BSP_SETS["hawk"])
+        hen_shape = sorted(counts[c] for c in BSP_SETS["hen"])
+        assert hen_shape == hawk_shape == [2, 9, 10, 36, 36, 40, 40], (
+            f"hen {hen_shape} must mirror hawk {hawk_shape}; a shape mismatch "
+            f"means hawk-vs-hen is no longer a matched pair"
+        )
+        assert sum(counts[c] for c in BSP_SETS["hen"]) == 173
+
+    def test_hen_ids_do_not_collide_with_any_other_basis(self):
+        """Duplicate ids in the menu would misalign every id -> index map."""
+        bsps = get_all_bsp_definitions()
+        ids = [b["id"] for b in bsps]
+        assert len(ids) == len(set(ids)), "duplicate BSP ids in the 546-BSP menu"
+
+    def test_negative_pole_threat_is_invisible_to_hawk(self):
+        """An all-LITTLE line is a real win that only hen can state."""
+        pieces = {
+            (0, 0): ("LITTLE", "BLACK", "SQUARE", "WITH_HOLE"),
+            (0, 1): ("LITTLE", "WHITE", "CIRCLE", "WITHOUT_HOLE"),
+            (0, 2): ("LITTLE", "BLACK", "CIRCLE", "WITH_HOLE"),
+        }
+        offered = {"size": "LITTLE", "coloration": "WHITE",
+                   "shape": "SQUARE", "hole": "WITH_HOLE"}
+        md = self._board(pieces, offered)
+
+        hawk_ids = [f"row_0_completable_{a}" for a in self.POS]
+        hen_ids = [f"row_0_completable_{a}" for a in self.NEG]
+        hawk = compute_bsp_vector(md, hawk_ids)
+        hen = compute_bsp_vector(md, hen_ids)
+        tiger = compute_bsp_vector(md, ["tiger_line_row_0_winnable"])
+
+        assert max(hawk) == 0.0, "no positive pole is threatened here"
+        assert hen[0] == 1.0, "row_0_completable_little must fire"
+        assert tiger[0] == 1.0, "tiger sees the LITTLE win"
+
+    def test_tiger_equals_or_of_hawk_and_hen(self):
+        """The identity, on randomised boards -- lines AND 2x2 squares."""
+        import random
+
+        rng = random.Random(20260821)
+        sizes = ("TALL", "LITTLE")
+        cols = ("BLACK", "WHITE")
+        shapes = ("SQUARE", "CIRCLE")
+        holes = ("WITH_HOLE", "WITHOUT_HOLE")
+
+        checked = fired = 0
+        for _ in range(400):
+            coords = [(r, c) for r in range(4) for c in range(4)]
+            rng.shuffle(coords)
+            # Keep boards dense so "exactly one empty cell" happens often.
+            n = rng.randint(10, 15)
+            pieces = {
+                xy: (rng.choice(sizes), rng.choice(cols),
+                     rng.choice(shapes), rng.choice(holes))
+                for xy in coords[:n]
+            }
+            offered = {"size": rng.choice(sizes), "coloration": rng.choice(cols),
+                       "shape": rng.choice(shapes), "hole": rng.choice(holes)}
+            md = self._board(pieces, offered)
+
+            for unit, tiger_id in (
+                [(L, f"tiger_line_{L}_winnable") for L in self.LINES]
+                + [(S, f"tiger_{S}_winnable") for S in self.SQUARES]
+            ):
+                hawk = compute_bsp_vector(
+                    md, [f"{unit}_completable_{a}" for a in self.POS])
+                hen = compute_bsp_vector(
+                    md, [f"{unit}_completable_{a}" for a in self.NEG])
+                tiger = compute_bsp_vector(md, [tiger_id])[0]
+                union = 1.0 if (max(hawk) or max(hen)) else 0.0
+                assert union == tiger, (
+                    f"{unit}: OR(hawk={list(hawk)}, hen={list(hen)}) = {union} "
+                    f"!= tiger {tiger}"
+                )
+                checked += 1
+                fired += int(tiger)
+
+        assert fired > 50, (
+            f"only {fired} tiger positives over {checked} checks -- the identity "
+            f"is being verified almost entirely on negatives, so it proves little"
+        )
+
+    def test_hen_aggregates_read_the_negative_poles_only(self):
+        """`neg_any_threat` must not silently answer the hawk question.
+
+        Both ids end in `_any_threat`, so a dispatch ordering slip routes hen's
+        id to the positive-pole helper and the bug is invisible in the counts.
+        """
+        pieces = {
+            (1, 0): ("LITTLE", "BLACK", "SQUARE", "WITH_HOLE"),
+            (1, 1): ("LITTLE", "WHITE", "CIRCLE", "WITHOUT_HOLE"),
+            (1, 2): ("LITTLE", "BLACK", "CIRCLE", "WITH_HOLE"),
+        }
+        md = self._board(pieces, {"size": "TALL", "coloration": "BLACK",
+                                  "shape": "SQUARE", "hole": "WITH_HOLE"})
+
+        vals = compute_bsp_vector(
+            md, ["row_1_any_threat", "row_1_neg_any_threat",
+                 "board_threat_exists", "board_neg_threat_exists"])
+        assert vals[0] == 0.0, "no POSITIVE-pole threat on this board"
+        assert vals[1] == 1.0, "three LITTLE pieces + one empty IS a neg threat"
+        assert vals[2] == 0.0, "board_threat_exists is positive-pole only"
+        assert vals[3] == 1.0, "board_neg_threat_exists must see it"
+
+    def test_hen_categories_share_hawk_s_concept_families(self):
+        """hen must roll up into the same families, else no comparison exists."""
+        from games.quarto import CONCEPT_FAMILIES
+
+        for hen_cat, hawk_cat in (
+            ("neg_count", "reframed_count"),
+            ("neg_completable", "reframed_completable"),
+            ("neg_any_threat", "reframed_any_threat"),
+            ("neg_sq_count", "reframed_sq_count"),
+            ("neg_sq_completable", "reframed_sq_completable"),
+            ("neg_sq_any_threat", "reframed_sq_any_threat"),
+            ("neg_global", "reframed_global"),
+        ):
+            assert CONCEPT_FAMILIES[hen_cat] == CONCEPT_FAMILIES[hawk_cat], (
+                f"{hen_cat} and {hawk_cat} are the same concept at opposite "
+                f"polarity and must share (family, role)"
+            )

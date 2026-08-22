@@ -22,6 +22,7 @@ from lib.sae.dilution import (
     VERDICT_GLOSSARY,
     DilutionConfig,
     classify,
+    classify_with_stability,
     diagnose_concept,
     participation_ratio,
     solo_frac_of,
@@ -423,7 +424,9 @@ def test_verdicts_are_three_way_at_rule_3A3():
     Jaccard is ~0.10 for captured concepts and ~0.10 for spread ones.
     """
     cfg = DilutionConfig()
-    assert cfg.rule_version == "3A.3"
+    # 3A.4 only ADDS the stability band; the point verdict is unchanged, so the
+    # three-way collapse below must still hold at every later rule version.
+    assert cfg.rule_version == "3A.4"
     seen = {
         classify(_metrics(asymptote_r2=0.001, null_r2=0.0), cfg),      # absent
         classify(_metrics(solo_frac=0.95, intrinsic_dim=1.0), cfg),    # captured
@@ -497,3 +500,67 @@ def test_gate_summary_handles_both_rule_versions(tmp_path):
     assert got == {"legacy-run": 7, "current-run": 7}, got
     # a stale rule must be reported, not silently accepted
     assert "3A.2" in r.stdout and "reclassify" in r.stdout
+
+
+# --- rule 3A.4: the verdict stability band ------------------------------------
+#
+# Why these exist: `classify` maps a POINT estimate onto a threshold that cuts a
+# CONTINUUM (the 2026-08-21 bimodality retraction), and direct seed replication
+# measured 12-17% of per-concept verdicts flipping on seed alone. The band is
+# what keeps a near-boundary verdict from being quoted as if it were determined.
+
+def test_band_marks_a_near_boundary_captured_verdict_undecided():
+    cfg = DilutionConfig()
+    on_edge = _metrics(solo_frac=cfg.captured_solo_frac, intrinsic_dim=1.0,
+                       asymptote_r2_std=0.001)
+    verdict, st = classify_with_stability(on_edge, cfg)
+    assert verdict == "captured"
+    assert st["stability"] == "undecided"
+    assert "solo_frac" in st["flips_on"]
+
+
+def test_band_leaves_a_far_from_boundary_verdict_confident():
+    cfg = DilutionConfig()
+    clear = _metrics(solo_frac=0.99, intrinsic_dim=1.0, asymptote_r2_std=0.001)
+    verdict, st = classify_with_stability(clear, cfg)
+    assert verdict == "captured"
+    assert st["stability"] == "confident"
+    assert st["flips_on"] == []
+
+
+def test_band_covers_the_absent_floor_not_only_solo_frac():
+    """The flip mode a solo_frac-only band cannot see.
+
+    Regression on the 2026-08-21 finding: of K04-champYb's four measured
+    cross-seed verdict flips, ZERO went through solo_frac -- all four were
+    `absent <-> spread`, i.e. the rule-3A.3 learned-signal floor. A band that
+    watches only the `captured` threshold reports those four as confident.
+    """
+    cfg = DilutionConfig()
+    # asymptote_r2 sits just above the random-model control by ~random_margin.
+    near_floor = _metrics(asymptote_r2=0.30, null_r2=0.01,
+                          random_asymptote_r2=0.28, asymptote_r2_std=0.004,
+                          solo_frac=0.20)
+    verdict, st = classify_with_stability(near_floor, cfg)
+    assert st["stability"] == "undecided"
+    assert st["flips_on"] == ["asymptote_r2"], (
+        "the learned-signal floor must be what this verdict rests on")
+
+
+def test_band_widens_with_band_sds():
+    """More sd = more undecided. Guards the knob against being inert."""
+    m = _metrics(solo_frac=0.75, intrinsic_dim=1.0, asymptote_r2_std=0.001)
+    tight = classify_with_stability(m, DilutionConfig(band_sds=0.1))[1]
+    wide = classify_with_stability(m, DilutionConfig(band_sds=6.0))[1]
+    assert tight["stability"] == "confident"
+    assert wide["stability"] == "undecided"
+
+
+def test_band_is_a_pure_function_of_stored_metrics():
+    """Same guarantee `classify` has: re-bandable from a stored report."""
+    cfg = DilutionConfig()
+    m = _metrics(solo_frac=0.71, intrinsic_dim=1.0, asymptote_r2_std=0.002)
+    import copy
+    before = copy.deepcopy(m)
+    classify_with_stability(m, cfg)
+    assert m == before, "classify_with_stability must not mutate its input"

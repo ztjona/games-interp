@@ -34,6 +34,12 @@ Options:
                          for a captured verdict [default: 0.70].
     --captured-idim=<f>  Max intrinsic dimension for a captured verdict
                          [default: 2.0].
+    --band-sds=<f>       Rule 3A.4 stability band, in sd, applied to every
+                         quantity classify thresholds on [default: 3.0].
+    --solo-frac-seed-sd=<f>  Per-concept CROSS-SEED sd of solo_frac. Cannot be
+                         estimated from one run, so it is a measured constant:
+                         the MEAN over seeds 42/43/44 on K03/K04-champYb
+                         [default: 0.0523].
     --orbit-ids=<path>   Symmetry-orbit IDs so a position and its board
                          symmetries stay on the SAME side of every train/test
                          split [default: auto]. auto = resolve from the
@@ -67,6 +73,7 @@ from lib.sae.dilution import (
     DilutionConfig,
     RankingCache,
     classify,
+    classify_with_stability,
     diagnose_concept,
 )
 
@@ -74,7 +81,11 @@ from lib.sae.dilution import (
 # on the category name; covers gorilla (threat_*), hawk (reframed_*), tiger
 # (*_winnable, *_completing_attr).
 AUTO_MARKERS = ("threat", "winnable", "completable", "completing",
-                "reframed_count", "reframed_sq_count", "any_threat")
+                "reframed_count", "reframed_sq_count", "any_threat",
+                # hen's count categories, for the same reason as hawk's: the
+                # name contains no marker substring, so without these two the
+                # basis would silently lose 76 of its 173 BSPs from --auto.
+                "neg_count", "neg_sq_count")
 
 VERDICTS = ("absent", "captured", "spread")
 # Pre-3A.3 verdicts, still countable when summarising an old report
@@ -108,11 +119,18 @@ def is_auto_category(cat: str) -> bool:
     return any(mark in cat for mark in AUTO_MARKERS)
 
 
-def summarize(concepts, cat_fam=None):
+def summarize(concepts, cat_fam=None, cfg=None):
     """(category_summary, family_summary, gate_g3a) from diagnosed concepts.
 
     Shared by ``run`` and ``reclassify_report`` so a re-verdict cannot drift
     from a fresh run.
+
+    ``cfg`` enables the rule-3A.4 stability band: each concept's verdict is
+    re-tested at +/- ``band_sds`` sd on every quantity ``classify`` thresholds
+    on, and the gate reports how many verdicts survive. Without a band the
+    tally is a point estimate of a quantity measured to move 12-17% on seed
+    alone (docs/diary/2026-08-21_3A-residuals-and-handoff.md §2), so the band
+    is part of the result, not a footnote.
 
     ``cat_fam`` maps category -> concept family (from the schema's stamp). With
     it, the report also carries a CONCEPT-FAMILY rollup. Without that rollup the
@@ -216,6 +234,54 @@ def summarize(concepts, cat_fam=None):
         # A gate whose learned-signal floor never fired is not a test of it.
         "gate_is_provisional": n_tested < n_threat,
     }
+
+    # --- rule 3A.4: the stability band -------------------------------------
+    # Recomputed here rather than read off the concepts, so a `reclassify` with
+    # different thresholds re-bands too (the band moves with the boundary).
+    if cfg is not None:
+        n_undecided = 0
+        flips_on = {}
+        for c in concepts:
+            if c.get("degenerate") or "asymptote_r2" not in c:
+                c.setdefault("verdict_stability", "confident")
+                c.setdefault("verdict_flips_on", [])
+                continue
+            _, st = classify_with_stability(c, cfg)
+            c["verdict_stability"] = st["stability"]
+            c["verdict_flips_on"] = st["flips_on"]
+            if st["stability"] == "undecided":
+                n_undecided += 1
+                for k in st["flips_on"]:
+                    flips_on[k] = flips_on.get(k, 0) + 1
+
+        # The band on the GATE quantity: resolve every undecided concept the
+        # least- and most-geometric way. If the two ends straddle 0.50 the run
+        # does not determine the gate, and saying so is the whole point.
+        undecided_geo = sum(
+            1 for c in concepts
+            if c.get("verdict_stability") == "undecided"
+            and c["verdict"] in ("spread", "diluted", "tiled"))
+        undecided_non_geo = n_undecided - undecided_geo
+        lo = (n_geo - undecided_geo) / n_threat if n_threat else 0.0
+        hi = (n_geo + undecided_non_geo) / n_threat if n_threat else 0.0
+        gate.update({
+            "n_undecided": n_undecided,
+            "undecided_frac": round(n_undecided / n_threat, 4) if n_threat else 0.0,
+            # WHICH threshold the undecided verdicts rest on. `solo_frac` means
+            # the captured boundary; `asymptote_r2` the absent / learned-signal
+            # floor. Reported separately because a band on solo_frac alone is
+            # blind to the second, which is how ALL FOUR of K04's measured seed
+            # flips happened.
+            "undecided_flips_on": dict(sorted(flips_on.items())),
+            "geometric_frac_lo": round(lo, 4),
+            "geometric_frac_hi": round(hi, 4),
+            # The gate verdict is only quotable when the band does not straddle
+            # the 0.50 boundary.
+            "gate_verdict_is_stable": bool((lo >= 0.5) == (hi >= 0.5)),
+            "band": {"sds": cfg.band_sds,
+                     "solo_frac_seed_sd": cfg.solo_frac_seed_sd},
+        })
+
     return cat_summary, family_summary, gate
 
 
@@ -256,7 +322,7 @@ def reclassify_report(path: Path, cfg: DilutionConfig, dry_run: bool) -> dict:
             cat_fam = {k: v["concept_family"]
                        for k, v in category_families(json.load(f)).items()
                        if v.get("concept_family")}
-    cat_summary, family_summary, gate = summarize(concepts, cat_fam)
+    cat_summary, family_summary, gate = summarize(concepts, cat_fam, cfg)
     report["category_summary"] = cat_summary
     report["family_summary"] = family_summary
     report["gate_g3a"] = gate
@@ -382,7 +448,7 @@ def run(run_id, game, bsps, categories, random_run_id, cfg, quiet, orbit_spec="a
     cat_fam = {k: v["concept_family"]
                for k, v in category_families(schema).items()
                if v.get("concept_family")}
-    cat_summary, family_summary, gate = summarize(concepts, cat_fam)
+    cat_summary, family_summary, gate = summarize(concepts, cat_fam, cfg)
 
     result = {
         "summary": {
@@ -432,6 +498,18 @@ def _print_summary(result):
                   f" not representative; read per-BSP.")
     print(f"Gate G-3A: {g.get('n_spread', 0)} spread of {g['n_threat_bsps']} "
           f"threat BSPs -> geometric_frac={g['geometric_frac']:.2f} -> {g['verdict']}")
+    if "n_undecided" in g:
+        b = g["band"]
+        print(f"  band (rule 3A.4, +/-{b['sds']:g} sd): "
+              f"geometric_frac in [{g['geometric_frac_lo']:.2f}, "
+              f"{g['geometric_frac_hi']:.2f}]  "
+              f"{g['n_undecided']}/{g['n_threat_bsps']} undecided "
+              f"({g['undecided_frac']*100:.1f}%)"
+              + (f"  resting on {g['undecided_flips_on']}"
+                 if g["undecided_flips_on"] else ""))
+        if not g["gate_verdict_is_stable"]:
+            print("  WARNING: the band STRADDLES 0.50 -- this run does not "
+                  "determine the gate. Do not quote the verdict.")
     cov = g.get("random_control_coverage")
     if g.get("gate_is_provisional"):
         print(f"!! PROVISIONAL: only {g.get('n_random_control_applied', 0)}/"
@@ -449,6 +527,8 @@ def _config_from_args(args) -> DilutionConfig:
         top_k=int(args["--top-k"]),
         captured_solo_frac=float(args["--captured-solo-frac"]),
         captured_idim=float(args["--captured-idim"]),
+        band_sds=float(args["--band-sds"]),
+        solo_frac_seed_sd=float(args["--solo-frac-seed-sd"]),
     )
 
 

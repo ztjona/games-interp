@@ -37,6 +37,8 @@ the repo). No non-ASCII characters -- the host prints under cp1252.
 
 from __future__ import annotations
 
+import itertools
+import math
 from dataclasses import dataclass, asdict, field
 
 import numpy as np
@@ -107,11 +109,34 @@ class DilutionConfig:
     tile_overlap: float = 0.15   # mean support Jaccard below this -> tiled-ish
     tile_neg_frac: float = 0.50  # negative-coupling fraction above this -> tiled
 
+    # --- verdict stability band (rule 3A.4) --------------------------------
+    # Every threshold above discretises a CONTINUUM. The 2026-08-21 retraction
+    # settled that: at category level 13 of 69 medians sit above 0.8 and 36
+    # below 0.4, but 20 sit in between -- there is no valley for 0.70 to fall
+    # into. A threshold on a continuum needs an uncertainty band or it reports
+    # noise as a finding, so the band is REQUIRED, not decorative.
+    band_sds: float = 3.0
+    # Per-concept cross-seed sd of solo_frac, measured over seeds 42/43/44 on
+    # K03/K04-champYb (99 concepts, 2026-08-21). The MEAN, deliberately, not
+    # the median: the sd distribution is heavily right-skewed (median 0.0110,
+    # mean 0.0523, p90 0.12-0.17), and a band is a claim about the tail, not
+    # the centre. Banding at 3 x median called 96.6% of verdicts confident
+    # while direct seed replication measured 12-17% of them flipping; 3 x mean
+    # reproduces the measured rate. Cross-seed variation cannot be estimated
+    # from ONE run, so unlike asymptote_r2_std this has to be a constant.
+    # Re-derive it with `python scripts/verdict_stability.py`, which also
+    # prints the GROUND-TRUTH flip rate this band only approximates, and warns
+    # if the constant here has drifted from the measurement.
+    solo_frac_seed_sd: float = 0.0523
+
     # Bumped whenever ``classify`` changes, so a stored verdict can always be
     # traced to the rule that produced it. 3A.1 = original (knee_k AND
     # community_size only); 3A.2 = adds the solo_frac/intrinsic_dim path;
-    # 3A.3 = adds the random-model floor and collapses diluted/tiled -> spread.
-    rule_version: str = "3A.3"
+    # 3A.3 = adds the random-model floor and collapses diluted/tiled -> spread;
+    # 3A.4 = adds the stability band (``classify_with_stability``). The point
+    # verdict is UNCHANGED at 3A.4 -- only the confidence annotation is new, so
+    # every 3A.3 verdict still reads the same.
+    rule_version: str = "3A.4"
 
     seed: int = 0
 
@@ -289,6 +314,33 @@ GLOSSARY: dict[str, dict[str, str]] = {
                  "threat concepts whose failure mode is GEOMETRIC (present in the code "
                  "but spread out) rather than absent or already clean. >= 0.50 -> "
                  "Gate G-3A says phase 3C proceeds.",
+    },
+    "verdict_stability": {
+        "range": "confident | undecided",
+        "ideal": "confident",
+        "means": "Does the verdict survive pushing every quantity `classify` "
+                 "thresholds on to +/- band_sds sd? `undecided` means the point "
+                 "estimate sits close enough to a boundary that a re-run could "
+                 "land the other side. Required because the thresholds cut a "
+                 "CONTINUUM (solo_frac is not bimodal -- 2026-08-21 retraction), "
+                 "and because seed replication measured 12-17% of per-concept "
+                 "verdicts flipping. Rule 3A.4.",
+    },
+    "verdict_flips_on": {
+        "range": "list of metric names (possibly empty)",
+        "ideal": "empty",
+        "means": "Which banded quantity, moved ALONE, changes this verdict -- "
+                 "i.e. which threshold the verdict actually rests on. "
+                 "`asymptote_r2` points at the absent / learned-signal floor; "
+                 "`solo_frac` at the captured threshold.",
+    },
+    "geometric_frac_lo / geometric_frac_hi": {
+        "range": "0..1",
+        "ideal": "n/a -- the band on the gate quantity",
+        "means": "geometric_frac if EVERY undecided concept resolved the least / "
+                 "most geometric way. The gate verdict is only safe to quote "
+                 "when both ends fall the same side of 0.50; when they straddle "
+                 "it, the run does not determine the gate.",
     },
 }
 
@@ -756,6 +808,121 @@ def classify(metrics: dict, cfg: DilutionConfig) -> str:
     return "spread"
 
 
+# Quantities ``classify`` thresholds on that carry a measurable uncertainty.
+# Perturbing the METRIC rather than the threshold means one entry here covers
+# every rule that reads it -- ``asymptote_r2`` alone feeds three separate
+# comparisons in ``classify`` (the permutation gap, the absolute floor and the
+# learned-signal floor), and they must move together.
+#
+# name -> how to get its sd from a metrics dict
+_BAND_SOURCES: tuple[tuple[str, str], ...] = (
+    # Measured WITHIN the run. NOTE the sqrt(n_splits) in ``_band_sd``:
+    # ``asymptote_r2`` is the MEAN over n_splits resamples while
+    # ``asymptote_r2_std`` is the sd ACROSS them, so the uncertainty OF THE
+    # STORED NUMBER is sd/sqrt(n_splits), not sd. Banding the mean at the
+    # across-split sd made K04's conv2 verdicts 46% undecided against a
+    # measured 17% flip rate -- a scale error, not a finding.
+    ("asymptote_r2", "asymptote_r2_std"),
+    # Measured ACROSS SEEDS; not estimable from one run, so it comes from cfg.
+    ("solo_frac", "@cfg.solo_frac_seed_sd"),
+)
+
+
+def _band_sd(key: str, source: str, metrics: dict, cfg: DilutionConfig) -> float:
+    """Uncertainty of the STORED value of ``key``, in its own units."""
+    if source.startswith("@cfg."):
+        return float(getattr(cfg, source[len("@cfg."):]))
+    sd = float(metrics.get(source) or 0.0)
+    if key == "asymptote_r2" and cfg.n_splits > 1:
+        # sd of a mean of n_splits draws.
+        sd /= math.sqrt(cfg.n_splits)
+    return sd
+
+
+def classify_with_stability(metrics: dict, cfg: DilutionConfig) -> tuple[str, dict]:
+    """``(verdict, stability)`` -- the point verdict plus whether it survives.
+
+    Rule 3A.4. ``classify`` maps a point estimate to a label; this asks whether
+    that label is an artefact of where the point happens to sit. Every quantity
+    in ``_BAND_SOURCES`` is pushed to +/- ``band_sds`` sd and ``classify`` is
+    re-run at each corner of the resulting box. If every corner agrees the
+    verdict is ``confident``; otherwise it is ``undecided`` and
+    ``flips_on`` names the quantities that, moved alone, change it.
+
+    Why this is not optional, and why it bands EVERY threshold rather than the
+    ``captured`` one:
+
+      * `solo_frac` is not bimodal (retraction, 2026-08-21 §4) -- 0.70 cuts a
+        continuum, so the point verdict near it carries no information without
+        a band.
+      * Direct seed replication (§2) measured per-concept verdicts flipping
+        12-17% on seed alone. Decomposing those flips: K03's 9 flips were 8 via
+        `solo_frac` crossing 0.70 and 1 via another term -- but **all 4 of
+        K04's flips were `absent <-> spread`, with `solo_frac` never crossing
+        anything**. A band on `solo_frac` alone is structurally blind to half
+        the measured instability, which is why the box covers `asymptote_r2`
+        (and therefore the random-model floor) as well.
+
+    The two sds are not the same KIND of number, and that limit is part of the
+    result: ``asymptote_r2``'s band is a within-run SPLIT sd (row resampling
+    only -- it does not retrain the SAE, so it is a LOWER BOUND on seed-to-seed
+    movement), while ``solo_frac``'s is a true cross-seed sd but a single
+    pooled constant rather than per-concept. The band is therefore the best
+    available uncertainty for each quantity, not one calibrated interval:
+    read ``undecided`` as "near a boundary relative to how much this number is
+    known to move", never as a significance test. Where seeds actually exist,
+    the MEASURED flip rate beats this estimate and should be quoted instead.
+    """
+    verdict = classify(metrics, cfg)
+
+    deltas: dict[str, float] = {}
+    for key, source in _BAND_SOURCES:
+        sd = _band_sd(key, source, metrics, cfg)
+        if sd <= 0:
+            continue
+        # solo_frac may be absent on a pre-3A.2 report; back-fill it so the
+        # perturbed copy has something to move.
+        base = solo_frac_of(metrics) if key == "solo_frac" else metrics.get(key)
+        if base is None:
+            continue
+        deltas[key] = sd * cfg.band_sds
+
+    def _base(key: str) -> float:
+        return solo_frac_of(metrics) if key == "solo_frac" else float(metrics[key])
+
+    keys = sorted(deltas)
+
+    # All 2^k corners of the box: two quantities can jointly cross a boundary
+    # that neither crosses alone (asymptote_r2 down AND solo_frac down both push
+    # toward a different label), so a one-at-a-time sweep can miss a flip.
+    stable = True
+    for corner in itertools.product((-1, 1), repeat=len(keys)):
+        probe = dict(metrics)
+        for key, sign in zip(keys, corner):
+            probe[key] = _base(key) + sign * deltas[key]
+        if classify(probe, cfg) != verdict:
+            stable = False
+            break
+
+    # ...but ATTRIBUTION is one-at-a-time, because "which threshold is doing the
+    # work" is the actionable half of the answer.
+    flips_on: list[str] = []
+    for key in keys:
+        for sign in (-1, 1):
+            probe = dict(metrics)
+            probe[key] = _base(key) + sign * deltas[key]
+            if classify(probe, cfg) != verdict:
+                flips_on.append(key)
+                break
+
+    stability = {
+        "stability": "confident" if stable else "undecided",
+        "flips_on": flips_on,
+        "band_sds": cfg.band_sds,
+    }
+    return verdict, stability
+
+
 class RankingCache:
     """Per-run stage-A state: the binarized firing subsample and its rates.
 
@@ -827,7 +994,10 @@ def diagnose_concept(
             "top_phi": 0.0, "curve": [], "orbit_aware_split": False,
             "random_control_applied": False,
         }
+        # No candidates at all -- absent with nothing to be uncertain about.
         metrics["verdict"] = "absent"
+        metrics["verdict_stability"] = "confident"
+        metrics["verdict_flips_on"] = []
         return metrics
 
     # --- Stage B: everything else runs on the top_k selected columns only, so
@@ -918,5 +1088,8 @@ def diagnose_concept(
             metrics["random_asymptote_r2"] = rr["asymptote_r2"]
             metrics["random_control_applied"] = True
 
-    metrics["verdict"] = classify(metrics, cfg)
+    verdict, stability = classify_with_stability(metrics, cfg)
+    metrics["verdict"] = verdict
+    metrics["verdict_stability"] = stability["stability"]
+    metrics["verdict_flips_on"] = stability["flips_on"]
     return metrics

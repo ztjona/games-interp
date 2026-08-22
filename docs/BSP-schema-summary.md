@@ -55,7 +55,7 @@ Phase 1F established that the gorilla threat BSPs are linearly accessible in `co
 | `_square` | shape | SQUARE | CIRCLE |
 | `_with_hole` | hole | WITH_HOLE | WITHOUT_HOLE |
 
-**Note:** Only positive-value variants are probed. Negative variants (e.g., `_little`, `_white`) are the complement for cell attributes, but for threats they represent distinct board patterns (3 LITTLE in a row ≠ not having 3 TALL in a row). This asymmetry is a known limitation — see "Known Gaps" below.
+**Note:** gorilla and hawk probe only the positive-value variants. For *cell attributes* the negative variant is simply the complement, but for *threats* it is a distinct board pattern (3 LITTLE in a row ≠ not having 3 TALL in a row). That asymmetry was a known limitation until 2026-08-21, when the **hen** set (below) added the four negative poles as their own basis.
 
 ---
 
@@ -86,6 +86,47 @@ Reframes threats under alternative bases that may match the model's internal rep
 | `reframed_global` | 2 | `board_threat_exists` (any line OR square has threat) + `board_completable_exists` (any threat completable with offered piece) | 0.597 / 0.408 |
 
 **Note:** Global BSPs now include both lines AND 2×2 squares in their computation (updated 2026-03-31).
+
+---
+
+## Hen Set (173 BSPs) — hawk's shape on the NEGATIVE attribute poles
+
+Added 2026-08-21. **A separate basis, not an extension of hawk** — extending
+hawk would silently change every banked hawk number, and hawk-vs-hen on one
+dictionary is the matched pair that isolates polarity.
+
+| Negative suffix | Metadata key | Value (=1) | hawk's positive counterpart |
+|---|---|---|---|
+| `_little` | size | LITTLE | `_tall` |
+| `_white` | coloration | WHITE | `_black` |
+| `_circle` | shape | CIRCLE | `_square` |
+| `_without_hole` | hole | WITHOUT_HOLE | `_with_hole` |
+
+Category-for-category mirror of hawk, so the two are directly comparable and
+share `(concept_family, family_role)`:
+
+| hen category | n | hawk counterpart | n |
+|---|---:|---|---:|
+| `neg_count` | 40 | `reframed_count` | 40 |
+| `neg_completable` | 40 | `reframed_completable` | 40 |
+| `neg_any_threat` | 10 | `reframed_any_threat` | 10 |
+| `neg_sq_count` | 36 | `reframed_sq_count` | 36 |
+| `neg_sq_completable` | 36 | `reframed_sq_completable` | 36 |
+| `neg_sq_any_threat` | 9 | `reframed_sq_any_threat` | 9 |
+| `neg_global` | 2 | `reframed_global` | 2 |
+
+**Why it exists.** Quarto is won by four pieces sharing *a value* of an
+attribute, so an all-LITTLE line wins exactly as an all-TALL line does. tiger's
+`_line_would_be_complete` tests `len(set(values)) == 1` and therefore fires for
+both; hawk's `_compute_line_completable` requires three pieces at the POSITIVE
+pole and so fires only for one. Measured consequence, champYb, 10 lines,
+296,045 positions: `hawk ⇒ tiger` with **zero** counterexamples, and 32,408 of
+tiger's 68,041 line positives — **47.6%** — are wins hawk cannot state.
+
+**The identity.** With hen on disk, `tiger == OR(hawk ∪ hen)` over lines and
+2×2 squares holds with **zero violations** on all three champions
+(~290k positions each). Guarded by
+`tests/test_bsp_logic.py::TestHenNegativePoles`.
 
 ---
 
@@ -124,7 +165,7 @@ winning_move_exists  ←  threat + placement + offered piece compatibility
 
 | Gap | Impact | Priority |
 |-----|--------|----------|
-| **Negative attribute threats** (3 LITTLE, 3 WHITE, etc.) | Missing half of threat patterns. Would double threat/count BSP counts. Not critical for probes since model encodes these symmetrically. | Low — flag for future |
+| ~~**Negative attribute threats**~~ (3 LITTLE, 3 WHITE, …) | **CLOSED 2026-08-21** by the `hen` set. It was not "low priority": it was half the threat menu. `hawk ⇒ tiger` held with zero counterexamples precisely because hawk could only ever state the positive half, and **47.8–48.7% of tiger's positives are negative-pole wins**. The "model encodes these symmetrically" assumption was never tested. | — |
 | **Distance-to-win encoding** (count of threats on board) | Multi-class, not binary. Would require binarization (num_threats ≥ 1, ≥ 2, etc.). Experiment plan Phase 1D mentioned this. | Medium — future work |
 | **Turn/player information** | "Whose turn is it?" not in metadata. | Low |
 | **Piece interaction BSPs** | E.g., "offered piece is same size as piece at (r,c)". Combinatorial explosion. | Low |
@@ -163,6 +204,22 @@ square_2_1_any_threat        →  square_{tr}_{lc}_any_threat
 board_threat_exists          →  (singleton, includes lines + squares)
 board_completable_exists     →  (singleton, includes lines + squares)
 ```
+
+### Hen — the same shapes on the negative poles
+```
+row_0_count_ge3_little           →  {line_type}_{idx}_count_ge3_{neg_suffix}
+diag_main_completable_white      →  {line_type}_{idx}_completable_{neg_suffix}
+col_2_neg_any_threat             →  {line_type}_{idx}_neg_any_threat
+square_0_0_count_ge3_circle      →  square_{tr}_{lc}_count_ge3_{neg_suffix}
+square_1_2_completable_without_hole → square_{tr}_{lc}_completable_{neg_suffix}
+square_2_1_neg_any_threat        →  square_{tr}_{lc}_neg_any_threat
+board_neg_threat_exists          →  (singleton)
+board_neg_completable_exists     →  (singleton)
+```
+The `count_ge3` / `completable` ids are distinguished from hawk's by the SUFFIX
+alone; the aggregate ids carry an explicit `neg_` because otherwise they would
+collide. `compute_bsp_vector` dispatches the `neg_` aggregates **before** the
+hawk patterns, since `row_0_neg_any_threat` also ends in `_any_threat`.
 
 ---
 

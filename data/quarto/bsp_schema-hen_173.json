@@ -1,0 +1,1448 @@
+{
+  "animal": "hen",
+  "bsp_set_name": "hen_173",
+  "bsps": [
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 0: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "row_0_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 0: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "row_0_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 0: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "row_0_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 0: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "row_0_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 1: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "row_1_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 1: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "row_1_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 1: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "row_1_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 1: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "row_1_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 2: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "row_2_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 2: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "row_2_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 2: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "row_2_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 2: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "row_2_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 3: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "row_3_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 3: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "row_3_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 3: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "row_3_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Row 3: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "row_3_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 0: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "col_0_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 0: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "col_0_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 0: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "col_0_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 0: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "col_0_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 1: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "col_1_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 1: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "col_1_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 1: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "col_1_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 1: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "col_1_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 2: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "col_2_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 2: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "col_2_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 2: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "col_2_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 2: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "col_2_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 3: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "col_3_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 3: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "col_3_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 3: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "col_3_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Col 3: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "col_3_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag main: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "diag_main_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag main: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "diag_main_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag main: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "diag_main_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag main: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "diag_main_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag anti: >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "diag_anti_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag anti: >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "diag_anti_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag anti: >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "diag_anti_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_count",
+      "concept_family": "line_threat",
+      "description": "Diag anti: >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "diag_anti_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 0: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "row_0_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 0: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "row_0_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 0: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "row_0_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 0: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "row_0_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 1: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "row_1_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 1: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "row_1_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 1: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "row_1_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 1: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "row_1_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 2: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "row_2_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 2: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "row_2_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 2: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "row_2_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 2: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "row_2_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 3: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "row_3_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 3: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "row_3_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 3: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "row_3_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Row 3: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "row_3_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 0: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "col_0_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 0: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "col_0_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 0: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "col_0_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 0: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "col_0_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 1: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "col_1_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 1: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "col_1_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 1: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "col_1_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 1: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "col_1_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 2: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "col_2_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 2: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "col_2_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 2: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "col_2_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 2: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "col_2_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 3: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "col_3_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 3: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "col_3_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 3: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "col_3_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Col 3: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "col_3_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag main: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "diag_main_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag main: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "diag_main_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag main: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "diag_main_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag main: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "diag_main_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag anti: threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "diag_anti_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag anti: threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "diag_anti_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag anti: threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "diag_anti_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_completable",
+      "concept_family": "line_threat",
+      "description": "Diag anti: threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "diag_anti_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Row 0: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "row_0_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Row 1: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "row_1_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Row 2: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "row_2_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Row 3: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "row_3_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Col 0: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "col_0_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Col 1: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "col_1_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Col 2: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "col_2_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Col 3: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "col_3_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Diag main: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "diag_main_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_any_threat",
+      "concept_family": "line_threat",
+      "description": "Diag anti: at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "diag_anti_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_0_0_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_0_0_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_0_0_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_0_0_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_0_1_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_0_1_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_0_1_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_0_1_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_0_2_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_0_2_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_0_2_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_0_2_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_1_0_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_1_0_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_1_0_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_1_0_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_1_1_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_1_1_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_1_1_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_1_1_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_1_2_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_1_2_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_1_2_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_1_2_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_2_0_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_2_0_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_2_0_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_2_0_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_2_1_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_2_1_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_2_1_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_2_1_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): >=3 occupied cells are LITTLE",
+      "family_role": "state",
+      "id": "square_2_2_count_ge3_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): >=3 occupied cells are WHITE",
+      "family_role": "state",
+      "id": "square_2_2_count_ge3_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): >=3 occupied cells are CIRCLE",
+      "family_role": "state",
+      "id": "square_2_2_count_ge3_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_count",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): >=3 occupied cells are WITHOUT_HOLE",
+      "family_role": "state",
+      "id": "square_2_2_count_ge3_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_0_0_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_0_0_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_0_0_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_0_0_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_0_1_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_0_1_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_0_1_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_0_1_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_0_2_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_0_2_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_0_2_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_0_2_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_1_0_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_1_0_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_1_0_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_1_0_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_1_1_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_1_1_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_1_1_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_1_1_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_1_2_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_1_2_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_1_2_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_1_2_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_2_0_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_2_0_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_2_0_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_2_0_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_2_1_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_2_1_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_2_1_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_2_1_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): threat in LITTLE AND offered piece is LITTLE",
+      "family_role": "agent_relative",
+      "id": "square_2_2_completable_little",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): threat in WHITE AND offered piece is WHITE",
+      "family_role": "agent_relative",
+      "id": "square_2_2_completable_white",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): threat in CIRCLE AND offered piece is CIRCLE",
+      "family_role": "agent_relative",
+      "id": "square_2_2_completable_circle",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_completable",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): threat in WITHOUT_HOLE AND offered piece is WITHOUT_HOLE",
+      "family_role": "agent_relative",
+      "id": "square_2_2_completable_without_hole",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,0): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_0_0_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,1): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_0_1_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (0,2): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_0_2_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,0): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_1_0_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,1): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_1_1_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (1,2): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_1_2_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,0): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_2_0_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,1): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_2_1_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_sq_any_threat",
+      "concept_family": "square_threat",
+      "description": "2x2 at (2,2): at least one NEGATIVE attribute pole has a threat pattern",
+      "family_role": "state_any",
+      "id": "square_2_2_neg_any_threat",
+      "type": "binary"
+    },
+    {
+      "category": "neg_global",
+      "concept_family": "global_threat",
+      "description": "At least one NEGATIVE-pole threat exists on any line or 2x2 square",
+      "family_role": "state_any",
+      "id": "board_neg_threat_exists",
+      "type": "binary"
+    },
+    {
+      "category": "neg_global",
+      "concept_family": "global_threat",
+      "description": "At least one NEGATIVE-pole threat is completable with the offered piece",
+      "family_role": "state_any",
+      "id": "board_neg_completable_exists",
+      "type": "binary"
+    }
+  ],
+  "categories": {
+    "neg_any_threat": 10,
+    "neg_completable": 40,
+    "neg_count": 40,
+    "neg_global": 2,
+    "neg_sq_any_threat": 9,
+    "neg_sq_completable": 36,
+    "neg_sq_count": 36
+  },
+  "category_families": {
+    "neg_any_threat": {
+      "concept_family": "line_threat",
+      "family_role": "state_any"
+    },
+    "neg_completable": {
+      "concept_family": "line_threat",
+      "family_role": "agent_relative"
+    },
+    "neg_count": {
+      "concept_family": "line_threat",
+      "family_role": "state"
+    },
+    "neg_global": {
+      "concept_family": "global_threat",
+      "family_role": "state_any"
+    },
+    "neg_sq_any_threat": {
+      "concept_family": "square_threat",
+      "family_role": "state_any"
+    },
+    "neg_sq_completable": {
+      "concept_family": "square_threat",
+      "family_role": "agent_relative"
+    },
+    "neg_sq_count": {
+      "concept_family": "square_threat",
+      "family_role": "state"
+    }
+  },
+  "concept_families": {
+    "global_threat": 2,
+    "line_threat": 90,
+    "square_threat": 81
+  },
+  "filters": {
+    "exclude_categories": null,
+    "only_categories": [
+      "neg_count",
+      "neg_completable",
+      "neg_any_threat",
+      "neg_sq_count",
+      "neg_sq_completable",
+      "neg_sq_any_threat",
+      "neg_global"
+    ]
+  },
+  "game": "quarto",
+  "num_bsps": 173
+}

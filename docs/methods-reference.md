@@ -152,16 +152,17 @@ standardised MCC is compared.
 | 3A metric | swing over p | safe to compare across populations? |
 |---|---:|---|
 | `asymptote_r2` | **86%** (fixed-quality planted latent) | **No** — match or standardise first |
-| `solo_frac` | 1% on a monosemantic concept, **28% on a diluted one** | **Only away from the threshold** |
+| `solo_frac` | 1% on a monosemantic concept, **28% on a spread one** | **Only away from the threshold** |
 | `intrinsic_dim` | **0–1%** | **Yes** |
 | `top_phi` (= MCC) | 50% | No |
 
-The verdict rule (3A.2) leans on `solo_frac` and `intrinsic_dim`. `intrinsic_dim`
-is robust; `solo_frac` is robust for concentrated concepts but drifts ~28% for
-diluted ones, so **a concept sitting near the `captured_solo_frac = 0.70`
+The verdict rule leans on `solo_frac` and `intrinsic_dim`. `intrinsic_dim` is
+robust; `solo_frac` is robust for concentrated concepts but drifts ~28% for
+spread ones, so **a concept sitting near the `captured_solo_frac = 0.70`
 boundary can flip verdict on prevalence alone**. Verdicts far from the boundary
-(the current situation — unsupervised runs sit at 0.16–0.42) are safe. Treat
-near-threshold verdicts as prevalence-sensitive and check them explicitly.
+(the current situation — unsupervised runs sit at 0.16–0.42) are safe.
+Near-threshold verdicts are no longer left to the reader to notice: rule 3A.4
+marks them `undecided` automatically (§3.5).
 
 **Base rate** = fraction of positions where a BSP is true. Note the distinction
 that matters: at N = 296,045 a base rate of 0.02 still gives ~5,900 positives, so
@@ -308,9 +309,9 @@ chosen hyperparameter, not a property of the SAE, and raising it would raise
 | `community_size` | 1…`top_k` | 1–3 | Latents in the co-firing community. Counts **redundancy** — near-duplicates inflate it without making the concept harder to read. |
 | `intrinsic_dim` | 1…`community_size` | ~1 | **PCA participation ratio** `(Σλ)²/Σλ²` of the community's codes, restricted to rows where the concept is TRUE. Continuous "effective dimensionality" — **not** a count of axes above a variance cutoff, so there is no 90%-threshold to choose. 1.0 = one dominant direction; 5.0 = five comparable ones. Computed on the **community**, not on all `top_k`. |
 | `support_overlap` | 0…1 | — (selects the failure mode) | Mean **pairwise Jaccard** of community firing supports: for each pair, `|rows where both fire| / |rows where either fires|`, averaged over pairs. **Not** "how many latents fire per position". HIGH = same rows (redundant → diluted); LOW = disjoint rows (shattered → tiled). Neither end is good. A singleton community has no pairs and returns 1.0 by convention — check `singleton_community` before reading 1.0 as redundancy. |
-| `neg_coupling_frac` | 0…1 | — | Share of within-community couplings that are negative (latents suppressing each other). High + low overlap = tiled. |
+| `neg_coupling_frac` | 0…1 | — | Share of within-community couplings that are negative (latents suppressing each other). Recorded but **no longer used by the verdict rule** — the tiling test it fed was retired at 3A.3. |
 | `knee_over_idim` | ≥1 typically | ~1 | `knee_k / intrinsic_dim`. ≫1 = many more latents needed than the code's own dimensionality implies: a splitting signature. |
-| `geometric_frac` | 0…1 | — | `(n_diluted + n_tiled) / n_threat_bsps`. **Gate G-3A**: ≥ 0.50 → 3C proceeds. |
+| `geometric_frac` | 0…1 | — | `n_spread / n_threat_bsps`. **Gate G-3A**: ≥ 0.50 → 3C proceeds. Quote it with its `geometric_frac_lo`/`_hi` band (§3.5). |
 
 ### 3.5 Verdicts and the classification rule
 
@@ -318,32 +319,41 @@ chosen hyperparameter, not a property of the SAE, and raising it would raise
 |---|---|---|
 | **absent** | Codes carry no more signal than the null. | Not a capacity problem — change the hook, or go E2E/supervised. No architecture change on these activations can help. |
 | **captured** | Recovered by a small, low-dimensional latent set. | Nothing to fix. |
-| **diluted** | Recoverable only by aggregating many **overlapping** latents (feature splitting). | *Geometric.* Info is present; an aggregating/hierarchical readout can get it. |
-| **tiled** | Recoverable but spread over near-disjoint, **competing** latents. | *Geometric.* Needs a manifold-aware/bilinear readout. |
+| **spread** | Recoverable from the dictionary, but only by combining many latents. | *Geometric.* Info is present; an aggregating/hierarchical readout can get it. |
+| ~~diluted~~ / ~~tiled~~ | **RETIRED at rule 3A.3**; both now report as `spread`. | Separating them needs a new statistic validated on a planted positive control. |
 
-**"Geometric"** = diluted **or** tiled = "the information is in the code, the flat
+**"Geometric"** = `spread` = "the information is in the code, the flat
 dictionary just isn't presenting it in one atom". This is the H10 outcome and the
 *favourable* case — the fix is an architecture change rather than a dead end.
 
-**Rule 3A.2** (`classify`, a pure function of the stored metrics):
+Each verdict also carries a **stability annotation** (`confident` /
+`undecided`) from rule 3A.4 — see below. A single-seed per-concept verdict
+must not be quoted without it.
+
+**Rule 3A.4** (`classify` + `classify_with_stability`, both pure functions of
+the stored metrics). Rule history: **3A.1** = the `knee_k AND community_size`
+test only; **3A.2** adds the `solo_frac`/`intrinsic_dim` path (b); **3A.3** adds
+the learned-signal floor and collapses `diluted`/`tiled` into `spread`;
+**3A.4** adds the stability band. The point verdict did not change at 3A.4.
 
 ```
 gap = asymptote_r2 - null_r2
 if gap < absent_margin (0.02) or asymptote_r2 < absent_floor (0.02):
     absent
-elif knee_k <= captured_k (2) AND community_size <= captured_size (3):        # (a)
+elif random_asymptote_r2 is not None                                           # (c)
+     and asymptote_r2 - random_asymptote_r2 < random_margin (0.02):
+    absent
+elif knee_k <= captured_k (2) AND community_size <= captured_size (3):         # (a)
     captured
 elif solo_frac >= captured_solo_frac (0.70)                                    # (b)
      AND (intrinsic_dim <= captured_idim (2.0) OR knee_k <= captured_k (2)):
     captured
-elif support_overlap < tile_overlap (0.15) AND neg_coupling_frac > tile_neg_frac (0.50):
-    tiled
 else:
-    diluted
+    spread
 ```
 
 **"A small, low-dimensional set" is a description, not the test.** There are two
-*sufficient* conditions and either one is enough:
+*sufficient* conditions for `captured` and either one is enough:
 
 - **(a)** operationalises "small" as *few latents needed* (`knee_k ≤ 2`) *and*
   *few latents present* (`community_size ≤ 3`).
@@ -354,7 +364,70 @@ else:
 
 (b) was added as rule **3A.2** after the 3A.1 rule failed its pre-registered
 calibration check — see [`diary/2026-07-27_3A-dilution-results.md`](diary/2026-07-27_3A-dilution-results.md) §3.
+
+**(c) is the learned-signal floor, added as rule 3A.3.** The permutation null
+shuffles the labels but leaves the dictionary's structure intact, so it tests
+"is this signal real?" and *not* "is this signal **learned**?". Measured
+2026-08-14, an SAE trained on an *untrained* network's conv2 activations scores
+R² 0.025–0.034 on every real gorilla threat — above `absent_floor` — so under
+3A.2 an untrained network passed gate G-3A at 100%. (c) applies **only** where
+a random-model control was actually computed; where it was not, the report sets
+`random_control_applied: false` and the gate reports itself provisional. The
+same entry retired `diluted`/`tiled` in favour of a single `spread`: the tiling
+test fired 42 times in 1,100 verdicts and *every* firing was a 2-latent
+community with exactly one negative edge — a coin flip on the sign of one
+partial correlation, not a measurement of tiling.
+
 `rule_version` is stamped into every report.
+
+### 3A.4 — the verdict stability band
+
+Every threshold above discretises a **continuum**. The 2026-08-21 retraction
+settled that `solo_frac` is not bimodal: of 69 category medians, 13 sit above
+0.8 and 36 below 0.4, but **20 sit in between**. A threshold on a continuum
+needs an uncertainty band or it reports noise as a finding, so the band is part
+of the result rather than a footnote.
+
+`classify_with_stability(metrics, cfg)` pushes every quantity `classify`
+thresholds on to ±`band_sds` (default 3) sd and re-runs `classify` at each of
+the 2ᵏ corners. Agreement everywhere ⇒ `verdict_stability: confident`;
+otherwise `undecided`, and `verdict_flips_on` names the quantities that change
+the verdict when moved **alone** — the actionable half, since it says which
+threshold the verdict actually rests on.
+
+| banded quantity | sd used | kind |
+|---|---|---|
+| `asymptote_r2` | `asymptote_r2_std / √n_splits` | within-run **split** sd (row resampling only — a *lower bound* on seed movement) |
+| `solo_frac` | `cfg.solo_frac_seed_sd` = **0.0523** | true **cross-seed** sd, but one pooled constant, not per-concept |
+
+Two design points, both learned from a measurement:
+
+- **It bands every threshold, not just `captured`.** Seed replication measured
+  per-concept verdicts flipping 12–17%. Decomposing those flips: K03's 9 were 8
+  via `solo_frac` crossing 0.70 and 1 elsewhere — but **all 4 of K04's were
+  `absent ↔ spread`, with `solo_frac` never crossing anything**. A band on the
+  `captured` threshold alone is structurally blind to that half.
+- **`solo_frac_seed_sd` is the MEAN per-concept cross-seed sd, not the median.**
+  The sd distribution is heavily right-skewed (median 0.0110, mean 0.0523, p90
+  0.12–0.17); a band is a claim about the tail. Banding at 3 × median called
+  96.6% of verdicts confident against a measured 12–17% flip rate.
+
+The `asymptote_r2` band uses the sd **of the stored mean** (`asymptote_r2` is
+the mean over `n_splits` resamples, `asymptote_r2_std` the sd *across* them);
+omitting the √n made K04 read 46% undecided against a measured 17%.
+
+**Calibration, stated honestly.** Against the two conditions with seed
+replicates the band *under*-calls: K03 5.3% undecided vs 11.8% measured, K04
+11.6% vs 17.4%. Both sds are lower bounds (split resampling does not retrain
+the SAE; the `solo_frac` constant is pooled rather than per-concept), so the
+direction is expected. **Where seeds exist, quote the measured flip rate, not
+the band.** Read `undecided` as "near a boundary relative to how much this
+number is known to move", never as a significance test.
+
+The gate carries the band too: `geometric_frac_lo`/`_hi` resolve every
+undecided concept the least- and most-geometric way, and
+`gate_verdict_is_stable` is false when they straddle 0.50 — in which case that
+run **does not determine its gate** and its verdict must not be quoted.
 
 Because the verdict is a **pure function of stored metrics**, a threshold change
 never needs the multi-GB `_h` caches:

@@ -193,6 +193,11 @@ Position datasets are named after metals to indicate opponent strength progressi
 **BSPs (Animals theme):**
 BSP label sets are named after animals to indicate set size:
 - `gorilla` — Full set (164 BSPs, all categories)
+- `hawk` — Reframed threat counts (173 BSPs), POSITIVE attribute poles
+- `hen` — hawk's shape on the NEGATIVE poles (173 BSPs). A separate basis, so
+  `tiger == OR(hawk ∪ hen)` is a checkable identity and hawk-vs-hen isolates
+  polarity on one dictionary. See `docs/BSP-schema-summary.md`.
+- `tiger` — Agent-relative / pool reasoning (36 BSPs)
 - `fox` — Cell properties only (87 BSPs: cell_occupancy, cell_attribute, offered_piece, game_phase)
 - Custom animal names for targeted subsets (user-defined during computation)
 

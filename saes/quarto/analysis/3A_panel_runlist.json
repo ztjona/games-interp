@@ -1,0 +1,473 @@
+{
+  "generated_from": "saes/quarto/analysis/3A_panel.json",
+  "n_entries": 76,
+  "entries": [
+    {
+      "run_id": "C01-champTa-s42-topk-k16-exp8-s4.conv2",
+      "bsps": "tigerTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "C01-champYb-s42-topk-k16-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E01-champTa-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "hawkTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E01-champTa-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "henTa",
+      "role": "panel-hen",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E01-champTa-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "tigerTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E02-champVe-s42-topk-k48-exp8-s4.conv2",
+      "bsps": "gorillaVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E03-champVe-s42-topk-k64-exp8-s4.conv2",
+      "bsps": "gorillaVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E03-champVe-s42-topk-k64-exp8-s4.conv2",
+      "bsps": "hawkVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E03-champVe-s42-topk-k64-exp8-s4.conv2",
+      "bsps": "henVe",
+      "role": "panel-hen",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "panel-hen",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E04-champTa-s42-topk-k96-exp8-s4.conv2",
+      "bsps": "gorillaTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E04-champVe-s42-topk-k96-exp8-s4.conv2",
+      "bsps": "tigerVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E05-champVe-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "hawkVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E05-champVe-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "henVe",
+      "role": "panel-hen",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E05-champVe-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "tigerVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "gorillaTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "hawkTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champTa-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "henTa",
+      "role": "panel-hen",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "gorillaVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "hawkVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "henVe",
+      "role": "panel-hen",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "E06-champVe-s42-batchtopk-k64-exp8-s4.conv2",
+      "bsps": "tigerVe",
+      "role": "panel",
+      "random_run_id": "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "F00-champVe-s42-batchtopk-k16-exp8-s4.fc1",
+      "bsps": "tigerVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F00-champYb-s42-batchtopk-k16-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "gorillaVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "hawkVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "henVe",
+      "role": "panel-hen",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F01-champVe-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "tigerVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F01-champYb-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F02-champTa-s42-topk-k64-exp8-s4.fc1",
+      "bsps": "tigerTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F02-champVe-s42-topk-k64-exp8-s4.fc1",
+      "bsps": "tigerVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F02-champYb-s42-topk-k64-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F03-champTa-s42-batchtopk-k32-exp8-s4.fc1",
+      "bsps": "tigerTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F03-champYb-s42-batchtopk-k32-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "gorillaTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "hawkTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F04-champTa-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "henTa",
+      "role": "panel-hen",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F04-champVe-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "gorillaVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F04-champVe-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "hawkVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "F04-champVe-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "henVe",
+      "role": "panel-hen",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "gorillaTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "hawkTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "henTa",
+      "role": "panel-hen",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champTa-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "tigerTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champVe-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "gorillaVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champVe-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "hawkVe",
+      "role": "panel",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H01-champVe-s42-jumprelu-t64-exp16-s4.fc1",
+      "bsps": "henVe",
+      "role": "panel-hen",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
+      "bsps": "gorillaTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
+      "bsps": "hawkTa",
+      "role": "panel",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H02-champTa-s42-jumprelu-t64-exp32-s4.fc1",
+      "bsps": "henTa",
+      "role": "panel-hen",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
+      "bsps": "gorillaTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
+      "bsps": "hawkTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "H04-champTa-s42-batchtopk-k32-exp16-s4.conv2",
+      "bsps": "henTa",
+      "role": "panel-hen",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "H05-champTa-s42-batchtopk-k32-exp32-s4.conv2",
+      "bsps": "tigerTa",
+      "role": "panel",
+      "random_run_id": "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "I03-champVe-lh030-s43-anchored-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "gorillaVe",
+      "role": "anchored-positive-control",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "I04-champTa-lh100-s43-anchored-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "tigerTa",
+      "role": "anchored-positive-control",
+      "random_run_id": "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "I04-champVe-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "tigerVe",
+      "role": "anchored-positive-control",
+      "random_run_id": "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "anchored-positive-control",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "panel-hen",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
+      "bsps": "henYb",
+      "role": "panel-hen",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "panel-hen",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K04-champYb-s44-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K05-champYb-s44-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K05-champYb-s44-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "henYb",
+      "role": "panel-hen",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K07-champYb-s42-topk-k16-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2"
+    },
+    {
+      "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "panel",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    },
+    {
+      "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
+      "bsps": "henYb",
+      "role": "panel-hen",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+    }
+  ],
+  "controls": [
+    "R2-champTarandom-s42-batchtopk-k32-exp8-s4.conv2",
+    "R2-champVerandom-s42-batchtopk-k32-exp8-s4.conv2",
+    "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+    "R3-champTarandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "R3-champVerandom-s42-jumprelu-t64-exp8-s4.fc1",
+    "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1"
+  ],
+  "needs_encode": {},
+  "missing_control_h": [],
+  "missing_labels": []
+}
