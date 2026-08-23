@@ -253,6 +253,38 @@
       "heterogeneous": false
     }
   },
+  "family_summary": {
+    "offered_completion": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 4,
+      "n": 4,
+      "n_spread": 4,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.1622,
+      "mean_solo_frac": 0.3578
+    },
+    "line_threat": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 10,
+      "n": 10,
+      "n_spread": 10,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.0793,
+      "mean_solo_frac": 0.2839
+    },
+    "square_threat": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 9,
+      "n": 9,
+      "n_spread": 9,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.0781,
+      "mean_solo_frac": 0.2876
+    }
+  },
   "concepts": [
     {
       "bsp_index": 5,
@@ -2416,37 +2448,5 @@
       "verdict_stability": "confident",
       "verdict_flips_on": []
     }
-  ],
-  "family_summary": {
-    "offered_completion": {
-      "absent": 0,
-      "captured": 0,
-      "spread": 4,
-      "n": 4,
-      "n_spread": 4,
-      "geometric_frac": 1.0,
-      "mean_asymptote_r2": 0.1622,
-      "mean_solo_frac": 0.3578
-    },
-    "line_threat": {
-      "absent": 0,
-      "captured": 0,
-      "spread": 10,
-      "n": 10,
-      "n_spread": 10,
-      "geometric_frac": 1.0,
-      "mean_asymptote_r2": 0.0793,
-      "mean_solo_frac": 0.2839
-    },
-    "square_threat": {
-      "absent": 0,
-      "captured": 0,
-      "spread": 9,
-      "n": 9,
-      "n_spread": 9,
-      "geometric_frac": 1.0,
-      "mean_asymptote_r2": 0.0781,
-      "mean_solo_frac": 0.2876
-    }
-  }
+  ]
 }

@@ -236,6 +236,28 @@
       "heterogeneous": false
     }
   },
+  "family_summary": {
+    "line_threat": {
+      "absent": 8,
+      "captured": 6,
+      "spread": 26,
+      "n": 40,
+      "n_spread": 26,
+      "geometric_frac": 0.65,
+      "mean_asymptote_r2": 0.1811,
+      "mean_solo_frac": 0.574
+    },
+    "square_threat": {
+      "absent": 0,
+      "captured": 8,
+      "spread": 28,
+      "n": 36,
+      "n_spread": 28,
+      "geometric_frac": 0.7778,
+      "mean_asymptote_r2": 0.3101,
+      "mean_solo_frac": 0.6396
+    }
+  },
   "concepts": [
     {
       "bsp_index": 80,
@@ -7407,27 +7429,5 @@
       "verdict_stability": "confident",
       "verdict_flips_on": []
     }
-  ],
-  "family_summary": {
-    "line_threat": {
-      "absent": 8,
-      "captured": 6,
-      "spread": 26,
-      "n": 40,
-      "n_spread": 26,
-      "geometric_frac": 0.65,
-      "mean_asymptote_r2": 0.1811,
-      "mean_solo_frac": 0.574
-    },
-    "square_threat": {
-      "absent": 0,
-      "captured": 8,
-      "spread": 28,
-      "n": 36,
-      "n_spread": 28,
-      "geometric_frac": 0.7778,
-      "mean_asymptote_r2": 0.3101,
-      "mean_solo_frac": 0.6396
-    }
-  }
+  ]
 }
