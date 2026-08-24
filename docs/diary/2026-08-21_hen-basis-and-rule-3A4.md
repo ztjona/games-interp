@@ -343,6 +343,66 @@ champVe/conv2 conclusion turns out to hinge on E05.
 **Process note**: a `-DryRun` runs this exact gate and would have caught it in
 ~20 min. It was described as skippable. It is not.
 
+## 8. POST-RUN 2: the panel ran; two cells disagreed; both were selection bugs [DIRECT]
+
+The 76-entry panel completed in **15h50m** on 2026-08-23. All 76 entries
+written, all at rule 3A.4, `random_control_coverage` 1.00 on every one, zero
+provisional gates. G-3A passes decisively: **6,471 / 7,938 concept-verdicts
+`spread` (81.5%)**, 60 of 72 unsupervised entries `3C-proceeds`.
+
+**Residual (a) is answered, and the answer is mostly reassuring.** 16 of 18
+cells agree across all three conditions, median within-cell `geometric_frac`
+range **0.02**. Two disagreed:
+
+| cell | geom per condition | range |
+|---|---|---:|
+| Yb/s4.conv2/tiger | 0.87 / 0.22 / 0.39 | **0.65** |
+| Yb/s4.fc1/tiger | 0.48 / 0.87 / 1.00 | **0.52** |
+
+Both exceed the 0.50 gate itself. **Both turned out to be defects in
+SELECTION, not disagreements about the concept** -- and they had different
+causes, which is why the fix needed two changes:
+
+1. **Duplicate recipes counted as distinct conditions.** `condition_of` keyed
+   on the seed-stripped run-id, but the campaign letter is part of that id:
+   `C01-champYb-s42-topk-k16-exp8-s4.conv2` and `K07-champYb-s42-...` are the
+   SAME recipe at the SAME seed, retrained after the 2026-08-15 conformance
+   fix (FVU 0.0502 vs 0.0232). `Yb/conv2/tiger` therefore held 2 recipes, not
+   3, and its spread was substantially legacy-vs-canonical. `condition_of` now
+   keys on `(architecture, k/threshold, expansion, hook)` read from the
+   TRAINING registry.
+2. **Non-conformant runs as panel members.** `Yb/fc1/tiger` held `F00` and
+   `F03` -- batchtopk with `aux_loss_weight = None`, the configuration
+   2026-08-15 showed is genuinely collapsed (F00: FVU 0.086, 98.1% dead). New
+   `--canonical-only` excludes runs missing their own architecture's specified
+   machinery.
+
+`[AI-REASONED PROVISIONAL ANALYSIS]` The contamination is **wider than the two
+cells that flipped**: 15 of 18 contain at least one non-conformant member and 4
+counted a duplicate recipe. Only two cells flipped because the other 16 sit at
+ceiling, where nothing can move. So the panel is a weaker robustness test than
+its headline implies, and the honest statement is: *among conformant,
+distinct-recipe dictionaries the conclusion is stable; the pre-fix panel could
+not have told us that.*
+
+**Fix applied (champYb only).** Re-selected champYb's 6 cells canonical-only
+and merged them into the panel, leaving the 12 champTa/champVe cells untouched.
+5 of 6 changed membership. **champTa and champVe have ZERO canonical batchtopk
+or jumprelu runs**, so filtering them would collapse both to TopK-only -- that
+needs retraining (~20 h), not re-selection, and is left open.
+
+All 54 members are now measured (not estimated) at >= `top_k`, minimum 66.
+`-SkipExisting` (freshness from the `rule_version` + `top_k` stored in each
+report) reduces the repair to **7 entries / 563 concepts**.
+
+**Still open after this**: the seed grid (3 conditions x 3 seeds x 4 bases; 22
+entries, ~4.6 h, **no training or encoding needed** -- all nine sibling
+checkpoints and their `_h` caches already exist), `dead_window` (implemented,
+tested, never set non-zero), champTa/Ve conformance, and the retired
+`diluted`/`tiled` distinction -- which means 3A tells 3C *that* the geometry is
+the problem but not *which*, so the 3C variant choice rests on literature
+priors rather than our measurement.
+
 ## 6. Standing corrections not to re-break
 
 As in the handoff, plus one. Never compare runs on a whole-basis scalar (compare

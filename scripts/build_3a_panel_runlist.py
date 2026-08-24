@@ -49,6 +49,7 @@ from pathlib import Path
 from docopt import docopt
 
 ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
 
 # The supervised positive control, one per champion. Not selected by
 # `select_3a_panel.py` (it excludes anchored runs); named here so the
@@ -140,7 +141,33 @@ def main() -> int:
     missing_controls = [c for c in controls
                         if not (cache / f"{c}_h.pt").exists()]
 
+    # Per-entry freshness, so a partial re-run is a filter rather than a
+    # 15-hour repeat. An entry is CURRENT when its report exists and was
+    # produced by the rule and support the config would use now; anything else
+    # (missing, older rule_version, different top_k) is stale and must re-run.
+    # Keyed on values stored in the report, so this cannot drift from what
+    # actually produced it.
+    from lib.sae.dilution import DilutionConfig
+    cfg = DilutionConfig()
+    n_current = 0
+    for e in entries:
+        rp = analysis / f"{e['run_id']}_dilution-{e['bsps']}.json"
+        cur = False
+        if rp.exists():
+            try:
+                cfg_stored = json.loads(rp.read_text(encoding="utf-8"))["summary"]["config"]
+                cur = (cfg_stored.get("rule_version") == cfg.rule_version
+                       and cfg_stored.get("top_k") == cfg.top_k)
+            except (KeyError, ValueError):
+                cur = False
+        e["report_current"] = cur
+        n_current += cur
+
     runlist = {
+        "n_current": n_current,
+        "n_stale": len(entries) - n_current,
+        "current_means": (f"report exists at rule_version={cfg.rule_version} "
+                          f"and top_k={cfg.top_k}"),
         "generated_from": str(panel_path.relative_to(ROOT)).replace("\\", "/"),
         "n_entries": len(entries),
         "entries": entries,
@@ -161,6 +188,7 @@ def main() -> int:
     print(f"{len(entries)} entries  ({', '.join(f'{k}={v}' for k, v in sorted(by_role.items()))})")
     print(f"  distinct checkpoints : {len({e['run_id'] for e in entries})}")
     print(f"  need an _h encode    : {len(need_encode)}")
+    print(f"  reports already CURRENT: {n_current}   stale/missing: {len(entries)-n_current}")
     print(f"  random-model controls: {len(controls)}"
           + (f"  MISSING _h: {missing_controls}" if missing_controls else ""))
     if runlist["missing_labels"]:

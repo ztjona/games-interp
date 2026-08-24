@@ -31,6 +31,13 @@ param(
     # sequences it.
     [switch]$Panel,
     [switch]$WithHen,
+    # -SkipExisting: run only the entries whose report is missing or STALE
+    # (produced by an older rule_version or a different top_k). Freshness is
+    # decided by scripts/build_3a_panel_runlist.py from values stored in each
+    # report, so it cannot drift from whatever produced them. Makes a targeted
+    # panel repair a minutes-long job instead of repeating a 15-hour pass --
+    # which is what a re-selection of one champion's cells needs.
+    [switch]$SkipExisting,
     # Substring filter over the "run_id|bsps" entries below. Partial re-runs
     # are first-class because every `_h` is now cached, so re-running a few
     # cells is minutes of CPU rather than the 2h12m a full pass costs. Doing it
@@ -157,10 +164,22 @@ try {
         $runlist = Get-Content "$ANALYSIS/3A_panel_runlist.json" -Raw | ConvertFrom-Json
         # Same "rid|bsps|random" shape the hand-pinned list uses, so everything
         # downstream is identical for both modes.
-        $RUNS = @($runlist.entries | ForEach-Object {
+        $entries = @($runlist.entries)
+        if ($SkipExisting) {
+            $all = $entries.Count
+            $entries = @($entries | Where-Object { -not $_.report_current })
+            Write-Host ("  -SkipExisting: {0} of {1} entries are stale or missing " +
+                "and will run; {2} already current." -f $entries.Count, $all,
+                ($all - $entries.Count))
+            if ($entries.Count -eq 0) {
+                Write-Host '  Nothing to do -- every report is current.'
+                return
+            }
+        }
+        $RUNS = @($entries | ForEach-Object {
                 "$($_.run_id)|$($_.bsps)|$($_.random_run_id)" })
         Write-Host ("  {0} entries over {1} checkpoints." -f $RUNS.Count,
-            @($runlist.entries.run_id | Sort-Object -Unique).Count)
+            @($entries.run_id | Sort-Object -Unique).Count)
     }
 
 

@@ -54,6 +54,13 @@ Options:
                        selection fails the measured health check [default: 5]
     --no-measure       Skip the _h-based measurement (registry estimate only).
                        Faster, but restores the 2026-08-21 failure mode.
+    --canonical-only   Keep only runs trained with their architecture's own
+                       specified machinery (see `is_canonical`). champTa and
+                       champVe have NO canonical batchtopk/jumprelu runs, so
+                       this collapses them to TopK-only -- use it per champion.
+    --merge-into=<p>   Update only the cells this invocation selects, inside an
+                       EXISTING panel JSON, leaving every other cell untouched.
+                       For fixing one champion without re-running the panel.
     --top-k=<n>        Diagnostic candidate count; the health floor [default: 64]
     --include-anchored Include anchored runs (normally excluded: they are the
                        supervised positive control, not panel members).
@@ -78,11 +85,58 @@ from lib.sae.eval import aggregate_per_category_by_family, resolve_schema_path  
 THREAT_FAMILIES = ("line_threat", "square_threat", "global_threat",
                    "offered_completion")
 SEED_RE = re.compile(r"-s\d+")
+EXP_RE = re.compile(r"exp(\d+)")
 
 
-def condition_of(run_id: str) -> str:
-    """Run id with the seed stripped -- `F04-champYb-s42-topk-...` -> the recipe."""
-    return SEED_RE.sub("-sSEED", run_id)
+def condition_of(run_id: str, entry: dict | None = None) -> str:
+    """The CONDITION a run instantiates: architecture, sparsity, expansion, hook.
+
+    Keyed on the HYPERPARAMETERS, not on the run-id string. Stripping the seed
+    from the id is not enough, because the campaign letter is part of the id:
+    `C01-champYb-s42-topk-k16-exp8-s4.conv2` and
+    `K07-champYb-s42-topk-k16-exp8-s4.conv2` are the SAME recipe re-trained
+    after the 2026-08-15 conformance fix, and an id-keyed dedup counted them as
+    two of the three "distinct conditions" in `Yb/s4.conv2/tiger` — so that
+    cell's 0.65 verdict spread was substantially a legacy-vs-canonical
+    comparison, not three conditions disagreeing.
+
+    Falls back to the seed-stripped id when the registry entry is unavailable.
+    """
+    if entry is None:
+        return SEED_RE.sub("-sSEED", run_id)
+    exp = EXP_RE.search(run_id)
+    return "|".join(str(x) for x in (
+        entry.get("architecture"),
+        entry.get("k") if entry.get("k") is not None else entry.get("l0_target"),
+        exp.group(1) if exp else "?",
+        entry.get("hook"),
+    ))
+
+
+def is_canonical(entry: dict) -> bool:
+    """Was this SAE trained with its OWN architecture's specified machinery?
+
+    The 2026-08-15 audit found dead-feature revival implemented for `TopKSAE`
+    only, and JumpReLU's tied init missing — so a panel that mixes pre- and
+    post-fix runs is partly comparing training machinery rather than
+    dictionaries. Under `--canonical-only` those runs are excluded.
+
+      topk       -- always carried the Gao aux loss; needs `aux_loss_weight`.
+      batchtopk  -- needs the aux loss AND the tied init.
+      jumprelu   -- aux loss is measured null for it; needs the tied init.
+
+    Note this is a *training-conformance* test, not a quality test: a canonical
+    run can still be a bad dictionary, which is what the health gate is for.
+    """
+    arch = entry.get("architecture")
+    if arch == "topk":
+        return entry.get("aux_loss_weight") is not None
+    if arch == "batchtopk":
+        return (entry.get("aux_loss_weight") is not None
+                and entry.get("init_mode") is not None)
+    if arch == "jumprelu":
+        return entry.get("init_mode") is not None
+    return False
 
 
 def threat_score(metrics: dict, schema: dict) -> float | None:
@@ -129,6 +183,10 @@ def main() -> int:
     data_dir = ROOT / "data" / game
 
     reg = json.loads((ROOT / "saes" / game / "eval_registry.json").read_text())
+    # Conformance and the recipe key are TRAINING properties, so they come from
+    # the training registry, not the eval one.
+    treg = json.loads((ROOT / "saes" / game / "training_registry.json").read_text())
+    canon_only = args["--canonical-only"]
     schemas = {}
     for b in bases:
         p = resolve_schema_path(data_dir, b)
@@ -157,7 +215,10 @@ def main() -> int:
         score = threat_score(m, schemas[basis])
         if score is None:
             continue
-        cond = condition_of(run_id)
+        tentry = treg.get(run_id)
+        if canon_only and not (tentry and is_canonical(tentry)):
+            continue
+        cond = condition_of(run_id, tentry)
         cur = best[(champ, hook, basis)].get(cond)
         if cur is None or score > cur[0]:
             best[(champ, hook, basis)][cond] = (score, run_id, round(d_dict * (1 - dead/100)))
@@ -219,6 +280,35 @@ def main() -> int:
           f"missing: {len(missing)}")
     for r in missing:
         print("   needs encode:", r)
+
+    merge = args["--merge-into"]
+    if merge:
+        target = Path(merge)
+        base = json.loads(target.read_text(encoding="utf-8"))
+        before = {c: [m["run_id"] for m in ms] for c, ms in base["panel"].items()}
+        base["panel"].update(panel)
+        base.setdefault("merged_selections", []).append({
+            "cells": sorted(panel),
+            "canonical_only": bool(canon_only),
+            "top_k": top_k,
+        })
+        base["needs_encode"] = sorted(
+            r for ms in base["panel"].values() for m in ms
+            for r in [m["run_id"]] if not (cache / f"{r}_h.pt").exists())
+        target.write_text(json.dumps(base, indent=2, sort_keys=True), encoding="utf-8")
+        print(f"\nMerged {len(panel)} cell(s) into {target}; "
+              f"{len(base['panel']) - len(panel)} cell(s) untouched.")
+        changed = 0
+        for c, ms in sorted(panel.items()):
+            now = [m["run_id"] for m in ms]
+            was = before.get(c, [])
+            if set(now) != set(was):
+                changed += 1
+                print(f"  {c}")
+                print(f"     was: {', '.join(r.split('-')[0] for r in was)}")
+                print(f"     now: {', '.join(r.split('-')[0] for r in now)}")
+        print(f"  {changed} of {len(panel)} selected cell(s) changed membership.")
+        return 0
 
     out = args["--output"]
     if out and out != "none":

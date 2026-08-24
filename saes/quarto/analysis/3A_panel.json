@@ -1,6 +1,32 @@
 {
   "health_floor_alive": 64,
   "health_measured_with": "lib.sae.dilution.RankingCache (same definition as the diagnostic)",
+  "merged_selections": [
+    {
+      "canonical_only": true,
+      "cells": [
+        "Yb/s4.conv2/gorilla",
+        "Yb/s4.conv2/hawk",
+        "Yb/s4.conv2/tiger",
+        "Yb/s4.fc1/gorilla",
+        "Yb/s4.fc1/hawk",
+        "Yb/s4.fc1/tiger"
+      ],
+      "top_k": 64
+    },
+    {
+      "canonical_only": true,
+      "cells": [
+        "Yb/s4.conv2/gorilla",
+        "Yb/s4.conv2/hawk",
+        "Yb/s4.conv2/tiger",
+        "Yb/s4.fc1/gorilla",
+        "Yb/s4.fc1/hawk",
+        "Yb/s4.fc1/tiger"
+      ],
+      "top_k": 64
+    }
+  ],
   "needs_encode": [],
   "panel": {
     "Ta/s4.conv2/gorilla": [
@@ -251,16 +277,16 @@
         "threat_mcc": 0.1149
       },
       {
-        "alive": 147,
-        "alive_source": "measured",
-        "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
-        "threat_mcc": 0.1109
-      },
-      {
         "alive": 174,
         "alive_source": "measured",
         "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1047
+      },
+      {
+        "alive": 230,
+        "alive_source": "measured",
+        "run_id": "C01-champYb-s42-topk-k16-exp8-s4.conv2",
+        "threat_mcc": 0.1025
       }
     ],
     "Yb/s4.conv2/hawk": [
@@ -271,16 +297,16 @@
         "threat_mcc": 0.1187
       },
       {
-        "alive": 147,
-        "alive_source": "measured",
-        "run_id": "K02-champYb-s42-batchtopk-k32-exp8-s4.conv2",
-        "threat_mcc": 0.114
-      },
-      {
         "alive": 174,
         "alive_source": "measured",
         "run_id": "E03-champYb-s42-topk-k64-exp8-s4.conv2",
         "threat_mcc": 0.1066
+      },
+      {
+        "alive": 175,
+        "alive_source": "measured",
+        "run_id": "E02-champYb-s42-topk-k48-exp8-s4.conv2",
+        "threat_mcc": 0.1054
       }
     ],
     "Yb/s4.conv2/tiger": [
@@ -297,10 +323,10 @@
         "threat_mcc": 0.1157
       },
       {
-        "alive": 230,
+        "alive": 216,
         "alive_source": "measured",
-        "run_id": "C01-champYb-s42-topk-k16-exp8-s4.conv2",
-        "threat_mcc": 0.1083
+        "run_id": "K06-champYb-s43-topk-k32-exp8-s4.conv2",
+        "threat_mcc": 0.1075
       }
     ],
     "Yb/s4.fc1/gorilla": [
@@ -311,16 +337,16 @@
         "threat_mcc": 0.6206
       },
       {
-        "alive": 589,
-        "alive_source": "measured",
-        "run_id": "F01-champYb-s42-topk-k32-exp8-s4.fc1",
-        "threat_mcc": 0.6098
-      },
-      {
         "alive": 329,
         "alive_source": "measured",
         "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
         "threat_mcc": 0.603
+      },
+      {
+        "alive": 346,
+        "alive_source": "measured",
+        "run_id": "K12-champYb-s42-jumprelu-t64-exp64-s4.fc1",
+        "threat_mcc": 0.6013
       }
     ],
     "Yb/s4.fc1/hawk": [
@@ -345,22 +371,22 @@
     ],
     "Yb/s4.fc1/tiger": [
       {
-        "alive": 76,
-        "alive_source": "measured",
-        "run_id": "F00-champYb-s42-batchtopk-k16-exp8-s4.fc1",
-        "threat_mcc": 0.3137
-      },
-      {
-        "alive": 160,
-        "alive_source": "measured",
-        "run_id": "F03-champYb-s42-batchtopk-k32-exp8-s4.fc1",
-        "threat_mcc": 0.2887
-      },
-      {
         "alive": 358,
         "alive_source": "measured",
         "run_id": "F02-champYb-s42-topk-k64-exp8-s4.fc1",
         "threat_mcc": 0.2762
+      },
+      {
+        "alive": 329,
+        "alive_source": "measured",
+        "run_id": "K11-champYb-s42-jumprelu-t64-exp32-s4.fc1",
+        "threat_mcc": 0.2531
+      },
+      {
+        "alive": 346,
+        "alive_source": "measured",
+        "run_id": "K12-champYb-s42-jumprelu-t64-exp64-s4.fc1",
+        "threat_mcc": 0.2445
       }
     ]
   },
