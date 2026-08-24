@@ -1,9 +1,9 @@
 {
-  "n_current": 69,
-  "n_stale": 7,
+  "n_current": 81,
+  "n_stale": 33,
   "current_means": "report exists at rule_version=3A.4 and top_k=64",
   "generated_from": "saes/quarto/analysis/3A_panel.json",
-  "n_entries": 76,
+  "n_entries": 114,
   "entries": [
     {
       "run_id": "C01-champTa-s42-topk-k16-exp8-s4.conv2",
@@ -17,7 +17,7 @@
       "bsps": "gorillaYb",
       "role": "panel",
       "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
-      "report_current": false
+      "report_current": true
     },
     {
       "run_id": "E01-champTa-s42-topk-k32-exp8-s4.conv2",
@@ -52,14 +52,14 @@
       "bsps": "hawkYb",
       "role": "panel",
       "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
-      "report_current": false
+      "report_current": true
     },
     {
       "run_id": "E02-champYb-s42-topk-k48-exp8-s4.conv2",
       "bsps": "henYb",
       "role": "panel-hen",
       "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
-      "report_current": false
+      "report_current": true
     },
     {
       "run_id": "E03-champVe-s42-topk-k64-exp8-s4.conv2",
@@ -419,6 +419,34 @@
       "report_current": true
     },
     {
+      "run_id": "K03-champYb-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": true
+    },
+    {
+      "run_id": "K03-champYb-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K03-champYb-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K03-champYb-s42-topk-k32-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
       "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
       "bsps": "gorillaYb",
       "role": "panel",
@@ -437,6 +465,97 @@
       "bsps": "henYb",
       "role": "panel-hen",
       "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": true
+    },
+    {
+      "run_id": "K03-champYb-s43-topk-k32-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K03-champYb-s44-topk-k32-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": true
+    },
+    {
+      "run_id": "K03-champYb-s44-topk-k32-exp8-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K03-champYb-s44-topk-k32-exp8-s4.fc1",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K03-champYb-s44-topk-k32-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K04-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": true
+    },
+    {
+      "run_id": "K04-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K04-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K04-champYb-s42-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": true
+    },
+    {
+      "run_id": "K04-champYb-s43-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K04-champYb-s43-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K04-champYb-s43-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K04-champYb-s43-batchtopk-k32-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
       "report_current": true
     },
     {
@@ -468,6 +587,69 @@
       "report_current": true
     },
     {
+      "run_id": "K05-champYb-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s42-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s43-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s43-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s43-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s43-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K05-champYb-s44-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
       "run_id": "K05-champYb-s44-jumprelu-t64-exp8-s4.fc1",
       "bsps": "hawkYb",
       "role": "panel",
@@ -480,11 +662,95 @@
       "role": "panel-hen",
       "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
       "report_current": true
+    },
+    {
+      "run_id": "K05-champYb-s44-jumprelu-t64-exp8-s4.fc1",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s42-topk-k32-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s43-topk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s43-topk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s43-topk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
     },
     {
       "run_id": "K06-champYb-s43-topk-k32-exp8-s4.conv2",
       "bsps": "tigerYb",
       "role": "panel",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": true
+    },
+    {
+      "run_id": "K06-champYb-s44-topk-k32-exp8-s4.conv2",
+      "bsps": "gorillaYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s44-topk-k32-exp8-s4.conv2",
+      "bsps": "hawkYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s44-topk-k32-exp8-s4.conv2",
+      "bsps": "henYb",
+      "role": "seed-grid",
+      "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
+      "report_current": false
+    },
+    {
+      "run_id": "K06-champYb-s44-topk-k32-exp8-s4.conv2",
+      "bsps": "tigerYb",
+      "role": "seed-grid",
       "random_run_id": "R2-champYbrandom-s42-batchtopk-k32-exp8-s4.conv2",
       "report_current": false
     },
@@ -521,21 +787,21 @@
       "bsps": "tigerYb",
       "role": "panel",
       "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
-      "report_current": false
+      "report_current": true
     },
     {
       "run_id": "K12-champYb-s42-jumprelu-t64-exp64-s4.fc1",
       "bsps": "gorillaYb",
       "role": "panel",
       "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
-      "report_current": false
+      "report_current": true
     },
     {
       "run_id": "K12-champYb-s42-jumprelu-t64-exp64-s4.fc1",
       "bsps": "tigerYb",
       "role": "panel",
       "random_run_id": "R3-champYbrandom-s42-jumprelu-t64-exp8-s4.fc1",
-      "report_current": false
+      "report_current": true
     }
   ],
   "controls": [

@@ -38,6 +38,12 @@ param(
     # panel repair a minutes-long job instead of repeating a 15-hour pass --
     # which is what a re-selection of one champion's cells needs.
     [switch]$SkipExisting,
+    # -SeedGrid: add every other trained seed of each panel condition, across
+    # every basis, so the verdict-flip rate is MEASURED instead of approximated
+    # by rule 3A.4's band (which is known to under-call it by 1.5-2x). Costs no
+    # training and no encoding -- the sibling checkpoints and their _h caches
+    # already exist. Combine with -SkipExisting to run only what is missing.
+    [switch]$SeedGrid,
     # Substring filter over the "run_id|bsps" entries below. Partial re-runs
     # are first-class because every `_h` is now cached, so re-running a few
     # cells is minutes of CPU rather than the 2h12m a full pass costs. Doing it
@@ -155,8 +161,10 @@ try {
     # scripts/build_3a_panel_runlist.py.
     if ($Panel) {
         Write-Host "`n[panel] Expanding analysis/3A_panel.json into a runlist..."
-        $henArg = if ($WithHen) { '--with-hen' } else { '' }
-        python scripts/build_3a_panel_runlist.py --game=$GAME @($henArg | Where-Object { $_ })
+        $blArgs = @("--game=$GAME")
+        if ($WithHen) { $blArgs += '--with-hen' }
+        if ($SeedGrid) { $blArgs += '--seed-grid' }
+        python scripts/build_3a_panel_runlist.py @blArgs
         if ($LASTEXITCODE -ne 0) {
             throw ("Runlist build failed -- BSP labels are missing for at least " +
                    "one basis. Run scripts/compute_bsp_labels.py first.")

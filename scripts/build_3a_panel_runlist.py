@@ -35,6 +35,11 @@ Options:
     --game=<name>      Game name [default: quarto]
     --panel=<path>     Panel JSON [default: auto] (auto = analysis/3A_panel.json)
     --with-hen         Mirror every hawk entry onto the `hen` basis.
+    --seed-grid        Also emit every OTHER trained seed of each panel
+                       condition, across every basis, so the verdict-flip rate
+                       can be MEASURED rather than approximated by rule 3A.4's
+                       band. Adds no training and no encoding -- the sibling
+                       checkpoints and their `_h` caches already exist.
     --no-anchored      Drop the anchored positive controls (NOT recommended).
     --output=<path>    Write the runlist JSON [default: auto]
 """
@@ -74,6 +79,21 @@ RANDOM_CONTROLS: dict[str, str] = {
 }
 
 _RUN_RE = re.compile(r"champ(\w\w)[-\w.]*?-(s4\.\w+|fc1|conv2)$")
+_SEED_RE = re.compile(r"-s(\d+)(?=-)")
+
+
+def seed_siblings(run_id: str, training_registry: dict) -> list[str]:
+    """Every trained seed of ``run_id``'s condition, including itself.
+
+    The condition is the run id with the seed field blanked. Unlike
+    `select_3a_panel.condition_of` this is deliberately id-based: here we want
+    the SAME recipe under the SAME campaign letter -- i.e. genuine seed
+    replicates -- not two campaigns' takes on one recipe, which differ in
+    training machinery and would contaminate a seed measurement.
+    """
+    stem = _SEED_RE.sub("-sSEED", run_id)
+    return sorted(r for r in training_registry
+                  if _SEED_RE.sub("-sSEED", r) == stem)
 
 
 def resolve_control(run_id: str) -> str:
@@ -114,6 +134,33 @@ def main() -> int:
     if not args["--no-anchored"]:
         for run_id, bsps in ANCHORED_CONTROLS:
             add(run_id, bsps, "anchored-positive-control")
+
+    # --- seed grid ---------------------------------------------------------
+    # The flip rate across seeds is the GROUND TRUTH for verdict stability;
+    # rule 3A.4's band only approximates it, and is measured to under-call by
+    # 1.5-2x. Every seed of a panel condition is run against every basis, so
+    # each condition yields a per-basis flip rate -- including `hen`, which has
+    # none at all and carries the three entries whose bands straddle the gate.
+    if args["--seed-grid"]:
+        treg = json.loads(
+            (ROOT / "saes" / game / "training_registry.json").read_text(encoding="utf-8"))
+        treg = {k: v for k, v in treg.items()
+                if isinstance(v, dict) and "architecture" in v}
+        bases = ["gorilla", "hawk", "tiger"] + (["hen"] if args["--with-hen"] else [])
+        panel_members = sorted({m["run_id"] for ms in panel["panel"].values() for m in ms})
+        n_before = len(entries)
+        for member in panel_members:
+            sibs = seed_siblings(member, treg)
+            if len(sibs) < 2:                     # not a replicated condition
+                continue
+            champ = next((c for c in ("Ta", "Ve", "Yb") if f"champ{c}" in member), None)
+            if champ is None:
+                continue
+            for sib in sibs:
+                for b in bases:
+                    add(sib, f"{b}{champ}", "seed-grid")
+        print(f"  seed grid: +{len(entries) - n_before} entries "
+              f"over {len({e['run_id'] for e in entries if e['role'] == 'seed-grid'})} checkpoints")
 
     # Group consecutive entries by checkpoint. Each entry is a separate process
     # that loads that run's `_h` (1.4-4.8 GB) plus its control's, and a
