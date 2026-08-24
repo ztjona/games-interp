@@ -168,9 +168,12 @@ try {
         if ($SkipExisting) {
             $all = $entries.Count
             $entries = @($entries | Where-Object { -not $_.report_current })
-            Write-Host ("  -SkipExisting: {0} of {1} entries are stale or missing " +
-                "and will run; {2} already current." -f $entries.Count, $all,
-                ($all - $entries.Count))
+            # One format string, not a concatenation: `-f` binds to the string
+            # immediately left of it, so ("a{0}" + "b{2}" -f x,y,z) formats only
+            # the second half and prints "{0}" literally -- which is what the
+            # 2026-08-24 repair run logged.
+            Write-Host ("  -SkipExisting: {0} of {1} entries are stale or missing and will run; {2} already current." -f
+                $entries.Count, $all, ($all - $entries.Count))
             if ($entries.Count -eq 0) {
                 Write-Host '  Nothing to do -- every report is current.'
                 return
