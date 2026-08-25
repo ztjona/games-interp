@@ -257,6 +257,21 @@ def summarize(concepts, cat_fam=None, cfg=None):
         # The band on the GATE quantity: resolve every undecided concept the
         # least- and most-geometric way. If the two ends straddle 0.50 the run
         # does not determine the gate, and saying so is the whole point.
+        # The SPECTRUM, as counts. This is the primary reading: it needs no
+        # assumption about how the undecided concepts would resolve, which is
+        # the whole problem with turning them into an interval. A cell with
+        # "2 spread, 0 captured, 0 absent, 21 in play" is reporting that the
+        # measurement is undetermined -- far more legible than the [0.09, 1.00]
+        # the worst-case bound gives for the same cell.
+        confident = {"spread": 0, "captured": 0, "absent": 0}
+        for c in concepts:
+            if c.get("verdict_stability") == "undecided":
+                continue
+            v = c["verdict"]
+            v = "spread" if v in ("diluted", "tiled") else v
+            if v in confident:
+                confident[v] += 1
+
         undecided_geo = sum(
             1 for c in concepts
             if c.get("verdict_stability") == "undecided"
@@ -265,6 +280,9 @@ def summarize(concepts, cat_fam=None, cfg=None):
         lo = (n_geo - undecided_geo) / n_threat if n_threat else 0.0
         hi = (n_geo + undecided_non_geo) / n_threat if n_threat else 0.0
         gate.update({
+            "n_confident_spread": confident["spread"],
+            "n_confident_captured": confident["captured"],
+            "n_confident_absent": confident["absent"],
             "n_undecided": n_undecided,
             "undecided_frac": round(n_undecided / n_threat, 4) if n_threat else 0.0,
             # WHICH threshold the undecided verdicts rest on. `solo_frac` means
@@ -273,8 +291,14 @@ def summarize(concepts, cat_fam=None, cfg=None):
             # blind to the second, which is how ALL FOUR of K04's measured seed
             # flips happened.
             "undecided_flips_on": dict(sorted(flips_on.items())),
-            "geometric_frac_lo": round(lo, 4),
-            "geometric_frac_hi": round(hi, 4),
+            # WORST CASE, not a plausible range: every undecided concept
+            # resolved the same way at once. Measured against the cross-seed
+            # ranges on 2026-08-24 it is 3-10x too wide, and vacuous at small n
+            # (tiger has 23 concepts, so one concept is 0.043 of the fraction).
+            # Named accordingly so it cannot be misread as a confidence
+            # interval; the counts above are the reading to quote.
+            "geometric_frac_worst_lo": round(lo, 4),
+            "geometric_frac_worst_hi": round(hi, 4),
             # The gate verdict is only quotable when the band does not straddle
             # the 0.50 boundary.
             "gate_verdict_is_stable": bool((lo >= 0.5) == (hi >= 0.5)),
@@ -500,13 +524,17 @@ def _print_summary(result):
           f"threat BSPs -> geometric_frac={g['geometric_frac']:.2f} -> {g['verdict']}")
     if "n_undecided" in g:
         b = g["band"]
-        print(f"  band (rule 3A.4, +/-{b['sds']:g} sd): "
-              f"geometric_frac in [{g['geometric_frac_lo']:.2f}, "
-              f"{g['geometric_frac_hi']:.2f}]  "
-              f"{g['n_undecided']}/{g['n_threat_bsps']} undecided "
-              f"({g['undecided_frac']*100:.1f}%)"
-              + (f"  resting on {g['undecided_flips_on']}"
+        print(f"  spectrum (+/-{b['sds']:g} sd band): "
+              f"{g['n_confident_spread']} spread / "
+              f"{g['n_confident_captured']} captured / "
+              f"{g['n_confident_absent']} absent CONFIDENTLY, "
+              f"{g['n_undecided']} in play  of {g['n_threat_bsps']}"
+              + (f"   (in play rests on {g['undecided_flips_on']})"
                  if g["undecided_flips_on"] else ""))
+        print(f"  worst case if every in-play concept resolved the same way: "
+              f"geometric_frac in [{g['geometric_frac_worst_lo']:.2f}, "
+              f"{g['geometric_frac_worst_hi']:.2f}] -- a bound, NOT a "
+              f"confidence interval")
         if not g["gate_verdict_is_stable"]:
             print("  WARNING: the band STRADDLES 0.50 -- this run does not "
                   "determine the gate. Do not quote the verdict.")

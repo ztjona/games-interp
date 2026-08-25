@@ -68,8 +68,11 @@ def summarize_run(path: str) -> dict:
         # readings of the same run.
         "n_undecided": g.get("n_undecided"),
         "undecided_frac": g.get("undecided_frac"),
-        "geometric_frac_lo": g.get("geometric_frac_lo"),
-        "geometric_frac_hi": g.get("geometric_frac_hi"),
+        "n_confident_spread": g.get("n_confident_spread"),
+        "n_confident_captured": g.get("n_confident_captured"),
+        "n_confident_absent": g.get("n_confident_absent"),
+        "geometric_frac_worst_lo": g.get("geometric_frac_worst_lo"),
+        "geometric_frac_worst_hi": g.get("geometric_frac_worst_hi"),
         "gate_verdict_is_stable": g.get("gate_verdict_is_stable"),
     }
 
@@ -89,18 +92,18 @@ def main() -> int:
     out.write_text(json.dumps({"runs": rows}, indent=2, sort_keys=True),
                    encoding="utf-8")
 
-    hdr = (f"{'run_id':<50}{'bsps':<11}{'geom':>6}{'[lo,hi]':>13}{'und':>6}"
+    hdr = (f"{'run_id':<50}{'bsps':<11}{'geom':>6}{'n':>5}{'sp/ca/ab/play':>15}"
            f"{'solo':>6}{'idim':>6}{'|phi|':>7}{'R2':>7}{'ctrl':>6}  verdict")
     print(hdr)
     print("-" * len(hdr))
     for r in rows:
         cov = r.get("random_control_coverage")
-        band = ("    not banded" if r.get("geometric_frac_lo") is None
-                else f"[{r['geometric_frac_lo']:.2f},{r['geometric_frac_hi']:.2f}]".rjust(13))
-        und = ("   -" if r.get("undecided_frac") is None
-               else f"{r['undecided_frac']*100:>5.0f}%")
+        band = ("  not banded" if r.get("n_confident_spread") is None
+                else (f"{r['n_confident_spread']}/{r['n_confident_captured']}"
+                      f"/{r['n_confident_absent']}/{r['n_undecided']}").rjust(15))
+        n_bsps = r.get("n_threat_bsps", 0)
         print(f"{r['run_id'][:49]:<50}{r['bsp_set']:<11}{r['geometric_frac']:>6.2f}"
-              f"{band}{und:>6}"
+              f"{n_bsps:>5}{band}"
               f"{r['median_solo_frac']:>6.2f}{r['median_intrinsic_dim']:>6.2f}"
               f"{r['median_top_phi']:>7.3f}{r['mean_asymptote_r2']:>7.3f}"
               f"{'  n/a' if cov is None else f'{cov:>5.0%}'}  {r['verdict']}"
@@ -126,7 +129,8 @@ def main() -> int:
               f"of geometric_frac.)")
         for r in straddle:
             print(f"     {r['run_id'][:44]:<46}{r['bsp_set']:<11}"
-                  f"[{r['geometric_frac_lo']:.2f}, {r['geometric_frac_hi']:.2f}]")
+                  f"[{r['geometric_frac_worst_lo']:.2f}, "
+                  f"{r['geometric_frac_worst_hi']:.2f}]")
 
     prov = [r for r in rows if r.get("gate_is_provisional")]
     if prov:

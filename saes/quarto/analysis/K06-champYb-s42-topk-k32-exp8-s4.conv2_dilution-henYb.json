@@ -162,10 +162,15 @@
         "ideal": "empty",
         "means": "Which banded quantity, moved ALONE, changes this verdict -- i.e. which threshold the verdict actually rests on. `asymptote_r2` points at the absent / learned-signal floor; `solo_frac` at the captured threshold."
       },
-      "geometric_frac_lo / geometric_frac_hi": {
+      "n_confident_spread / _captured / _absent": {
+        "range": "counts summing with n_undecided to n_threat_bsps",
+        "ideal": "n/a -- this IS the spectrum",
+        "means": "How many threat concepts hold each verdict ROBUSTLY, i.e. survive the +/-band_sds perturbation, plus how many are in play. Quote these, not an interval: turning the in-play concepts into a range on geometric_frac requires assuming how they would resolve, and every such assumption is arbitrary. '2 spread / 0 captured / 0 absent / 21 in play of 23' says plainly that the measurement is undetermined."
+      },
+      "geometric_frac_worst_lo / _worst_hi": {
         "range": "0..1",
         "ideal": "n/a -- the band on the gate quantity",
-        "means": "geometric_frac if EVERY undecided concept resolved the least / most geometric way. The gate verdict is only safe to quote when both ends fall the same side of 0.50; when they straddle it, the run does not determine the gate."
+        "means": "WORST CASE: geometric_frac if EVERY in-play concept resolved the least / most geometric way AT ONCE. A union bound, not a confidence interval -- measured 3-10x wider than the cross-seed range on 2026-08-24, and vacuous at small n (at tiger's 23 concepts one concept is 0.043 of the fraction). Its one legitimate use is `gate_verdict_is_stable`: when both ends fall the same side of 0.50 the gate holds no matter how the in-play concepts land."
       }
     },
     "verdicts": {
@@ -187,14 +192,17 @@
     "verdict": "3C-proceeds",
     "deprioritized_because": null,
     "gate_is_provisional": false,
+    "n_confident_spread": 97,
+    "n_confident_captured": 0,
+    "n_confident_absent": 0,
     "n_undecided": 74,
     "undecided_frac": 0.4327,
     "undecided_flips_on": {
       "asymptote_r2": 74,
       "solo_frac": 1
     },
-    "geometric_frac_lo": 0.5673,
-    "geometric_frac_hi": 1.0,
+    "geometric_frac_worst_lo": 0.5673,
+    "geometric_frac_worst_hi": 1.0,
     "gate_verdict_is_stable": true,
     "band": {
       "sds": 3.0,
