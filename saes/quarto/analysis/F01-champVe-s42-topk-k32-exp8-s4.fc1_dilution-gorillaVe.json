@@ -36,7 +36,8 @@
       "tile_neg_frac": 0.5,
       "band_sds": 3.0,
       "solo_frac_seed_sd": 0.0523,
-      "rule_version": "3A.4",
+      "asymptote_r2_seed_sd": 0.00648,
+      "rule_version": "3A.5",
       "seed": 0
     }
   },
@@ -182,14 +183,14 @@
     "verdict": "3C-proceeds",
     "deprioritized_because": null,
     "gate_is_provisional": false,
-    "n_undecided": 11,
-    "undecided_frac": 0.1447,
+    "n_undecided": 16,
+    "undecided_frac": 0.2105,
     "undecided_flips_on": {
-      "asymptote_r2": 3,
+      "asymptote_r2": 8,
       "solo_frac": 8
     },
     "geometric_frac_lo": 0.6053,
-    "geometric_frac_hi": 0.75,
+    "geometric_frac_hi": 0.8158,
     "gate_verdict_is_stable": true,
     "band": {
       "sds": 3.0,
@@ -3560,8 +3561,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0285,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 115,
@@ -3654,8 +3657,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0312,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 116,
@@ -3844,8 +3849,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0286,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 118,
@@ -3938,8 +3945,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.023,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 119,
@@ -4032,8 +4041,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0245,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 120,

@@ -40,7 +40,8 @@
       "tile_neg_frac": 0.5,
       "band_sds": 3.0,
       "solo_frac_seed_sd": 0.0523,
-      "rule_version": "3A.4",
+      "asymptote_r2_seed_sd": 0.00648,
+      "rule_version": "3A.5",
       "seed": 0
     }
   },
@@ -186,14 +187,14 @@
     "verdict": "3C-proceeds",
     "deprioritized_because": null,
     "gate_is_provisional": false,
-    "n_undecided": 11,
-    "undecided_frac": 0.0643,
+    "n_undecided": 17,
+    "undecided_frac": 0.0994,
     "undecided_flips_on": {
-      "asymptote_r2": 6,
+      "asymptote_r2": 12,
       "solo_frac": 5
     },
-    "geometric_frac_lo": 0.9298,
-    "geometric_frac_hi": 0.9942,
+    "geometric_frac_lo": 0.9006,
+    "geometric_frac_hi": 1.0,
     "gate_verdict_is_stable": true,
     "band": {
       "sds": 3.0,
@@ -3632,8 +3633,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0741,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 35,
@@ -4010,8 +4013,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0637,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 39,
@@ -7306,8 +7311,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0099,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 74,
@@ -7592,8 +7599,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0116,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 77,
@@ -7686,8 +7695,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0134,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 78,
@@ -8818,8 +8829,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0513,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 90,

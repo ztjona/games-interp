@@ -21,6 +21,138 @@
       "p90": 0.1683
     }
   },
+  "K03-champYb-sSEED-topk-k32-exp8-s4.fc1|hawkYb": {
+    "flip_rate": 0.1228,
+    "geometric_frac_per_seed": {
+      "42": 0.2749,
+      "43": 0.2865,
+      "44": 0.2749
+    },
+    "geometric_frac_range": 0.0117,
+    "n_concepts": 171,
+    "n_flips": 21,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.4637,
+      "mean": 0.0413,
+      "median": 0.008,
+      "p90": 0.1363
+    }
+  },
+  "K03-champYb-sSEED-topk-k32-exp8-s4.fc1|henYb": {
+    "flip_rate": 0.076,
+    "geometric_frac_per_seed": {
+      "42": 0.4503,
+      "43": 0.4386,
+      "44": 0.4444
+    },
+    "geometric_frac_range": 0.0117,
+    "n_concepts": 171,
+    "n_flips": 13,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.3405,
+      "mean": 0.0241,
+      "median": 0.0061,
+      "p90": 0.0636
+    }
+  },
+  "K03-champYb-sSEED-topk-k32-exp8-s4.fc1|tigerYb": {
+    "flip_rate": 0.0,
+    "geometric_frac_per_seed": {
+      "42": 1.0,
+      "43": 1.0,
+      "44": 1.0
+    },
+    "geometric_frac_range": 0.0,
+    "n_concepts": 23,
+    "n_flips": 0,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.1977,
+      "mean": 0.0374,
+      "median": 0.0118,
+      "p90": 0.1175
+    }
+  },
+  "K04-champYb-sSEED-batchtopk-k32-exp8-s4.conv2|gorillaYb": {
+    "flip_rate": 0.0,
+    "geometric_frac_per_seed": {
+      "42": 1.0,
+      "43": 1.0,
+      "44": 1.0
+    },
+    "geometric_frac_range": 0.0,
+    "n_concepts": 76,
+    "n_flips": 0,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.0709,
+      "mean": 0.0216,
+      "median": 0.0192,
+      "p90": 0.0402
+    }
+  },
+  "K04-champYb-sSEED-batchtopk-k32-exp8-s4.conv2|hawkYb": {
+    "flip_rate": 0.1754,
+    "geometric_frac_per_seed": {
+      "42": 0.7076,
+      "43": 0.6433,
+      "44": 0.6842
+    },
+    "geometric_frac_range": 0.0643,
+    "n_concepts": 171,
+    "n_flips": 30,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.0641,
+      "mean": 0.0222,
+      "median": 0.0192,
+      "p90": 0.0388
+    }
+  },
+  "K04-champYb-sSEED-batchtopk-k32-exp8-s4.conv2|henYb": {
+    "flip_rate": 0.1287,
+    "geometric_frac_per_seed": {
+      "42": 0.8538,
+      "43": 0.8012,
+      "44": 0.8772
+    },
+    "geometric_frac_range": 0.076,
+    "n_concepts": 171,
+    "n_flips": 22,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.3219,
+      "mean": 0.0511,
+      "median": 0.0331,
+      "p90": 0.1192
+    }
+  },
   "K04-champYb-sSEED-batchtopk-k32-exp8-s4.conv2|tigerYb": {
     "flip_rate": 0.1739,
     "geometric_frac_per_seed": {
@@ -43,12 +175,188 @@
       "p90": 0.1223
     }
   },
+  "K05-champYb-sSEED-jumprelu-t64-exp8-s4.fc1|gorillaYb": {
+    "flip_rate": 0.0921,
+    "geometric_frac_per_seed": {
+      "42": 0.0526,
+      "43": 0.0789,
+      "44": 0.0789
+    },
+    "geometric_frac_range": 0.0263,
+    "n_concepts": 76,
+    "n_flips": 7,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.313,
+      "mean": 0.0285,
+      "median": 0.006,
+      "p90": 0.0827
+    }
+  },
+  "K05-champYb-sSEED-jumprelu-t64-exp8-s4.fc1|hawkYb": {
+    "flip_rate": 0.152,
+    "geometric_frac_per_seed": {
+      "42": 0.2456,
+      "43": 0.2281,
+      "44": 0.269
+    },
+    "geometric_frac_range": 0.0409,
+    "n_concepts": 171,
+    "n_flips": 26,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.4537,
+      "mean": 0.0467,
+      "median": 0.0071,
+      "p90": 0.1599
+    }
+  },
+  "K05-champYb-sSEED-jumprelu-t64-exp8-s4.fc1|henYb": {
+    "flip_rate": 0.1579,
+    "geometric_frac_per_seed": {
+      "42": 0.462,
+      "43": 0.4737,
+      "44": 0.4678
+    },
+    "geometric_frac_range": 0.0117,
+    "n_concepts": 171,
+    "n_flips": 27,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.5103,
+      "mean": 0.0495,
+      "median": 0.0139,
+      "p90": 0.1238
+    }
+  },
+  "K05-champYb-sSEED-jumprelu-t64-exp8-s4.fc1|tigerYb": {
+    "flip_rate": 0.0,
+    "geometric_frac_per_seed": {
+      "42": 0.9565,
+      "43": 0.9565,
+      "44": 0.9565
+    },
+    "geometric_frac_range": 0.0,
+    "n_concepts": 23,
+    "n_flips": 0,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.1309,
+      "mean": 0.0344,
+      "median": 0.0156,
+      "p90": 0.0893
+    }
+  },
+  "K06-champYb-sSEED-topk-k32-exp8-s4.conv2|gorillaYb": {
+    "flip_rate": 0.0,
+    "geometric_frac_per_seed": {
+      "42": 1.0,
+      "43": 1.0,
+      "44": 1.0
+    },
+    "geometric_frac_range": 0.0,
+    "n_concepts": 76,
+    "n_flips": 0,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.0627,
+      "mean": 0.022,
+      "median": 0.0204,
+      "p90": 0.0354
+    }
+  },
+  "K06-champYb-sSEED-topk-k32-exp8-s4.conv2|hawkYb": {
+    "flip_rate": 0.2047,
+    "geometric_frac_per_seed": {
+      "42": 0.6667,
+      "43": 0.7427,
+      "44": 0.7427
+    },
+    "geometric_frac_range": 0.076,
+    "n_concepts": 171,
+    "n_flips": 35,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.1552,
+      "mean": 0.0363,
+      "median": 0.0283,
+      "p90": 0.0717
+    }
+  },
+  "K06-champYb-sSEED-topk-k32-exp8-s4.conv2|henYb": {
+    "flip_rate": 0.1228,
+    "geometric_frac_per_seed": {
+      "42": 0.8363,
+      "43": 0.883,
+      "44": 0.924
+    },
+    "geometric_frac_range": 0.0877,
+    "n_concepts": 171,
+    "n_flips": 21,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.2847,
+      "mean": 0.0709,
+      "median": 0.0328,
+      "p90": 0.2014
+    }
+  },
+  "K06-champYb-sSEED-topk-k32-exp8-s4.conv2|tigerYb": {
+    "flip_rate": 0.3043,
+    "geometric_frac_per_seed": {
+      "42": 0.3913,
+      "43": 0.6522,
+      "44": 0.3913
+    },
+    "geometric_frac_range": 0.2609,
+    "n_concepts": 23,
+    "n_flips": 7,
+    "seeds": [
+      "42",
+      "43",
+      "44"
+    ],
+    "solo_frac_seed_sd": {
+      "max": 0.2904,
+      "mean": 0.0451,
+      "median": 0.0227,
+      "p90": 0.0581
+    }
+  },
   "_pooled_solo_frac_seed_sd": {
-    "in_use": 0.0523,
-    "max": 0.3762,
-    "mean": 0.0523,
-    "median": 0.0135,
-    "n_concepts": 99,
-    "p90": 0.1502
+    "in_use": 0.0407,
+    "max": 0.5103,
+    "mean": 0.0407,
+    "median": 0.0191,
+    "n_concepts": 1764,
+    "p90": 0.1145
   }
 }

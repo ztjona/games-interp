@@ -37,7 +37,8 @@
       "tile_neg_frac": 0.5,
       "band_sds": 3.0,
       "solo_frac_seed_sd": 0.0523,
-      "rule_version": "3A.4",
+      "asymptote_r2_seed_sd": 0.00648,
+      "rule_version": "3A.5",
       "seed": 0
     }
   },
@@ -183,15 +184,15 @@
     "verdict": "3C-proceeds",
     "deprioritized_because": null,
     "gate_is_provisional": false,
-    "n_undecided": 4,
-    "undecided_frac": 0.1739,
+    "n_undecided": 18,
+    "undecided_frac": 0.7826,
     "undecided_flips_on": {
-      "asymptote_r2": 3,
+      "asymptote_r2": 18,
       "solo_frac": 2
     },
-    "geometric_frac_lo": 0.8261,
+    "geometric_frac_lo": 0.2174,
     "geometric_frac_hi": 1.0,
-    "gate_verdict_is_stable": true,
+    "gate_verdict_is_stable": false,
     "band": {
       "sds": 3.0,
       "solo_frac_seed_sd": 0.0523
@@ -756,8 +757,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0382,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 10,
@@ -850,8 +853,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0466,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 11,
@@ -944,8 +949,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0456,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 12,
@@ -1132,8 +1139,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0397,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 14,
@@ -1226,8 +1235,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0446,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 15,
@@ -1320,8 +1331,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0433,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 16,
@@ -1414,8 +1427,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0343,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 17,
@@ -1604,8 +1619,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0402,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 19,
@@ -1698,8 +1715,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0419,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 20,
@@ -1792,8 +1811,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0453,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 21,
@@ -1886,8 +1907,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0368,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 22,
@@ -1980,8 +2003,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0461,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 23,
@@ -2074,8 +2099,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0452,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 24,
@@ -2265,8 +2292,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0416,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 26,
@@ -2457,6 +2486,7 @@
       "verdict": "spread",
       "verdict_stability": "undecided",
       "verdict_flips_on": [
+        "asymptote_r2",
         "solo_frac"
       ]
     }

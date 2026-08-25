@@ -36,7 +36,8 @@
       "tile_neg_frac": 0.5,
       "band_sds": 3.0,
       "solo_frac_seed_sd": 0.0523,
-      "rule_version": "3A.4",
+      "asymptote_r2_seed_sd": 0.00648,
+      "rule_version": "3A.5",
       "seed": 0
     }
   },
@@ -182,14 +183,14 @@
     "verdict": "3C-deprioritized",
     "deprioritized_because": "captured",
     "gate_is_provisional": false,
-    "n_undecided": 5,
-    "undecided_frac": 0.0658,
+    "n_undecided": 8,
+    "undecided_frac": 0.1053,
     "undecided_flips_on": {
-      "asymptote_r2": 3,
+      "asymptote_r2": 6,
       "solo_frac": 2
     },
-    "geometric_frac_lo": 0.0658,
-    "geometric_frac_hi": 0.1316,
+    "geometric_frac_lo": 0.0526,
+    "geometric_frac_hi": 0.1579,
     "gate_verdict_is_stable": true,
     "band": {
       "sds": 3.0,
@@ -3362,8 +3363,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0399,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 113,
@@ -3456,8 +3459,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0408,
       "verdict": "absent",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 114,
@@ -3930,8 +3935,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.043,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 119,

@@ -424,9 +424,10 @@ def test_verdicts_are_three_way_at_rule_3A3():
     Jaccard is ~0.10 for captured concepts and ~0.10 for spread ones.
     """
     cfg = DilutionConfig()
-    # 3A.4 only ADDS the stability band; the point verdict is unchanged, so the
-    # three-way collapse below must still hold at every later rule version.
-    assert cfg.rule_version == "3A.4"
+    # 3A.4 added the stability band and 3A.5 calibrated it; neither changes the
+    # point verdict, so the three-way collapse below must hold at every later
+    # rule version.
+    assert cfg.rule_version == "3A.5"
     seen = {
         classify(_metrics(asymptote_r2=0.001, null_r2=0.0), cfg),      # absent
         classify(_metrics(solo_frac=0.95, intrinsic_dim=1.0), cfg),    # captured

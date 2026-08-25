@@ -118,8 +118,12 @@ def main() -> int:
         print(f"\n!! {len(straddle)}/{len(rows)} runs have a stability band that "
               f"STRADDLES the 0.50 gate: geometric_frac is not determined for "
               f"them at +/-band_sds sd, so their verdict must not be quoted as "
-              f"a result. (Rule 3A.4; see the 2026-08-21 bimodality retraction "
-              f"for why the band is required.)")
+              f"a result. (See the 2026-08-21 bimodality retraction for why "
+              f"the band is required. NOTE lo/hi is a WORST-CASE union bound: "
+              f"it resolves every undecided concept the same way at once, so "
+              f"it is 3-10x wider than the measured cross-seed range and is "
+              f"vacuous at small n -- tiger has 23 concepts, so each is 0.043 "
+              f"of geometric_frac.)")
         for r in straddle:
             print(f"     {r['run_id'][:44]:<46}{r['bsp_set']:<11}"
                   f"[{r['geometric_frac_lo']:.2f}, {r['geometric_frac_hi']:.2f}]")

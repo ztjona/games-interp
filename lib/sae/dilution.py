@@ -115,28 +115,49 @@ class DilutionConfig:
     # below 0.4, but 20 sit in between -- there is no valley for 0.70 to fall
     # into. A threshold on a continuum needs an uncertainty band or it reports
     # noise as a finding, so the band is REQUIRED, not decorative.
-    band_sds: float = 3.0
-    # Per-concept cross-seed sd of solo_frac, measured over seeds 42/43/44 on
-    # K03/K04-champYb (99 concepts, 2026-08-21). The MEAN, deliberately, not
-    # the median: the sd distribution is heavily right-skewed (median 0.0110,
-    # mean 0.0523, p90 0.12-0.17), and a band is a claim about the tail, not
-    # the centre. Banding at 3 x median called 96.6% of verdicts confident
-    # while direct seed replication measured 12-17% of them flipping; 3 x mean
-    # reproduces the measured rate. Cross-seed variation cannot be estimated
-    # from ONE run, so unlike asymptote_r2_std this has to be a constant.
-    # Re-derive it with `python scripts/verdict_stability.py`, which also
-    # prints the GROUND-TRUTH flip rate this band only approximates, and warns
-    # if the constant here has drifted from the measurement.
-    solo_frac_seed_sd: float = 0.0523
+    # Calibrated 2026-08-24 against the seed grid's measured flip rates, which
+    # is the first time this could be chosen by measurement rather than taste.
+    # Sweep over 16 condition x basis cells (mean measured flip rate 11.4%):
+    #   with the asymptote floor -- 0.5sd -> 8.2%, 1.0 -> 15.9%, 3.0 -> 25.3%
+    #   without it               -- 3.0sd -> 7.1%, i.e. under-calls at EVERY
+    #                               width, because a split sd cannot see seeds.
+    # 1.0 sits at 1.40x the measured rate: deliberately a little conservative,
+    # because a concept that did not flip across three draws can still be near
+    # enough to flip on a fourth, and "undecided" should mean "could plausibly
+    # land the other side", not "did land it in this sample". 3.0 was a
+    # ~99.7% interval and flagged 91% of one cell -- too blunt to be useful.
+    band_sds: float = 1.0
+    # Per-concept cross-seed sd of solo_frac. Re-measured 2026-08-24 on the
+    # seed grid: 4 conditions x 3 seeds x 4 bases, **1,764 concepts** (the
+    # previous 0.0523 came from 99 concepts, 2 conditions, one basis).
+    # The MEAN, deliberately, not the median: the distribution is heavily
+    # right-skewed (median 0.0191, mean 0.0407, p90 0.1145), and a band is a
+    # claim about the tail. Per-basis means span only 1.6x (gorilla 0.0300,
+    # hawk 0.0366, tiger 0.0459, hen 0.0489), so one pooled constant is fair;
+    # the within-basis skew is ~5x and dominates.
+    # Re-derive with `python scripts/verdict_stability.py`, which prints the
+    # GROUND-TRUTH flip rate and warns if this constant has drifted.
+    solo_frac_seed_sd: float = 0.0407
+    # Cross-seed sd of asymptote_r2, same grid, same 1,764 concepts.
+    # `asymptote_r2_std` is a WITHIN-RUN split sd: it resamples rows but never
+    # retrains the SAE, so it cannot see seed movement at all and was measured
+    # **1.96x low (median) / 3.39x (mean)**. That is the single biggest reason
+    # the band under-called the measured flip rate. `_band_sd` takes the LARGER
+    # of the per-concept split sd and this floor, keeping concept-specific
+    # noise where it exceeds typical seed movement without ever under-stating.
+    asymptote_r2_seed_sd: float = 0.00648
 
     # Bumped whenever ``classify`` changes, so a stored verdict can always be
     # traced to the rule that produced it. 3A.1 = original (knee_k AND
     # community_size only); 3A.2 = adds the solo_frac/intrinsic_dim path;
     # 3A.3 = adds the random-model floor and collapses diluted/tiled -> spread;
-    # 3A.4 = adds the stability band (``classify_with_stability``). The point
-    # verdict is UNCHANGED at 3A.4 -- only the confidence annotation is new, so
-    # every 3A.3 verdict still reads the same.
-    rule_version: str = "3A.4"
+    # 3A.4 = adds the stability band (``classify_with_stability``);
+    # 3A.5 = band CALIBRATED against measured cross-seed flip rates (band_sds
+    # 3.0 -> 1.0, asymptote_r2 gains a measured seed floor, solo_frac_seed_sd
+    # 0.0523 -> 0.0407 on 1,764 concepts instead of 99).
+    # The point verdict is UNCHANGED at both 3A.4 and 3A.5 -- only the
+    # confidence annotation moves, so every 3A.3 verdict still reads the same.
+    rule_version: str = "3A.5"
 
     seed: int = 0
 
@@ -834,8 +855,11 @@ def _band_sd(key: str, source: str, metrics: dict, cfg: DilutionConfig) -> float
         return float(getattr(cfg, source[len("@cfg."):]))
     sd = float(metrics.get(source) or 0.0)
     if key == "asymptote_r2" and cfg.n_splits > 1:
-        # sd of a mean of n_splits draws.
+        # sd of a mean of n_splits draws...
         sd /= math.sqrt(cfg.n_splits)
+        # ...floored at the MEASURED cross-seed movement, because a split sd
+        # never retrains the SAE and so cannot see seed variation at all.
+        sd = max(sd, cfg.asymptote_r2_seed_sd)
     return sd
 
 

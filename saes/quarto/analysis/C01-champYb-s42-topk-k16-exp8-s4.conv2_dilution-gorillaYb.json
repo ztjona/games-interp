@@ -36,7 +36,8 @@
       "tile_neg_frac": 0.5,
       "band_sds": 3.0,
       "solo_frac_seed_sd": 0.0523,
-      "rule_version": "3A.4",
+      "asymptote_r2_seed_sd": 0.00648,
+      "rule_version": "3A.5",
       "seed": 0
     }
   },
@@ -182,10 +183,12 @@
     "verdict": "3C-proceeds",
     "deprioritized_because": null,
     "gate_is_provisional": false,
-    "n_undecided": 0,
-    "undecided_frac": 0.0,
-    "undecided_flips_on": {},
-    "geometric_frac_lo": 1.0,
+    "n_undecided": 4,
+    "undecided_frac": 0.0526,
+    "undecided_flips_on": {
+      "asymptote_r2": 4
+    },
+    "geometric_frac_lo": 0.9474,
     "geometric_frac_hi": 1.0,
     "gate_verdict_is_stable": true,
     "band": {
@@ -535,8 +538,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0473,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 83,
@@ -4295,8 +4300,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0452,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 123,
@@ -5047,8 +5054,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0495,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 131,
@@ -6551,8 +6560,10 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0421,
       "verdict": "spread",
-      "verdict_stability": "confident",
-      "verdict_flips_on": []
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 147,
