@@ -1,0 +1,14 @@
+\begin{tabular}{llrrrrr}
+\toprule
+agent & layer & $n$ & $R^2$ & $R^2_{\text{rand}}$ & retention & solo \\
+\midrule
+M1 & conv2 & 810 & 0.096 & 0.032 & 3.0$\times$ & 0.28 \\
+M1 & fc1 & 810 & 0.163 & 0.031 & 5.3$\times$ & 0.43 \\
+\addlinespace[2pt]
+M2 & conv2 & 810 & 0.097 & 0.032 & 3.1$\times$ & 0.25 \\
+M2 & fc1 & 810 & 0.260 & 0.028 & 9.2$\times$ & 0.58 \\
+\addlinespace[2pt]
+M3 & conv2 & 810 & 0.087 & 0.037 & 2.3$\times$ & 0.13 \\
+\textbf{M3} & \textbf{fc1} & 810 & 0.565 & 0.037 & \textbf{15.2$\times$} & \textbf{0.92} \\
+\bottomrule
+\end{tabular}

@@ -1,0 +1,22 @@
+\begin{tabular}{llrrrrrc}
+\toprule
+basis & concept family & $n$ & base rate & fc1 & conv2 & $\Delta$ & fc1 wins \\
+\midrule
+state & \texttt{board\_occupancy} & 16 & 0.3401 & 0.448 & 0.542 & \textbf{-0.094} & 2/9 \\
+state & \texttt{board\_attribute} & 64 & 0.1713 & 0.399 & 0.518 & \textbf{-0.119} & 2/9 \\
+state & \texttt{offered\_piece\_attr} & 4 & 0.5042 & 0.370 & 0.378 & \textbf{-0.008} & 3/9 \\
+\midrule
+state & \texttt{line\_threat} & 40 & 0.0095 & 0.260 & 0.102 & \textbf{+0.158} & 9/9 \\
+state & \texttt{square\_threat} & 36 & 0.0091 & 0.388 & 0.106 & \textbf{+0.281} & 9/9 \\
+state & \texttt{global\_threat}$\ddagger$ & 1 & 0.2559 & 0.383 & 0.201 & \textbf{+0.183} & 9/9 \\
+state & \texttt{game\_phase} & 3 & 0.3333 & 0.432 & 0.230 & \textbf{+0.202} & 9/9 \\
+count & \texttt{line\_threat} & 90 & 0.0136 & 0.244 & 0.110 & \textbf{+0.134} & 9/9 \\
+count & \texttt{square\_threat} & 81 & 0.0126 & 0.340 & 0.112 & \textbf{+0.228} & 9/9 \\
+count & \texttt{global\_threat}$\ddagger$ & 2 & 0.2525 & 0.360 & 0.201 & \textbf{+0.159} & 9/9 \\
+agent-rel. & \texttt{line\_threat} & 10 & 0.0248 & 0.195 & 0.101 & \textbf{+0.094} & 9/9 \\
+agent-rel. & \texttt{square\_threat} & 9 & 0.0229 & 0.273 & 0.101 & \textbf{+0.172} & 9/9 \\
+agent-rel. & \texttt{global\_threat}$\ddagger$ & 5 & 0.4510 & 0.405 & 0.217 & \textbf{+0.188} & 9/9 \\
+agent-rel. & \texttt{pool\_reasoning}$\ddagger$ & 8 & 0.4928 & 0.405 & 0.216 & \textbf{+0.188} & 9/9 \\
+agent-rel. & \texttt{offered\_completion} & 4 & 0.0476 & 0.239 & 0.147 & \textbf{+0.092} & 8/9 \\
+\bottomrule
+\end{tabular}
