@@ -45,12 +45,14 @@
   add a third measurement that asks where a concept goes when no single atom
   carries it. Across three agents, three SAE architectures in fourteen recipes,
   four dictionary widths and 546 ground-truth concepts: \textbf{(i)} the preferred layer partitions
-  perfectly by concept family---every per-cell family prefers the convolutional
-  layer, every relational family the bottleneck, in 9 of 9 matched cells---so a
-  pooled comparison averages effects of opposite sign and reports nothing;
+  by concept family (fourteen of fifteen families' cell-averaged gaps point the
+  same way, per-cell toward the convolutional layer and relational toward the
+  bottleneck), so a pooled comparison averages effects of opposite sign and
+  reports nothing;
   \textbf{(ii)} the probe overturns the natural reading of that split, since for
   state threats the convolutional layer is \emph{equally or more} linearly
-  available in 11 of 12 cells while its dictionary isolates 3--5$\times$ less;
+  available in 11 of 12 cells while its dictionary isolates
+  $1.4$--$4.8\times$ less;
   and \textbf{(iii)} the residual failure has a specific logical shape. Holding
   basis, agent-relativity and base rate fixed and varying only logical form,
   single-atom capture drops from 81.2\% to \textbf{0.0\%} the moment a concept is
@@ -78,7 +80,7 @@ move from being completed---poorly. The asymmetry is robust across
 architectures and capacities, which makes it look structural rather than
 incidental. Two very different explanations predict exactly this observation.
 On \textbf{the information account}, the network never forms the relational
-concept---it plays well by some non-decomposable shortcut, so no dictionary can
+concept; it plays well by some non-decomposable shortcut, so no dictionary can
 surface what is not there, and the fix is to change the \emph{model}: different
 objective, architecture, or auxiliary supervision. On \textbf{the factorisation
   account}, the network does form the concept but distributes it over many
@@ -89,7 +91,7 @@ directions, so no single atom aligns with it
 These prescriptions are opposite, and the standard evaluation cannot tell them
 apart, because it measures one dictionary at one layer and has no reference for
 what was available to be decomposed. Our first move is a measurement that is
-cheap and, as far as we can tell, not standard: run a linear probe \emph{and} an
+cheap and, to our knowledge, not standard: run a linear probe \emph{and} an
 SAE on the \emph{same} activations, at two layers, for the same concepts and the
 same positions. The probe upper-bounds what is linearly present
 (\emph{availability}); the best single latent measures what the dictionary
@@ -101,25 +103,29 @@ still somewhere: we regress the concept on the 64 most associated latents and
 ask how much they recover at all (\emph{retention}, against a matched dictionary
 trained on an untrained network) and what share of it sits in the single best
 one (\emph{concentration}). Together these turn ``the SAE score is low'' into
-``the dictionary lost it'' versus ``the dictionary has it, in pieces''---and
+``the dictionary lost it'' versus ``the dictionary has it, in pieces'', and
 since we know what each concept is a function of, we can then ask which pieces.
 Our contributions:
 
 \begin{enumerate}
-  \item \textbf{The preferred layer partitions perfectly by concept family}
-        (\S\ref{sec:partition}): over nine matched (agent $\times$ recipe) cells,
-        every per-cell family prefers the convolutional layer and every relational
-        family the bottleneck, with no exceptions. A pooled comparison averages a
-        $+0.28$ against a $-0.12$ and is uninterpretable.
+  \item \textbf{The preferred layer partitions by concept family}
+        (\S\ref{sec:partition}): the cell-averaged gap points the same way for all
+        fifteen families over nine matched (agent $\times$ recipe) cells---per-cell
+        toward the convolutional layer, relational toward the bottleneck; the
+        fifteenth, the trivial-baseline family, is a near-tie that splits by agent.
+        A pooled comparison averages a $+0.28$ against a $-0.12$ and is
+        uninterpretable.
   \item \textbf{The gap is factorisation, not information}
         (\S\ref{sec:availability}): for state threats the convolutional layer is
         equally or \emph{more} linearly available in 11 of 12 cells, yet its
-        dictionary isolates 3--5$\times$ less.
+        dictionary isolates $1.4$--$4.8\times$ less.
   \item \textbf{Retention separates two failures that score alike}
-        (\S\ref{sec:retention}): at the strongest agent's bottleneck the dictionary
-        holds $15.2\times$ the untrained-network floor and concentrates $0.92$ of it;
-        at its convolutional layer, $2.3\times$ and $0.13$. Both score
-        $I \approx 0.18$ on the concepts we care about, for opposite reasons.
+        (\S\ref{sec:retention}): state threats at the strongest agent's convolutional
+        layer and disjunctive concepts at its bottleneck both fall far short of a
+        single atom (concentration $0.13$ and $0.31$ against the $0.70$ threshold),
+        but retention reads the first as barely in the dictionary ($2.3\times$ the
+        untrained-network floor) and the second as fully in it (median $R^2 = 0.741$)
+        and split across its disjuncts.
   \item \textbf{The residual wall is a \emph{disjunction} wall}
         (\S\ref{sec:disjunction}): within a single basis, with agent-relativity and
         base rate held fixed, capture goes $81.2\% \to 0.0\%$ when the only change is
@@ -144,10 +150,13 @@ attribute. The distinctive rule is that \emph{your opponent chooses the piece
 piece for my opponent'' a first-class strategic concept and cleanly separates
 board-state from agent-relative concepts.
 
-\paragraph{Agents.} Three value-based convolutional agents share an identical
-trunk and differ only in training procedure: \textbf{M1} distils a depth-2
-minimax selector, \textbf{M2} adds an oracle-ablation curriculum, and
-\textbf{M3} adds dense piece-safety shaping. Head-to-head, $\text{M3} >
+\paragraph{Agents.} Three value-based convolutional agents share the same trunk
+and differ mainly in training procedure: \textbf{M1} selects self-play moves with
+a depth-2 minimax selector, \textbf{M2} distils a depth-2 minimax oracle for
+selection and keeps it enabled throughout training, and \textbf{M3} adds dense
+piece-safety shaping. \textbf{M3} also carries one training-only auxiliary head
+that is never read at inference, and \textbf{M1} trains for 4{,}350 epochs
+against 10{,}000 for \textbf{M2}/\textbf{M3}. Head-to-head, $\text{M3} >
   \text{M2} > \text{M1}$, so the three form an ordered competence axis; all three
 remain below a depth-2 minimax baseline. Each contributes its own deduplicated
 self-play position set (290{,}147 / 289{,}795 / 296{,}045 positions), aggregated
@@ -244,15 +253,15 @@ lower-bound presence.
 \section{Results}
 \label{sec:results}
 
-\subsection{The preferred layer partitions perfectly by concept family}
+\subsection{The preferred layer partitions by concept family}
 \label{sec:partition}
 
 \begin{table}[t]
   \centering
   \caption{Best-latent MCC by concept family, averaged over nine matched
     (agent $\times$ recipe) cells; $\Delta = \text{fc1} - \text{conv2}$. ``fc1
-    wins'' counts cells with $\Delta>0$. The partition is total: every per-cell
-    family goes to conv2, every relational family to fc1.
+    wins'' counts cells with $\Delta>0$. The partition is total for
+    fourteen of fifteen families---the trivial-baseline family is a near-tie.
     $\ddagger$ base rate far from $p_{\text{ref}}$; read on raw MCC.}
   \label{tab:split}
   \small
@@ -263,12 +272,12 @@ Table~\ref{tab:split} gives every family, averaged over the nine matched cells.
 Per-cell families go to \texttt{conv2} (fc1 wins 2/9, 2/9 and 3/9); every
 relational family goes to \texttt{fc1} (9/9 for eleven of twelve, 8/9 for the
 twelfth). The two groups do not overlap, and the sign is stable across three
-agents and three recipes. The methodological consequence is that a \emph{pooled}
+agents and three recipes---the one exception being the trivial-baseline family.
+The methodological consequence is that a \emph{pooled}
 layer comparison is meaningless here: averaging $+0.281$ on square threats with
 $-0.119$ on cell attributes yields a number whose sign depends on how many
 concepts of each kind the menu happens to contain, not on anything about the
-model. Our own earlier pooled reading of these same runs said simply ``fc1 is
-better,'' which is true on the menu average and false for a third of the menu.
+model.
 
 \subsection{The probe changes what the split means}
 \label{sec:availability}
@@ -277,7 +286,8 @@ better,'' which is true on the menu average and false for a third of the menu.
   \centering
   \caption{Availability (linear probe) vs.\ isolation (best latent) on state
     threats, standardised to $p_{\text{ref}}=0.025$. conv2 is equally or more
-    linearly available in 11 of 12 cells, while fc1 isolates 3--5$\times$ more.}
+    linearly available in 11 of 12 cells, while fc1 isolates
+    $1.4$--$4.8\times$ more.}
   \label{tab:avail}
   \small
   \input{table_availability.tex}
@@ -309,11 +319,9 @@ $0.938$ at fc1, a difference of $0.008$) and their dictionaries differ by
 This is the paper's first observation. The information is not lost crossing the
 bottleneck---a probe recovers it at $0.87$--$0.96$ on \emph{both} sides. What
 changes is its \emph{form}: distributed across a spatial map at \texttt{conv2},
-factored into individual directions at \texttt{fc1}. The two dictionaries have
-identical input width, size, recipe, positions and concepts, so the only
-variable left is how the layer arranges the information. Note also how flat the
-conv2 efficiency column is: $0.18$--$0.23$ across every
-basis, family and agent, so whatever prevents atomisation there is insensitive
+factored into individual directions at \texttt{fc1}. Note also how flat the
+conv2 efficiency column is: $0.18$--$0.23$ across the twelve cells of
+Table~\ref{tab:avail}, so whatever prevents atomisation there is insensitive
 to how much of the concept is present. Along the competence axis
 $\text{M1} \to \text{M2} \to \text{M3}$, by contrast, fc1 efficiency rises
 $0.48 \to 0.59 \to 0.91$ on square threats and $0.41 \to 0.51 \to 0.62$ on line
@@ -341,14 +349,13 @@ threats off raw \texttt{conv2} activations at MCC $0.87$--$0.96$, this says
 something sharper than ``conv2's dictionary is worse'': \textbf{the concept is
   in the layer and is not in the dictionary}, not even spread over 64 latents.
 The convolutional failure is an encoding failure; only the bottleneck failure is
-a factorisation failure in the sense \S\ref{sec:method} defines. The two are
-indistinguishable on isolation alone---both score $I \approx 0.18$---which is
-why isolation alone should not be used to choose a fix. A third case completes
+a factorisation failure in the sense \S\ref{sec:method} defines. Both score low
+on isolation ($I = 0.18$ and $0.30$, far below what the probe predicts), so
+isolation alone should not be used to choose a fix. A third case completes
 the set and behaves exactly as the information account predicts: at
 \texttt{conv2}, agent-relative concepts score low on \emph{availability} too
-($0.338$, against $0.808$ at fc1 on M3's ``winnable square'' family), because
-they are functions of the offered piece and the offered piece is first combined
-with board state at the fully-connected layers. When a layer genuinely lacks a
+($0.338$, against $0.808$ at fc1 on M3's ``winnable square'' family). When a
+layer genuinely lacks a
 concept, availability drops as well; state threats do not behave that way, which
 is the contrast \S\ref{sec:availability} rests on. Everything below
 therefore concerns M3 / \texttt{fc1}, the one (agent, layer) where the
@@ -393,16 +400,17 @@ the offered piece and have a median base rate of $0.0030$, and are still
 captured four times in five. Pooled over bases the gap is 9 points. Whatever the
 wall is, it is not agent-relativity.
 
-\textbf{Nor is it prevalence, which runs the wrong way.} The \emph{most}
-captured group is the rarest (agent-relative pinned, base rate $0.0029$) and the
-least captured is among the most common (disjunctive, $0.0316$); restricting
-both arms to a common window $[0.015, 0.050]$ leaves the effect intact, 71.4\%
-captured for pinned ($n=868$) against \textbf{0.0\%} for disjunctive ($n=437$).
-Critically, \textbf{the disjunctive concepts are not information-poor}
-(Figure~\ref{fig:disj}, left): they have the \emph{highest} retention in the
-table---median $R^2 = 0.741$ for \textsc{count}'s 4-way disjunctions against
-$0.530$ for its pinned concepts. The dictionary knows the answer and has no atom
-for it.
+\textbf{Nor is it prevalence.} A matched comparison settles it: restricting
+both arms to a common base-rate window $[0.015, 0.050]$ leaves the effect
+intact, 71.4\% captured for pinned ($n=868$) against \textbf{0.0\%} for
+disjunctive ($n=437$). The direction runs the wrong way at the level of shape
+too: the disjunctive concepts are the \emph{more common} (base rates
+$0.0316$/$0.0226$) and the least captured, while the rarer pinned concepts
+($0.0152$/$0.0029$) are captured 68--77\%. Critically, \textbf{the disjunctive
+  concepts are not information-poor} (Figure~\ref{fig:disj}, left): they have the
+\emph{highest} retention in the table---median $R^2 = 0.741$ for \textsc{count}'s
+4-way disjunctions against $0.532$ for its pinned state concepts. The dictionary
+knows the answer and has no atom for it.
 
 \subsection{The mechanism, and what capacity does not fix}
 \label{sec:mechanism}
@@ -460,15 +468,15 @@ by $0.000$, with median concentration flat at $0.19$--$0.20$.
 \paragraph{The \texttt{captured} arm fires, and selection does not manufacture
   retention.} A three-way verdict is worthless if one arm never triggers. Across
 the panel \texttt{captured} fires 2{,}265 times in 12{,}151 verdicts (18.6\%;
-\texttt{spread} 74.6\%, \texttt{absent} 6.8\%), including an entire unsupervised
-basis at 85.5\% on M3 / \texttt{fc1}; the supervised positive control---slots
+\texttt{spread} 74.6\%, \texttt{absent} 6.8\%), including the state basis's threat
+categories at 85.5\% on M3 / \texttt{fc1}; the supervised positive control---slots
 anchored to the agent-relative concepts by an auxiliary loss---comes out 16 of
 23 \texttt{captured} at concentration $0.76$, against 0/23 for unsupervised
 dictionaries on identical rows. All 114 cells carry 100\% random-control
 coverage and none is provisional. Separately, ranking latents on rows that
 overlap the rows $R^2$ is measured on is double-dipping that the permutation
 null cannot see, since it shuffles labels \emph{after} selection; a
-selection-aware null---permute first, then re-rank, re-select and refit---
+selection-aware null---permute first, then refit the whole pipeline---
 returns $-0.0006$ to $-0.0013$ where the real values are $0.058$--$0.656$.
 Selecting 64 of the 199--643 live latents buys no held-out $R^2$ from noise.
 
@@ -483,7 +491,8 @@ relational families are unchanged, per-cell isolation recovers $\sim$5$\times$
 ($0.108 \to 0.527$), and square-threat isolation moves only $0.115 \to 0.178$
 against fc1's $0.851$. Represented by its \emph{best} dictionary rather than its
 worst, conv2 is demonstrably competent at per-cell concepts and still fails on
-threats. All conv2 numbers above use the repaired dictionary.
+threats. All conv2 numbers above use the repaired dictionary except
+Table~\ref{tab:split}, whose pre-repair split counts understate the partition.
 
 \paragraph{Stability, and the one cell we do not quote.} Across a 4-condition
 $\times$ 3-seed grid (1{,}764 concepts), 11.4\% of concept verdicts flip between
@@ -534,13 +543,14 @@ because it is fine-grained, and averaging over the whole menu discards that.
 \section{Discussion and limitations}
 \label{sec:discussion}
 
-A low SAE score is not self-interpreting. On these agents the same
-$I \approx 0.18$ means three different things: ``barely present in the layer''
-(agent-relative concepts at \texttt{conv2}), ``present in the layer, absent from
-the dictionary'' (state threats at \texttt{conv2}), and ``present in the
-dictionary, split across its disjuncts'' (disjunctive concepts at \texttt{fc1}).
-Availability separates the first from the other two, retention the second from
-the third, and only the third is a failure dictionary design can address.
+A low SAE score is not self-interpreting. On these agents low isolation means
+three different things, spanning a $3\times$ range ($I = 0.096$--$0.30$):
+agent-relative concepts barely present in the convolutional layer, state
+threats present in the layer but absent from its dictionary, and disjunctive
+concepts present in the bottleneck's dictionary but split across their
+disjuncts. Availability separates the first from the other two, retention the
+second from the third, and only the third is a failure dictionary design can
+address.
 Reporting a probe baseline and a retention floor per concept family alongside
 any SAE evaluation is cheap and changes which fix you reach for.
 
@@ -560,9 +570,7 @@ whole dictionary holds; a concept recoverable only from hundreds of latents
 reads as low retention---the right reading for interpretability, not for
 information content. \textbf{(iii) The tiling signature is conditional} on the
 dictionary having resolved atoms at all, and holds on one (agent, layer) pair. \textbf{(iv) Linear
-  availability only}, and two layers rather than a depth sweep---a concept
-present non-linearly registers as unavailable, and where between the two layers
-the change of form occurs is open. \textbf{(v) One game, one architecture
+  availability only, and two layers rather than a depth sweep}. \textbf{(v) One game, one architecture
   family}; whether the partition and the disjunction wall transfer elsewhere is
 untested, the strongest prior evidence being \citet{du2025gpt} and the
 absorption literature's arrival at the same non-fix.
