@@ -565,3 +565,62 @@ def test_band_is_a_pure_function_of_stored_metrics():
     before = copy.deepcopy(m)
     classify_with_stability(m, cfg)
     assert m == before, "classify_with_stability must not mutate its input"
+
+
+def test_cli_defaults_match_dilution_config():
+    """The CLI must not carry a second copy of any rule constant.
+
+    Regression guard for the 2026-08-25 defect: `dilution_diagnostic.py`
+    hard-coded `--band-sds [default: 3.0]` and
+    `--solo-frac-seed-sd [default: 0.0523]` in its docstring while
+    `DilutionConfig` had moved to rule 3A.5 (1.0 / 0.0407). Every one of the 114
+    panel reports was therefore stamped `rule_version: 3A.5` and banded at
+    3A.4's width -- a stored verdict that cannot be traced to the rule that
+    produced it, which is the one thing `rule_version` exists to prevent.
+
+    Same failure family as the 2026-08-21 selection/gate split: a constant with
+    two homes drifts. Every threshold flag now defaults to `auto`.
+    """
+    from docopt import docopt
+
+    import scripts.dilution_diagnostic as cli
+
+    args = docopt(cli.__doc__, argv=["--run-id=x", "--bsps=y"])
+    for flag, field, _cast in cli._CFG_OVERRIDES:
+        assert str(args[flag]).lower() == "auto", (
+            f"{flag} hard-codes a value; it must default to `auto` so "
+            f"DilutionConfig.{field} stays the single source of truth")
+    assert cli._config_from_args(args) == DilutionConfig()
+
+
+def test_cli_overrides_still_apply():
+    """`auto` must not make the flags inert."""
+    from docopt import docopt
+
+    import scripts.dilution_diagnostic as cli
+
+    args = docopt(cli.__doc__, argv=["--run-id=x", "--bsps=y",
+                                     "--band-sds=2.5", "--top-k=32"])
+    cfg = cli._config_from_args(args)
+    assert cfg.band_sds == 2.5 and cfg.top_k == 32
+    assert cfg.solo_frac_seed_sd == DilutionConfig().solo_frac_seed_sd
+
+
+def test_panel_freshness_keys_cover_every_banded_constant():
+    """A report is only `current` if its band constants match too.
+
+    The freshness check keyed on `rule_version` + `top_k`, so it called all 114
+    stale-banded reports current and `-SkipExisting` would have skipped the
+    repair. Anything `classify`/`classify_with_stability` reads must be keyed.
+    """
+    from lib.sae.dilution import _BAND_SOURCES
+    from scripts.build_3a_panel_runlist import FRESHNESS_KEYS
+
+    for key, source in _BAND_SOURCES:
+        if source.startswith("@cfg."):
+            assert source[len("@cfg."):] in FRESHNESS_KEYS
+    for field in ("band_sds", "asymptote_r2_seed_sd", "captured_solo_frac",
+                  "captured_idim", "absent_margin", "absent_floor",
+                  "random_margin", "rule_version", "top_k"):
+        assert field in FRESHNESS_KEYS, f"{field} is not keyed for freshness"
+        assert hasattr(DilutionConfig(), field)

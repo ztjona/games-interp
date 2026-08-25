@@ -15,7 +15,7 @@ Options:
     -h --help          Show this help message.
     --game=<name>      Game name [default: quarto]
     --expect-rule=<v>  Warn if any report was verdicted by a different rule
-                       [default: 3A.3]
+                       [default: auto] (auto = DilutionConfig.rule_version)
     --output=<path>    Output JSON [default: auto]
 """
 
@@ -28,6 +28,11 @@ from pathlib import Path
 from statistics import median
 
 from docopt import docopt
+
+ROOT = Path(__file__).resolve().parent.parent
+sys.path.insert(0, str(ROOT))
+
+from lib.sae.dilution import DilutionConfig  # noqa: E402
 
 # `spread` is the rule-3A.3 geometric verdict; the retired labels are still
 # counted so a not-yet-reclassified report summarises rather than crashes.
@@ -111,6 +116,8 @@ def main() -> int:
 
     rules = {r["rule_version"] for r in rows}
     expect = args["--expect-rule"]
+    if expect == "auto":
+        expect = DilutionConfig().rule_version
     if rules != {expect}:
         print(f"\nWARNING: mixed or stale verdict rules {sorted(rules)} "
               f"(expected {expect}). Run: python scripts/dilution_diagnostic.py "

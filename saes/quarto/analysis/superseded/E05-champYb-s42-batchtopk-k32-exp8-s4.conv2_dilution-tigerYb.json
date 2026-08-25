@@ -35,7 +35,10 @@
       "captured_idim": 2.0,
       "tile_overlap": 0.15,
       "tile_neg_frac": 0.5,
-      "rule_version": "3A.3",
+      "band_sds": 1.0,
+      "solo_frac_seed_sd": 0.0407,
+      "asymptote_r2_seed_sd": 0.00648,
+      "rule_version": "3A.5",
       "seed": 0
     }
   },
@@ -145,6 +148,26 @@
         "range": "0..1",
         "ideal": "n/a -- this is the gate quantity",
         "means": "(n_diluted + n_tiled) / n_threat_bsps for one run. The fraction of threat concepts whose failure mode is GEOMETRIC (present in the code but spread out) rather than absent or already clean. >= 0.50 -> Gate G-3A says phase 3C proceeds."
+      },
+      "verdict_stability": {
+        "range": "confident | undecided",
+        "ideal": "confident",
+        "means": "Does the verdict survive pushing every quantity `classify` thresholds on to +/- band_sds sd? `undecided` means the point estimate sits close enough to a boundary that a re-run could land the other side. Required because the thresholds cut a CONTINUUM (solo_frac is not bimodal -- 2026-08-21 retraction), and because seed replication measured 12-17% of per-concept verdicts flipping. Rule 3A.4."
+      },
+      "verdict_flips_on": {
+        "range": "list of metric names (possibly empty)",
+        "ideal": "empty",
+        "means": "Which banded quantity, moved ALONE, changes this verdict -- i.e. which threshold the verdict actually rests on. `asymptote_r2` points at the absent / learned-signal floor; `solo_frac` at the captured threshold."
+      },
+      "n_confident_spread / _captured / _absent": {
+        "range": "counts summing with n_undecided to n_threat_bsps",
+        "ideal": "n/a -- this IS the spectrum",
+        "means": "How many threat concepts hold each verdict ROBUSTLY, i.e. survive the +/-band_sds perturbation, plus how many are in play. Quote these, not an interval: turning the in-play concepts into a range on geometric_frac requires assuming how they would resolve, and every such assumption is arbitrary. '2 spread / 0 captured / 0 absent / 21 in play of 23' says plainly that the measurement is undetermined."
+      },
+      "geometric_frac_worst_lo / _worst_hi": {
+        "range": "0..1",
+        "ideal": "n/a -- the band on the gate quantity",
+        "means": "WORST CASE: geometric_frac if EVERY in-play concept resolved the least / most geometric way AT ONCE. A union bound, not a confidence interval -- measured 3-10x wider than the cross-seed range on 2026-08-24, and vacuous at small n (at tiger's 23 concepts one concept is 0.043 of the fraction). Its one legitimate use is `gate_verdict_is_stable`: when both ends fall the same side of 0.50 the gate holds no matter how the in-play concepts land."
       }
     },
     "verdicts": {
@@ -165,7 +188,22 @@
     "geometric_frac": 0.1739,
     "verdict": "3C-deprioritized",
     "deprioritized_because": "absent",
-    "gate_is_provisional": false
+    "gate_is_provisional": false,
+    "n_confident_spread": 4,
+    "n_confident_captured": 0,
+    "n_confident_absent": 18,
+    "n_undecided": 1,
+    "undecided_frac": 0.0435,
+    "undecided_flips_on": {
+      "asymptote_r2": 1
+    },
+    "geometric_frac_worst_lo": 0.1739,
+    "geometric_frac_worst_hi": 0.2174,
+    "gate_verdict_is_stable": true,
+    "band": {
+      "sds": 1.0,
+      "solo_frac_seed_sd": 0.0407
+    }
   },
   "category_summary": {
     "tiger_offered_completing_attr": {
@@ -294,7 +332,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0534,
-      "verdict": "spread"
+      "verdict": "spread",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 6,
@@ -363,7 +403,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0541,
-      "verdict": "spread"
+      "verdict": "spread",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 7,
@@ -432,7 +474,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0649,
-      "verdict": "spread"
+      "verdict": "spread",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 8,
@@ -501,7 +545,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0672,
-      "verdict": "spread"
+      "verdict": "spread",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 9,
@@ -570,7 +616,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0356,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 10,
@@ -639,7 +687,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0386,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 11,
@@ -708,7 +758,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0369,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 12,
@@ -777,7 +829,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0376,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 13,
@@ -846,7 +900,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0322,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 14,
@@ -915,7 +971,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0395,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 15,
@@ -984,7 +1042,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0464,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 16,
@@ -1053,7 +1113,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0314,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 17,
@@ -1122,7 +1184,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0413,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 18,
@@ -1191,7 +1255,11 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0393,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "undecided",
+      "verdict_flips_on": [
+        "asymptote_r2"
+      ]
     },
     {
       "bsp_index": 19,
@@ -1260,7 +1328,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0379,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 20,
@@ -1329,7 +1399,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0413,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 21,
@@ -1398,7 +1470,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0386,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 22,
@@ -1467,7 +1541,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0386,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 23,
@@ -1536,7 +1612,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0401,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 24,
@@ -1605,7 +1683,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0403,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 25,
@@ -1674,7 +1754,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0386,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 26,
@@ -1743,7 +1825,9 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0396,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 27,
@@ -1812,7 +1896,41 @@
       ],
       "random_control_applied": true,
       "random_asymptote_r2": 0.0392,
-      "verdict": "absent"
+      "verdict": "absent",
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     }
-  ]
+  ],
+  "family_summary": {
+    "offered_completion": {
+      "absent": 0,
+      "captured": 0,
+      "spread": 4,
+      "n": 4,
+      "n_spread": 4,
+      "geometric_frac": 1.0,
+      "mean_asymptote_r2": 0.1244,
+      "mean_solo_frac": 0.1704
+    },
+    "line_threat": {
+      "absent": 10,
+      "captured": 0,
+      "spread": 0,
+      "n": 10,
+      "n_spread": 0,
+      "geometric_frac": 0.0,
+      "mean_asymptote_r2": 0.0378,
+      "mean_solo_frac": 0.3333
+    },
+    "square_threat": {
+      "absent": 9,
+      "captured": 0,
+      "spread": 0,
+      "n": 9,
+      "n_spread": 0,
+      "geometric_frac": 0.0,
+      "mean_asymptote_r2": 0.0367,
+      "mean_solo_frac": 0.2848
+    }
+  }
 }

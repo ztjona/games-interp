@@ -1,6 +1,6 @@
 # Phase 3A first run: results, a failed calibration check, and rule 3A.2 (2026-07-27)
 
-Status: frozen self-contained record. Parent ledger: [`phase-3.md`](phase-3.md).
+Status: frozen self-contained record. Parent ledger: [`phase-3A.md`](phase-3A.md).
 Method spec (frozen, still accurate for everything except the `captured`
 branch): [`2026-07-21_3A-dilution-diagnostic.md`](2026-07-21_3A-dilution-diagnostic.md).
 Numbers from the report JSONs are `[DIRECT]`; interpretation is

@@ -284,9 +284,25 @@ At base rate 0.02, a flat 40k subsample leaves ~800 positives and ~240 in the
 held-out split — too few to trust a knee. The `min_positives` rule widens the
 budget to ~100k rows for such a concept while **preserving the natural base
 rate** (it is a larger uniform sample, not a stratified/enriched one, so R2 stays
-interpretable). Reports carry `n_curve_rows` and `n_curve_positives`; a concept
-whose `n_curve_positives` is far below `min_positives` is too rare in this
-dataset to diagnose and its verdict is provisional.
+interpretable). Reports carry `n_curve_rows` and `n_curve_positives`.
+
+⚠️ **The widening is capped at N, and the cap binds often.** At base rate 0.0023
+the whole 296,045-row dataset holds only 671 positives, so `min_positives` is a
+target, not a guarantee: **45.9% of concept-instances in the 2026-08-25 panel
+fall below it**. There is **no `provisional` flag for this** — `gate_is_provisional`
+keys on random-control coverage alone — so read `n_curve_positives` yourself
+before quoting a single rare concept. The measured direction is that low power
+pushes a verdict toward **`absent`**, not toward `spread`:
+
+| `n_curve_positives` | n | % spread | % captured | % absent |
+|---|---:|---:|---:|---:|
+| < 1,000 | 3,576 | 61.4% | 21.8% | **16.8%** |
+| 1,000-2,000 | 2,004 | 75.1% | 19.2% | 5.7% |
+| 2,000-5,000 | 6,432 | 81.5% | 17.0% | 1.6% |
+| >= 5,000 | 139 | 89.2% | 6.5% | 4.3% |
+
+So the under-powered tail *deflates* `geometric_frac` — conservative for a gate
+that passes at >= 0.50, and **not** conservative for an `absent` verdict.
 
 ### 3.4 Metrics
 
@@ -311,7 +327,7 @@ chosen hyperparameter, not a property of the SAE, and raising it would raise
 | `support_overlap` | 0…1 | — (selects the failure mode) | Mean **pairwise Jaccard** of community firing supports: for each pair, `|rows where both fire| / |rows where either fires|`, averaged over pairs. **Not** "how many latents fire per position". HIGH = same rows (redundant → diluted); LOW = disjoint rows (shattered → tiled). Neither end is good. A singleton community has no pairs and returns 1.0 by convention — check `singleton_community` before reading 1.0 as redundancy. |
 | `neg_coupling_frac` | 0…1 | — | Share of within-community couplings that are negative (latents suppressing each other). Recorded but **no longer used by the verdict rule** — the tiling test it fed was retired at 3A.3. |
 | `knee_over_idim` | ≥1 typically | ~1 | `knee_k / intrinsic_dim`. ≫1 = many more latents needed than the code's own dimensionality implies: a splitting signature. |
-| `geometric_frac` | 0…1 | — | `n_spread / n_threat_bsps`. **Gate G-3A**: ≥ 0.50 → 3C proceeds. Quote it with its `geometric_frac_lo`/`_hi` band (§3.5). |
+| `geometric_frac` | 0…1 | — | `n_spread / n_threat_bsps`. **Gate G-3A**: ≥ 0.50 → 3C proceeds. Quote it with the **confident-verdict counts** (`n_confident_spread` / `_captured` / `_absent` / `n_undecided`), not with an interval — see §3A.5. |
 
 ### 3.5 Verdicts and the classification rule
 
@@ -327,14 +343,29 @@ dictionary just isn't presenting it in one atom". This is the H10 outcome and th
 *favourable* case — the fix is an architecture change rather than a dead end.
 
 Each verdict also carries a **stability annotation** (`confident` /
-`undecided`) from rule 3A.4 — see below. A single-seed per-concept verdict
+`undecided`) from rule 3A.4/3A.5 — see below. A single-seed per-concept verdict
 must not be quoted without it.
 
-**Rule 3A.4** (`classify` + `classify_with_stability`, both pure functions of
+**Rule 3A.5** (`classify` + `classify_with_stability`, both pure functions of
 the stored metrics). Rule history: **3A.1** = the `knee_k AND community_size`
 test only; **3A.2** adds the `solo_frac`/`intrinsic_dim` path (b); **3A.3** adds
 the learned-signal floor and collapses `diluted`/`tiled` into `spread`;
-**3A.4** adds the stability band. The point verdict did not change at 3A.4.
+**3A.4** adds the stability band; **3A.5** *calibrates* that band against
+measured cross-seed flip rates. **The point verdict has not changed since 3A.3**
+— 3A.4 and 3A.5 move only the confidence annotation, so every 3A.3 verdict still
+reads the same.
+
+> **Every rule constant lives in `lib.sae.dilution.DilutionConfig` and nowhere
+> else.** `dilution_diagnostic.py`'s threshold flags all default to `auto` =
+> the dataclass value; `summarize_3a_gate.py --expect-rule` and
+> `build_3a_panel_runlist.py`'s freshness key read it too. This is not
+> housekeeping: on 2026-08-25 the CLI still hard-coded 3A.4's band constants
+> while the dataclass had moved to 3A.5, so **114 reports were stamped
+> `rule_version: 3A.5` and banded at 3A.4's width** — a stored verdict that
+> could not be traced to the rule that produced it, which is the one thing
+> `rule_version` exists to prevent. Pinned by
+> `tests/test_dilution.py::test_cli_defaults_match_dilution_config` and
+> `::test_panel_freshness_keys_cover_every_banded_constant`.
 
 ```
 gap = asymptote_r2 - null_r2
@@ -380,7 +411,7 @@ partial correlation, not a measurement of tiling.
 
 `rule_version` is stamped into every report.
 
-### 3A.4 — the verdict stability band
+### 3A.5 — the verdict stability band, calibrated
 
 Every threshold above discretises a **continuum**. The 2026-08-21 retraction
 settled that `solo_frac` is not bimodal: of 69 category medians, 13 sit above
@@ -389,45 +420,77 @@ needs an uncertainty band or it reports noise as a finding, so the band is part
 of the result rather than a footnote.
 
 `classify_with_stability(metrics, cfg)` pushes every quantity `classify`
-thresholds on to ±`band_sds` (default 3) sd and re-runs `classify` at each of
-the 2ᵏ corners. Agreement everywhere ⇒ `verdict_stability: confident`;
-otherwise `undecided`, and `verdict_flips_on` names the quantities that change
-the verdict when moved **alone** — the actionable half, since it says which
-threshold the verdict actually rests on.
+thresholds on to ±`band_sds` sd and re-runs `classify` at each of the 2ᵏ
+corners. Agreement everywhere ⇒ `verdict_stability: confident`; otherwise
+`undecided`, and `verdict_flips_on` names the quantities that change the verdict
+when moved **alone** — the actionable half, since it says which threshold the
+verdict actually rests on.
 
 | banded quantity | sd used | kind |
 |---|---|---|
-| `asymptote_r2` | `asymptote_r2_std / √n_splits` | within-run **split** sd (row resampling only — a *lower bound* on seed movement) |
-| `solo_frac` | `cfg.solo_frac_seed_sd` = **0.0523** | true **cross-seed** sd, but one pooled constant, not per-concept |
+| `asymptote_r2` | `max(asymptote_r2_std / √n_splits, cfg.asymptote_r2_seed_sd = 0.00648)` | within-run **split** sd, **floored at the measured cross-seed sd** |
+| `solo_frac` | `cfg.solo_frac_seed_sd` = **0.0407** | true **cross-seed** sd, but one pooled constant, not per-concept |
 
-Two design points, both learned from a measurement:
+**`band_sds` = 1.0**, chosen by measurement rather than taste. The 2026-08-24
+seed grid (4 conditions × 3 seeds × 4 bases, 1,764 concepts) gave a
+ground-truth flip rate to calibrate against — mean **11.4%** over 16 cells:
 
-- **It bands every threshold, not just `captured`.** Seed replication measured
-  per-concept verdicts flipping 12–17%. Decomposing those flips: K03's 9 were 8
-  via `solo_frac` crossing 0.70 and 1 elsewhere — but **all 4 of K04's were
-  `absent ↔ spread`, with `solo_frac` never crossing anything**. A band on the
-  `captured` threshold alone is structurally blind to that half.
+| band width | `undecided` called |
+|---|---:|
+| 0.5 sd | 8.2% |
+| **1.0 sd** | **15.9%** (sweep) / **11.5%** on the 114-cell panel |
+| 3.0 sd | 25.3% |
+| 3.0 sd *without* the asymptote floor | 7.1% — under-calls at **every** width |
+
+1.0 sd sits close to the measured rate and deliberately a shade conservative: a
+concept that did not flip across three draws can still be near enough to flip on
+a fourth, and `undecided` should mean "could plausibly land the other side", not
+"did land it in this sample". 3.0 sd was a ~99.7% interval that flagged 91% of
+one cell — too blunt to be useful.
+
+Three design points, all learned from a measurement:
+
+- **It bands every threshold, not just `captured`.** Decomposing the measured
+  flips: K03's 9 were 8 via `solo_frac` crossing 0.70 and 1 elsewhere — but
+  **all 4 of K04's were `absent ↔ spread`, with `solo_frac` never crossing
+  anything**. A band on the `captured` threshold alone is structurally blind to
+  that half.
 - **`solo_frac_seed_sd` is the MEAN per-concept cross-seed sd, not the median.**
-  The sd distribution is heavily right-skewed (median 0.0110, mean 0.0523, p90
-  0.12–0.17); a band is a claim about the tail. Banding at 3 × median called
-  96.6% of verdicts confident against a measured 12–17% flip rate.
+  Re-measured 2026-08-24 on 1,764 concepts (the previous 0.0523 came from 99):
+  median 0.0191, **mean 0.0407**, p90 0.1145, max 0.5103. The distribution is
+  heavily right-skewed and a band is a claim about the tail. Per-basis means
+  span only 1.6× (gorilla 0.0300 → hen 0.0489), so one pooled constant
+  is fair; the within-basis skew is ~5× and dominates.
+- **`asymptote_r2_std` is a within-run SPLIT sd** — it resamples rows but never
+  retrains the SAE, so it cannot see seed movement and was measured **1.96×
+  low (median) / 3.39× (mean)**. That was the single biggest reason the
+  3A.4 band under-called. `_band_sd` takes the **larger** of the per-concept
+  split sd (of the *stored mean*, i.e. divided by √n_splits) and the
+  measured seed floor. Omitting the √n made K04 read 46% undecided against
+  a measured 17%.
 
-The `asymptote_r2` band uses the sd **of the stored mean** (`asymptote_r2` is
-the mean over `n_splits` resamples, `asymptote_r2_std` the sd *across* them);
-omitting the √n made K04 read 46% undecided against a measured 17%.
+Re-derive both constants with `python scripts/verdict_stability.py`, which
+prints the **ground-truth flip rate** and warns if the stored constant drifted.
 
-**Calibration, stated honestly.** Against the two conditions with seed
-replicates the band *under*-calls: K03 5.3% undecided vs 11.8% measured, K04
-11.6% vs 17.4%. Both sds are lower bounds (split resampling does not retrain
-the SAE; the `solo_frac` constant is pooled rather than per-concept), so the
-direction is expected. **Where seeds exist, quote the measured flip rate, not
-the band.** Read `undecided` as "near a boundary relative to how much this
-number is known to move", never as a significance test.
+**Read `undecided` as "near a boundary relative to how much this number is known
+to move", never as a significance test. Where seeds exist, quote the MEASURED
+flip rate, not the band.**
 
-The gate carries the band too: `geometric_frac_lo`/`_hi` resolve every
-undecided concept the least- and most-geometric way, and
-`gate_verdict_is_stable` is false when they straddle 0.50 — in which case that
-run **does not determine its gate** and its verdict must not be quoted.
+#### Reporting the gate's uncertainty: counts, not an interval
+
+Report `n_confident_spread` / `_captured` / `_absent` / `n_undecided`. Turning
+the in-play concepts into a range on `geometric_frac` requires assuming how they
+would resolve, and every such assumption is arbitrary. *"2 spread / 0 captured /
+0 absent / 21 in play of 23"* says plainly that the measurement is undetermined.
+
+`geometric_frac_worst_lo`/`_worst_hi` resolve **every** in-play concept the
+least- and most-geometric way **at once**. That is a **union bound, not a
+confidence interval** — measured 3–10× wider than the cross-seed range
+and vacuous at small n (at tiger's 23 concepts, one concept is 0.043 of the
+fraction). Its one legitimate use is `gate_verdict_is_stable`: when both ends
+fall the same side of 0.50 the gate holds however the in-play concepts land.
+When they straddle it, that run **does not determine its gate** and its verdict
+must not be quoted.
 
 Because the verdict is a **pure function of stored metrics**, a threshold change
 never needs the multi-GB `_h` caches:
@@ -440,11 +503,29 @@ python scripts/dilution_diagnostic.py reclassify saes/quarto/analysis/*_dilution
 
 - **Permutation null** (always): shuffled labels, same regression. Weak — it only
   destroys the concept's association, not the dictionary's structure.
-- **Random-model SAE control** (preferred, currently missing for Ta/Ve/Yb): an
-  SAE trained on a *randomly initialised* network's activations. A random CNN
-  still yields SAE structure, so the permutation null **understates** what
-  "absent" should mean. Reports record `random_control: null` when it was not
-  available, so the weaker null is never silently assumed.
+- **Random-model SAE control** (the learned-signal floor; `R2-champ*random` for
+  conv2, `R3-champ*random` for fc1, 100% coverage since 2026-08-23): an SAE
+  trained on a *randomly initialised* network's activations. A random CNN still
+  yields SAE structure, so the permutation null **understates** what "absent"
+  should mean. Reports record `random_control: null` when it was not available,
+  so the weaker null is never silently assumed. Keep the control's **alive-latent
+  count at or below** the runs it gates — a larger control pool would raise the
+  floor through selection rather than through structure (measured 2026-08-25:
+  controls 120 / 190 alive vs 173-690 for the runs, so the floor is if anything
+  set slightly low).
+- **Selection-aware null** (audit control, not run per-concept): permute the
+  labels **before** candidate selection, then run the entire pipeline — re-rank
+  by |phi|, re-select the top `top_k`, refit the curve. The permutation null in
+  `restricted_r2_curve` shuffles *after* selection and so holds the selected
+  columns fixed; only this one can see whether ranking on rows that overlap the
+  test rows inflates `asymptote_r2`. Measured 2026-08-25 (5 draws x 3 concepts x
+  2 dictionaries): **R2 = -0.001 +/- 0.0003**, i.e. selecting 64 latents from
+  199-643 alive buys **zero** held-out R2 from noise. Two things follow:
+  `asymptote_r2` is an honest estimate, and the random-model floor's 0.03-0.05
+  is a real architectural prior rather than a selection artefact. Re-run it if
+  `top_k` rises, `max_rows` falls, or a dictionary with a far larger alive pool
+  enters the panel — the bias scales with the pool. Protocol and numbers:
+  [`diary/2026-08-25_3A-final-report.md`](diary/2026-08-25_3A-final-report.md) S2.1.
 
 ## 4. Hypothesis and gate IDs
 
@@ -453,7 +534,7 @@ python scripts/dilution_diagnostic.py reclassify saes/quarto/analysis/*_dilution
 | **H10** | The SAE/LP wall is *geometric*: conjunctive concepts occupy multi-dimensional structure that flat dictionary atoms dilute or tile. Phase 3's founding hypothesis. |
 | **H11** | Decision-upstream concepts (tiger) are more linearly readable than spectator concepts (gorilla) at matched base rate. |
 | **G11** | The epiphenomenality risk (Balogh & Jelasity): a probe can decode a concept the model never *uses*. **Decodability ≠ causality.** |
-| **G-3A** | `geometric_frac ≥ 0.50` over a run's threat BSPs → 3C proceeds; else 3C deprioritised in favour of hooks / E2E. 3B runs regardless. |
+| **G-3A** | **PASSED, 3A CLOSED 2026-08-25.** `geometric_frac ≥ 0.50` over a run's threat BSPs → 3C proceeds; else 3C deprioritised in favour of hooks / E2E. 3B runs regardless. A run whose `gate_verdict_is_stable` is false does not determine its gate. Result: [`diary/2026-08-25_3A-final-report.md`](diary/2026-08-25_3A-final-report.md). |
 | **G-3C** | Beat I04 tigerVe, or close ≥50% of the threat SAE/LP gap, over 3 seeds, with the random control unchanged and centred cross-seed feature-overlap stability. |
 | **HP-canonical** | **CLOSED 2026-08-17.** Both axes have interior optima under canonical recipes — conv2 k=32, fc1 exp32 — so the swept ranges are wide enough. Opened 2026-08-16; see §6. |
 

@@ -1,7 +1,7 @@
 # 3A residuals measured; bimodality retracted; hen specified (2026-08-21)
 
 Status: frozen record + **handoff for the next session**. Parent ledger:
-[`phase-3.md`](phase-3.md). Metric definitions: [`../methods-reference.md`](../methods-reference.md).
+[`phase-3A.md`](phase-3A.md). Metric definitions: [`../methods-reference.md`](../methods-reference.md).
 Numbers are `[DIRECT]`; interpretation is `[AI-REASONED PROVISIONAL ANALYSIS]`.
 
 Closes the three residuals left open by

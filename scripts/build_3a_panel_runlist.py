@@ -56,6 +56,17 @@ from docopt import docopt
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+# A report is CURRENT only if every config value the verdict or its band depends
+# on matches what DilutionConfig would use now. `rule_version` alone is NOT
+# enough: on 2026-08-25 the CLI still hard-coded 3A.4's band constants while the
+# dataclass had moved to 3A.5, so 114 reports were stamped 3A.5, banded at 3A.4,
+# and this check called every one of them current. Anything `classify` or
+# `classify_with_stability` reads belongs in this tuple.
+FRESHNESS_KEYS = ("rule_version", "top_k", "band_sds", "solo_frac_seed_sd",
+                  "asymptote_r2_seed_sd", "captured_solo_frac", "captured_idim",
+                  "captured_k", "captured_size", "absent_margin", "absent_floor",
+                  "random_margin")
+
 # The supervised positive control, one per champion. Not selected by
 # `select_3a_panel.py` (it excludes anchored runs); named here so the
 # calibration arm cannot go missing when the panel is regenerated.
@@ -203,8 +214,7 @@ def main() -> int:
         if rp.exists():
             try:
                 cfg_stored = json.loads(rp.read_text(encoding="utf-8"))["summary"]["config"]
-                cur = (cfg_stored.get("rule_version") == cfg.rule_version
-                       and cfg_stored.get("top_k") == cfg.top_k)
+                cur = all(cfg_stored.get(k) == getattr(cfg, k) for k in FRESHNESS_KEYS)
             except (KeyError, ValueError):
                 cur = False
         e["report_current"] = cur

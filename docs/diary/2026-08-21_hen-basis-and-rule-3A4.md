@@ -1,6 +1,6 @@
 # `hen` built and verified; rule 3A.4 bands the verdict; panel wired (2026-08-21 PM)
 
-Status: frozen record. Parent ledger: [`phase-3.md`](phase-3.md). Metric and
+Status: frozen record. Parent ledger: [`phase-3A.md`](phase-3A.md). Metric and
 rule definitions: [`../methods-reference.md`](../methods-reference.md) §3.5.
 Numbers are `[DIRECT]`; interpretation is `[AI-REASONED PROVISIONAL ANALYSIS]`.
 

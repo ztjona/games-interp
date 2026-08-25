@@ -38,8 +38,8 @@
       "captured_idim": 2.0,
       "tile_overlap": 0.15,
       "tile_neg_frac": 0.5,
-      "band_sds": 3.0,
-      "solo_frac_seed_sd": 0.0523,
+      "band_sds": 1.0,
+      "solo_frac_seed_sd": 0.0407,
       "asymptote_r2_seed_sd": 0.00648,
       "rule_version": "3A.5",
       "seed": 0
@@ -192,21 +192,20 @@
     "verdict": "3C-deprioritized",
     "deprioritized_because": "captured",
     "gate_is_provisional": false,
-    "n_confident_spread": 69,
-    "n_confident_captured": 84,
+    "n_confident_spread": 73,
+    "n_confident_captured": 95,
     "n_confident_absent": 0,
-    "n_undecided": 18,
-    "undecided_frac": 0.1053,
+    "n_undecided": 3,
+    "undecided_frac": 0.0175,
     "undecided_flips_on": {
-      "asymptote_r2": 2,
-      "solo_frac": 16
+      "solo_frac": 3
     },
-    "geometric_frac_worst_lo": 0.4035,
-    "geometric_frac_worst_hi": 0.5088,
-    "gate_verdict_is_stable": false,
+    "geometric_frac_worst_lo": 0.4269,
+    "geometric_frac_worst_hi": 0.4444,
+    "gate_verdict_is_stable": true,
     "band": {
-      "sds": 3.0,
-      "solo_frac_seed_sd": 0.0523
+      "sds": 1.0,
+      "solo_frac_seed_sd": 0.0407
     }
   },
   "category_summary": {
@@ -2131,10 +2130,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0246,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 19,
@@ -4389,10 +4386,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0045,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 43,
@@ -5895,10 +5890,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0042,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 59,
@@ -5991,10 +5984,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0062,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 60,
@@ -7497,10 +7488,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.015,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 76,
@@ -7593,10 +7582,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0131,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 77,
@@ -7783,10 +7770,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0131,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 79,
@@ -7879,10 +7864,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0113,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 80,
@@ -9763,10 +9746,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0701,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 100,
@@ -10235,10 +10216,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0796,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 105,
@@ -12399,10 +12378,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0101,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 128,
@@ -12495,10 +12472,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0093,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 129,
@@ -13907,10 +13882,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0158,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 144,
@@ -15039,10 +15012,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0123,
       "verdict": "captured",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 156,
@@ -15135,10 +15106,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0104,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "solo_frac"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 157,

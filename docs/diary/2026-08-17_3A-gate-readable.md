@@ -1,6 +1,6 @@
 # Phase 3A: the gate becomes readable, and the wall is a *framing* effect (2026-08-17)
 
-Status: frozen self-contained record. Parent ledger: [`phase-3.md`](phase-3.md).
+Status: frozen self-contained record. Parent ledger: [`phase-3A.md`](phase-3A.md).
 Metric definitions and the verdict rule: [`../methods-reference.md`](../methods-reference.md)
 §3, §6. Numbers are `[DIRECT]` from `saes/quarto/analysis/`; interpretation is
 `[AI-REASONED PROVISIONAL ANALYSIS]`.

@@ -38,8 +38,8 @@
       "captured_idim": 2.0,
       "tile_overlap": 0.15,
       "tile_neg_frac": 0.5,
-      "band_sds": 3.0,
-      "solo_frac_seed_sd": 0.0523,
+      "band_sds": 1.0,
+      "solo_frac_seed_sd": 0.0407,
       "asymptote_r2_seed_sd": 0.00648,
       "rule_version": "3A.5",
       "seed": 0
@@ -192,20 +192,20 @@
     "verdict": "3C-proceeds",
     "deprioritized_because": null,
     "gate_is_provisional": false,
-    "n_confident_spread": 92,
+    "n_confident_spread": 101,
     "n_confident_captured": 0,
     "n_confident_absent": 0,
-    "n_undecided": 79,
-    "undecided_frac": 0.462,
+    "n_undecided": 70,
+    "undecided_frac": 0.4094,
     "undecided_flips_on": {
-      "asymptote_r2": 79
+      "asymptote_r2": 70
     },
-    "geometric_frac_worst_lo": 0.538,
+    "geometric_frac_worst_lo": 0.5906,
     "geometric_frac_worst_hi": 1.0,
     "gate_verdict_is_stable": true,
     "band": {
-      "sds": 3.0,
-      "solo_frac_seed_sd": 0.0523
+      "sds": 1.0,
+      "solo_frac_seed_sd": 0.0407
     }
   },
   "category_summary": {
@@ -5926,10 +5926,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0079,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 59,
@@ -7174,10 +7172,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0098,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 72,
@@ -7942,10 +7938,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0087,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 80,
@@ -8132,10 +8126,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0876,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 82,
@@ -8228,10 +8220,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0845,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 83,
@@ -12654,10 +12644,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0137,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 130,
@@ -13422,10 +13410,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0108,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 138,
@@ -14958,10 +14944,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0097,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 154,
@@ -16104,10 +16088,8 @@
       "random_control_applied": true,
       "random_asymptote_r2": 0.0804,
       "verdict": "spread",
-      "verdict_stability": "undecided",
-      "verdict_flips_on": [
-        "asymptote_r2"
-      ]
+      "verdict_stability": "confident",
+      "verdict_flips_on": []
     },
     {
       "bsp_index": 166,

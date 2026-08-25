@@ -29,17 +29,25 @@ Options:
                          [default: auto] (auto = relational/threat categories).
     --random-run-id=<id> Random-model SAE run_id for the absent control
                          [default: none].
-    --top-k=<n>          Candidate latents per concept [default: 64].
+    --top-k=<n>          Candidate latents per concept [default: auto].
     --captured-solo-frac=<f>  Share of recoverable signal one latent must carry
-                         for a captured verdict [default: 0.70].
+                         for a captured verdict [default: auto].
     --captured-idim=<f>  Max intrinsic dimension for a captured verdict
-                         [default: 2.0].
+                         [default: auto].
     --band-sds=<f>       Rule 3A.4 stability band, in sd, applied to every
-                         quantity classify thresholds on [default: 3.0].
+                         quantity classify thresholds on [default: auto].
     --solo-frac-seed-sd=<f>  Per-concept CROSS-SEED sd of solo_frac. Cannot be
-                         estimated from one run, so it is a measured constant:
-                         the MEAN over seeds 42/43/44 on K03/K04-champYb
-                         [default: 0.0523].
+                         estimated from one run, so it is a measured constant
+                         (see DilutionConfig; re-derive with
+                         scripts/verdict_stability.py) [default: auto].
+
+    Every threshold above defaults to `auto` = the value in
+    ``lib.sae.dilution.DilutionConfig``, which is the SINGLE source of truth and
+    the thing ``rule_version`` names. Hard-coding a number here instead gave the
+    2026-08-25 defect: the dataclass moved to rule 3A.5 (band_sds 3.0 -> 1.0,
+    solo_frac_seed_sd 0.0523 -> 0.0407) while these strings did not, so 114
+    reports were stamped `3A.5` and banded at 3A.4's width. Pinned by
+    tests/test_dilution.py::test_cli_defaults_match_dilution_config.
     --orbit-ids=<path>   Symmetry-orbit IDs so a position and its board
                          symmetries stay on the SAME side of every train/test
                          split [default: auto]. auto = resolve from the
@@ -550,14 +558,25 @@ def _print_summary(result):
     print("(full metric glossary is embedded in the output JSON under 'glossary')")
 
 
+# CLI flag -> DilutionConfig field, for the thresholds a caller may override.
+# `auto` (the default for every one) means "whatever the dataclass says", so the
+# dataclass stays the only place a rule constant is written down.
+_CFG_OVERRIDES: tuple[tuple[str, str, type], ...] = (
+    ("--top-k", "top_k", int),
+    ("--captured-solo-frac", "captured_solo_frac", float),
+    ("--captured-idim", "captured_idim", float),
+    ("--band-sds", "band_sds", float),
+    ("--solo-frac-seed-sd", "solo_frac_seed_sd", float),
+)
+
+
 def _config_from_args(args) -> DilutionConfig:
-    return DilutionConfig(
-        top_k=int(args["--top-k"]),
-        captured_solo_frac=float(args["--captured-solo-frac"]),
-        captured_idim=float(args["--captured-idim"]),
-        band_sds=float(args["--band-sds"]),
-        solo_frac_seed_sd=float(args["--solo-frac-seed-sd"]),
-    )
+    kw = {}
+    for flag, field, cast in _CFG_OVERRIDES:
+        val = args.get(flag)
+        if val is not None and str(val).lower() != "auto":
+            kw[field] = cast(val)
+    return DilutionConfig(**kw)
 
 
 def _do_reclassify(args) -> None:

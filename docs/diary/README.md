@@ -58,7 +58,8 @@ without checking it, that is the failure mode this convention exists for.
 | 1 (A–G) | [phase-1.md](phase-1.md) | Initial SAE family work on champAa: Anakin sweep (28 configs), conv2 LP, competence audit, H1/H6/H7/H8 establishment. |
 | 2A | [phase-2A.md](phase-2A.md) | Conv2 architecture sweep on champAa (33 runs, Deep Brain 3× GPU, 2026-05-11). C01 winner; reporting standard (MCC + F1-lift) adopted. |
 | 2B | [phase-2B.md](phase-2B.md) | Two-champion era (champS4 / champTa), CLOSED 2026-06-09. Five chapters: champS4 mini-sweep, LP rescoping, 25-config sweep + H9, Sweep H capacity null, close-out folding in the executed "2C" arc (tiger → anchored I/J → champVe). |
-| 3 | [phase-3.md](phase-3.md) | OPEN (2026-06-09). Geometric concept structure: H10, dilution diagnostic, α/β allocation regime, geometry-aware SAE variants, causal patching. |
+| 3 | [phase-3.md](phase-3.md) | OPEN (2026-06-09). Geometric concept structure: H10, α/β allocation regime, geometry-aware SAE variants, causal patching. Live ledger for 3B / 3B-causal / 3C / 3D. |
+| 3A | [phase-3A.md](phase-3A.md) | **CLOSED 2026-08-25.** Dilution diagnostic. G-3A passes (114 cells, 12,151 concept-verdicts, 74.6% `spread`); the residual wall is a **disjunction over attribute poles**, not agent-relativity. Split out of phase-3.md at the ~400-line cap. |
 
 ### Design notes
 

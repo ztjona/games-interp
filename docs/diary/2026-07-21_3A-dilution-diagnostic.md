@@ -1,10 +1,10 @@
 # Phase 3A — dilution diagnostic: method specification (2026-07-21)
 
 Status: design + implementation. Frozen after creation (dated diary entry).
-Parent ledger: [`phase-3.md`](phase-3.md). Founding rationale + gate
+Parent ledger: [`phase-3A.md`](phase-3A.md). Founding rationale + gate
 pre-registration: [`2026-06-09_geometric-pivot.md`](2026-06-09_geometric-pivot.md)
 §4 (3A). Reassessment against the 2026-07-14 literature v2:
-[`phase-3.md`](phase-3.md) ch. "2026-07-21 litv2 reassessment".
+[`phase-3A.md`](phase-3A.md) ch. "2026-07-21 litv2 reassessment".
 
 This document specifies **what 3A measures, how, and how a verdict is
 assigned**, so that any result JSON can be reproduced and audited. Code:

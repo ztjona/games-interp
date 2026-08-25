@@ -772,7 +772,7 @@ def classify(metrics: dict, cfg: DilutionConfig) -> str:
     re-runnable on a stored report without touching the SAE codes.
 
     Rule 3A.3. Two changes from 3A.2, both recorded in
-    ``docs/diary/2026-08-16_rule-3A3.md``:
+    ``docs/diary/2026-08-17_3A-gate-readable.md`` S1:
 
     **(1) A random-model floor.** ``absent`` now also fires when the concept is
     no more recoverable from this dictionary than from one trained on an
