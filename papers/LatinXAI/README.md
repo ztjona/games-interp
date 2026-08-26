@@ -22,6 +22,28 @@ python make_figure_3a.py                  # -> fig_disjunction.pdf    (reads the
 latexmk -pdf main.tex
 ```
 
+## Submission abstract (plain unicode, max 2000 chars)
+
+The OpenReview form takes the abstract as **plain unicode text, 2000 characters
+max** - no LaTeX. Regenerate it from `main.tex` after any abstract edit, so the
+form text and the PDF cannot drift:
+
+```bash
+python plain_abstract.py main.tex --out=abstract.txt          # unicode (paste this)
+python plain_abstract.py main.tex --ascii --out=abstract-ascii.txt   # fallback
+```
+
+Current: **1534 / 2000 characters**, 247 words. The converter resolves LaTeX to
+unicode rather than deleting it (`\times` -> U+00D7, ` ``...'' ` -> U+201C/D,
+`--` between digits -> U+2013) and reports any leftover markup, so a stray
+`\emph{}` cannot reach the form silently.
+
+The LaTeX abstract carries **no `\textbf` or `\emph`** either: OpenReview does
+not render them, and keeping the typeset abstract and the submitted text
+identical in wording and styling means a reader comparing the two sees no
+difference. Math (`$...$`, `\times`) and `\%` stay in `main.tex` - they are
+content, not styling - and the converter resolves them to unicode for the form.
+
 `make_tables.py` reads `saes/quarto/eval_registry.json` and the
 `*_sae-lp-efficiency.json` reports, and rolls categories up with the project's
 own `aggregate_per_category_by_family` (which reads `concept_family` off the
