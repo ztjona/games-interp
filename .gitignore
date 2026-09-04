@@ -26,6 +26,16 @@ models/**/*.pth
 # stage_<slug>.md, so you never have to guess which. See CLAUDE.md "runners/".
 # Metrics (*.jsonl) and registry JSONs ARE tracked (small, useful for cross-device sync).
 saes/**/*.pt
+# ...but NOT the runtime lock files or hand-made registry backups: a 0-byte lock
+# is a process artefact, and a *.bak of a file that is already under version
+# control is a second, silently-diverging copy of it (untracked 2026-09-04).
+saes/**/*.lock
+saes/**/*.bak
+# ...nor the registry's write-then-rename staging file. It normally exists for
+# microseconds (lib/sae/registry.py writes *.tmp then .replace()s it), but an
+# interrupted write leaves one behind, and a half-written registry is the last
+# thing that should reach a commit.
+saes/**/*.tmp
 
 # Per-runner stage plans (auto-generated to-do lists; regenerated every run)
 /stage_*.md

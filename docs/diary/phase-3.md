@@ -26,19 +26,70 @@ asks **why**, geometrically, and **what architecture follows**:
 Working steps (gates and full method in the founding note, as revised by the
 2026-07-21 litv2 reassessment chapter, now in [`phase-3A.md`](phase-3A.md)):
 
-| Step | What | Gate | Status |
-|---|---|---|---|
-| 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | ✅ **CLOSED 2026-08-25 — G-3A PASSES.** 114 cells, 12,151 concept-verdicts, 74.6% `spread`; the wall is a **disjunction** wall. Ledger: [`phase-3A.md`](phase-3A.md); report: [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md) |
-| 3B | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending |
-| 3B-causal | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | pending |
-| 3C | Geometry-aware SAE variants (brief sharpened by 3A — an **aggregating readout over existing sibling atoms**, hierarchical arm favoured): γ pre-check, hierarchical anchoring, **Matryoshka-vs-H-SAE-vs-MP-SAE**, bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | **UNBLOCKED** (G-3A passed) |
-| 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
+**Order changed 2026-09-04**: the causal step runs BEFORE ground-truth
+geometry. The IDs are unchanged -- `3B.1` already means the three-term
+decomposition and eight frozen diary entries reference `3B-causal` as written,
+so the reorder is encoded as *order*, not as a rename. `3B-geom` is a display
+alias for the geometry track, adopted because a bare "3B" is ambiguous once a
+sibling runs first; entries dated before 2026-09-04 that say "3B" mean
+`3B-geom`. Rationale:
+[`2026-09-04_3A-close-and-3B-reorder.md`](2026-09-04_3A-close-and-3B-reorder.md) S3.
 
+| Runs | Step | What | Gate | Status |
+|:---:|---|---|---|---|
+| — | 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | ✅ **CLOSED 2026-08-25 — G-3A PASSES.** 114 cells, 12,151 concept-verdicts, 74.6% `spread`; the wall is a **disjunction** wall. Ledger: [`phase-3A.md`](phase-3A.md); report: [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md) |
+| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **NEXT** -- top-K export BUILT 2026-09-04 (`scripts/export_topk_matches.py`); build the planted causal control before running the screen |
+| **2** | **3B** (alias `3B-geom`) | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending -- needs no new compute (alpha by construction, beta from the width sweep on disk) |
+| **3** | 3C | Geometry-aware SAE variants (brief sharpened by 3A — an **aggregating readout over existing sibling atoms**): γ pre-check, hierarchical anchoring, **SASA block decoders (LEAD ARM, adopted 2026-09-04)** vs Matryoshka / H-SAE / MP-SAE vs bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | **UNBLOCKED** (G-3A passed) |
+| **4** | 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
 
 ## Chapters
 
 *(appended as results land; date-stamped. 3A's chapters live in
 [`phase-3A.md`](phase-3A.md).)*
+
+
+### 2026-09-04 -- 3A bookkeeping closed; plan reordered; SASA adopted
+
+Full record:
+[`2026-09-04_3A-close-and-3B-reorder.md`](2026-09-04_3A-close-and-3B-reorder.md).
+
+- **Paper branch folded in** (fast-forward, zero divergence). Its two non-paper
+  edits are corrections with one root cause: champYb's conv2 numbers were
+  computed on `E05`, the degenerate dictionary 3A had *already* replaced with
+  `K04` on 2026-08-17. The efficiency numbers (2026-08-14) predate that repair
+  and were never propagated. Corrected: champYb `square_threat` conv2 best
+  latent **0.115 -> 0.178**; fc1-over-conv2 isolation **"3-7x" -> 1.8-4.8x**
+  (recomputed independently over all 12 matched state-threat cells: 1.79x to
+  4.81x). One internal inconsistency inside the paper branch itself (`1.4-4.8x`
+  vs `1.8-4.8x` in the same file) fixed to `1.8`.
+- **The substitution is now an ARTEFACT, not a build-time patch.** The paper
+  swapped the column inside `make_tables.py`; the project instead generated
+  `K04-champYb-...conv2_sae-lp-efficiency.json` and moved the `E05` report to
+  `superseded/`. Rebuilt paper tables are byte-identical in every reported
+  field. General rule earned: *a repaired dictionary is substituted in the
+  artefact, not in the script that reads it.*
+- **Plan reordered: 3B-causal runs first.** Already the standing instruction in
+  three places while the numbered plan said otherwise. No rename (`3B.1` is
+  taken by the three-term decomposition; eight frozen entries reference
+  `3B-causal`); the order is encoded as a `Runs` column plus the `3B-geom`
+  display alias.
+- **SASA adopted as 3C's lead arm.** `subspace-aware-sparse-autoencoders-
+  effective` proves splitting is objective-driven for features of intrinsic
+  dimension >= 2, and its converse (block size r >= d_i => one group is the
+  global minimiser) is testable HERE and nowhere else, because `knee_k` gives
+  d_i by construction. Caveat recorded: disjunction-spans-a-subspace is an
+  analogy needing a test, and the paper's empirics are single-run.
+- **Top-K candidate export BUILT** (plan item 7, 3B-causal's prerequisite).
+  Derived from the `_matching-*.pt` caches -- no `_h`, no GPU, no cache-format
+  change. Measured what reporting standard 4 had only warned about: F1-argmax
+  and MCC-argmax **disagree on ~a third of concepts**, and on up to 10% the F1
+  pick is outside the MCC top-16. Tests 961 -> 969.
+- **k-dose ladder deferred**, not dropped: it would reopen a closed phase whose
+  reports back a submitted paper, and its prevalence confound (base rate rises
+  with the number of OR'd poles) is not yet designed away. It returns as the
+  test of SASA's `r = d_i` prediction in 3C.
+- **No `_h` pruning** until reviewer comments land and 3B-causal starts.
 
 
 ### 2026-07-27 — champYb results + method refinements

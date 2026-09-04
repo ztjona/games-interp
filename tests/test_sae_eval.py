@@ -30,6 +30,7 @@ from lib.sae.eval import (
     compute_feature_sharing,
     evaluate_sae,
     match_features_to_bsps,
+    top_k_features_per_bsp,
 )
 
 # ---------------------------------------------------------------------------
@@ -932,3 +933,101 @@ class TestFamilyRollupIsFirstClass:
             "registry_query.py `top` no longer warns that its columns are "
             "whole-basis means and must not be used to compare runs."
         )
+
+
+# ---------------------------------------------------------------------------
+# Top-K candidate export (Phase 3B-causal input)
+# ---------------------------------------------------------------------------
+
+
+class TestTopKFeaturesPerBSP:
+    """The causal track ranks a shortlist, not the argmax (reporting std 4)."""
+
+    @staticmethod
+    def _planted(n: int = 2000, d: int = 40, b: int = 6, seed: int = 0):
+        """Feature 7 is exactly BSP 2; everything else is noise."""
+        torch.manual_seed(seed)
+        labels = (torch.rand(n, b) < 0.05).float()
+        h = torch.rand(n, d)
+        h[:, 7] = labels[:, 2]
+        return match_features_to_bsps(h, labels)
+
+    def test_shapes_and_clamping(self):
+        m = self._planted()
+        tk = top_k_features_per_bsp(m, k=5)
+        assert tk.indices.shape == (6, 5)
+        assert tk.values.shape == (6, 5)
+        assert tk.k == 5
+        assert tk.metric == "mcc"
+        # k larger than the dictionary is clamped, not an error.
+        assert top_k_features_per_bsp(m, k=10_000).k == 40
+
+    def test_values_are_descending(self):
+        tk = top_k_features_per_bsp(self._planted(), k=8)
+        assert bool((tk.values[:, :-1] >= tk.values[:, 1:]).all())
+
+    def test_finds_the_planted_feature(self):
+        tk = top_k_features_per_bsp(self._planted(), k=8)
+        assert int(tk.indices[2, 0]) == 7
+        assert float(tk.values[2, 0]) == pytest.approx(1.0, abs=1e-4)
+
+    def test_companion_metrics_are_gathered_at_the_same_features(self):
+        """A row's f1/mcc/precision must describe THAT row's features."""
+        m = self._planted()
+        tk = top_k_features_per_bsp(m, k=6, metric="mcc")
+        # Ranking by mcc means the mcc companion equals the ranking values.
+        assert torch.allclose(tk.mcc, tk.values)
+        for b in range(tk.indices.shape[0]):
+            for j in range(tk.k):
+                feat = int(tk.indices[b, j])
+                assert float(tk.f1[b, j]) == pytest.approx(
+                    float(m.f1[feat, b]), abs=1e-6)
+                assert float(tk.precision[b, j]) == pytest.approx(
+                    float(m.precision[feat, b]), abs=1e-6)
+
+    def test_argmax_f1_rank_flags_metric_disagreement(self):
+        """0 = the two metrics agree; -1 = F1's pick is outside the list."""
+        m = self._planted()
+        tk = top_k_features_per_bsp(m, k=40, metric="mcc")  # whole dictionary
+        # With the full dictionary in the list, nothing can fall outside it.
+        assert int(tk.argmax_f1_rank.min()) >= 0
+        for b in range(tk.indices.shape[0]):
+            rank = int(tk.argmax_f1_rank[b])
+            assert int(tk.indices[b, rank]) == int(m.best_feature_per_bsp[b])
+        # Truncating to 1 candidate makes any disagreement fall outside.
+        tk1 = top_k_features_per_bsp(m, k=1, metric="mcc")
+        for b in range(6):
+            agree = (int(m.best_feature_per_bsp[b])
+                     == int(m.best_feature_per_bsp_mcc[b]))
+            assert int(tk1.argmax_f1_rank[b]) == (0 if agree else -1)
+
+    def test_rejects_unknown_or_uncomputed_metric(self):
+        m = self._planted()
+        with pytest.raises(ValueError, match="metric must be one of"):
+            top_k_features_per_bsp(m, metric="accuracy")
+        m.mcc = None
+        with pytest.raises(ValueError, match="predates that metric"):
+            top_k_features_per_bsp(m, metric="mcc")
+
+    def test_ranking_by_f1_can_differ_from_ranking_by_mcc(self):
+        """The whole reason the export exists: the orderings are not the same."""
+        m = self._planted(seed=3)
+        by_mcc = top_k_features_per_bsp(m, k=3, metric="mcc").indices
+        by_f1 = top_k_features_per_bsp(m, k=3, metric="f1").indices
+        assert not torch.equal(by_mcc, by_f1), (
+            "F1 and MCC produced identical shortlists on this fixture; the "
+            "fixture no longer exercises the disagreement the export is for."
+        )
+
+    def test_needs_no_activations(self):
+        """Derivable from the cached metric matrices alone -- no _h, no GPU."""
+        m = self._planted()
+        detached = FeatureBSPMatching(
+            precision=m.precision, recall=m.recall, f1=m.f1,
+            best_f1_per_bsp=m.best_f1_per_bsp,
+            best_feature_per_bsp=m.best_feature_per_bsp,
+            mcc=m.mcc,
+        )
+        tk = top_k_features_per_bsp(detached, k=4)
+        assert tk.indices.shape == (6, 4)
+        assert tk.youden_j is None and tk.mcc_at_pref is None

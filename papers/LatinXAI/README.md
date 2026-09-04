@@ -80,11 +80,19 @@ verdicts) — the one (champion, hook) whose pinned concepts have modal
   champions, so it uses `mcc_at_pref` throughout (all six efficiency reports
   carry it).
 - **conv2 for champYb is the repaired `K04`, not `E05`.** `E05` is degenerate
-  (99.0% dead, FVU 0.110) because BatchTopK lacked the Gao dead-latent aux loss
-  until 2026-08-15. Using it would flatter the paper's thesis. `make_tables.py`
-  substitutes `K04` (FVU 0.0066) and prints a sign-flip robustness check:
-  2 of 15 families flip, both per-cell, both *toward* the partition; all 12
-  relational families unchanged (reported in §4.6).
+  (99.0% dead, FVU 0.110, 41 alive against `top_k=64`) because BatchTopK lacked
+  the Gao dead-latent aux loss until 2026-08-15. Using it would flatter the
+  paper's thesis. **Since 2026-09-04 the substitution lives UPSTREAM**, not in
+  this directory: `saes/quarto/analysis/K04-…conv2_sae-lp-efficiency.json` is
+  the artefact and `E05`'s report has moved to `analysis/superseded/`, so
+  `collect_availability` reads the right dictionary without help.
+  `apply_conv2_repair` is kept as an idempotent guard (if anyone regenerates the
+  `E05` report it still corrects) and is now a no-op on a clean tree — verified:
+  rebuilding gives 90 rows identical in every reported field, with only the
+  `*_legacy` bookkeeping columns moving. The sign-flip robustness check reads
+  `eval_registry.json` directly and is unaffected: 2 of 15 families flip, both
+  per-cell, both *toward* the partition; all 12 relational families unchanged
+  (reported in §4.6). Project rule: [`docs/methods-reference.md`](../../docs/methods-reference.md) §8.
 - **champTa rows are post-rebuild** (2026-08-12, all four opponent modes). The
   "provisional" flag in `RESEARCH-STATUS.md` is stale for these rows —
   `_dataset_status.json` records the rebuild and the SAE-sweep retrain.

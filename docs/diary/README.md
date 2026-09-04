@@ -58,7 +58,7 @@ without checking it, that is the failure mode this convention exists for.
 | 1 (A–G) | [phase-1.md](phase-1.md) | Initial SAE family work on champAa: Anakin sweep (28 configs), conv2 LP, competence audit, H1/H6/H7/H8 establishment. |
 | 2A | [phase-2A.md](phase-2A.md) | Conv2 architecture sweep on champAa (33 runs, Deep Brain 3× GPU, 2026-05-11). C01 winner; reporting standard (MCC + F1-lift) adopted. |
 | 2B | [phase-2B.md](phase-2B.md) | Two-champion era (champS4 / champTa), CLOSED 2026-06-09. Five chapters: champS4 mini-sweep, LP rescoping, 25-config sweep + H9, Sweep H capacity null, close-out folding in the executed "2C" arc (tiger → anchored I/J → champVe). |
-| 3 | [phase-3.md](phase-3.md) | OPEN (2026-06-09). Geometric concept structure: H10, α/β allocation regime, geometry-aware SAE variants, causal patching. Live ledger for 3B / 3B-causal / 3C / 3D. |
+| 3 | [phase-3.md](phase-3.md) | OPEN (2026-06-09). Geometric concept structure: H10, α/β allocation regime, geometry-aware SAE variants, causal patching. Live ledger for 3B-causal / 3B (`3B-geom`) / 3C / 3D. **Step order set 2026-09-04: 3B-causal runs first**; its working-steps table carries a `Runs` column. |
 | 3A | [phase-3A.md](phase-3A.md) | **CLOSED 2026-08-25.** Dilution diagnostic. G-3A passes (114 cells, 12,151 concept-verdicts, 74.6% `spread`); the residual wall is a **disjunction over attribute poles**, not agent-relativity. Split out of phase-3.md at the ~400-line cap. |
 
 ### Design notes
@@ -71,6 +71,13 @@ without checking it, that is the failure mode this convention exists for.
 | 2026-05-25 | [anchored-sweep-ij-results](2026-05-25_anchored-sweep-ij-results.md) | **Results** of I/J anchored sweep (24 configs). Winner: I04 anchored-jumprelu lh=1.0 (+62% F1-lift). Decision gate PASS. Per-slot anchor analysis, cross-BSP coverage, J-series negative result, reporting standard for future anchored experiments. |
 | 2026-06-09 | [geometric-pivot](2026-06-09_geometric-pivot.md) | Phase 3 founding design note. H10 (the SAE/LP wall is geometric), evidence from 5 newly-ingested papers + 2026-06-08 synthesis, pre-registered plan 3A–3D with gates G-3A / G-3C, thesis-risk framing. |
 | 2026-06-18 | [champYb-onboarding](2026-06-18_champYb-onboarding.md) | champYb onboarding (Yb_hotChamp, hot-piece-shaped S4 subclass). New game module `quarto_s4_hot`, config, checkpoint integration, staged pipeline; how it slots into Phase 3 as a piece-safety-trained trunk. Groundwork only — no GPU run. |
+| 2026-07-21 | [3A-dilution-diagnostic](2026-07-21_3A-dilution-diagnostic.md) | 3A method spec: co-firing communities, restricted-R², the four pre-registered verdicts, gate G-3A. |
+| 2026-08-12 | [pre-run-audit-and-concept-families](2026-08-12_pre-run-audit-and-concept-families.md) | Pre-run audit; `concept_family` / `family_role` stamped onto every BSP schema, making cross-basis triads a property of the data. |
+| 2026-08-14 | [hook-specialisation](2026-08-14_hook-specialisation.md) | conv2 wins every per-cell family, fc1 every relational one. Availability vs isolation; defines the **3B.1** three-term decomposition. Its conv2 numbers are `E05`-based — superseded by `K04`, see 2026-09-04. |
+| 2026-08-15 | [dead-feature-revival](2026-08-15_dead-feature-revival.md) | The Gao aux loss existed in one architecture of three. `E05`→`K04` repair (FVU 0.110 → 0.0066). Cross-architecture claims unsafe without conformance. |
+| 2026-08-21 | [hen-basis-and-rule-3A4](2026-08-21_hen-basis-and-rule-3A4.md) | New `hen` basis (negative attribute poles); `tiger == OR(hawk ∪ hen)` with zero violations. Rule 3A.4 bands every threshold. |
+| 2026-08-25 | [3A-final-report](2026-08-25_3A-final-report.md) | **3A closed, G-3A passes.** Validity audit, stability, and the result: the wall is a **disjunction** wall — `knee_k` lands on the disjunct count known by construction. |
+| 2026-09-04 | [3A-close-and-3B-reorder](2026-09-04_3A-close-and-3B-reorder.md) | 3A bookkeeping closed: paper branch reconciled, `E05`→`K04` promoted from a build-time patch to an artefact. **Plan reordered — 3B-causal first** (no rename; `3B-geom` alias). **SASA adopted as 3C's lead arm.** Top-K candidate export built. |
 
 ### Explanations (formerly "supervisor advances")
 

@@ -3,6 +3,11 @@
 Status: **CLOSED 2026-08-25. Gate G-3A PASSES; 3C proceeds.**
 Final report (glossary, validity audit, every table):
 [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md).
+Bookkeeping closed **2026-09-04** — paper branch reconciled, `E05`→`K04`
+promoted from a build-time patch to an artefact, plan reordered (3B-causal
+first), SASA adopted for 3C:
+[`2026-09-04_3A-close-and-3B-reorder.md`](2026-09-04_3A-close-and-3B-reorder.md).
+**No 3A number changed.**
 
 Parent: [`phase-3.md`](phase-3.md). Split out of it on 2026-08-25, when the
 combined ledger passed the ~400-line cap and 3A closed -- so the parent stays

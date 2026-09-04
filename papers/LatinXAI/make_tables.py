@@ -147,6 +147,13 @@ def collect_availability(repair: bool = True) -> list[dict]:
     substitute the canonical retrain (``K04``, FVU 0.0066) so conv2 is
     represented by its BEST dictionary, not its worst. Availability (the LP
     column) is read off raw activations and is identical either way.
+
+    SINCE 2026-09-04 the substitution lives upstream: the project generated the
+    ``K04`` efficiency report and moved ``E05``'s to ``analysis/superseded/``,
+    because patching it here fixed one consumer and left the defective report on
+    disk for every other one (docs/methods-reference.md S8). ``repair`` is now an
+    idempotent GUARD -- it re-corrects if anyone regenerates the ``E05`` report
+    -- and is a no-op on a clean tree.
     """
     analysis = PROJECT_DIR / "saes" / GAME / "analysis"
     rows = []
@@ -175,7 +182,10 @@ CONV2_REPAIR = ("K04", "champYb", "batchtopk-k32-exp8")
 
 
 def apply_conv2_repair(rows: list[dict]) -> list[dict]:
-    """Swap champYb's conv2 isolation column onto the canonical K04 dictionary."""
+    """Swap champYb's conv2 isolation column onto the canonical K04 dictionary.
+
+    Idempotent guard -- a no-op once the upstream artefact is the K04 report.
+    """
     registry = load_registry()
     exp, champ, recipe = CONV2_REPAIR
     rid = run_id(exp, champ.replace("champ", ""), recipe, "conv2")

@@ -548,7 +548,8 @@ Full hypothesis table with current status: [`../RESEARCH-STATUS.md`](../RESEARCH
    mean — a category is many independent BSPs and they can disagree structurally.
 4. Feature→BSP alignment in the eval pipeline is **greedy argmax on
    decodability**, not causality. 3A avoids this by scoring communities (top-K by
-   signed phi), never a single feature. Causal claims need 3B-causal / 3D.
+   signed phi), never a single feature. Causal claims need 3B-causal / 3D, and
+   start from the shortlist of §7 — never from the argmax.
 5. Every results presentation opens with a glossary — link here rather than
    restating definitions.
 6. A pre-registered gate must be shown able to **fail**: run the positive control
@@ -637,3 +638,59 @@ dictionary (4,096 -> 32,768 slots) alive latents move 350 -> 400 and effective
 expansion 0.68x -> 0.78x, never reaching 1x, for +0.016 then -0.014 coverage. On
 conv2, k=16 has the MOST alive latents (364) and the WORST coverage (0.269). The
 residual wall cannot be attacked by enlarging the dictionary.
+
+## 7. Top-K candidate features per BSP (added 2026-09-04)
+
+The input to the causal track. `lib/sae/eval.py::match_features_to_bsps` reduces
+each BSP to ONE feature, the argmax; rule §5.4 forbids resting a causal claim on
+it, because the argmax feature can be a spectator while the feature the network
+uses ranks lower.
+
+**Definition.** For each BSP, the `k` features with the highest value of a
+ranking metric, in descending order, together with every companion metric
+evaluated *at those same features*.
+
+| field | range / ideal | meaning |
+|---|---|---|
+| `rank_metric` | — | metric the shortlist is ordered by. Default **`mcc`**: §1 makes it the headline and §5.1 prefers it at the base rates threat concepts have (~0.02). `mcc_at_pref`, `youden_j`, `f1` also available. |
+| `top_k` | integer ≥ 1, default **16** | candidates per BSP. Clamped to `d_dict`. 16 covers the measured `knee_k` range (mode 1 for pinned, mode 9 for tiger's 8-fold disjunctions) with headroom. |
+| `argmax_f1_rank` | integer ≥ −1, ideal 0 | 0-based position of the **F1-argmax** feature inside the MCC shortlist; **−1 = outside it**. This is §5.4's "F1-vs-MCC disagreement is a robustness flag", measured. |
+
+**It needs no activations.** The `_matching-<animal>.pt` cache already stores the
+full `(d_dict, num_bsps)` metric matrices, so a shortlist is a `torch.topk` over
+data on disk: no `_h` cache, no GPU, no re-encode, and **no change to the cache
+format**, so every previously-evaluated checkpoint works unchanged.
+
+```bash
+python scripts/export_topk_matches.py --run-id=<stem> --bsps=<animal>
+python scripts/export_topk_matches.py --all --filter='*champYb*' --dry-run
+```
+Output: `saes/<game>/analysis/{run_id}_topk-{animal}.json`, with an embedded
+`glossary` key (§5.5).
+
+**What it is not.** The ordering is still **decodability**. It is a candidate
+list; 3B-causal re-ranks it by intervention effect. Nothing in the export decides
+which feature the network uses.
+
+## 8. Which dictionary represents a (champion, hook) (added 2026-09-04)
+
+A degenerate dictionary is not a fact about its hook. `E05-champYb-…s4.conv2`
+has FVU 0.110, 99.0 % dead and **41 alive latents against `top_k = 64`** — it
+cannot fill the diagnostic's candidate list and `scripts/check_sae_usable.py`
+rejects it. 3A replaced it with the canonical retrain `K04` (FVU 0.0066, 174
+alive) on 2026-08-17.
+
+**Rule: champYb `s4.conv2` is `K04`, never `E05`,** in every report and every
+comparison. Selection is on **dictionary health** (`dead_features_pct` AND FVU
+together — neither alone is a fault signal), never on the outcome: `K04` is in
+fact slightly *worse* on `coverage_mcc` for tigerYb (0.128 → 0.115).
+
+**And the substitution belongs in the artefact.** The paper build originally
+swapped the column at table-build time, which fixes one consumer and leaves the
+defective report on disk for every other one. Instead: regenerate the report and
+move the old one to `analysis/superseded/`.
+
+```bash
+python scripts/sae_lp_efficiency.py --champ=Yb --hook=s4.conv2 \
+    --run-id=K04-champYb-s42-batchtopk-k32-exp8-s4.conv2
+```

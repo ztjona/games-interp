@@ -404,6 +404,146 @@ def match_features_to_bsps(
 
 
 # ---------------------------------------------------------------------------
+# Top-K candidate features per BSP  (input to the causal track, Phase 3B-causal)
+# ---------------------------------------------------------------------------
+
+# Why this exists: ``match_features_to_bsps`` reduces every BSP to ONE feature
+# (the argmax). That is a decodability ranking, and reporting standard 4 says a
+# causal claim may not rest on it -- the argmax feature can be a spectator while
+# the feature the network actually uses ranks #2 or lower. The causal track
+# needs the whole shortlist so it can re-rank it by intervention effect.
+#
+# Nothing here needs the (N x d_dict) encoded activations: the full
+# ``(d_dict, num_bsps)`` metric matrices are already in the matching cache, so
+# a top-K export is a ``torch.topk`` over data on disk -- no ``_h`` cache, no
+# GPU, no re-encode.
+
+# 16 candidates per BSP. Rationale: 3A's own candidate lists are top-64-of-alive
+# and its `knee_k` -- the number of latents a concept actually needs -- has mode
+# 1 for pinned concepts and mode 9 for tiger's 8-fold disjunctions, so 16 covers
+# the measured range with headroom while keeping the export small enough to hold
+# every BSP of every panel member in memory at once.
+TOP_K_DEFAULT = 16
+
+# Metrics a shortlist may be ranked by. MCC is the default because reporting
+# standard 1 makes it the headline and standard 4 explicitly prefers it for the
+# rare threat concepts this track is about (base rate ~0.02, where F1 moves with
+# prevalence through precision).
+RANKABLE_METRICS = ("mcc", "mcc_at_pref", "youden_j", "f1")
+
+
+@dataclass
+class TopKMatches:
+    """The top-K candidate features for every BSP, ranked by one metric.
+
+    Attributes:
+        metric:   name of the ranking metric (one of RANKABLE_METRICS)
+        k:        candidates per BSP actually returned (min(k, d_dict))
+        indices:  (num_bsps, k) int64 feature ids, descending by ``metric``
+        values:   (num_bsps, k) the ranking metric at those features
+        f1:            (num_bsps, k) F1 at those same features
+        mcc:           (num_bsps, k) MCC at those same features
+        youden_j:      (num_bsps, k) Youden's J, or None if not computed
+        mcc_at_pref:   (num_bsps, k) MCC at p_ref, or None if not computed
+        precision:     (num_bsps, k) precision at those features
+        recall:        (num_bsps, k) recall at those features
+        argmax_f1_rank: (num_bsps,) 0-based rank of the F1-argmax feature inside
+            this shortlist, or -1 when it falls outside it. Reporting standard 4
+            calls F1-vs-MCC disagreement a robustness flag; this is that flag,
+            measured rather than asserted.
+    """
+
+    metric: str
+    k: int
+    indices: torch.Tensor
+    values: torch.Tensor
+    f1: torch.Tensor
+    mcc: torch.Tensor
+    precision: torch.Tensor
+    recall: torch.Tensor
+    youden_j: torch.Tensor | None = None
+    mcc_at_pref: torch.Tensor | None = None
+    argmax_f1_rank: torch.Tensor | None = None
+
+
+def top_k_features_per_bsp(
+    matching: FeatureBSPMatching,
+    k: int = TOP_K_DEFAULT,
+    metric: str = "mcc",
+) -> TopKMatches:
+    """Rank every BSP's candidate features and keep the best ``k``.
+
+    This does NOT decide causality -- it produces the shortlist that the causal
+    screen (gradient alignment) and the intervention (clamp/steer) re-rank. The
+    ordering here is still decodability; that is the point of exporting more
+    than one.
+
+    Args:
+        matching: output of ``match_features_to_bsps`` (or a loaded cache).
+        k:        candidates per BSP. Clamped to the dictionary size.
+        metric:   ranking metric, one of ``RANKABLE_METRICS``.
+
+    Returns:
+        TopKMatches with per-BSP shortlists and companion metrics.
+
+    Raises:
+        ValueError: if ``metric`` is unknown or was not computed for this
+            matching (legacy caches predate ``youden_j`` / ``mcc_at_pref``).
+    """
+    if metric not in RANKABLE_METRICS:
+        raise ValueError(
+            f"metric must be one of {RANKABLE_METRICS}, got {metric!r}"
+        )
+    scores = getattr(matching, metric, None)
+    if scores is None:
+        raise ValueError(
+            f"matching has no {metric!r} matrix -- it predates that metric. "
+            f"Re-run sae_eval.py evaluate --force, or rank by 'f1'."
+        )
+    if k < 1:
+        raise ValueError(f"k must be >= 1, got {k}")
+
+    d_dict, num_bsps = scores.shape
+    k_eff = min(int(k), int(d_dict))
+
+    with torch.no_grad():
+        # (k, num_bsps) -> (num_bsps, k): one row per BSP reads naturally.
+        values, indices = scores.topk(k_eff, dim=0)
+        values, indices = values.T.contiguous(), indices.T.contiguous()
+
+        def gather(mat: torch.Tensor | None) -> torch.Tensor | None:
+            if mat is None:
+                return None
+            # mat is (d_dict, num_bsps); take mat[indices[b, j], b].
+            return mat.T.gather(1, indices).contiguous()
+
+        argmax_f1_rank = None
+        if matching.best_feature_per_bsp is not None:
+            hit = indices == matching.best_feature_per_bsp.unsqueeze(1)
+            # argmax on a bool row gives the first True, or 0 when there is
+            # none -- so mask the no-hit rows to -1 explicitly.
+            argmax_f1_rank = torch.where(
+                hit.any(dim=1),
+                hit.float().argmax(dim=1),
+                torch.full((num_bsps,), -1, dtype=torch.long),
+            )
+
+        return TopKMatches(
+            metric=metric,
+            k=k_eff,
+            indices=indices,
+            values=values,
+            f1=gather(matching.f1),
+            mcc=gather(matching.mcc),
+            precision=gather(matching.precision),
+            recall=gather(matching.recall),
+            youden_j=gather(matching.youden_j),
+            mcc_at_pref=gather(matching.mcc_at_pref),
+            argmax_f1_rank=argmax_f1_rank,
+        )
+
+
+# ---------------------------------------------------------------------------
 # Coverage
 # ---------------------------------------------------------------------------
 
