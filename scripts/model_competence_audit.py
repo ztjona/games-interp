@@ -29,6 +29,17 @@ E. Phase-stratified Q entropy
                             — Entropy of softmax(legal Q-values) bucketed by
                               piece count.  A competent model should be more
                               decisive (lower entropy) late game.
+F. Raw illegal first choice
+                            — How often the UNMASKED top-1 is illegal: an
+                              occupied cell (place head, full dataset) or a
+                              piece not in storage (select head, on the
+                              post-placement states Test B builds).  Also the
+                              number of engine retries (ith_option) before a
+                              legal move.  The Quartopy engine retries invalid
+                              moves instead of penalising them, so a model can
+                              play well with a high F -- which is exactly why
+                              Q on illegal actions must never be read as a
+                              preference.  Bucketed by pieces on board.
 
 Usage:
     model_competence_audit.py [--model-config=<yaml>]
@@ -235,6 +246,10 @@ def run_tests_abc(
     a_total = a_correct = 0
     b_total = b_correct = b_forced_loss = 0
     c_distinct_fractions: list[float] = []
+    # Test F, select head: raw top-1 over all 16 pieces, on the post-placement
+    # state; illegal = not in storage.
+    f_sel_total = f_sel_illegal = 0
+    f_sel_retries: list[int] = []
 
     for i in tqdm(indices, desc=f"A/B/C [{label}]"):
         b_enc = boards[i]
@@ -273,6 +288,14 @@ def run_tests_abc(
             # Did the placement itself already end the game?  If so, opponent
             # never gets a piece — skip test B for this position.
             if not after.check_win(mode_2x2=True)[0]:
+                # ── Test F (select head) ─────────────────────────────
+                _, qp_raw = forward_qvalues(model, after, None, device)
+                avail = {p.index() for p in storage}
+                ranking = np.argsort(-qp_raw)
+                f_sel_total += 1
+                f_sel_illegal += int(int(ranking[0]) not in avail)
+                f_sel_retries.append(
+                    next(k for k, i in enumerate(ranking) if int(i) in avail))
                 empties_after = [
                     (r, c) for (r, c) in empties if (r, c) != (placed_r, placed_c)
                 ]
@@ -313,6 +336,19 @@ def run_tests_abc(
             "n_avoided": b_correct,
             "accuracy": (b_correct / b_total) if b_total else None,
             "n_forced_loss_skipped": b_forced_loss,
+        },
+        "test_F_raw_illegal_select": {
+            "n_positions": f_sel_total,
+            "raw_top1_illegal_rate": (
+                f_sel_illegal / f_sel_total if f_sel_total else None),
+            "mean_retries": (
+                float(np.mean(f_sel_retries)) if f_sel_retries else None),
+            "p90_retries": (
+                float(np.percentile(f_sel_retries, 90)) if f_sel_retries else None),
+            "interpretation": (
+                "Unmasked select top-1 is a piece NOT in storage, on the "
+                "post-placement state (model's own legal placement). The bot "
+                "filters these; training masks them."),
         },
         "test_C_offered_piece_sensitivity": {
             "n_positions": len(c_distinct_fractions),
@@ -423,7 +459,50 @@ def run_tests_de(
         ),
     }
 
-    return {"test_D_q_occupancy_gap": test_d, "test_E_phase_entropy": test_e}
+    # ── Test F (place head) ─────────────────────────────────────────
+    # Raw top-1 over all 16 cells; illegal = occupied. Engine retries = rank of
+    # the first empty cell in the full ranking (the ith_option the engine
+    # would reach). Counted only where >=1 cell is occupied AND >=1 is empty.
+    has_occ = occ_mask.any(dim=1) & empty_mask.any(dim=1)
+    raw_top1 = qb_all.argmax(dim=1)
+    illegal = occ_mask[torch.arange(n), raw_top1]
+    ranks = qb_all.argsort(dim=1, descending=True)
+    retries = (~occ_mask.gather(1, ranks)).float().argmax(dim=1)
+    chance = n_pieces.float() / 16.0
+    f_buckets = {
+        "all": torch.ones(n, dtype=torch.bool),
+        "pieces_1_4": (n_pieces >= 1) & (n_pieces <= 4),
+        "pieces_5_8": (n_pieces >= 5) & (n_pieces <= 8),
+        "pieces_9_12": (n_pieces >= 9) & (n_pieces <= 12),
+        "pieces_13_15": n_pieces >= 13,
+    }
+    f_by_phase: dict[str, dict[str, float | int]] = {}
+    for name, mask in f_buckets.items():
+        m = mask & has_occ
+        if not bool(m.any()):
+            f_by_phase[name] = {"n": 0}
+            continue
+        f_by_phase[name] = {
+            "n": int(m.sum()),
+            "raw_top1_illegal_rate": float(illegal[m].float().mean()),
+            "uniform_chance": float(chance[m].mean()),
+        }
+    test_f = {
+        "n_positions": int(has_occ.sum()),
+        "raw_top1_illegal_rate": float(illegal[has_occ].float().mean()),
+        "uniform_chance": float(chance[has_occ].mean()),
+        "mean_retries": float(retries[has_occ].float().mean()),
+        "p90_retries": float(retries[has_occ].float().quantile(0.9)),
+        "max_retries": int(retries[has_occ].max()),
+        "by_phase": f_by_phase,
+        "interpretation": (
+            "Unmasked place top-1 is an OCCUPIED cell. The engine retries "
+            "invalid moves (ith_option), so play stays legal; Q on illegal "
+            "actions is untrained and must not be read as a preference."),
+    }
+
+    return {"test_D_q_occupancy_gap": test_d, "test_E_phase_entropy": test_e,
+            "test_F_raw_illegal_place": test_f}
 
 
 # ──────────────────────────────────────────────────────────────────────

@@ -1,0 +1,65 @@
+# Phase 3B-causal run config for ONE champion.
+#
+# This file is the whole portability contract: nothing in lib/sae/interchange.py
+# or the 3B-causal scripts names a champion, a hook or a file. To re-run on a
+# new champion, copy this file to champ<Tag>.yaml and change the names below;
+# the runner (runners/3B-causal.ps1 -Champ <Tag>) reports anything missing and
+# the command that produces it. Results are keyed by (basis, bsp_id,
+# representation role R1..R7), so two champions' summaries join directly.
+#
+# Design, predictions and verdict rule: docs/diary/2026-09-12_3B-causal-preregistration.md
+# as amended (pre-data) by docs/diary/2026-09-12_3B-causal-amendment-1.md
+
+champion: configs/models/champYb.yaml   # model path, untrained twin, game module
+
+# The module whose OUTPUT is the hook value z. Every hook in this repo is a
+# pre-activation (functional ReLU after the module), and the readout always
+# applies the network's own ReLU to a patched z.
+hook: s4.fc1
+
+# Logit modules read by the readout, one per decision head. Their outputs are
+# pre-tanh logits; tanh is monotone and changes no decision.
+heads:
+  place: s4.fc2_place
+  select: s4.fc2_select
+
+# closed_form : relu(z) @ W.T + b from the head module's weights (exact, fast)
+# forward_hook: replace the hook module's output, run the real model (any arch)
+# auto        : build both; control A3 must find them identical on the dry run,
+#               else the run falls back to forward_hook and says so.
+readout: auto
+
+positions: data/quarto/positions-amalgam_yb_unique.pt
+activations: data/quarto/s4.fc1_amalgam_yb_activations.pt
+orbit_ids: data/quarto/orbit_ids-amalgam_yb_unique.pt
+bsp_suffix: Yb               # label files bsp_labels-<basis>Yb_<n>.pt
+
+# Dictionaries under test (pre-registration S5.4).
+dictionaries:
+  primary: K05-champYb-s42-jumprelu-t64-exp8-s4.fc1     # R1-R4
+  replicate: [F04-champYb-s42-jumprelu-t64-exp8-s4.fc1]
+  seeds: [K05-champYb-s43-jumprelu-t64-exp8-s4.fc1,
+          K05-champYb-s44-jumprelu-t64-exp8-s4.fc1]
+  anchored: I04-champYb-lh100-s42-anchored-jumprelu-t64-exp8-s4.fc1   # R6, tiger only
+
+# Linear-probe results per basis (R5). The probe DIRECTIONS live next to each
+# as <stem>_directions.pt (scripts/linear_probe_baseline.py::directions_path_for).
+# Reports produced before 2026-09-12 carry no directions: re-run the probe.
+linear_probes:
+  hawk: data/quarto/linear_probe_hawk_173_s4.fc1_amalgam_yb_activations_results.json
+  hen: data/quarto/linear_probe_hen_173_s4.fc1_amalgam_yb_activations_results.json
+  tiger: data/quarto/linear_probe_tiger_36_s4.fc1_amalgam_yb_activations_results.json
+
+# Wave 1 (pre-registration S5.2): offered-piece swap on a fixed board.
+wave1:
+  bases: [hawk, hen, tiger]
+  categories:
+    hawk: [reframed_completable, reframed_sq_completable]
+    hen: [neg_completable, neg_sq_completable]
+    tiger: [tiger_line_winnable, tiger_square_winnable,
+            tiger_offered_completing_attr]
+  # Single BSPs from categories whose other members have no place-phase target
+  # (tiger_decision_global's other four are select-phase: Wave 3).
+  extra_bsps:
+    tiger: [tiger_win_now_exists]
+  head: place

@@ -1,0 +1,226 @@
+{
+  "schema_version": 2,
+  "champion": "champYb",
+  "champion_display_name": "Yb_hotChamp(3) [hot lambda=1.0, seedB, E=10000]",
+  "champion_config": "configs\\models\\champYb.yaml",
+  "game": "quarto_s4_hot",
+  "positions_path": "data\\quarto\\positions-amalgam_yb_unique.pt",
+  "n_total_positions": 296045,
+  "n_abc": 5000,
+  "seed": 42,
+  "device": "cuda",
+  "models": {
+    "trained": {
+      "model_path": "models/quarto/20260614_2031-Yb_hotChamp(3)0612_HOT_1.0_seedB_E_10000.pt",
+      "label": "trained",
+      "game": "quarto_s4_hot",
+      "elapsed_seconds": 104.0,
+      "n_positions_abc": 5000,
+      "n_positions_de": 296045,
+      "test_A_winning_placement": {
+        "n_winnable": 1202,
+        "n_correct": 1166,
+        "accuracy": 0.9700499168053245,
+        "chance_baseline": "fraction of empty cells that win (varies); see per-position breakdown if needed"
+      },
+      "test_B_losing_piece_avoidance": {
+        "n_auditable": 1479,
+        "n_avoided": 1445,
+        "accuracy": 0.9770114942528736,
+        "n_forced_loss_skipped": 288
+      },
+      "test_F_raw_illegal_select": {
+        "n_positions": 3834,
+        "raw_top1_illegal_rate": 0.2853416797078769,
+        "mean_retries": 0.40714658320292124,
+        "p90_retries": 1.0,
+        "interpretation": "Unmasked select top-1 is a piece NOT in storage, on the post-placement state (model's own legal placement). The bot filters these; training masks them."
+      },
+      "test_C_offered_piece_sensitivity": {
+        "n_positions": 4999,
+        "mean_distinct_fraction": 0.20745093851715177,
+        "median_distinct_fraction": 0.16666666666666666,
+        "interpretation": "1.0 = every offered piece picks a different cell; low = model ignores the offered piece"
+      },
+      "test_D_q_occupancy_gap": {
+        "n_positions": 296029,
+        "mean_gap": -0.24511903524398804,
+        "median_gap": -0.10122282803058624,
+        "std_gap": 0.28871050477027893,
+        "fraction_positive_gap": 0.10861773788928986,
+        "interpretation": "Q(empty) \u2212 Q(occupied) on the unmasked board head. >0 means the model has learned legality."
+      },
+      "test_E_phase_entropy": {
+        "by_phase": {
+          "all": {
+            "n": 296045,
+            "mean_entropy_nats": 2.26094651222229,
+            "median_entropy_nats": 2.381477117538452,
+            "max_possible_at_uniform": 2.3517217896085936
+          },
+          "early_0_4": {
+            "n": 120715,
+            "mean_entropy_nats": 2.5597586631774902,
+            "median_entropy_nats": 2.5627808570861816,
+            "max_possible_at_uniform": 2.568334301063083
+          },
+          "mid_5_10": {
+            "n": 163582,
+            "mean_entropy_nats": 2.111686944961548,
+            "median_entropy_nats": 2.1850533485412598,
+            "max_possible_at_uniform": 2.2052730079887626
+          },
+          "late_11_15": {
+            "n": 11748,
+            "mean_entropy_nats": 1.268865704536438,
+            "median_entropy_nats": 1.3381297588348389,
+            "max_possible_at_uniform": 1.4641936644630082
+          }
+        },
+        "interpretation": "Lower entropy late-game \u2192 more decisive. Random model approaches log(n_legal_cells) uniformly."
+      },
+      "test_F_raw_illegal_place": {
+        "n_positions": 296029,
+        "raw_top1_illegal_rate": 0.671832799911499,
+        "uniform_chance": 0.34354108572006226,
+        "mean_retries": 1.7651379108428955,
+        "p90_retries": 4.0,
+        "max_retries": 15,
+        "by_phase": {
+          "all": {
+            "n": 296029,
+            "raw_top1_illegal_rate": 0.671832799911499,
+            "uniform_chance": 0.34354108572006226
+          },
+          "pieces_1_4": {
+            "n": 120699,
+            "raw_top1_illegal_rate": 0.40259653329849243,
+            "uniform_chance": 0.18476955592632294
+          },
+          "pieces_5_8": {
+            "n": 132316,
+            "raw_top1_illegal_rate": 0.8281311392784119,
+            "uniform_chance": 0.39662814140319824
+          },
+          "pieces_9_12": {
+            "n": 41033,
+            "raw_top1_illegal_rate": 0.9469207525253296,
+            "uniform_chance": 0.6155030727386475
+          },
+          "pieces_13_15": {
+            "n": 1981,
+            "raw_top1_illegal_rate": 0.9384149312973022,
+            "uniform_chance": 0.8381814956665039
+          }
+        },
+        "interpretation": "Unmasked place top-1 is an OCCUPIED cell. The engine retries invalid moves (ith_option), so play stays legal; Q on illegal actions is untrained and must not be read as a preference."
+      }
+    },
+    "random": {
+      "model_path": "models/quarto/20260612_1414-Yb_hotChamp(3)0612_HOT_1.0_seedB_E_0000.pt",
+      "label": "random",
+      "game": "quarto_s4_hot",
+      "elapsed_seconds": 90.3,
+      "n_positions_abc": 5000,
+      "n_positions_de": 296045,
+      "test_A_winning_placement": {
+        "n_winnable": 1202,
+        "n_correct": 316,
+        "accuracy": 0.2628951747088186,
+        "chance_baseline": "fraction of empty cells that win (varies); see per-position breakdown if needed"
+      },
+      "test_B_losing_piece_avoidance": {
+        "n_auditable": 1996,
+        "n_avoided": 846,
+        "accuracy": 0.42384769539078154,
+        "n_forced_loss_skipped": 847
+      },
+      "test_F_raw_illegal_select": {
+        "n_positions": 4684,
+        "raw_top1_illegal_rate": 0.40649017933390263,
+        "mean_retries": 0.7459436379163108,
+        "p90_retries": 2.0,
+        "interpretation": "Unmasked select top-1 is a piece NOT in storage, on the post-placement state (model's own legal placement). The bot filters these; training masks them."
+      },
+      "test_C_offered_piece_sensitivity": {
+        "n_positions": 4999,
+        "mean_distinct_fraction": 0.12111321531705609,
+        "median_distinct_fraction": 0.1,
+        "interpretation": "1.0 = every offered piece picks a different cell; low = model ignores the offered piece"
+      },
+      "test_D_q_occupancy_gap": {
+        "n_positions": 296029,
+        "mean_gap": 1.8556303984951228e-05,
+        "median_gap": 4.1163526475429535e-05,
+        "std_gap": 0.023476492613554,
+        "fraction_positive_gap": 0.5007009506225586,
+        "interpretation": "Q(empty) \u2212 Q(occupied) on the unmasked board head. >0 means the model has learned legality."
+      },
+      "test_E_phase_entropy": {
+        "by_phase": {
+          "all": {
+            "n": 296045,
+            "mean_entropy_nats": 2.3121347427368164,
+            "median_entropy_nats": 2.397157907485962,
+            "max_possible_at_uniform": 2.3517217896085936
+          },
+          "early_0_4": {
+            "n": 120715,
+            "mean_entropy_nats": 2.565420627593994,
+            "median_entropy_nats": 2.5642740726470947,
+            "max_possible_at_uniform": 2.568334301063083
+          },
+          "mid_5_10": {
+            "n": 163582,
+            "mean_entropy_nats": 2.188528060913086,
+            "median_entropy_nats": 2.1967105865478516,
+            "max_possible_at_uniform": 2.2052730079887626
+          },
+          "late_11_15": {
+            "n": 11748,
+            "mean_entropy_nats": 1.430660367012024,
+            "median_entropy_nats": 1.608452320098877,
+            "max_possible_at_uniform": 1.4641936644630082
+          }
+        },
+        "interpretation": "Lower entropy late-game \u2192 more decisive. Random model approaches log(n_legal_cells) uniformly."
+      },
+      "test_F_raw_illegal_place": {
+        "n_positions": 296029,
+        "raw_top1_illegal_rate": 0.47323402762413025,
+        "uniform_chance": 0.34354108572006226,
+        "mean_retries": 0.790473222732544,
+        "p90_retries": 2.0,
+        "max_retries": 15,
+        "by_phase": {
+          "all": {
+            "n": 296029,
+            "raw_top1_illegal_rate": 0.47323402762413025,
+            "uniform_chance": 0.34354108572006226
+          },
+          "pieces_1_4": {
+            "n": 120699,
+            "raw_top1_illegal_rate": 0.3082875609397888,
+            "uniform_chance": 0.18476955592632294
+          },
+          "pieces_5_8": {
+            "n": 132316,
+            "raw_top1_illegal_rate": 0.5455046892166138,
+            "uniform_chance": 0.39662814140319824
+          },
+          "pieces_9_12": {
+            "n": 41033,
+            "raw_top1_illegal_rate": 0.7067969441413879,
+            "uniform_chance": 0.6155030727386475
+          },
+          "pieces_13_15": {
+            "n": 1981,
+            "raw_top1_illegal_rate": 0.858152449131012,
+            "uniform_chance": 0.8381814956665039
+          }
+        },
+        "interpretation": "Unmasked place top-1 is an OCCUPIED cell. The engine retries invalid moves (ith_option), so play stays legal; Q on illegal actions is untrained and must not be read as a preference."
+      }
+    }
+  }
+}

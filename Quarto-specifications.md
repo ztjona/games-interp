@@ -25,6 +25,17 @@ Total unique pieces: 2^4 = 16
 - `Sa_S4` unified-aux autoregressive CNN (champS4) — `models/quarto/Sa_S4.py`,
   registered via `configs/models/champS4.yaml` and the `quarto_s4` game module.
 
+**Every hook is a PRE-activation.** `ActivationStore` registers a forward hook
+on the named `nn.Module` (a `Linear` or `Conv2d`), and every model in this repo
+applies ReLU *functionally* afterwards (`x = F.relu(self.fc1(x))`; there are no
+`nn.ReLU` modules). So `fc1` / `s4.fc1` / `conv2` / `s4.conv2` activations — and
+every SAE trained on them — live in **pre-ReLU** space: values can be negative
+(champYb `s4.fc1` min −5.7, no exact zeros). The next layer reads `relu(·)` of
+the hook value, and at inference the S4 dropout after `fc1` is the identity.
+Any intervention made at a hook must therefore be passed back through the
+network's own ReLU; a closed form that treats the hook value as the heads'
+input is wrong.
+
 **Hookable layers — champAa (`CNN_uncoupled`):**
 - `fc_in_piece` — (B,16) Piece input embedding
 - `conv1` — (B,16,4,4) Early spatial features

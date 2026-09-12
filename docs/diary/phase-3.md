@@ -38,7 +38,7 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 | Runs | Step | What | Gate | Status |
 |:---:|---|---|---|---|
 | — | 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | ✅ **CLOSED 2026-08-25 — G-3A PASSES.** 114 cells, 12,151 concept-verdicts, 74.6% `spread`; the wall is a **disjunction** wall. Ledger: [`phase-3A.md`](phase-3A.md); report: [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md) |
-| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). Not yet built |
+| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). Core library built and tested (`lib/sae/interchange.py`); counterfactual generator and runner next |
 | **2** | **3B** (alias `3B-geom`) | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending -- needs no new compute (alpha by construction, beta from the width sweep on disk) |
 | **3** | 3C | Geometry-aware SAE variants (brief sharpened by 3A — an **aggregating readout over existing sibling atoms**): γ pre-check, hierarchical anchoring, **SASA block decoders (LEAD ARM, adopted 2026-09-04)** vs Matryoshka / H-SAE / MP-SAE vs bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | **UNBLOCKED** (G-3A passed) |
 | **4** | 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
@@ -68,7 +68,19 @@ Full design (frozen on commit):
   rather than penalising them. Decision: proceed. Counterfactuals keep the
   legal set identical, and illegal logits are never scored.
 - Disclosed before any data: the `‖W d‖` screen and its r = −0.19 with MCC,
-  hence H-C4 is two-sided.
+  hence H-C4 is two-sided. That screen was also computed in the wrong space:
+  **every hook is pre-ReLU** (functional ReLU after the module), so SAE
+  directions live in `z` while the heads read `relu(z)`. Patches go back
+  through the network's own ReLU.
+- Training confirmed from source by the training project: every loss masks
+  illegal actions, no legality loss. A new champion is being trained in
+  parallel; 3B-causal is built to re-run on it unchanged.
+- **Amendment log of record** (the pre-registration itself is frozen, so its
+  own log stays empty):
+  1. [`2026-09-12_3B-causal-amendment-1.md`](2026-09-12_3B-causal-amendment-1.md)
+     — **pre-data**: pre-ReLU hook and the corrected Tier-A controls; training
+     facts and Test F; ordered verdict rule with `install-only` /
+     `remove-only`; portability contract.
 
 
 ### 2026-09-04 -- 3A bookkeeping closed; plan reordered; SASA adopted

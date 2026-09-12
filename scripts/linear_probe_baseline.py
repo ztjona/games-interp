@@ -47,6 +47,13 @@ Options:
     --max-iter=<int>       Max iterations for solver [default: 1000]
     --C=<float>            Inverse regularization strength [default: 1.0]
     --output=<path>        Save results JSON to this path [default: auto]
+                           The probe DIRECTIONS are saved next to it as
+                           <output stem>_directions.pt: coef (num_bsps, d_act),
+                           intercept, threshold and a fitted mask. The probe is
+                           fit on the raw hook activations (no scaler), so coef
+                           is already the direction in activation space -- the
+                           input 3B-causal patches along (R5). Regenerable, so
+                           gitignored like every data/*.pt.
 
 Examples:
     linear_probe_baseline.py data/quarto/fc1_amalgam_activations.pt data/quarto/bsp_labels-gorilla_164.pt data/quarto/bsp_schema-gorilla_164.json
@@ -95,6 +102,18 @@ def _infer_bsp_set_name(bsp_path: Path, schema: dict) -> str:
     if stem.startswith(prefix):
         return stem[len(prefix) :]
     return stem
+
+
+def directions_path_for(results_path: Path | str) -> Path:
+    """Where the probe directions of a results JSON live (one home, reused by
+    3B-causal so the two can never disagree on the name)."""
+    results_path = Path(results_path)
+    stem = results_path.name
+    if stem.endswith("_results.json"):
+        stem = stem[: -len("_results.json")]
+    elif stem.endswith(".json"):
+        stem = stem[: -len(".json")]
+    return results_path.with_name(f"{stem}_directions.pt")
 
 
 def _default_output_path(act_path: Path, bsp_path: Path, schema: dict) -> Path:
@@ -221,6 +240,14 @@ def main():
     # --- Fit per-BSP logistic regression ---
     results_per_bsp = []
     t0 = time.time()
+    # Probe directions, kept for the causal track (3B-causal patches along
+    # them). Rows of BSPs that were not fitted (constant label) stay zero and
+    # are flagged in `fitted`, so a caller can never patch along a non-probe.
+    d_act = X_train.shape[1]
+    coef = np.zeros((num_bsps, d_act), dtype=np.float32)
+    intercept = np.zeros(num_bsps, dtype=np.float32)
+    thresholds = np.full(num_bsps, np.nan, dtype=np.float32)
+    fitted = np.zeros(num_bsps, dtype=bool)
 
     for i in tqdm(range(num_bsps), desc="Probing BSPs", file=sys.stderr):
         bsp_id = bsp_defs[i]["id"]
@@ -261,6 +288,9 @@ def main():
             random_state=seed,
         )
         clf.fit(X_train, y_train_i)
+        coef[i] = clf.coef_[0].astype(np.float32)
+        intercept[i] = float(clf.intercept_[0])
+        fitted[i] = True
 
         # Choose the decision threshold that maximises MCC, FIT ON TRAIN.
         #
@@ -284,6 +314,7 @@ def main():
             m = ((tp_ * tn_ - fp_ * fn_) / den) if den > 0 else 0.0
             if m > best_m:
                 best_t, best_m = float(t), m
+        thresholds[i] = best_t
         y_pred = (clf.predict_proba(X_test)[:, 1] >= best_t).astype(int)
 
         cm = confusion_matrix(y_test_i, y_pred, labels=[0, 1])
@@ -436,6 +467,21 @@ def main():
         # sort_keys for reproducibility: the per_category dict is otherwise
         # emitted in a non-deterministic key order and churns git on re-runs.
         json.dump(output, f, indent=2, sort_keys=True)
+
+    directions_path = directions_path_for(output_path)
+    torch.save(
+        {
+            "bsp_ids": [d["id"] for d in bsp_defs],
+            "coef": torch.from_numpy(coef),
+            "intercept": torch.from_numpy(intercept),
+            "threshold": torch.from_numpy(thresholds),
+            "fitted": torch.from_numpy(fitted),
+            "space": "raw hook activations (pre-ReLU), no feature scaling",
+            "config": output["config"],
+        },
+        directions_path,
+    )
+    print(f"Probe directions saved to: {directions_path}", file=sys.stderr)
 
     # --- Print summary ---
     print("\n=== Linear Probe Baseline ===", file=sys.stderr)

@@ -33,7 +33,6 @@ trail of *what happened*; this folder is for *what it means*.
 
 ## Index
 
-_(none yet — add a row when you write one)_
-
 | Topic | Written | Summary |
 |---|---|---|
+| [new-champion-recommendations](new-champion-recommendations.md) | 2026-09-12 | How to train the next Quarto champion so every analysis re-runs on it: the comparability contract, legality via synthetic illegal-move = loss transitions, a controlled L0/L1 pair with matched seeds, provenance, and competence-only acceptance criteria. |
