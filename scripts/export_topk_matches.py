@@ -146,7 +146,17 @@ def build_report(
             f"  run: python sae_eval.py evaluate saes/{game}/{run_id}.pt "
             f"--bsps={animal}"
         )
-    matching = load_matching(path)
+    return build_report_from_matching(load_matching(path), run_id, animal, game,
+                                      top_k, metric, source=str(path).replace("\\", "/"))
+
+
+def build_report_from_matching(
+    matching: FeatureBSPMatching, run_id: str, animal: str, game: str,
+    top_k: int, metric: str, source: str,
+) -> dict:
+    """The export report for an in-memory matching -- the single home of the
+    report format, used both for cached matchings and by 3B-causal when a
+    matching has to be computed (hen has no sae_eval cache)."""
     tk = top_k_features_per_bsp(matching, k=top_k, metric=metric)
 
     schema_path = resolve_schema_path(Path("data") / game, animal)
@@ -197,7 +207,7 @@ def build_report(
         "d_dict": int(matching.f1.shape[0]),
         "num_bsps": len(entries),
         "p_ref": matching.p_ref,
-        "source_cache": str(path).replace("\\", "/"),
+        "source_cache": source,
         "summary": {
             "n_argmax_f1_disagrees": len(disagree),
             "n_argmax_f1_outside_topk": len(outside),

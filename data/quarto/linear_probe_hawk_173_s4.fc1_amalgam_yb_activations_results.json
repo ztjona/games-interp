@@ -2,7 +2,7 @@
   "config": {
     "C": 1.0,
     "activations": "data\\quarto\\s4.fc1_amalgam_yb_activations.pt",
-    "bsp_labels": "E:\\ZTJONA\\games-interp\\data\\quarto\\bsp_labels-hawkYb_173.pt",
+    "bsp_labels": "data\\quarto\\bsp_labels-hawkYb_173.pt",
     "bsp_set": "hawk_173",
     "max_iter": 1000,
     "max_train": 50000,

@@ -437,9 +437,12 @@ def train_das_direction(z_b: torch.Tensor, z_s: torch.Tensor, readout: Readout,
     Train it on training folds only and score it held out -- it is selected on
     the outcome, so an in-sample score is meaningless.
     """
-    g = torch.Generator().manual_seed(seed)
-    v = (init.clone() if init is not None
-         else torch.randn(z_b.shape[1], generator=g)).to(z_b.dtype).requires_grad_(True)
+    g = torch.Generator().manual_seed(seed)          # CPU generator: reproducible on any device
+    v0 = init.clone() if init is not None else torch.randn(z_b.shape[1], generator=g)
+    # Move BEFORE requires_grad_: a leaf created on the CPU and moved afterwards
+    # is not the tensor the optimiser updates, and a CPU leaf cannot meet CUDA
+    # data at all.
+    v = v0.to(device=z_b.device, dtype=z_b.dtype).detach().requires_grad_(True)
     opt = torch.optim.Adam([v], lr=lr)
     neg = torch.finfo(z_b.dtype).min / 4
     for _ in range(steps):

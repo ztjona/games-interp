@@ -694,3 +694,52 @@ move the old one to `analysis/superseded/`.
 python scripts/sae_lp_efficiency.py --champ=Yb --hook=s4.conv2 \
     --run-id=K04-champYb-s42-batchtopk-k32-exp8-s4.conv2
 ```
+
+## 9. Interchange interventions — Phase 3B-causal (added 2026-09-12)
+
+Implementation: `lib/sae/interchange.py` (game-agnostic) and
+`scripts/games/quarto_counterfactuals.py` (Quarto pairs). The frozen design,
+predictions and thresholds are in
+[`diary/2026-09-12_3B-causal-preregistration.md`](diary/2026-09-12_3B-causal-preregistration.md)
+and its amendments; this section defines the numbers.
+
+**The operation.** Base input `b`, source input `s`, hook value `z` (the
+**pre-ReLU** module output; every hook in this repo is a pre-activation). A
+representation of concept C is overwritten in `z_b` with its value from `z_s`;
+the network's own downstream computation, including its ReLU, then decides.
+
+| patch | `z_b'` |
+|---|---|
+| SAE latent set J | `z_b + Σ_{j∈J} (a_j(s) − a_j(b)) · W_dec[j]` — error-preserving: the rest of the reconstruction and the SAE error are untouched |
+| direction w | `z_b + ((z_s − z_b)·ŵ) ŵ` |
+| full | `z_s` (ceiling / control A2) |
+
+| metric | range / ideal | definition |
+|---|---|---|
+| **IIA** | [0, 1], ideal 1 | share of pairs whose patched legal decision is in the target set |
+| **r₀** | [0, 1] | same share for the unpatched base (no-patch rate) |
+| **IIA\*** | (−∞, 1], ideal 1, 0 = no effect | `(IIA − r₀) / (1 − r₀)`; undefined when r₀ = 1 |
+| **flip rate** | [0, 1] | share of pairs whose legal decision changes at all |
+| **target margin** | logit units, ideal > 0 | change of the best target logit minus the mean change of the other legal actions — shows partial effects that do not flip the decision |
+
+**Every score is over the legal set.** Q on illegal actions is never a
+training target in champYb (every loss masks it), so illegal logits are
+excluded before the argmax and never interpreted.
+
+**Pair kinds** (same board, different piece in hand, so the legal set is
+identical by construction): *switch-on* (C false → true), *switch-off*
+(true → false; the base must actually play the concept's move), *specificity*
+(C false in both; the patch must NOT pull toward the concept's cells).
+
+**Verdict rule `3B.C1`** — ordered, first match wins; the full table is frozen
+in amendment 1 §A3 and implemented as `interchange.classify`:
+`underpowered` → `context-blind` → `concept-consistent (on-only)` →
+`concept-consistent` → `install-only` → `remove-only` → `anti-consistent` →
+`off-target` → `inert`. "Installs" / "removes" = IIA\* ≥ 0.20 and
+Benjamini–Hochberg-significant (q = 0.05, within representation × arm) against
+a 1,000-draw null. Minimum n: 100 switch-on, 100 specificity, 50 switch-off.
+
+**Nulls.** Random unit directions in `z` space (for probe, anchored and DAS
+directions); frequency-matched random latent sets, ±20 % firing frequency (for
+SAE latents). p-values are empirical `(k + 1) / (n + 1)`, with a Gaussian tail
+when the observed value exceeds every draw. CIs: bootstrap over **board orbits**.

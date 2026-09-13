@@ -2,7 +2,7 @@
   "config": {
     "C": 1.0,
     "activations": "data\\quarto\\s4.fc1_amalgam_yb_activations.pt",
-    "bsp_labels": "E:\\ZTJONA\\games-interp\\data\\quarto\\bsp_labels-tigerYb_36.pt",
+    "bsp_labels": "data\\quarto\\bsp_labels-tigerYb_36.pt",
     "bsp_set": "tiger_36",
     "max_iter": 1000,
     "max_train": 50000,
