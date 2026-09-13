@@ -7,7 +7,7 @@
  "hook": "s4.fc1",
  "readout": "closed_form",
  "freeze": {
-  "git_head": "efc9c1fe1db4d4fa73acbd23c02b980acfbae3d0",
+  "git_head": "3c08c75f7225c601763a2144aa1dba66fe0cdfe4",
   "files": {
    "docs/diary/2026-09-12_3B-causal-preregistration.md": {
     "sha256": "9e966a1b10f7892ef1b4637495c0aa37a5ab096197d5f052b0ab8ac566143ebc",
@@ -18,8 +18,8 @@
     "committed_and_clean": true
    },
    "docs/diary/2026-09-12_3B-causal-amendment-2.md": {
-    "sha256": "c2278fefc791248bc52930fe48e863db7bc159e0b7a04a4635c5b6c4fed719ff",
-    "committed_and_clean": false
+    "sha256": "c3ee9b9856c058eff1a0c21762e63e65b28b70ba3bec98469ff19e08172c5a30",
+    "committed_and_clean": true
    }
   }
  },

@@ -41,6 +41,11 @@ $ErrorActionPreference = 'Stop'
 $PSNativeCommandUseErrorActionPreference = $true
 Set-Location (Join-Path $PSScriptRoot '..')
 $env:PYTHONUTF8 = '1'
+# Activate the venv explicitly (a detached launch does not inherit it). Without
+# this, `python` under launch.ps1's WMI spawn is the system interpreter, which
+# has torch but no numpy -- the first 3B-causal launch died on exactly that.
+$activate = '.\.venv\Scripts\Activate.ps1'
+if (Test-Path $activate) { & $activate } else { throw ".venv not found at $activate" }
 New-Item -ItemType Directory -Force -Path logs | Out-Null
 Start-Transcript -Path 'logs/3B-causal.transcript.log' -Append | Out-Null
 $runStart = Get-Date

@@ -101,7 +101,13 @@ Get-Content logs\champYb.transcript.log -Wait -Tail 40   # follow progress
 ```
 `launch.ps1` spawns via `Win32_Process.Create` (WMI), not `Start-Process`: a
 Start-Process child stays in sshd's job object and is killed on disconnect (same
-as `nohup`); the WMI-spawned process is outside that job and survives.
+as `nohup`); the WMI-spawned process is outside that job and survives. **The
+detached process inherits nothing from your shell** -- so verify a new runner
+with `pwsh -File runners\launch.ps1 <slug> -DryRun`, not in the foreground. A
+foreground dry run passed for `3B-causal.ps1` while its first detached launch
+died at once (no venv activation: `python` was the system interpreter, no
+numpy). `tests/test_runners.py` now checks every runner activates `.venv`
+before its first `python` call.
 
 Visualization data export (invoked by the champion runners; also standalone):
 ```bash
