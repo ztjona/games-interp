@@ -93,7 +93,12 @@ def freeze_stamps() -> dict:
         rel = f.relative_to(ROOT).as_posix()
         dirty = subprocess.run(["git", "status", "--porcelain", "--", rel], cwd=ROOT,
                                capture_output=True, text=True).stdout.strip()
-        stamps[rel] = {"sha256": hashlib.sha256(f.read_bytes()).hexdigest(),
+        # Hash LINE-NORMALISED content: git on Windows may check a file out with
+        # CRLF while the committed blob has LF, and a raw-byte hash then fails to
+        # match `git show` even though nothing changed (it did, on Wave 1's
+        # pre-registration). Normalising makes the stamp comparable to the blob.
+        content = f.read_bytes().replace(b"\r\n", b"\n")
+        stamps[rel] = {"sha256_lf": hashlib.sha256(content).hexdigest(),
                        "committed_and_clean": dirty == ""}
     head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT,
                           capture_output=True, text=True).stdout.strip()
