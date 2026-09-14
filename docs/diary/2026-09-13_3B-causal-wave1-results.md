@@ -197,11 +197,10 @@ The pilot has told us how to test the question properly. Three options:
    new pre-registration fixing §5: **network-own interchange accuracy as the
    primary target**; a specificity **effect-size floor** set from the
    ceiling's own scale (fixed *before* data); switch-off scored against the
-   network's counterfactual, not the oracle. Run it on **fresh data**: the new
-   L0/L1 champions, and/or champYb pairs disjoint by orbit from the pilot's.
-   Plenty remain for specificity and switch-on in most concepts, but the rarest
-   pinned concepts used all their switch-on pairs, so those need the new
-   champions.
+   network's counterfactual, not the oracle. Run it on **fresh data**: new
+   champYb positions and/or new champions, never the pilot's boards. The rarest
+   pinned concepts used all their switch-on pairs, so whether fresh data give
+   them enough is an empirical question for the design-stage power count.
 2. **Do the registered fallback (DAS-k)** as amendment 3. Faithful to the
    letter of §7, but §5.4 argues it does not address the failure observed.
 3. **Unseal R1–R6 as explicitly exploratory.** Their verdicts would carry the
@@ -209,9 +208,10 @@ The pilot has told us how to test the question properly. Three options:
    let their results shape the confirmatory design, so it should come after, if
    at all.
 
-Recommendation: **1, on the new champions first**. They are the untouched data
-the pilot cannot contaminate, and the portable pipeline re-runs on them with one
-config file. Keep R1–R6 sealed until Wave 1b is frozen.
+Recommendation: **1**, on data the pilot cannot have contaminated. The portable
+pipeline re-runs on any position set or champion with one config file. Keep R1–R6
+sealed until Wave 1b is frozen. (Chosen 2026-09-14: see
+[`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md).)
 
 ## 9. Reproducing
 
