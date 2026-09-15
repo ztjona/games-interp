@@ -63,33 +63,54 @@ def board_symmetry_images(boards: torch.Tensor) -> list[torch.Tensor]:
     return out
 
 
+def _hash_weights(boards: torch.Tensor, pieces: torch.Tensor | None, seed: int):
+    """Random odd 64-bit weights; int64 arithmetic wraps, which is the intended
+    mod-2^64 polynomial hash. The board weights are drawn FIRST, so they are the
+    same whether or not the piece weights are needed."""
+    rng = np.random.default_rng(seed)
+    w = torch.from_numpy(
+        (rng.integers(1, 2**62, size=int(np.prod(boards.shape[1:])), dtype=np.int64) | 1)
+    )
+    if pieces is None:
+        return w, None
+    wp = torch.from_numpy(
+        (rng.integers(1, 2**62, size=int(np.prod(pieces.shape[1:])) or 1,
+                      dtype=np.int64) | 1)
+    )
+    return w, wp
+
+
+def _min_image_hash(boards: torch.Tensor, w: torch.Tensor, extra) -> torch.Tensor:
+    n = boards.shape[0]
+    best = None
+    for img in board_symmetry_images(boards):
+        h = (img.reshape(n, -1).to(torch.int64) * w).sum(dim=1) + extra
+        best = h if best is None else torch.minimum(best, h)
+    return best
+
+
 def orbit_ids(boards: torch.Tensor, pieces: torch.Tensor, seed: int = 0) -> np.ndarray:
     """(N,) int64 orbit IDs: equal iff the positions are board-symmetric images.
 
     The canonical key is the MINIMUM hash over the orbit, which is invariant to
     which member we started from.
     """
-    n = boards.shape[0]
-    flat_dim = int(np.prod(boards.shape[1:]))
-    rng = np.random.default_rng(seed)
-    # Random odd 64-bit weights; int64 arithmetic wraps, which is the intended
-    # mod-2^64 polynomial hash.
-    w = torch.from_numpy(
-        (rng.integers(1, 2**62, size=flat_dim, dtype=np.int64) | 1)
-    )
-    wp = torch.from_numpy(
-        (rng.integers(1, 2**62, size=int(np.prod(pieces.shape[1:])) or 1,
-                      dtype=np.int64) | 1)
-    )
-
-    piece_flat = pieces.reshape(n, -1).to(torch.int64)
+    w, wp = _hash_weights(boards, pieces, seed)
+    piece_flat = pieces.reshape(boards.shape[0], -1).to(torch.int64)
     piece_term = (piece_flat * wp[: piece_flat.shape[1]]).sum(dim=1)
+    return _min_image_hash(boards, w, piece_term).numpy()
 
-    best = None
-    for img in board_symmetry_images(boards):
-        h = (img.reshape(n, -1).to(torch.int64) * w).sum(dim=1) + piece_term
-        best = h if best is None else torch.minimum(best, h)
-    return best.numpy()
+
+def board_keys(boards: torch.Tensor, seed: int = 0) -> np.ndarray:
+    """(N,) int64: the orbit key of the BOARD alone, the piece in hand ignored.
+
+    Equal iff two boards are D4 images of each other. Same board weights as
+    :func:`orbit_ids`. Used by the 3B-causal Wave 1b freshness filter (its
+    pre-registration S4.3: a gold position is dropped when its board, up to the
+    8 symmetries, is the board of any pilot pair).
+    """
+    w, _ = _hash_weights(boards, None, seed)
+    return _min_image_hash(boards, w, 0).numpy()
 
 
 def main():

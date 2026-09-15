@@ -29,6 +29,16 @@ Audit that produced this file:
 | `positions-amalgam_yb_unique.pt` | Yb | 296,045 | **OK** | Correct: four `Yb_hotChamp` modes, `quarto_s4_hot`. |
 | `positions-amalgam_all_unique.pt` | unified | 677,744 | **SUPERSEDED** | Pool itself is sound, but its *composition* inherits the above: 2 of 5 inputs are champAa's positions and 1 is random-play-only. Rebuild after the champTa fix. |
 
+**3B-causal Wave 1b position sets** (added 2026-09-14; built by
+`scripts/build_gold_sets.py` from `configs/3B-causal/champYb-gold{3,5}.yaml`;
+not covered by `validate_datasets.py`, which checks champion amalgams — each
+file's provenance names its raw `gold<k>` source, seed and the freshness filter):
+
+| file | champion | N | status | why |
+|---|---|---:|---|---|
+| `positions-gold3_yb_unique.pt` | Yb | 225,197 | **OK** | 30,000 `gold3` games, seed 3003, CPU: 226,043 raw → 225,755 unique → 558 dropped as pilot boards. Labels `bsp_labels-{hawk,hen}YbGold3_173.pt`, `tigerYbGold3_36.pt`; `orbit_ids-gold3_yb_unique.pt`. |
+| `positions-gold5_yb_unique.pt` | Yb | 132,274 | **OK** | 30,000 `gold5` games, seed 3005, CPU: 132,274 raw, no duplicates, none dropped. Labels `…YbGold5…`; `orbit_ids-gold5_yb_unique.pt`. |
+
 ## Derived artefacts inherit the status of their source
 
 Everything below is computed from the **QUARANTINED** champTa dataset and is

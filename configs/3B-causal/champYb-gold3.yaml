@@ -1,0 +1,28 @@
+# Phase 3B-causal WAVE 1b run config: champYb on the gold3 position set.
+#
+# Design (frozen): docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md,
+# verdict rule 3B.C2. Everything not set here is inherited from champYb.yaml --
+# champion, hook, heads, readout, dictionaries, probes and the 176 concepts are
+# Wave 1's, unchanged (pre-registration S3). Only the position set and the rule
+# change. A position set is a config file, as a champion is.
+
+extends: champYb.yaml
+rule: 3B.C2
+tag: champYb-gold3                 # outputs: 3B-causal_champYb-gold3_wave1b*.json
+
+# The gold3 set (pre-registration S4): built by scripts/build_gold_sets.py from
+# the recipe below; the freshness filter (S4.3) has already dropped every board
+# of a pilot pair, and the run re-checks it against pilot_run.
+positions: data/quarto/positions-gold3_yb_unique.pt
+orbit_ids: data/quarto/orbit_ids-gold3_yb_unique.pt
+labels_suffix: YbGold3             # the gold set's own labels: bsp_labels-<basis>YbGold3_<n>.pt (generator guard)
+# bsp_suffix stays Yb (inherited): shortlists, 3A knee_k reports and probes are
+# the amalgam's, where the dictionaries were trained (pre-registration S13).
+pilot_run: saes/quarto/analysis/3B-causal_champYb_wave1.json
+
+positions_recipe:
+  opponents: gold3                 # 3 random placements (+ the hand-over), then legal argmax
+  games: 30000
+  seed: 3003
+  device: cpu                      # near-tied Q-values break differently on CPU and CUDA
+  raw_dir: data/quarto_Yb

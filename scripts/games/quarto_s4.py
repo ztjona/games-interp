@@ -20,7 +20,11 @@ To slot into the existing pipeline (``generate_positions.py``,
 * ``generate_positions(...)`` — same signature as ``quarto.generate_positions``;
   uses :class:`S4ModelBot` (backed by ``predict_phase``) for the model side
   in any opponent mode that involves the trained model.
-* ``OPPONENT_MODES`` — identical four-mode set.
+* ``OPPONENT_MODES`` — identical four-mode set, plus the **gold** modes
+  ``gold<k>`` (not in the tuple; parsed by :func:`gold_prefix`): the model
+  against itself after a *k*-placement random prefix, both sides then playing
+  the legal argmax, recording placement decisions from the (*k*+1)-th on. See
+  the 3B-causal Wave 1b pre-registration (2026-09-14) §4.1.
 
 The on-disk position format (``boards``, ``pieces`` = 16-d offered, ``metadata``)
 is unchanged, so the resulting positions files, BSP-label files, and BSP
@@ -30,6 +34,7 @@ schemas are interoperable with the existing ``compute_bsp_labels.py`` and
 
 from __future__ import annotations
 
+import re
 import sys
 from pathlib import Path
 from typing import Any
@@ -46,6 +51,14 @@ OPPONENT_MODES = (
     "random_v_model",
     "model_v_model",
 )
+
+_GOLD_MODE = re.compile(r"gold([0-9]+)")
+
+
+def gold_prefix(opponents: str) -> int | None:
+    """*k* for a ``gold<k>`` mode (e.g. ``gold3`` -> 3); None for any other mode."""
+    m = _GOLD_MODE.fullmatch(opponents)
+    return int(m.group(1)) if m else None
 
 
 # ──────────────────────────────────────────────────────────────────────
@@ -290,6 +303,41 @@ class S4ModelBot(BotAI):
         raise RuntimeError("S4ModelBot: no valid piece found in ranking.")
 
 
+def pieces_on_board(game) -> int:
+    return 16 - len(game.game_board.get_valid_moves())
+
+
+class PrefixGreedyBot(BotAI):
+    """One seat of a gold game: random for a *k*-placement prefix, then legal argmax.
+
+    The clock is read off the board, so both seats share it. A placement onto a
+    board holding *n* pieces is the (*n*+1)-th placement: random iff *n* < *k*.
+    A selection made with *n* pieces on the board hands over the piece for the
+    (*n*+1)-th placement: random iff *n* <= *k*, so the random player hands over
+    the (*k*+1)-th piece, then leaves. Everything after is
+    ``S4ModelBot(deterministic=True)``: the first legal entry of the network's
+    ranking, i.e. its legal argmax.
+    """
+
+    @property
+    def name(self):
+        return f"PrefixGreedyBot(k={self.k})"
+
+    def __init__(self, wrapper: S4Wrapper, k: int, **kw):
+        super().__init__()
+        self.k = k
+        self.random = RandomBot()
+        self.greedy = S4ModelBot(wrapper, deterministic=True, label=f"gold{k}")
+
+    def place_piece(self, game, piece, ith_option=0, *a, **kw):
+        bot = self.random if pieces_on_board(game) < self.k else self.greedy
+        return bot.place_piece(game, piece, ith_option, *a, **kw)
+
+    def select(self, game, ith_option=0, *a, **kw):
+        bot = self.random if pieces_on_board(game) <= self.k else self.greedy
+        return bot.select(game, ith_option, *a, **kw)
+
+
 # ──────────────────────────────────────────────────────────────────────
 # Position generation (mirrors quarto.generate_positions exactly,
 # substituting S4ModelBot for ModelBot)
@@ -309,6 +357,8 @@ def _load_shared_model(
             f"opponents='{opponents}' requires a model, but no model_path was given"
         )
     model1 = load_model(model_path, device=device)
+    if gold_prefix(opponents) is not None:
+        return model1, model1
     if opponents == "model_v_random":
         return model1, None
     if opponents == "random_v_model":
@@ -322,6 +372,9 @@ def _load_shared_model(
 
 
 def _make_bots(opponents, model1, model2):
+    k = gold_prefix(opponents)
+    if k is not None:
+        return PrefixGreedyBot(model1, k), PrefixGreedyBot(model2, k)
     if opponents == "random_v_random":
         return RandomBot(), RandomBot()
     if opponents == "model_v_random":
@@ -340,7 +393,7 @@ def _make_bots(opponents, model1, model2):
             S4ModelBot(model2, deterministic=False, temperature=0.1),
         )
     raise ValueError(
-        f"Unknown opponent mode '{opponents}'. Choose from: {OPPONENT_MODES}"
+        f"Unknown opponent mode '{opponents}'. Choose from: {OPPONENT_MODES} or gold<k>"
     )
 
 
@@ -366,6 +419,8 @@ def generate_positions(
     torch.manual_seed(seed)
 
     shared_model = _load_shared_model(opponents, model_path, None, device)
+    # gold<k>: the k-placement random prefix is played but not recorded
+    min_pieces = gold_prefix(opponents) or 0
 
     boards: list[np.ndarray] = []
     pieces: list[np.ndarray] = []
@@ -381,6 +436,8 @@ def generate_positions(
             game.play_turn()
             if not game.pick:
                 pass
+            elif pieces_on_board(game) < min_pieces:
+                turn_count += 1
             else:
                 board_enc = game.game_board.encode()[0]
                 offered = game.selected_piece

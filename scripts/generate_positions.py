@@ -15,7 +15,10 @@ Options:
                            model_v_random   – model (P1) vs random (P2)
                            random_v_model   – random (P1) vs model (P2)
                            model_v_model    – self-play (same model both players)
-    --model <path>         Model path for P1 (required for model_v_* modes)
+                           gold<k>          – self-play after a k-placement random
+                                              prefix, both sides then legal argmax;
+                                              records placements k+1 on (S4 games only)
+    --model <path>         Model path for P1 (required for model_v_* and gold modes)
     --model2 <path>        Model path for P2 (optional, only for model_v_model with different models)
     --num-games <int>      Number of games to play [default: 10000]
     --output-dir <path>    Output directory [default: auto]
@@ -33,6 +36,10 @@ Examples:
     # Generate model_v_model with SAME model (self-play)
     python generate_positions.py --game quarto --opponents model_v_model \
         --model models/quarto/Aa_replay.pt
+
+    # Generate gold3 (3 random placements, then champYb's best play for both sides)
+    python generate_positions.py --game quarto_s4_hot --opponents gold3 \
+        --model models/quarto/<champYb>.pt --num-games 30000 --seed 3003
 
     # Generate model_v_model with DIFFERENT models
     python generate_positions.py --game quarto --opponents model_v_model \

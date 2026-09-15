@@ -1,0 +1,2608 @@
+{
+ "rule_version": "3B.C2",
+ "wave": "1b",
+ "champion": "champYb",
+ "untrained_twin": false,
+ "config": "configs/3B-causal/champYb-gold5.yaml",
+ "hook": "s4.fc1",
+ "readout": "closed_form",
+ "freeze": {
+  "git_head": "c29d85909769814ef825c6dbccef174097c99964",
+  "files": {
+   "docs/diary/2026-09-12_3B-causal-preregistration.md": {
+    "sha256_lf": "2ef6e2e545e7ba5546fffe80d93a945ea1a943878c773d411494c8a1d71a6f24",
+    "committed_and_clean": true
+   },
+   "docs/diary/2026-09-12_3B-causal-amendment-1.md": {
+    "sha256_lf": "219b9a4467e99ddc47533c3275d1e72e614f55499bb125dacb157dba6e2417cf",
+    "committed_and_clean": true
+   },
+   "docs/diary/2026-09-12_3B-causal-amendment-2.md": {
+    "sha256_lf": "c3ee9b9856c058eff1a0c21762e63e65b28b70ba3bec98469ff19e08172c5a30",
+    "committed_and_clean": true
+   },
+   "docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md": {
+    "sha256_lf": "f1c52c18ffed41bddd7436ef9e90476a028d80675b637583708f379d01684a75",
+    "committed_and_clean": true
+   }
+  }
+ },
+ "tier_a": {
+  "A1a_null_space_on_h_max_abs": 2.6645352591003757e-15,
+  "A1b_dead_units_on_z_max_abs": 0.0,
+  "A2_full_patch_agreement": 1.0,
+  "A3_closed_vs_forward_max_abs": 1.9073486328125e-06,
+  "A3_decisions_identical": true,
+  "passed": {
+   "A1a": true,
+   "A1b": true,
+   "A2": true,
+   "A3": true
+  },
+  "readout": "closed_form"
+ },
+ "cap": 1000,
+ "null_draws": 1000,
+ "seed": 0,
+ "concept_filter": null,
+ "n_concepts": 176,
+ "power": {
+  "row_0_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 439
+   },
+   "switch_off": {
+    "n": 283,
+    "boards": 58
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 936
+   }
+  },
+  "row_0_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 556
+   },
+   "switch_off": {
+    "n": 328,
+    "boards": 77
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "row_0_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 566
+   },
+   "switch_off": {
+    "n": 348,
+    "boards": 97
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "row_0_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 592
+   },
+   "switch_off": {
+    "n": 323,
+    "boards": 68
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 955
+   }
+  },
+  "row_1_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 605
+   },
+   "switch_off": {
+    "n": 194,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 945
+   }
+  },
+  "row_1_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 547
+   },
+   "switch_off": {
+    "n": 150,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 960
+   }
+  },
+  "row_1_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 673
+   },
+   "switch_off": {
+    "n": 257,
+    "boards": 63
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 952
+   }
+  },
+  "row_1_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 607
+   },
+   "switch_off": {
+    "n": 299,
+    "boards": 64
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 954
+   }
+  },
+  "row_2_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 520
+   },
+   "switch_off": {
+    "n": 173,
+    "boards": 42
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 953
+   }
+  },
+  "row_2_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 521
+   },
+   "switch_off": {
+    "n": 170,
+    "boards": 36
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "row_2_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 531
+   },
+   "switch_off": {
+    "n": 170,
+    "boards": 51
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 952
+   }
+  },
+  "row_2_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 426
+   },
+   "switch_off": {
+    "n": 223,
+    "boards": 55
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 954
+   }
+  },
+  "row_3_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 377
+   },
+   "switch_off": {
+    "n": 254,
+    "boards": 50
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 926
+   }
+  },
+  "row_3_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 439
+   },
+   "switch_off": {
+    "n": 332,
+    "boards": 73
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 926
+   }
+  },
+  "row_3_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 492
+   },
+   "switch_off": {
+    "n": 248,
+    "boards": 54
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 942
+   }
+  },
+  "row_3_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 437
+   },
+   "switch_off": {
+    "n": 286,
+    "boards": 56
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 927
+   }
+  },
+  "col_0_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 517
+   },
+   "switch_off": {
+    "n": 226,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 946
+   }
+  },
+  "col_0_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 388
+   },
+   "switch_off": {
+    "n": 264,
+    "boards": 58
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 932
+   }
+  },
+  "col_0_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 569
+   },
+   "switch_off": {
+    "n": 283,
+    "boards": 72
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 923
+   }
+  },
+  "col_0_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 407
+   },
+   "switch_off": {
+    "n": 246,
+    "boards": 49
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 927
+   }
+  },
+  "col_1_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 443
+   },
+   "switch_off": {
+    "n": 234,
+    "boards": 55
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 939
+   }
+  },
+  "col_1_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 505
+   },
+   "switch_off": {
+    "n": 243,
+    "boards": 67
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "col_1_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 540
+   },
+   "switch_off": {
+    "n": 274,
+    "boards": 69
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "col_1_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 518
+   },
+   "switch_off": {
+    "n": 278,
+    "boards": 74
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 947
+   }
+  },
+  "col_2_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 460
+   },
+   "switch_off": {
+    "n": 213,
+    "boards": 48
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 942
+   }
+  },
+  "col_2_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 488
+   },
+   "switch_off": {
+    "n": 240,
+    "boards": 68
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 952
+   }
+  },
+  "col_2_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 483
+   },
+   "switch_off": {
+    "n": 213,
+    "boards": 61
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 949
+   }
+  },
+  "col_2_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 508
+   },
+   "switch_off": {
+    "n": 291,
+    "boards": 64
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 951
+   }
+  },
+  "col_3_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 649
+   },
+   "switch_off": {
+    "n": 247,
+    "boards": 53
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "col_3_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 649
+   },
+   "switch_off": {
+    "n": 248,
+    "boards": 63
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 963
+   }
+  },
+  "col_3_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 706
+   },
+   "switch_off": {
+    "n": 291,
+    "boards": 80
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 961
+   }
+  },
+  "col_3_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 630
+   },
+   "switch_off": {
+    "n": 238,
+    "boards": 54
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 972
+   }
+  },
+  "diag_main_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 543
+   },
+   "switch_off": {
+    "n": 321,
+    "boards": 82
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 939
+   }
+  },
+  "diag_main_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 538
+   },
+   "switch_off": {
+    "n": 392,
+    "boards": 136
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 938
+   }
+  },
+  "diag_main_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 616
+   },
+   "switch_off": {
+    "n": 499,
+    "boards": 177
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 943
+   }
+  },
+  "diag_main_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 537
+   },
+   "switch_off": {
+    "n": 443,
+    "boards": 115
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 946
+   }
+  },
+  "diag_anti_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 449
+   },
+   "switch_off": {
+    "n": 279,
+    "boards": 79
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 919
+   }
+  },
+  "diag_anti_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 504
+   },
+   "switch_off": {
+    "n": 332,
+    "boards": 99
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 903
+   }
+  },
+  "diag_anti_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 518
+   },
+   "switch_off": {
+    "n": 474,
+    "boards": 172
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 925
+   }
+  },
+  "diag_anti_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 472
+   },
+   "switch_off": {
+    "n": 351,
+    "boards": 110
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 923
+   }
+  },
+  "square_0_0_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 478
+   },
+   "switch_off": {
+    "n": 156,
+    "boards": 38
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "square_0_0_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 526
+   },
+   "switch_off": {
+    "n": 161,
+    "boards": 36
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "square_0_0_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 582
+   },
+   "switch_off": {
+    "n": 211,
+    "boards": 53
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 959
+   }
+  },
+  "square_0_0_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 533
+   },
+   "switch_off": {
+    "n": 200,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 959
+   }
+  },
+  "square_0_1_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 411
+   },
+   "switch_off": {
+    "n": 206,
+    "boards": 46
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 948
+   }
+  },
+  "square_0_1_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 509
+   },
+   "switch_off": {
+    "n": 207,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 948
+   }
+  },
+  "square_0_1_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 508
+   },
+   "switch_off": {
+    "n": 200,
+    "boards": 48
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 949
+   }
+  },
+  "square_0_1_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 503
+   },
+   "switch_off": {
+    "n": 181,
+    "boards": 46
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 945
+   }
+  },
+  "square_0_2_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 456
+   },
+   "switch_off": {
+    "n": 159,
+    "boards": 36
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 965
+   }
+  },
+  "square_0_2_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 511
+   },
+   "switch_off": {
+    "n": 203,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 966
+   }
+  },
+  "square_0_2_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 540
+   },
+   "switch_off": {
+    "n": 150,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "square_0_2_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 573
+   },
+   "switch_off": {
+    "n": 161,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 960
+   }
+  },
+  "square_1_0_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 466
+   },
+   "switch_off": {
+    "n": 180,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "square_1_0_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 429
+   },
+   "switch_off": {
+    "n": 188,
+    "boards": 44
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "square_1_0_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 553
+   },
+   "switch_off": {
+    "n": 203,
+    "boards": 46
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 961
+   }
+  },
+  "square_1_0_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 504
+   },
+   "switch_off": {
+    "n": 200,
+    "boards": 59
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 942
+   }
+  },
+  "square_1_1_completable_tall": {
+   "switch_on": {
+    "n": 998,
+    "boards": 372
+   },
+   "switch_off": {
+    "n": 200,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "square_1_1_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 369
+   },
+   "switch_off": {
+    "n": 169,
+    "boards": 36
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "square_1_1_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 456
+   },
+   "switch_off": {
+    "n": 178,
+    "boards": 52
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 968
+   }
+  },
+  "square_1_1_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 475
+   },
+   "switch_off": {
+    "n": 127,
+    "boards": 46
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 953
+   }
+  },
+  "square_1_2_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 603
+   },
+   "switch_off": {
+    "n": 194,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "square_1_2_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 535
+   },
+   "switch_off": {
+    "n": 221,
+    "boards": 46
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 969
+   }
+  },
+  "square_1_2_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 655
+   },
+   "switch_off": {
+    "n": 211,
+    "boards": 56
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 980
+   }
+  },
+  "square_1_2_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 647
+   },
+   "switch_off": {
+    "n": 179,
+    "boards": 47
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 974
+   }
+  },
+  "square_2_0_completable_tall": {
+   "switch_on": {
+    "n": 754,
+    "boards": 290
+   },
+   "switch_off": {
+    "n": 146,
+    "boards": 34
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 945
+   }
+  },
+  "square_2_0_completable_black": {
+   "switch_on": {
+    "n": 895,
+    "boards": 329
+   },
+   "switch_off": {
+    "n": 187,
+    "boards": 39
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 928
+   }
+  },
+  "square_2_0_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 391
+   },
+   "switch_off": {
+    "n": 235,
+    "boards": 52
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 947
+   }
+  },
+  "square_2_0_completable_with_hole": {
+   "switch_on": {
+    "n": 949,
+    "boards": 330
+   },
+   "switch_off": {
+    "n": 140,
+    "boards": 35
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 941
+   }
+  },
+  "square_2_1_completable_tall": {
+   "switch_on": {
+    "n": 914,
+    "boards": 338
+   },
+   "switch_off": {
+    "n": 196,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 941
+   }
+  },
+  "square_2_1_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 399
+   },
+   "switch_off": {
+    "n": 180,
+    "boards": 37
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 931
+   }
+  },
+  "square_2_1_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 421
+   },
+   "switch_off": {
+    "n": 201,
+    "boards": 44
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 946
+   }
+  },
+  "square_2_1_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 428
+   },
+   "switch_off": {
+    "n": 231,
+    "boards": 61
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 939
+   }
+  },
+  "square_2_2_completable_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 452
+   },
+   "switch_off": {
+    "n": 148,
+    "boards": 35
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "square_2_2_completable_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 523
+   },
+   "switch_off": {
+    "n": 208,
+    "boards": 46
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 972
+   }
+  },
+  "square_2_2_completable_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 536
+   },
+   "switch_off": {
+    "n": 257,
+    "boards": 54
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 960
+   }
+  },
+  "square_2_2_completable_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 492
+   },
+   "switch_off": {
+    "n": 194,
+    "boards": 41
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 970
+   }
+  },
+  "row_0_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 492
+   },
+   "switch_off": {
+    "n": 289,
+    "boards": 64
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 935
+   }
+  },
+  "row_0_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 439
+   },
+   "switch_off": {
+    "n": 318,
+    "boards": 79
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 942
+   }
+  },
+  "row_0_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 459
+   },
+   "switch_off": {
+    "n": 186,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 938
+   }
+  },
+  "row_0_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 469
+   },
+   "switch_off": {
+    "n": 256,
+    "boards": 56
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 946
+   }
+  },
+  "row_1_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 552
+   },
+   "switch_off": {
+    "n": 233,
+    "boards": 53
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 962
+   }
+  },
+  "row_1_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 590
+   },
+   "switch_off": {
+    "n": 315,
+    "boards": 83
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 958
+   }
+  },
+  "row_1_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 513
+   },
+   "switch_off": {
+    "n": 182,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 958
+   }
+  },
+  "row_1_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 554
+   },
+   "switch_off": {
+    "n": 166,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 967
+   }
+  },
+  "row_2_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 511
+   },
+   "switch_off": {
+    "n": 248,
+    "boards": 61
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 967
+   }
+  },
+  "row_2_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 466
+   },
+   "switch_off": {
+    "n": 278,
+    "boards": 71
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "row_2_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 506
+   },
+   "switch_off": {
+    "n": 184,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "row_2_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 548
+   },
+   "switch_off": {
+    "n": 246,
+    "boards": 54
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 953
+   }
+  },
+  "row_3_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 393
+   },
+   "switch_off": {
+    "n": 281,
+    "boards": 61
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 930
+   }
+  },
+  "row_3_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 486
+   },
+   "switch_off": {
+    "n": 249,
+    "boards": 65
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 936
+   }
+  },
+  "row_3_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 425
+   },
+   "switch_off": {
+    "n": 254,
+    "boards": 56
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 928
+   }
+  },
+  "row_3_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 466
+   },
+   "switch_off": {
+    "n": 243,
+    "boards": 53
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 935
+   }
+  },
+  "col_0_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 436
+   },
+   "switch_off": {
+    "n": 266,
+    "boards": 62
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 921
+   }
+  },
+  "col_0_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 471
+   },
+   "switch_off": {
+    "n": 329,
+    "boards": 86
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 935
+   }
+  },
+  "col_0_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 358
+   },
+   "switch_off": {
+    "n": 274,
+    "boards": 51
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 926
+   }
+  },
+  "col_0_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 519
+   },
+   "switch_off": {
+    "n": 310,
+    "boards": 73
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 935
+   }
+  },
+  "col_1_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 465
+   },
+   "switch_off": {
+    "n": 255,
+    "boards": 62
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "col_1_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 468
+   },
+   "switch_off": {
+    "n": 199,
+    "boards": 49
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 932
+   }
+  },
+  "col_1_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 395
+   },
+   "switch_off": {
+    "n": 172,
+    "boards": 37
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 949
+   }
+  },
+  "col_1_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 524
+   },
+   "switch_off": {
+    "n": 263,
+    "boards": 62
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 947
+   }
+  },
+  "col_2_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 470
+   },
+   "switch_off": {
+    "n": 192,
+    "boards": 49
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 952
+   }
+  },
+  "col_2_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 479
+   },
+   "switch_off": {
+    "n": 230,
+    "boards": 65
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 939
+   }
+  },
+  "col_2_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 424
+   },
+   "switch_off": {
+    "n": 202,
+    "boards": 49
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 952
+   }
+  },
+  "col_2_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 506
+   },
+   "switch_off": {
+    "n": 282,
+    "boards": 60
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 941
+   }
+  },
+  "col_3_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 590
+   },
+   "switch_off": {
+    "n": 315,
+    "boards": 73
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "col_3_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 616
+   },
+   "switch_off": {
+    "n": 355,
+    "boards": 95
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 958
+   }
+  },
+  "col_3_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 562
+   },
+   "switch_off": {
+    "n": 262,
+    "boards": 58
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 971
+   }
+  },
+  "col_3_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 604
+   },
+   "switch_off": {
+    "n": 258,
+    "boards": 58
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 963
+   }
+  },
+  "diag_main_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 571
+   },
+   "switch_off": {
+    "n": 248,
+    "boards": 86
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 935
+   }
+  },
+  "diag_main_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 544
+   },
+   "switch_off": {
+    "n": 461,
+    "boards": 148
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 930
+   }
+  },
+  "diag_main_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 494
+   },
+   "switch_off": {
+    "n": 282,
+    "boards": 69
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 938
+   }
+  },
+  "diag_main_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 510
+   },
+   "switch_off": {
+    "n": 430,
+    "boards": 128
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 943
+   }
+  },
+  "diag_anti_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 531
+   },
+   "switch_off": {
+    "n": 327,
+    "boards": 102
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 919
+   }
+  },
+  "diag_anti_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 547
+   },
+   "switch_off": {
+    "n": 221,
+    "boards": 66
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 913
+   }
+  },
+  "diag_anti_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 429
+   },
+   "switch_off": {
+    "n": 326,
+    "boards": 82
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 916
+   }
+  },
+  "diag_anti_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 506
+   },
+   "switch_off": {
+    "n": 269,
+    "boards": 73
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 923
+   }
+  },
+  "square_0_0_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 464
+   },
+   "switch_off": {
+    "n": 184,
+    "boards": 42
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "square_0_0_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 429
+   },
+   "switch_off": {
+    "n": 238,
+    "boards": 60
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 943
+   }
+  },
+  "square_0_0_completable_circle": {
+   "switch_on": {
+    "n": 852,
+    "boards": 300
+   },
+   "switch_off": {
+    "n": 181,
+    "boards": 39
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "square_0_0_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 470
+   },
+   "switch_off": {
+    "n": 192,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 963
+   }
+  },
+  "square_0_1_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 544
+   },
+   "switch_off": {
+    "n": 210,
+    "boards": 64
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 949
+   }
+  },
+  "square_0_1_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 385
+   },
+   "switch_off": {
+    "n": 180,
+    "boards": 52
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 940
+   }
+  },
+  "square_0_1_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 378
+   },
+   "switch_off": {
+    "n": 221,
+    "boards": 52
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 948
+   }
+  },
+  "square_0_1_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 445
+   },
+   "switch_off": {
+    "n": 222,
+    "boards": 50
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 946
+   }
+  },
+  "square_0_2_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 513
+   },
+   "switch_off": {
+    "n": 186,
+    "boards": 44
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 949
+   }
+  },
+  "square_0_2_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 408
+   },
+   "switch_off": {
+    "n": 191,
+    "boards": 42
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "square_0_2_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 415
+   },
+   "switch_off": {
+    "n": 196,
+    "boards": 44
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 967
+   }
+  },
+  "square_0_2_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 370
+   },
+   "switch_off": {
+    "n": 216,
+    "boards": 44
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 965
+   }
+  },
+  "square_1_0_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 466
+   },
+   "switch_off": {
+    "n": 207,
+    "boards": 52
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 958
+   }
+  },
+  "square_1_0_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 404
+   },
+   "switch_off": {
+    "n": 235,
+    "boards": 57
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 938
+   }
+  },
+  "square_1_0_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 390
+   },
+   "switch_off": {
+    "n": 206,
+    "boards": 48
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "square_1_0_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 490
+   },
+   "switch_off": {
+    "n": 168,
+    "boards": 37
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "square_1_1_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 412
+   },
+   "switch_off": {
+    "n": 193,
+    "boards": 56
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 960
+   }
+  },
+  "square_1_1_completable_white": {
+   "switch_on": {
+    "n": 911,
+    "boards": 333
+   },
+   "switch_off": {
+    "n": 159,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 961
+   }
+  },
+  "square_1_1_completable_circle": {
+   "switch_on": {
+    "n": 890,
+    "boards": 316
+   },
+   "switch_off": {
+    "n": 130,
+    "boards": 31
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "square_1_1_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 432
+   },
+   "switch_off": {
+    "n": 146,
+    "boards": 34
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 963
+   }
+  },
+  "square_1_2_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 653
+   },
+   "switch_off": {
+    "n": 225,
+    "boards": 60
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 966
+   }
+  },
+  "square_1_2_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 597
+   },
+   "switch_off": {
+    "n": 224,
+    "boards": 63
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 973
+   }
+  },
+  "square_1_2_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 508
+   },
+   "switch_off": {
+    "n": 161,
+    "boards": 34
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 964
+   }
+  },
+  "square_1_2_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 615
+   },
+   "switch_off": {
+    "n": 210,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 961
+   }
+  },
+  "square_2_0_completable_little": {
+   "switch_on": {
+    "n": 918,
+    "boards": 334
+   },
+   "switch_off": {
+    "n": 168,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 918
+   }
+  },
+  "square_2_0_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 375
+   },
+   "switch_off": {
+    "n": 269,
+    "boards": 53
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 932
+   }
+  },
+  "square_2_0_completable_circle": {
+   "switch_on": {
+    "n": 753,
+    "boards": 255
+   },
+   "switch_off": {
+    "n": 226,
+    "boards": 45
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 949
+   }
+  },
+  "square_2_0_completable_without_hole": {
+   "switch_on": {
+    "n": 798,
+    "boards": 290
+   },
+   "switch_off": {
+    "n": 142,
+    "boards": 32
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 941
+   }
+  },
+  "square_2_1_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 411
+   },
+   "switch_off": {
+    "n": 207,
+    "boards": 43
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 930
+   }
+  },
+  "square_2_1_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 393
+   },
+   "switch_off": {
+    "n": 196,
+    "boards": 50
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 938
+   }
+  },
+  "square_2_1_completable_circle": {
+   "switch_on": {
+    "n": 885,
+    "boards": 314
+   },
+   "switch_off": {
+    "n": 153,
+    "boards": 32
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 938
+   }
+  },
+  "square_2_1_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 445
+   },
+   "switch_off": {
+    "n": 171,
+    "boards": 42
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 945
+   }
+  },
+  "square_2_2_completable_little": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 482
+   },
+   "switch_off": {
+    "n": 219,
+    "boards": 51
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 952
+   }
+  },
+  "square_2_2_completable_white": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 502
+   },
+   "switch_off": {
+    "n": 179,
+    "boards": 47
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 964
+   }
+  },
+  "square_2_2_completable_circle": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 368
+   },
+   "switch_off": {
+    "n": 154,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 955
+   }
+  },
+  "square_2_2_completable_without_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 477
+   },
+   "switch_off": {
+    "n": 178,
+    "boards": 40
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 955
+   }
+  },
+  "tiger_win_now_exists": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 996
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 955
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 995
+   }
+  },
+  "tiger_offered_completes_tall": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 961
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 691
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 958
+   }
+  },
+  "tiger_offered_completes_black": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 969
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 711
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 956
+   }
+  },
+  "tiger_offered_completes_square": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 973
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 750
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 959
+   }
+  },
+  "tiger_offered_completes_with_hole": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 969
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 713
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 960
+   }
+  },
+  "tiger_line_row_0_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 888
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 435
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 940
+   }
+  },
+  "tiger_line_row_1_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 906
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 386
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 957
+   }
+  },
+  "tiger_line_row_2_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 899
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 367
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 943
+   }
+  },
+  "tiger_line_row_3_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 882
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 399
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 950
+   }
+  },
+  "tiger_line_col_0_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 859
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 417
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 941
+   }
+  },
+  "tiger_line_col_1_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 875
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 410
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 955
+   }
+  },
+  "tiger_line_col_2_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 883
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 400
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 944
+   }
+  },
+  "tiger_line_col_3_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 913
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 444
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 959
+   }
+  },
+  "tiger_line_diag_main_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 905
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 597
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 931
+   }
+  },
+  "tiger_line_diag_anti_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 870
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 555
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 912
+   }
+  },
+  "tiger_square_0_0_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 887
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 332
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 962
+   }
+  },
+  "tiger_square_0_1_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 891
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 363
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 947
+   }
+  },
+  "tiger_square_0_2_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 890
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 312
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 961
+   }
+  },
+  "tiger_square_1_0_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 880
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 337
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 943
+   }
+  },
+  "tiger_square_1_1_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 855
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 322
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 960
+   }
+  },
+  "tiger_square_1_2_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 926
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 349
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 971
+   }
+  },
+  "tiger_square_2_0_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 837
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 310
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 939
+   }
+  },
+  "tiger_square_2_1_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 852
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 327
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 941
+   }
+  },
+  "tiger_square_2_2_winnable": {
+   "switch_on": {
+    "n": 1000,
+    "boards": 881
+   },
+   "switch_off": {
+    "n": 1000,
+    "boards": 333
+   },
+   "specificity": {
+    "n": 1000,
+    "boards": 966
+   }
+  }
+ },
+ "underpowered_arms": {},
+ "glossary": {
+  "IIA": {
+   "range": "[0, 1], ideal 1",
+   "meaning": "share of pairs whose patched legal decision lands in the target set"
+  },
+  "r0": {
+   "range": "[0, 1]",
+   "meaning": "share of pairs whose UNPATCHED base decision already lands in the target set"
+  },
+  "IIA_star": {
+   "range": "(-inf, 1], ideal 1, 0 = no effect",
+   "meaning": "chance-corrected IIA = (IIA - r0) / (1 - r0)"
+  },
+  "flip_rate": {
+   "range": "[0, 1]",
+   "meaning": "share of pairs whose legal decision changes at all under the patch"
+  },
+  "target_margin": {
+   "range": "logit units, ideal > 0",
+   "meaning": "change in the best target logit minus the mean change of the other legal actions"
+  },
+  "verdict": {
+   "range": "see VERDICTS",
+   "meaning": "rule 3B.C2; Wave 1b pre-registration S9"
+  },
+  "D(x)": {
+   "range": "a cell",
+   "meaning": "the network's decision on input x: legal argmax of the place head"
+  },
+  "network_own_target": {
+   "range": "-",
+   "meaning": "D(s) for switch-on and switch-off, D(b) for specificity"
+  },
+  "IIA_net_star": {
+   "range": "(-inf, 1], ideal 1, 0 = no effect",
+   "meaning": "(A - A0) / (1 - A0), A = P(D_R = D(s)), A0 = P(D(b) = D(s)); stored as iia_star in C2 arms"
+  },
+  "F": {
+   "range": "[0, 1], ideal 0",
+   "meaning": "specificity flip rate P(D_R != D(b)) on pairs where C is false in both"
+  },
+  "E": {
+   "range": "[-1, 1], ideal <= 0",
+   "meaning": "excess leak: F minus the median F of the null"
+  },
+  "rho": {
+   "range": ">= 0, ideal 0",
+   "meaning": "relative leak E / IIA_net*(switch-on); undefined when that is <= 0; context-blind at >= 0.5"
+  },
+  "oracle_iia_star": {
+   "range": "(-inf, 1]",
+   "meaning": "Wave 1's primary score (target = the rational move), kept for continuity"
+  },
+  "ceiling": {
+   "range": "-",
+   "meaning": "the full-activation patch (z_s into the base), under both targets"
+  }
+ },
+ "position_set": "champYb-gold5",
+ "positions": "data/quarto/positions-gold5_yb_unique.pt",
+ "n_positions": 132274,
+ "freshness": {
+  "pilot_run": "saes/quarto/analysis/3B-causal_champYb_wave1.json",
+  "pilot_positions": "data/quarto/positions-amalgam_yb_unique.pt",
+  "pilot_pair_rows": 119629,
+  "pilot_board_orbits": 119311,
+  "hash": "scripts/compute_orbit_ids.py board_keys, seed 0",
+  "stale_positions_at_run": 0,
+  "filter": {
+   "pilot_run": "saes/quarto/analysis/3B-causal_champYb_wave1.json",
+   "pilot_positions": "data/quarto/positions-amalgam_yb_unique.pt",
+   "pilot_pair_rows": 119629,
+   "pilot_board_orbits": 119311,
+   "hash": "scripts/compute_orbit_ids.py board_keys, seed 0",
+   "source": "data/quarto_Yb/positions-gold5_yb_dedup.pt",
+   "n_in": 132274,
+   "n_removed": 0,
+   "n_out": 132274
+  }
+ },
+ "feasibility": {
+  "concepts": 176,
+  "powered_in_every_arm": 176,
+  "fraction": 1.0,
+  "powered_per_arm": {
+   "switch_on": 176,
+   "specificity": 176,
+   "switch_off": 176
+  },
+  "passed": true,
+  "rule": ">= 50% of concepts powered in every arm (n_min {'switch_on': 100, 'specificity': 100, 'switch_off': 50})"
+ }
+}

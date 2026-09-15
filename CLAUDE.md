@@ -149,14 +149,20 @@ Ranked by **MCC**, not F1. Each BSP carries `argmax_f1_rank`: 0 = the two
 metrics agree on the best feature, -1 = the F1 pick is not even in the top-16.
 The list is DECODABILITY; 3B-causal re-ranks it by intervention effect.
 
-Phase 3B-causal (interchange interventions; design frozen in the 2026-09-12
-pre-registration + amendments). **Portable: a champion is a config file**,
-`configs/3B-causal/champ<Tag>.yaml`; nothing in the pipeline names a champion:
+Phase 3B-causal (interchange interventions). Wave 1 (rule `3B.C1`): the
+2026-09-12 pre-registration + amendments; Wave 1b (rule `3B.C2`, network-own
+targets, fresh `gold` position sets): the 2026-09-14 pre-registration.
+**Portable: a champion is a config file**, `configs/3B-causal/champ<Tag>.yaml`,
+and so is a position set, `champ<Tag>-<set>.yaml` (`extends:` the champion's,
+sets `rule:` and a `positions_recipe`); nothing in the pipeline names either:
 ```powershell
 python scripts/interchange_3b.py --config=configs/3B-causal/champYb.yaml --prereqs   # what is missing + how to make it
 pwsh -File runners\3B-causal.ps1 -Champ Yb -DryRun    # guard + Tier A + power; computes NO score
 pwsh -File runners\3B-causal.ps1 -Champ Yb -Smoke     # untrained twin, 5 concepts: pipeline + timing
-pwsh -File runners\launch.ps1 3B-causal -Champ Yb     # the real run (~55 min); refuses unless design files are committed
+pwsh -File runners\launch.ps1 3B-causal -Champ Yb     # Wave 1 (~55 min); refuses unless design files are committed
+pwsh -File runners\launch.ps1 3B-causal -Set gold3,gold5 -DryRun   # Wave 1b: builds missing sets, + freshness, feasibility
+pwsh -File runners\launch.ps1 3B-causal -Set gold3,gold5           # Wave 1b: both sets in parallel, one GPU each
+python scripts/build_gold_sets.py --config=configs/3B-causal/champYb-gold3.yaml --dry-run   # the build commands
 ```
 The real run embeds SHA-256 stamps of the pre-registration and every amendment
 and refuses to start unless they are committed and unmodified: the design is

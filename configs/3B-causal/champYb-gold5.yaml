@@ -1,0 +1,21 @@
+# Phase 3B-causal WAVE 1b run config: champYb on the gold5 position set.
+#
+# Design (frozen): docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md,
+# verdict rule 3B.C2. Identical to champYb-gold3.yaml except for the prefix
+# length and its seed; a hypothesis counts only if gold3 and gold5 agree (S11).
+
+extends: champYb.yaml
+rule: 3B.C2
+tag: champYb-gold5                 # outputs: 3B-causal_champYb-gold5_wave1b*.json
+
+positions: data/quarto/positions-gold5_yb_unique.pt
+orbit_ids: data/quarto/orbit_ids-gold5_yb_unique.pt
+labels_suffix: YbGold5
+pilot_run: saes/quarto/analysis/3B-causal_champYb_wave1.json
+
+positions_recipe:
+  opponents: gold5                 # 5 random placements (+ the hand-over), then legal argmax
+  games: 30000
+  seed: 3005
+  device: cpu
+  raw_dir: data/quarto_Yb

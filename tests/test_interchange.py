@@ -312,3 +312,120 @@ class TestVerdictRule:
         assert classify(_arm(s=0.20), _arm(s=0.0, sig=False), None) \
             == "concept-consistent (on-only)"
         assert math.isclose(0.20, 0.20)
+
+
+class TestFeasibility:
+    """Wave 1b S4.4: a set enters only if >= 50% of concepts are powered in every arm."""
+
+    @staticmethod
+    def _power(on, spec, off):
+        return {"switch_on": {"n": on}, "specificity": {"n": spec}, "switch_off": {"n": off}}
+
+    def test_every_arm_must_reach_its_own_n_min(self):
+        from lib.sae.interchange import underpowered_arms
+        pw = {"a": self._power(100, 100, 50), "b": self._power(100, 100, 49),
+              "c": self._power(99, 1000, 1000)}
+        assert underpowered_arms(pw) == {"a": [], "b": ["switch_off"], "c": ["switch_on"]}
+
+    def test_half_is_enough_and_less_is_not(self):
+        from lib.sae.interchange import feasibility
+        ok, bad = self._power(500, 500, 500), self._power(500, 500, 0)
+        assert feasibility({"a": ok, "b": bad})["passed"]
+        f = feasibility({"a": ok, "b": bad, "c": bad})
+        assert not f["passed"] and f["powered_in_every_arm"] == 1
+        assert f["powered_per_arm"] == {"switch_on": 3, "specificity": 3, "switch_off": 1}
+
+
+class TestRuleC2:
+    """Wave 1b S9: context-blind = installs AND E significant AND rho >= 0.5."""
+
+    @staticmethod
+    def _spec(excess, sig=True):
+        return _arm(s=None, sig=sig, excess=excess)
+
+    def test_small_relative_leak_is_not_context_blind(self):
+        on = _arm(s=0.8)
+        assert classify(on, self._spec(0.3), None, rule="3B.C2") == "concept-consistent (on-only)"
+        assert classify(on, self._spec(0.3), None, rule="3B.C1") == "context-blind"
+
+    def test_rho_threshold_is_inclusive(self):
+        assert classify(_arm(s=0.8), self._spec(0.4), None, rule="3B.C2") == "context-blind"
+        assert classify(_arm(s=0.8), self._spec(0.39), _arm(n=80), rule="3B.C2") == "concept-consistent"
+
+    def test_insignificant_or_undefined_excess_is_not_context_blind(self):
+        assert classify(_arm(s=0.8), self._spec(0.9, sig=False), None, rule="3B.C2") \
+            == "concept-consistent (on-only)"
+        assert classify(_arm(s=0.8), self._spec(None), None, rule="3B.C2") \
+            == "concept-consistent (on-only)"
+
+    def test_relative_leak(self):
+        from lib.sae.interchange import relative_leak
+        assert relative_leak(self._spec(0.2), _arm(s=0.4)) == pytest.approx(0.5)
+        assert relative_leak(self._spec(0.2), _arm(s=0.0)) is None
+        assert relative_leak(self._spec(0.2), _arm(s=-0.1)) is None
+
+    def test_unknown_rule_raises(self):
+        with pytest.raises(ValueError):
+            classify(_arm(), _arm(), None, rule="3B.C9")
+
+    @pytest.mark.parametrize("rule", ["3B.C1", "3B.C2"])
+    def test_off_target_needs_an_insignificant_switch_on(self, rule):
+        """Amendment 1 A3: significant-but-below-floor with a significant flip rate
+        is inert, not off-target (the code omitted this until 2026-09-14)."""
+        spec = _arm(s=0.0, sig=False)
+        assert classify(_arm(s=0.1, sig=True, flip_significant=True), spec, None, rule=rule) == "inert"
+        assert classify(_arm(s=0.1, sig=False, flip_significant=True), spec, None, rule=rule) \
+            == "off-target"
+
+
+class TestCovarianceMatchedNull:
+    def test_unit_norm_and_inside_the_span_of_real_differences(self):
+        from lib.sae.interchange import covariance_matched_directions
+        g = torch.Generator().manual_seed(0)
+        basis = torch.linalg.qr(torch.randn(64, 3, generator=g))[0]          # (64, 3)
+        delta = torch.randn(500, 3, generator=g) @ basis.T + 5.0            # offset: centred away
+        w = covariance_matched_directions(delta, 200, torch.Generator().manual_seed(1))
+        assert w.shape == (200, 64)
+        assert torch.allclose(w.norm(dim=1), torch.ones(200), atol=1e-5)
+        resid = w - (w @ basis) @ basis.T
+        assert resid.abs().max() < 1e-4
+
+    def test_follows_the_covariance_not_isotropy(self):
+        from lib.sae.interchange import covariance_matched_directions
+        g = torch.Generator().manual_seed(0)
+        delta = torch.randn(2000, 16, generator=g) * torch.tensor([10.0] + [1.0] * 15)
+        w = covariance_matched_directions(delta, 500, torch.Generator().manual_seed(2))
+        assert w[:, 0].abs().mean() > 3 * w[:, 1:].abs().mean()
+
+
+class TestDasMulti:
+    @staticmethod
+    def _setup(seed=0, n=40, d=12, a=6):
+        g = torch.Generator().manual_seed(seed)
+        W, b = torch.randn(a, d, generator=g), torch.randn(a, generator=g)
+        ro = LinearReluReadout(W, b)
+        zb, zs = torch.randn(n, d, generator=g), torch.randn(n, d, generator=g)
+        legal = torch.ones(n, a, dtype=torch.bool)
+        tgt = torch.zeros(n, a, dtype=torch.bool)
+        tgt[torch.arange(n), torch.randint(a, (n,), generator=g)] = True
+        return ro, zb, zs, tgt, legal
+
+    def test_one_batch_is_the_single_kind_trainer(self):
+        from lib.sae.interchange import DasBatch, train_das_direction, train_das_direction_multi
+        ro, zb, zs, tgt, legal = self._setup()
+        w1 = train_das_direction(zb, zs, ro, tgt, legal, steps=50, seed=3)
+        w2 = train_das_direction_multi([DasBatch(zb, zs, tgt, legal)], ro, steps=50, seed=3)
+        assert torch.equal(w1, w2)
+
+    def test_each_kind_weighs_the_same_whatever_its_size(self):
+        """Repeating one kind's rows 10x leaves the objective, hence w, unchanged."""
+        from lib.sae.interchange import DasBatch, train_das_direction_multi
+        ro, zb, zs, tgt, legal = self._setup()
+        a = DasBatch(zb[:10], zs[:10], tgt[:10], legal[:10])
+        b = DasBatch(zb[10:], zs[10:], tgt[10:], legal[10:])
+        rep = lambda x: x.repeat(10, 1)  # noqa: E731
+        b10 = DasBatch(rep(zb[10:]), rep(zs[10:]), rep(tgt[10:]), rep(legal[10:]))
+        empty = DasBatch(zb[:0], zs[:0], tgt[:0], legal[:0])
+        w = train_das_direction_multi([a, b], ro, steps=50, seed=4)
+        assert torch.allclose(w, train_das_direction_multi([a, b10], ro, steps=50, seed=4), atol=1e-5)
+        assert torch.equal(w, train_das_direction_multi([a, empty, b], ro, steps=50, seed=4))

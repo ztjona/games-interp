@@ -22,7 +22,9 @@ Options:
                                    not given, the corresponding category list is applied
                                    automatically. Auto-detected from --output if omitted.
     --output <path>                Output .pt file for labels [default: auto]
-    --schema-out <path>            Output JSON schema file [default: auto]
+    --schema-out <path>            Output JSON schema file [default: auto]. "none" writes no
+                                   schema: it checks the label columns against the basis
+                                   schema already on disk (labels for a new position set)
     --only-categories <cats>       Comma-separated categories to include. Overrides any
                                    ``--name``-implied filter. If omitted and ``--name`` does not
                                    resolve to a known set, ALL BSPs are included (not recommended).
@@ -270,7 +272,8 @@ def main():
     else:
         output_path = Path(args["--output"])
 
-    if args["--schema-out"] == "auto" or args["--schema-out"] is None:
+    keep_schema = args["--schema-out"] == "none"
+    if args["--schema-out"] in ("auto", "none", None):
         schema_path = data_dir / f"bsp_schema-{schema_basis_name}.json"
     else:
         schema_path = Path(args["--schema-out"])
@@ -329,13 +332,21 @@ def main():
         "bsps": selected_bsps,
     }
 
-    with open(schema_path, "w", encoding="utf-8") as f:
-        # sort_keys for reproducibility: dict key iteration order is otherwise
-        # non-deterministic across runs and produces spurious git churn (the
-        # "categories" summary is a dict; the "bsps" list order is preserved).
-        json.dump(schema_doc, f, indent=2, sort_keys=True)
-
-    print(f"Saved BSP schema to: {schema_path}", file=sys.stderr)
+    if keep_schema:
+        # Labels for a new position set on an existing basis: the basis schema is
+        # already on disk (and tracked). Do not rewrite it -- verify instead that
+        # these label columns are exactly its BSPs, in order.
+        on_disk = json.loads(schema_path.read_text(encoding="utf-8")) if schema_path.exists() else None
+        if on_disk is None or on_disk["bsps"] != json.loads(json.dumps(selected_bsps)):
+            sys.exit(f"ERROR: --schema-out none needs {schema_path} with exactly these BSPs")
+        print(f"Schema unchanged; columns verified against {schema_path}", file=sys.stderr)
+    else:
+        with open(schema_path, "w", encoding="utf-8") as f:
+            # sort_keys for reproducibility: dict key iteration order is otherwise
+            # non-deterministic across runs and produces spurious git churn (the
+            # "categories" summary is a dict; the "bsps" list order is preserved).
+            json.dump(schema_doc, f, indent=2, sort_keys=True)
+        print(f"Saved BSP schema to: {schema_path}", file=sys.stderr)
 
     # Summary to stdout
     summary = {

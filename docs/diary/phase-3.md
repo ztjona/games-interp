@@ -38,7 +38,7 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 | Runs | Step | What | Gate | Status |
 |:---:|---|---|---|---|
 | — | 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | ✅ **CLOSED 2026-08-25 — G-3A PASSES.** 114 cells, 12,151 concept-verdicts, 74.6% `spread`; the wall is a **disjunction** wall. Ledger: [`phase-3A.md`](phase-3A.md); report: [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md) |
-| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). **Wave 1 RAN 2026-09-13 — gate FAILED as registered** (DAS-1 6%); R1–R6 sealed. A pilot: it exposed an unfloored specificity arm and a confounded switch-off target. **Wave 1b PRE-REGISTERED 2026-09-14** ([`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md)): gold3/gold5, network-own targets. [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md) |
+| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). **Wave 1 RAN 2026-09-13 — gate FAILED as registered** (DAS-1 6%); R1–R6 sealed. A pilot: it exposed an unfloored specificity arm and a confounded switch-off target. **Wave 1b PRE-REGISTERED 2026-09-14** ([`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md)): gold3/gold5, network-own targets. **Built + dry runs feasible 2026-09-14** (gold3 73%, gold5 100% powered in every arm; [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md)); runs pending. [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md) |
 | **2** | **3B** (alias `3B-geom`) | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending -- needs no new compute (alpha by construction, beta from the width sweep on disk) |
 | **3** | 3C | Geometry-aware SAE variants (brief sharpened by 3A — an **aggregating readout over existing sibling atoms**): γ pre-check, hierarchical anchoring, **SASA block decoders (LEAD ARM, adopted 2026-09-04)** vs Matryoshka / H-SAE / MP-SAE vs bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | **UNBLOCKED** (G-3A passed) |
 | **4** | 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
@@ -47,6 +47,24 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 
 *(appended as results land; date-stamped. 3A's chapters live in
 [`phase-3A.md`](phase-3A.md).)*
+
+
+### 2026-09-14 -- 3B-causal Wave 1b built; both gold sets feasible
+
+Record: [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md).
+Design stage only; no Wave-1b score exists.
+
+- **Gold sets**: gold3 225,197 positions, gold5 132,274 (30,000 games each, CPU;
+  558 / 0 dropped as pilot boards). Generator guard 0 mismatches on both.
+- **Feasible**: powered in every arm gold3 128/176 (73 %; the 48 short are
+  hawk/hen pinned, switch-off only), gold5 176/176. Both sets enter.
+- **Prefix sweep** (descriptive, cannot change *k*): switch-off is the binding
+  arm at every *k*; greedy play rarely hands over a winning piece.
+- **Rule 3B.C2 implemented**; the 3B.C1 path reproduces the pilot's code exactly
+  on the untrained twin.
+- **Correction**: the 3B.C1 code omitted "switch-on not significant" from
+  off-target. One pilot R7 verdict moves off-target → inert; the gate is
+  unaffected.
 
 
 ### 2026-09-14 -- 3B-causal Wave 1b pre-registered

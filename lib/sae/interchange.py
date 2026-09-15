@@ -40,6 +40,12 @@ import torch
 # Version of the verdict rule defined in the pre-registration (S8). Stored in
 # every report so a verdict can never be read against the wrong rule.
 RULE_VERSION = "3B.C1"
+# Wave 1b (docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md S6-S9):
+# network-own targets, the specificity flip rate F / excess E / relative leak rho,
+# and context-blind = installs AND E significant AND rho >= RHO_CONTEXT_BLIND.
+RULE_C2 = "3B.C2"
+RULES = (RULE_VERSION, RULE_C2)
+RHO_CONTEXT_BLIND = 0.5
 
 # Pre-registered constants (pre-registration S8). Frozen: changing any of them
 # needs a dated amendment entry, not an edit here.
@@ -48,6 +54,29 @@ BH_Q = 0.05
 N_MIN_SWITCH_ON = 100
 N_MIN_SPECIFICITY = 100
 N_MIN_SWITCH_OFF = 50
+N_MIN = {"switch_on": N_MIN_SWITCH_ON, "specificity": N_MIN_SPECIFICITY,
+         "switch_off": N_MIN_SWITCH_OFF}
+# Wave 1b (pre-registration 2026-09-14, S4.4): a position set enters the analysis
+# only if at least this fraction of its concepts is powered in EVERY arm, judged
+# on design-stage pair counts before any score.
+FEASIBILITY_MIN = 0.50
+
+
+def underpowered_arms(power: dict) -> dict[str, list[str]]:
+    """{concept: [pair kinds below n_min]} from a design-stage power table."""
+    return {c: [k for k, v in pw.items() if v["n"] < N_MIN[k]] for c, pw in power.items()}
+
+
+def feasibility(power: dict) -> dict:
+    """The Wave-1b feasibility rule on a design-stage power table."""
+    under = underpowered_arms(power)
+    n_ok = sum(1 for v in under.values() if not v)
+    frac = n_ok / len(power) if power else 0.0
+    per_arm = {k: sum(1 for pw in power.values() if pw[k]["n"] >= N_MIN[k]) for k in N_MIN}
+    return {"concepts": len(power), "powered_in_every_arm": n_ok, "fraction": frac,
+            "powered_per_arm": per_arm, "passed": frac >= FEASIBILITY_MIN,
+            "rule": f">= {FEASIBILITY_MIN:.0%} of concepts powered in every arm "
+                    f"(n_min {N_MIN})"}
 
 # Machine-readable definitions travel with every report (reporting standard 6).
 GLOSSARY: dict[str, dict[str, str]] = {
@@ -63,6 +92,22 @@ GLOSSARY: dict[str, dict[str, str]] = {
                       "meaning": "change in the best target logit minus the mean change of the other legal actions"},
     "verdict": {"range": "see VERDICTS",
                 "meaning": f"rule {RULE_VERSION}; pre-registration S8"},
+}
+
+# Rule 3B.C2 (Wave 1b pre-registration S0, S6). A C2 report carries both.
+GLOSSARY_C2: dict[str, dict[str, str]] = {
+    "D(x)": {"range": "a cell", "meaning": "the network's decision on input x: legal argmax of the place head"},
+    "network_own_target": {"range": "-", "meaning": "D(s) for switch-on and switch-off, D(b) for specificity"},
+    "IIA_net_star": {"range": "(-inf, 1], ideal 1, 0 = no effect",
+                     "meaning": "(A - A0) / (1 - A0), A = P(D_R = D(s)), A0 = P(D(b) = D(s)); stored as iia_star in C2 arms"},
+    "F": {"range": "[0, 1], ideal 0",
+          "meaning": "specificity flip rate P(D_R != D(b)) on pairs where C is false in both"},
+    "E": {"range": "[-1, 1], ideal <= 0", "meaning": "excess leak: F minus the median F of the null"},
+    "rho": {"range": ">= 0, ideal 0",
+            "meaning": "relative leak E / IIA_net*(switch-on); undefined when that is <= 0; context-blind at >= 0.5"},
+    "oracle_iia_star": {"range": "(-inf, 1]", "meaning": "Wave 1's primary score (target = the rational move), kept for continuity"},
+    "ceiling": {"range": "-", "meaning": "the full-activation patch (z_s into the base), under both targets"},
+    "verdict": {"range": "see VERDICTS", "meaning": f"rule {RULE_C2}; Wave 1b pre-registration S9"},
 }
 
 VERDICTS = (
@@ -317,6 +362,23 @@ def random_unit_directions(n: int, d: int, generator: torch.Generator) -> torch.
     return v / v.norm(dim=1, keepdim=True)
 
 
+def covariance_matched_directions(delta: torch.Tensor, n: int,
+                                  generator: torch.Generator) -> torch.Tensor:
+    """Null B1' (Wave 1b S8): ``n`` unit directions drawn from N(0, Sigma), Sigma
+    the covariance of ``delta`` = z_s - z_b over a concept's pairs.
+
+    Sampled through the centred data matrix, x = eps @ Dc / sqrt(m - 1) with
+    eps ~ N(0, I_m): exactly N(0, Dc^T Dc / (m - 1)), no factorisation needed and
+    no failure when Sigma is singular (it is: m pairs span at most m - 1
+    dimensions). Null patches then move the network along the directions real
+    source-to-base differences use, not along random dead ones.
+    """
+    dc = (delta - delta.mean(0, keepdim=True)).double().cpu()
+    eps = torch.randn(n, dc.shape[0], generator=generator, dtype=torch.float64)
+    x = eps @ dc / max(dc.shape[0] - 1, 1) ** 0.5
+    return (x / x.norm(dim=1, keepdim=True).clamp(min=1e-12)).to(delta.dtype)
+
+
 def frequency_matched_sets(J: Sequence[int], freq: torch.Tensor, alive: torch.Tensor,
                            n_draws: int, generator: torch.Generator,
                            tol: float = 0.20) -> list[torch.Tensor]:
@@ -420,9 +482,27 @@ def bootstrap_iia_star(hit_patched: torch.Tensor, hit_base: torch.Tensor,
     return float(t.quantile(a)), float(t.quantile(1 - a))
 
 
+def bootstrap_rate(x: torch.Tensor, groups: torch.Tensor, n_boot: int = 1000, seed: int = 0,
+                   level: float = 0.95) -> tuple[float, float]:
+    """Percentile CI of a plain rate (the specificity flip rate F), resampling
+    GROUPS. IIA* with r0 = 0 is the rate itself, so this is that bootstrap."""
+    return bootstrap_iia_star(x, torch.zeros_like(x), groups, n_boot=n_boot, seed=seed, level=level)
+
+
 # ---------------------------------------------------------------------------
 # DAS-1: the single causal direction, learned (positive control + ceiling)
 # ---------------------------------------------------------------------------
+
+
+@dataclass
+class DasBatch:
+    """One pair kind's training data for :func:`train_das_direction_multi`."""
+
+    z_b: torch.Tensor
+    z_s: torch.Tensor
+    target: torch.Tensor                 # (n, A) bool
+    legal: torch.Tensor                  # (n, A) bool
+    inputs: Sequence[torch.Tensor] | None = None
 
 
 def train_das_direction(z_b: torch.Tensor, z_s: torch.Tensor, readout: Readout,
@@ -437,20 +517,38 @@ def train_das_direction(z_b: torch.Tensor, z_s: torch.Tensor, readout: Readout,
     Train it on training folds only and score it held out -- it is selected on
     the outcome, so an in-sample score is meaningless.
     """
+    return train_das_direction_multi([DasBatch(z_b, z_s, target, legal, inputs)], readout,
+                                     steps=steps, lr=lr, seed=seed, init=init)
+
+
+def train_das_direction_multi(batches: Sequence[DasBatch], readout: Readout,
+                              steps: int = 300, lr: float = 0.05, seed: int = 0,
+                              init: torch.Tensor | None = None) -> torch.Tensor:
+    """:func:`train_das_direction` over several pair kinds at once (Wave 1b S7):
+    each batch's loss is averaged over its own pairs, then the batches are
+    averaged, so a large kind (specificity) cannot dominate a small one. With one
+    batch it is exactly the single-kind trainer."""
+    batches = [b for b in batches if b.z_b.shape[0] > 0]
+    if not batches:
+        raise ValueError("no training pairs")
+    z0 = batches[0].z_b
     g = torch.Generator().manual_seed(seed)          # CPU generator: reproducible on any device
-    v0 = init.clone() if init is not None else torch.randn(z_b.shape[1], generator=g)
+    v0 = init.clone() if init is not None else torch.randn(z0.shape[1], generator=g)
     # Move BEFORE requires_grad_: a leaf created on the CPU and moved afterwards
     # is not the tensor the optimiser updates, and a CPU leaf cannot meet CUDA
     # data at all.
-    v = v0.to(device=z_b.device, dtype=z_b.dtype).detach().requires_grad_(True)
+    v = v0.to(device=z0.device, dtype=z0.dtype).detach().requires_grad_(True)
     opt = torch.optim.Adam([v], lr=lr)
-    neg = torch.finfo(z_b.dtype).min / 4
+    neg = torch.finfo(z0.dtype).min / 4
     for _ in range(steps):
         w = v / v.norm().clamp(min=1e-12)
-        logits = readout(patch_direction(z_b, z_s, w), inputs)
-        legal_l = logits.masked_fill(~legal, neg)
-        tgt_l = logits.masked_fill(~(target & legal), neg)
-        loss = (torch.logsumexp(legal_l, 1) - torch.logsumexp(tgt_l, 1)).mean()
+        losses = []
+        for b in batches:
+            logits = readout(patch_direction(b.z_b, b.z_s, w), b.inputs)
+            legal_l = logits.masked_fill(~b.legal, neg)
+            tgt_l = logits.masked_fill(~(b.target & b.legal), neg)
+            losses.append((torch.logsumexp(legal_l, 1) - torch.logsumexp(tgt_l, 1)).mean())
+        loss = losses[0] if len(losses) == 1 else torch.stack(losses).mean()
         opt.zero_grad()
         loss.backward()
         opt.step()
@@ -474,12 +572,31 @@ class ArmResult:
     significant: bool = False
     below_null_p5: bool = False       # switch-on only: anti-consistent test
     flip_significant: bool = False    # switch-on only: off-target test
+    excess: float | None = None       # specificity only, rule 3B.C2: E = F - median null F
 
 
-def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None) -> str:
-    """Verdict rule 3B.C1: pre-registration S8 as amended (pre-data) by
-    amendment 1, section A3, which names the install-only / remove-only
-    asymmetries and fixes the order in which the rules apply."""
+def relative_leak(spec: ArmResult, on: ArmResult) -> float | None:
+    """rho = E / IIA_net*(switch-on) (rule 3B.C2); undefined when that is <= 0."""
+    if spec.excess is None or on.iia_star is None or on.iia_star <= 0:
+        return None
+    return spec.excess / on.iia_star
+
+
+def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None,
+             rule: str = RULE_VERSION) -> str:
+    """The ordered verdict rule.
+
+    3B.C1: pre-registration S8 as amended (pre-data) by amendment 1, section A3,
+    which names the install-only / remove-only asymmetries and fixes the order in
+    which the rules apply. Context-blind = installs and specificity significant.
+
+    3B.C2 (Wave 1b S9): the same order and meanings; context-blind = installs,
+    the specificity excess E BH-significant, and rho = E / IIA_net*(switch-on)
+    >= 0.5 -- collateral at least half the intended effect. The caller passes
+    network-own IIA_net* as ``iia_star`` and E as the specificity arm's
+    ``excess``."""
+    if rule not in RULES:
+        raise ValueError(f"unknown rule {rule!r}")
     if on.n < N_MIN_SWITCH_ON or spec.n < N_MIN_SPECIFICITY:
         return "underpowered"
     off_powered = off is not None and off.n >= N_MIN_SWITCH_OFF
@@ -487,7 +604,12 @@ def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None) -> str:
                 and on.significant)
     removes = (off_powered and off.iia_star is not None
                and off.iia_star >= IIA_STAR_FLOOR and off.significant)
-    if installs and spec.significant:
+    if rule == RULE_C2:
+        rho = relative_leak(spec, on)
+        blind = spec.significant and rho is not None and rho >= RHO_CONTEXT_BLIND
+    else:
+        blind = spec.significant
+    if installs and blind:
         return "context-blind"
     if installs:
         if not off_powered:
@@ -497,6 +619,10 @@ def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None) -> str:
         return "remove-only"
     if on.below_null_p5:
         return "anti-consistent"
-    if on.flip_significant:
+    # "switch-on NOT significant, but the flip rate above its null's 95th
+    # percentile" (amendment 1 A3; Wave 1b S8). Until 2026-09-14 the code omitted
+    # "not significant": one pilot R7 verdict (tiger_win_now_exists, significant
+    # but below the 0.20 floor) read off-target instead of inert. Gate unaffected.
+    if on.flip_significant and not on.significant:
         return "off-target"
     return "inert"

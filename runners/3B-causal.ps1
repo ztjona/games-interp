@@ -1,35 +1,43 @@
 <#
 .SYNOPSIS
-  Phase 3B-causal, Wave 1: interchange interventions on one champion.
+  Phase 3B-causal: interchange interventions on one champion -- Wave 1 on its
+  amalgam, or Wave 1b on fresh gold position sets.
 
 .DESCRIPTION
   Portable by construction: -Champ selects configs/3B-causal/champ<Tag>.yaml,
-  and nothing else in the pipeline names a champion. Stages:
+  -Set selects position-set configs champ<Tag>-<set>.yaml (Wave 1b), and
+  nothing else in the pipeline names a champion or a set. Per config:
 
-    1. prerequisites  -- interchange_3b.py --prereqs. Missing probe
-                         directions are produced here (the lines it prints
-                         with "RUN: "); anything else missing is an error with
-                         the command that produces it.
-    2. dry run        -- freeze stamps, generator guard (vectorised concepts ==
-                         stored labels), Tier A on the real model, power table.
-                         Computes NO interchange score.
+    1. prerequisites  -- interchange_3b.py --prereqs. Inputs it can produce are
+                         produced here (the lines it prints with "RUN: ": probe
+                         directions; for a gold set, the whole position set via
+                         scripts/build_gold_sets.py -- ~10 min of CPU if absent);
+                         anything else missing is an error with the command
+                         that produces it.
+    2. dry run        -- freeze stamps, generator guard, (Wave 1b: freshness
+                         re-check), Tier A on the real model, power table
+                         (Wave 1b: feasibility). Computes NO interchange score.
     3. the run        -- only with every design file committed and unmodified
-                         (--require-frozen): the pre-registration must be frozen
-                         before any score exists.
+                         (--require-frozen). Wave 1b sets run IN PARALLEL, one
+                         per GPU, each logging to logs/3B-causal-<set>.log.
     4. stage plan     -- stage_3B-causal.md, the git-add list.
 
-  Design: docs/diary/2026-09-12_3B-causal-preregistration.md (+ amendments).
-  Runtime on champYb (measured on its untrained twin): ~15 s per concept,
-  176 concepts, plus replicate dictionaries -- about 55 min on one GPU.
+  Design: Wave 1  docs/diary/2026-09-12_3B-causal-preregistration.md (+ amendments);
+          Wave 1b docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md.
+  Runtime: Wave 1 on champYb ~55 min on one GPU; each Wave-1b set about an hour.
 
 .EXAMPLE
-  Dry-run:     pwsh -File runners\3B-causal.ps1 -Champ Yb -DryRun
-  Smoke test:  pwsh -File runners\3B-causal.ps1 -Champ Yb -Smoke
-  Real run:    pwsh -File runners\launch.ps1 3B-causal -Champ Yb
-  Follow:      Get-Content logs\3B-causal.transcript.log -Wait -Tail 40
+  Wave 1b dry run:  pwsh -File runners\launch.ps1 3B-causal -Set gold3,gold5 -DryRun
+  Wave 1b smoke:    pwsh -File runners\3B-causal.ps1 -Set gold3 -Smoke
+  Wave 1b run:      pwsh -File runners\launch.ps1 3B-causal -Set gold3,gold5
+  Wave 1 (pilot):   pwsh -File runners\launch.ps1 3B-causal -Champ Yb
+  Follow:           Get-Content logs\3B-causal.transcript.log -Wait -Tail 40
+                    Get-Content logs\3B-causal-gold3.log -Wait -Tail 20
 #>
 param(
     [string]$Champ = 'Yb',
+    # Wave 1b position sets, comma-separated (gold3,gold5). Empty = Wave 1.
+    [string]$Set = '',
     # Stop after the power table; no interchange score is computed.
     [switch]$DryRun,
     # Untrained twin, five representative concepts, output under logs/: proves
@@ -50,63 +58,95 @@ New-Item -ItemType Directory -Force -Path logs | Out-Null
 Start-Transcript -Path 'logs/3B-causal.transcript.log' -Append | Out-Null
 $runStart = Get-Date
 try {
-    $cfg = "configs/3B-causal/champ$Champ.yaml"
-    if (-not (Test-Path $cfg)) {
-        throw "No config $cfg. Copy configs/3B-causal/champYb.yaml and change the names."
+    $sets = @($Set -split ',' | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    $names = if ($sets.Count) { @($sets | ForEach-Object { "champ$Champ-$_" }) } else { @("champ$Champ") }
+    foreach ($n in $names) {
+        if (-not (Test-Path "configs/3B-causal/$n.yaml")) {
+            throw "No config configs/3B-causal/$n.yaml. Copy champYb.yaml (or champYb-gold3.yaml) and change the names."
+        }
     }
-    Write-Host "== 3B-causal Wave 1 on champ$Champ ($cfg) =="
+    $wave = if ($sets.Count) { 'Wave 1b' } else { 'Wave 1' }
+    Write-Host "== 3B-causal $wave on $($names -join ', ') =="
 
     # 1. prerequisites -- the check itself is Python (a tested entry point)
-    Write-Host "`n[1] prerequisites"
-    $PSNativeCommandUseErrorActionPreference = $false
-    $pre = python scripts/interchange_3b.py --config=$cfg --prereqs 2>&1
-    $preExit = $LASTEXITCODE
-    $PSNativeCommandUseErrorActionPreference = $true
-    $pre | ForEach-Object { Write-Host $_ }
-    if ($preExit -eq 3) {
-        $runs = @($pre | Where-Object { "$_" -like 'RUN: *' } | ForEach-Object { "$_".Substring(5) })
-        $other = @($pre | Where-Object { "$_" -like 'MISSING *' -and "$_" -notlike '*probe directions*' })
-        if ($other.Count -gt 0) { throw "Missing inputs that this runner cannot produce (see above)." }
-        foreach ($cmd in $runs) {
-            Write-Host "  producing: $cmd"
-            $parts = $cmd -split ' '
-            & $parts[0] $parts[1..($parts.Count - 1)]
+    foreach ($n in $names) {
+        $cfg = "configs/3B-causal/$n.yaml"
+        Write-Host "`n[1] prerequisites: $cfg"
+        $PSNativeCommandUseErrorActionPreference = $false
+        $pre = python scripts/interchange_3b.py --config=$cfg --prereqs 2>&1
+        $preExit = $LASTEXITCODE
+        $PSNativeCommandUseErrorActionPreference = $true
+        $pre | ForEach-Object { Write-Host $_ }
+        if ($preExit -eq 4) {
+            throw "Missing inputs that this runner cannot produce (see above)."
+        } elseif ($preExit -eq 3) {
+            $runs = @($pre | Where-Object { "$_" -like 'RUN: *' } | ForEach-Object { "$_".Substring(5) } |
+                    Select-Object -Unique)
+            foreach ($cmd in $runs) {
+                Write-Host "  producing: $cmd"
+                $parts = $cmd -split ' '
+                & $parts[0] $parts[1..($parts.Count - 1)]
+            }
+            python scripts/interchange_3b.py --config=$cfg --prereqs
+        } elseif ($preExit -ne 0) {
+            throw "Prerequisite check failed (exit $preExit)."
         }
-        python scripts/interchange_3b.py --config=$cfg --prereqs
-    } elseif ($preExit -ne 0) {
-        throw "Prerequisite check failed (exit $preExit)."
     }
 
     if ($Smoke) {
-        Write-Host "`n[smoke] untrained twin, five concepts, output in logs/3B-causal-smoke"
-        python scripts/interchange_3b.py --config=$cfg --untrained --no-replicates `
-            --concepts="row_0_completable_tall,row_0_completable_little,tiger_line_row_0_winnable,tiger_offered_completes_tall,tiger_win_now_exists" `
-            --out-dir=logs/3B-causal-smoke
+        foreach ($n in $names) {
+            Write-Host "`n[smoke] $n : untrained twin, five concepts, output in logs/3B-causal-smoke"
+            python scripts/interchange_3b.py --config="configs/3B-causal/$n.yaml" --untrained --no-replicates `
+                --concepts="row_0_completable_tall,row_0_completable_little,tiger_line_row_0_winnable,tiger_offered_completes_tall,tiger_win_now_exists" `
+                --out-dir=logs/3B-causal-smoke
+        }
         Write-Host ("`nSmoke test done in {0:hh\:mm\:ss}. Its numbers are meaningless by construction." -f ((Get-Date) - $runStart))
         return
     }
 
-    # 2. dry run: guard + Tier A + power, no score
-    Write-Host "`n[2] dry run"
-    python scripts/interchange_3b.py --config=$cfg --dry-run
+    # 2. dry run: guard (+ freshness) + Tier A + power (+ feasibility), no score
+    foreach ($n in $names) {
+        Write-Host "`n[2] dry run: $n"
+        python scripts/interchange_3b.py --config="configs/3B-causal/$n.yaml" --dry-run
+    }
     if ($DryRun) {
         Write-Host "`nDryRun -> stopping before any interchange score."
         return
     }
 
     # 3. the run -- refuses unless every design file is committed and clean
-    Write-Host "`n[3] Wave 1 (this is the long part)"
-    python scripts/interchange_3b.py --config=$cfg --require-frozen
-    Write-Host ("`nWave 1 done in {0:hh\:mm\:ss}." -f ((Get-Date) - $runStart))
+    if ($sets.Count) {
+        Write-Host "`n[3] $wave, $($names.Count) set(s) in parallel, one GPU each (the long part)"
+        $procs = @()
+        for ($i = 0; $i -lt $names.Count; $i++) {
+            $n = $names[$i]
+            $env:CUDA_VISIBLE_DEVICES = "$($i % 3)"
+            Write-Host "  $n on GPU $($i % 3) -> logs/3B-causal-$($sets[$i]).log"
+            $procs += Start-Process -FilePath python -PassThru -WindowStyle Hidden `
+                -ArgumentList @('scripts/interchange_3b.py', "--config=configs/3B-causal/$n.yaml", '--require-frozen') `
+                -RedirectStandardOutput "logs/3B-causal-$($sets[$i]).log" `
+                -RedirectStandardError "logs/3B-causal-$($sets[$i]).err"
+        }
+        Remove-Item Env:CUDA_VISIBLE_DEVICES
+        foreach ($p in $procs) { $p.WaitForExit() }
+        $bad = @($procs | Where-Object { $_.ExitCode -ne 0 })
+        if ($bad.Count -gt 0) { throw "$($bad.Count) set(s) failed; see logs/3B-causal-<set>.log and .err" }
+    } else {
+        Write-Host "`n[3] $wave (this is the long part)"
+        python scripts/interchange_3b.py --config="configs/3B-causal/$($names[0]).yaml" --require-frozen
+    }
+    Write-Host ("`n$wave done in {0:hh\:mm\:ss}." -f ((Get-Date) - $runStart))
 
     # 4. stage plan
     Write-Host "`n[4] stage plan"
-    $champName = "champ$Champ"
-    $files = @(Get-ChildItem "saes/quarto/analysis/3B-causal_${champName}_wave1*" | ForEach-Object { $_.FullName })
+    $files = @()
+    foreach ($n in $names) {
+        $files += @(Get-ChildItem "saes/quarto/analysis/3B-causal_${n}_wave1*" | ForEach-Object { $_.FullName })
+    }
     $files += @(Get-ChildItem "saes/quarto/analysis/*_topk-*.json" | Where-Object { $_.LastWriteTime -ge $runStart } |
             ForEach-Object { $_.FullName })
     python scripts/emit_stage.py --slug 3B-causal @files
-    Write-Host "`nDone. Results in saes/quarto/analysis/3B-causal_${champName}_wave1.json; commit plan in stage_3B-causal.md"
+    Write-Host "`nDone. Results in saes/quarto/analysis/3B-causal_<name>_wave1*.json; commit plan in stage_3B-causal.md"
 }
 finally {
     Stop-Transcript | Out-Null

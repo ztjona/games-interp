@@ -200,6 +200,14 @@ Position datasets are named after metals to indicate opponent strength progressi
 - `iron` — random_v_model (stronger, weak vs model)
 - `steel` — model_v_model (hardened self-play, strongest)
 - `amalgam` — combined all modes (ultimate mixture)
+- `gold<k>` — the champion against itself after a *k*-placement random prefix
+  (the random player also hands over the (*k*+1)-th piece), then **legal argmax**
+  for both sides; only placements *k*+1 onward are recorded
+  (`generate_positions.py --opponents gold<k>`, S4 games). Built by
+  `scripts/build_gold_sets.py` from a config's `positions_recipe`, deduplicated
+  within the set; generate on **CPU** (near-tied Q-values break differently on
+  CUDA, so the device is part of the recipe). Labels carry the set in the
+  suffix: `bsp_labels-<basis><Champ>Gold<k>_<n>.pt`, e.g. `hawkYbGold3`.
 
 **BSPs (Animals theme):**
 BSP label sets are named after animals to indicate set size:

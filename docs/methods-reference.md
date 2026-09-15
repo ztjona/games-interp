@@ -743,3 +743,48 @@ a 1,000-draw null. Minimum n: 100 switch-on, 100 specificity, 50 switch-off.
 directions); frequency-matched random latent sets, ±20 % firing frequency (for
 SAE latents). p-values are empirical `(k + 1) / (n + 1)`, with a Gaussian tail
 when the observed value exceeds every draw. CIs: bootstrap over **board orbits**.
+
+**Off-target** (both rules): switch-on **not** significant, but its flip rate
+above the null's 95th percentile (amendment 1 §A3). Until 2026-09-14 the code
+omitted "not significant"; verdicts are a pure function of the stored arm
+statistics, so a report is re-derived without re-running.
+
+### 9.1 Rule `3B.C2` — Wave 1b (added 2026-09-14)
+
+Frozen in [`diary/2026-09-14_3B-causal-wave1b-preregistration.md`](diary/2026-09-14_3B-causal-wave1b-preregistration.md)
+§6–§9. A run config selects it with `rule: 3B.C2`; implemented as
+`interchange.classify(..., rule="3B.C2")` and `scripts/interchange_3b.py::summarize_c2`.
+The primary target is the **network's own** counterfactual decision, not the
+rational move.
+
+| metric | range / ideal | definition |
+|---|---|---|
+| **D(x)** | a cell | legal argmax of the place head on input *x* |
+| **IIA_net\*** | (−∞, 1], ideal 1, 0 = no effect | `(A − A₀) / (1 − A₀)`, A = P(D_R = D(s)), A₀ = P(D(b) = D(s)) — switch-on and switch-off; stored as `iia_star` |
+| **F** | [0, 1], ideal 0 | specificity flip rate P(D_R ≠ D(b)) |
+| **E** | [−1, 1], ideal ≤ 0 | F − the median F of the representation's null |
+| **ρ** | ≥ 0, ideal 0 | E / IIA_net\*(switch-on); undefined when that is ≤ 0 |
+
+- **Verdicts**: 3B.C1's order and meanings, except **context-blind = installs ∧
+  E BH-significant ∧ ρ ≥ 0.5** (collateral at least half the intended effect).
+- **Nulls**: directions (R5–R7) use **B1′**, unit directions from N(0, Σ_Δ),
+  Σ_Δ the covariance of z_s − z_b over the concept's pairs of all kinds, sampled
+  exactly as ε·Δ_c/√(m−1) (no factorisation; Σ_Δ is singular);
+  `covariance_matched_directions`. The isotropic null is reported alongside
+  (`isotropic_null`). Latent sets: frequency-matched, as 3B.C1. Greater-tail p
+  on IIA_net\* and on F.
+- **R7 (DAS-1)**: cross-entropy over the legal set toward the network-own
+  target — D(s) for switch-on/off, D(b) for specificity — on all three kinds;
+  each kind's loss averaged over its pairs, then the kinds averaged
+  (`train_das_direction_multi`). **R4**: selected by switch-on IIA_net\* on the
+  training folds.
+- **Secondary, every arm**: the oracle IIA\* (3B.C1's score, `oracle`) and the
+  target margin; per concept and kind, the full-activation ceiling under both
+  targets (`ceiling`).
+- **Feasibility**: a position set enters only if ≥ 50 % of its concepts are
+  powered in every arm on design-stage counts (`interchange.feasibility`);
+  otherwise the run records it as dropped and computes no score.
+- **Freshness**: a gold position whose board (up to the 8 symmetries, piece
+  ignored) is any pilot pair's board is removed at build time
+  (`scripts/freshness_filter.py`, `compute_orbit_ids.board_keys`) and
+  re-checked when the run starts.
