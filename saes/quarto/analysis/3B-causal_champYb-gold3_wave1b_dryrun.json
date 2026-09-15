@@ -7,7 +7,7 @@
  "hook": "s4.fc1",
  "readout": "closed_form",
  "freeze": {
-  "git_head": "c29d85909769814ef825c6dbccef174097c99964",
+  "git_head": "363b58deb5ad03273d578e3babacf439a4a8c565",
   "files": {
    "docs/diary/2026-09-12_3B-causal-preregistration.md": {
     "sha256_lf": "2ef6e2e545e7ba5546fffe80d93a945ea1a943878c773d411494c8a1d71a6f24",

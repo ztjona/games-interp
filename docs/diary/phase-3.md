@@ -38,7 +38,7 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 | Runs | Step | What | Gate | Status |
 |:---:|---|---|---|---|
 | — | 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | ✅ **CLOSED 2026-08-25 — G-3A PASSES.** 114 cells, 12,151 concept-verdicts, 74.6% `spread`; the wall is a **disjunction** wall. Ledger: [`phase-3A.md`](phase-3A.md); report: [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md) |
-| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). **Wave 1 RAN 2026-09-13 — gate FAILED as registered** (DAS-1 6%); R1–R6 sealed. A pilot: it exposed an unfloored specificity arm and a confounded switch-off target. **Wave 1b PRE-REGISTERED 2026-09-14** ([`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md)): gold3/gold5, network-own targets. **Built + dry runs feasible 2026-09-14** (gold3 73%, gold5 100% powered in every arm; [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md)); runs pending. [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md) |
+| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). **Wave 1 RAN 2026-09-13 — gate FAILED as registered** (DAS-1 6%); R1–R6 sealed. A pilot: it exposed an unfloored specificity arm and a confounded switch-off target. **Wave 1b PRE-REGISTERED 2026-09-14** ([`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md)): gold3/gold5, network-own targets. **Built + dry runs feasible 2026-09-14** (gold3 73%, gold5 100% powered in every arm; [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md)); **Wave 1b RAN 2026-09-15: gate FAILED in both sets** (gold3 37%, gold5 2%): DAS-1 installs, does not remove; R1–R6 sealed ([`2026-09-15_3B-causal-wave1b-results.md`](2026-09-15_3B-causal-wave1b-results.md)). [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md) |
 | **2** | **3B** (alias `3B-geom`) | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending -- needs no new compute (alpha by construction, beta from the width sweep on disk) |
 | **3** | 3C | Geometry-aware SAE variants (brief sharpened by 3A — an **aggregating readout over existing sibling atoms**): γ pre-check, hierarchical anchoring, **SASA block decoders (LEAD ARM, adopted 2026-09-04)** vs Matryoshka / H-SAE / MP-SAE vs bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | **UNBLOCKED** (G-3A passed) |
 | **4** | 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
@@ -47,6 +47,23 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 
 *(appended as results land; date-stamped. 3A's chapters live in
 [`phase-3A.md`](phase-3A.md).)*
+
+
+### 2026-09-15 -- 3B-causal Wave 1b: the gate fails in both sets
+
+Record: [`2026-09-15_3B-causal-wave1b-results.md`](2026-09-15_3B-causal-wave1b-results.md).
+
+- **As registered**: DAS-1 concept-consistent or on-only on gold3 65/176 (37 %),
+  gold5 4/176 (2 %) → gate FAILED in both; H-C0 falsified (the sets agree).
+  R1–R6 unread in both sets; H-C1 to H-C5 untested.
+- **Specificity fixed**: no concept reaches ρ ≥ 0.5; the pilot's
+  context-blindness does not recur.
+- **Removal fails**: DAS-1 installs (pinned IIA_net\* ≈ 0.97) but, on switch-off,
+  leaves the formerly winning cell on only 20–46 % of the pairs where the
+  network itself would. The full patch always does, so the information is in
+  the hook but not along that one direction: the add-vs-remove asymmetry.
+- Decision pending: a new wave with an install gate and a DAS-k removal curve,
+  or close and take removal to 3D.
 
 
 ### 2026-09-14 -- 3B-causal Wave 1b built; both gold sets feasible

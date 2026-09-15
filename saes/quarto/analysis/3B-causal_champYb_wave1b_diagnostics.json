@@ -1,0 +1,912 @@
+{
+ "status": "POST-HOC DIAGNOSTICS OF FAILED GATES (Wave 1b pre-registration S10). R7 and representation-free quantities only; R1-R6 SEALED in every set.",
+ "sets": {
+  "3B-causal_champYb-gold3_wave1b": {
+   "run": "saes/quarto/analysis/3B-causal_champYb-gold3_wave1b.json",
+   "gate": {
+    "C1_das_concept_consistent": 65,
+    "C1_powered": 176,
+    "C1_fraction": 0.3693181818181818,
+    "passed": false,
+    "rule_version": "3B.C2",
+    "rule": "R7 concept-consistent or (on-only) for >= 50% of powered concepts (Wave 1b pre-registration S10, per gold set)"
+   },
+   "feasibility": {
+    "concepts": 176,
+    "powered_in_every_arm": 128,
+    "fraction": 0.7272727272727273,
+    "powered_per_arm": {
+     "switch_on": 176,
+     "specificity": 176,
+     "switch_off": 128
+    },
+    "passed": true,
+    "rule": ">= 50% of concepts powered in every arm (n_min {'switch_on': 100, 'specificity': 100, 'switch_off': 50})"
+   },
+   "r7_verdicts": {
+    "concept-consistent (on-only)": 48,
+    "off-target": 1,
+    "concept-consistent": 17,
+    "install-only": 109,
+    "inert": 1
+   },
+   "gate_passing_concepts": [
+    "col_0_completable_circle",
+    "col_0_completable_tall",
+    "col_0_completable_with_hole",
+    "col_2_completable_circle",
+    "col_2_completable_square",
+    "col_2_completable_tall",
+    "col_2_completable_with_hole",
+    "col_2_completable_without_hole",
+    "col_3_completable_little",
+    "col_3_completable_square",
+    "col_3_completable_tall",
+    "row_0_completable_circle",
+    "row_0_completable_little",
+    "row_0_completable_square",
+    "row_0_completable_tall",
+    "row_1_completable_little",
+    "row_1_completable_without_hole",
+    "row_2_completable_black",
+    "row_2_completable_little",
+    "row_2_completable_square",
+    "row_2_completable_tall",
+    "row_2_completable_with_hole",
+    "row_2_completable_without_hole",
+    "row_3_completable_black",
+    "row_3_completable_circle",
+    "row_3_completable_tall",
+    "row_3_completable_white",
+    "square_0_0_completable_little",
+    "square_0_0_completable_with_hole",
+    "square_0_0_completable_without_hole",
+    "square_0_1_completable_black",
+    "square_0_1_completable_little",
+    "square_0_1_completable_tall",
+    "square_0_1_completable_white",
+    "square_0_2_completable_black",
+    "square_0_2_completable_circle",
+    "square_0_2_completable_little",
+    "square_0_2_completable_square",
+    "square_0_2_completable_white",
+    "square_0_2_completable_without_hole",
+    "square_1_0_completable_black",
+    "square_1_0_completable_circle",
+    "square_1_0_completable_little",
+    "square_1_0_completable_tall",
+    "square_1_0_completable_white",
+    "square_1_1_completable_square",
+    "square_1_1_completable_without_hole",
+    "square_1_2_completable_black",
+    "square_1_2_completable_square",
+    "square_1_2_completable_tall",
+    "square_1_2_completable_without_hole",
+    "square_2_0_completable_circle",
+    "square_2_0_completable_little",
+    "square_2_0_completable_square",
+    "square_2_0_completable_tall",
+    "square_2_0_completable_white",
+    "square_2_1_completable_black",
+    "square_2_1_completable_without_hole",
+    "square_2_2_completable_circle",
+    "square_2_2_completable_square",
+    "square_2_2_completable_tall",
+    "square_2_2_completable_white",
+    "square_2_2_completable_without_hole",
+    "tiger_line_col_2_winnable",
+    "tiger_line_row_2_winnable"
+   ],
+   "family_rollup": {
+    "hawk pinned": {
+     "n_concepts": 76,
+     "r7_verdicts": {
+      "concept-consistent (on-only)": 24,
+      "off-target": 1,
+      "concept-consistent": 7,
+      "install-only": 44
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.43402568995952606,
+     "switch_on": {
+      "n_median": 1000.0,
+      "bh_significant": 75,
+      "flip_rate_median": 0.31384991109371185,
+      "target_margin_median": 2.113709568977356,
+      "oracle_iia_star_median": 0.9927982868269519,
+      "iia_net_star_median": 0.9768723273227593,
+      "pairs_pooled": {
+       "pairs": 74246,
+       "informative_share": 0.3402203485709668,
+       "informative_reproduces_D(s)": 0.9825811559778306,
+       "informative_leaves_D(b)": 0.9885193982581156,
+       "uninformative_keeps_D(b)": 0.9890376842363124
+      },
+      "ceiling": {
+       "network_own": 0.6830000281333923,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9755862370783033
+      }
+     },
+     "specificity": {
+      "n_median": 1000.0,
+      "bh_significant": 4,
+      "flip_rate_median": 0.16100001335144043,
+      "target_margin_median": 0.011499990243464708,
+      "oracle_iia_star_median": 0.12383907747275966,
+      "F_median": 0.16100001335144043,
+      "E_median": -0.012000001966953278,
+      "rho_median": -0.012423319697091179,
+      "pairs_pooled": {
+       "pairs": 76000,
+       "informative_share": 0.4403684210526316,
+       "informative_reproduces_D(s)": 0.10738615991394765,
+       "informative_leaves_D(b)": 0.2577387355085455,
+       "uninformative_keeps_D(b)": 0.8925514906423399
+      },
+      "ceiling": {
+       "network_own": 0.4580000340938568,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.016861767814600692
+      }
+     },
+     "switch_off": {
+      "n_median": 62.5,
+      "bh_significant": 8,
+      "flip_rate_median": 0.05090595223009586,
+      "target_margin_median": -0.5379393994808197,
+      "oracle_iia_star_median": 0.05090595223009586,
+      "iia_net_star_median": 0.0,
+      "pairs_pooled": {
+       "pairs": 5975,
+       "informative_share": 0.2977405857740586,
+       "informative_reproduces_D(s)": 0.2810567734682406,
+       "informative_leaves_D(b)": 0.4457560427206296,
+       "uninformative_keeps_D(b)": 0.9454242135367016
+      },
+      "ceiling": {
+       "network_own": 0.7853805124759674,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.2146194949746132
+      }
+     }
+    },
+    "hen pinned": {
+     "n_concepts": 76,
+     "r7_verdicts": {
+      "concept-consistent (on-only)": 24,
+      "install-only": 44,
+      "concept-consistent": 8
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.40440550446510315,
+     "switch_on": {
+      "n_median": 1000.0,
+      "bh_significant": 76,
+      "flip_rate_median": 0.3555000126361847,
+      "target_margin_median": 2.039058566093445,
+      "oracle_iia_star_median": 0.9932998993225525,
+      "iia_net_star_median": 0.961535939850987,
+      "pairs_pooled": {
+       "pairs": 71484,
+       "informative_share": 0.36945330423591294,
+       "informative_reproduces_D(s)": 0.9739113971980311,
+       "informative_leaves_D(b)": 0.9864066641423703,
+       "uninformative_keeps_D(b)": 0.9836269246128588
+      },
+      "ceiling": {
+       "network_own": 0.6397920846939087,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9664986571793865
+      }
+     },
+     "specificity": {
+      "n_median": 1000.0,
+      "bh_significant": 9,
+      "flip_rate_median": 0.1665000021457672,
+      "target_margin_median": 0.0076656818855553865,
+      "oracle_iia_star_median": 0.1250000046939802,
+      "F_median": 0.1665000021457672,
+      "E_median": -0.013999998569488525,
+      "rho_median": -0.014801288540486072,
+      "pairs_pooled": {
+       "pairs": 76000,
+       "informative_share": 0.4390657894736842,
+       "informative_reproduces_D(s)": 0.11336869549581947,
+       "informative_leaves_D(b)": 0.27894153256016063,
+       "uninformative_keeps_D(b)": 0.8887194764373343
+      },
+      "ceiling": {
+       "network_own": 0.45600003004074097,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.01546031341207168
+      }
+     },
+     "switch_off": {
+      "n_median": 60.0,
+      "bh_significant": 11,
+      "flip_rate_median": 0.07896103709936142,
+      "target_margin_median": -0.45551997423171997,
+      "oracle_iia_star_median": 0.07896103709936142,
+      "iia_net_star_median": 0.0,
+      "pairs_pooled": {
+       "pairs": 5210,
+       "informative_share": 0.32072936660268714,
+       "informative_reproduces_D(s)": 0.2950329144225015,
+       "informative_leaves_D(b)": 0.45960502692998206,
+       "uninformative_keeps_D(b)": 0.9465950833568805
+      },
+      "ceiling": {
+       "network_own": 0.7299145460128784,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.27008548378944397
+      }
+     }
+    },
+    "tiger offered_attr": {
+     "n_concepts": 4,
+     "r7_verdicts": {
+      "install-only": 4
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.2077084630727768,
+     "switch_on": {
+      "n_median": 1000.0,
+      "bh_significant": 4,
+      "flip_rate_median": 0.29250000417232513,
+      "target_margin_median": 0.5576462149620056,
+      "oracle_iia_star_median": 0.44108279257295635,
+      "iia_net_star_median": 0.3074642774632455,
+      "pairs_pooled": {
+       "pairs": 4000,
+       "informative_share": 0.3625,
+       "informative_reproduces_D(s)": 0.4793103448275862,
+       "informative_leaves_D(b)": 0.6420689655172414,
+       "uninformative_keeps_D(b)": 0.9117647058823529
+      },
+      "ceiling": {
+       "network_own": 0.6225000321865082,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9755792499293003
+      }
+     },
+     "specificity": {
+      "n_median": 1000.0,
+      "bh_significant": 0,
+      "flip_rate_median": 0.07200000435113907,
+      "target_margin_median": 0.003652202431112528,
+      "oracle_iia_star_median": 0.015376613050880405,
+      "F_median": 0.07200000435113907,
+      "E_median": -0.039000002667307854,
+      "rho_median": -0.12639594237831214,
+      "pairs_pooled": {
+       "pairs": 4000,
+       "informative_share": 0.311,
+       "informative_reproduces_D(s)": 0.10610932475884244,
+       "informative_leaves_D(b)": 0.17765273311897106,
+       "uninformative_keeps_D(b)": 0.9706095791001451
+      },
+      "ceiling": {
+       "network_own": 0.3240000158548355,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.002187345791024054
+      }
+     },
+     "switch_off": {
+      "n_median": 1000.0,
+      "bh_significant": 0,
+      "flip_rate_median": 0.03900000173598528,
+      "target_margin_median": -0.08698632195591927,
+      "oracle_iia_star_median": 0.03700000140815973,
+      "iia_net_star_median": 0.02615264083990685,
+      "pairs_pooled": {
+       "pairs": 3931,
+       "informative_share": 0.2701602645637242,
+       "informative_reproduces_D(s)": 0.05743879472693032,
+       "informative_leaves_D(b)": 0.10546139359698682,
+       "uninformative_keeps_D(b)": 0.9912861624259324
+      },
+      "ceiling": {
+       "network_own": 0.7500000596046448,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.24700000882148743
+      }
+     }
+    },
+    "tiger win_now": {
+     "n_concepts": 1,
+     "r7_verdicts": {
+      "inert": 1
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.03366074711084366,
+     "switch_on": {
+      "n_median": 1000,
+      "bh_significant": 1,
+      "flip_rate_median": 0.17600001394748688,
+      "target_margin_median": 0.15761993825435638,
+      "oracle_iia_star_median": 0.1508875979641307,
+      "iia_net_star_median": 0.10539848003558505,
+      "pairs_pooled": {
+       "pairs": 1000,
+       "informative_share": 0.389,
+       "informative_reproduces_D(s)": 0.2262210796915167,
+       "informative_leaves_D(b)": 0.33161953727506427,
+       "uninformative_keeps_D(b)": 0.9230769230769231
+      },
+      "ceiling": {
+       "network_own": 0.6110000014305115,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9704144004847375
+      }
+     },
+     "specificity": {
+      "n_median": 1000,
+      "bh_significant": 0,
+      "flip_rate_median": 0.1510000079870224,
+      "target_margin_median": 0.015478330664336681,
+      "oracle_iia_star_median": 0.05555554587318814,
+      "F_median": 0.1510000079870224,
+      "E_median": 0.019999995827674866,
+      "rho_median": 0.18975601755283747,
+      "pairs_pooled": {
+       "pairs": 1000,
+       "informative_share": 0.36,
+       "informative_reproduces_D(s)": 0.16666666666666666,
+       "informative_leaves_D(b)": 0.2972222222222222,
+       "uninformative_keeps_D(b)": 0.93125
+      },
+      "ceiling": {
+       "network_own": 0.36000001430511475,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.06140342468821276
+      }
+     },
+     "switch_off": {
+      "n_median": 1000,
+      "bh_significant": 0,
+      "flip_rate_median": 0.026000000536441803,
+      "target_margin_median": -0.016730008646845818,
+      "oracle_iia_star_median": 0.026000000536441803,
+      "iia_net_star_median": 0.019933500213170807,
+      "pairs_pooled": {
+       "pairs": 1000,
+       "informative_share": 0.301,
+       "informative_reproduces_D(s)": 0.04318936877076412,
+       "informative_leaves_D(b)": 0.06312292358803986,
+       "uninformative_keeps_D(b)": 0.9899856938483548
+      },
+      "ceiling": {
+       "network_own": 0.6990000605583191,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.2970000207424164
+      }
+     }
+    },
+    "tiger winnable": {
+     "n_concepts": 19,
+     "r7_verdicts": {
+      "install-only": 17,
+      "concept-consistent": 2
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.2376648634672165,
+     "switch_on": {
+      "n_median": 1000,
+      "bh_significant": 19,
+      "flip_rate_median": 0.3410000205039978,
+      "target_margin_median": 1.221359133720398,
+      "oracle_iia_star_median": 0.8421053548855861,
+      "iia_net_star_median": 0.8541667553640638,
+      "pairs_pooled": {
+       "pairs": 19000,
+       "informative_share": 0.3726315789473684,
+       "informative_reproduces_D(s)": 0.8598870056497175,
+       "informative_leaves_D(b)": 0.8668079096045198,
+       "uninformative_keeps_D(b)": 0.9807046979865772
+      },
+      "ceiling": {
+       "network_own": 0.6340000033378601,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9685536139408392
+      }
+     },
+     "specificity": {
+      "n_median": 1000,
+      "bh_significant": 2,
+      "flip_rate_median": 0.14600001275539398,
+      "target_margin_median": 0.0034645104315131903,
+      "oracle_iia_star_median": 0.0655940633773681,
+      "F_median": 0.14600001275539398,
+      "E_median": -0.047999992966651917,
+      "rho_median": -0.056989386655973785,
+      "pairs_pooled": {
+       "pairs": 19000,
+       "informative_share": 0.44073684210526315,
+       "informative_reproduces_D(s)": 0.12144733699546215,
+       "informative_leaves_D(b)": 0.2459995223310246,
+       "uninformative_keeps_D(b)": 0.9079616036137775
+      },
+      "ceiling": {
+       "network_own": 0.453000009059906,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.010596048030449369
+      }
+     },
+     "switch_off": {
+      "n_median": 503,
+      "bh_significant": 8,
+      "flip_rate_median": 0.087890625,
+      "target_margin_median": -0.4173111915588379,
+      "oracle_iia_star_median": 0.087890625,
+      "iia_net_star_median": 0.11926609377559308,
+      "pairs_pooled": {
+       "pairs": 10121,
+       "informative_share": 0.3187432071929651,
+       "informative_reproduces_D(s)": 0.1726596404215747,
+       "informative_leaves_D(b)": 0.30161190328580284,
+       "uninformative_keeps_D(b)": 0.9757795503988398
+      },
+      "ceiling": {
+       "network_own": 0.7006173133850098,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.2993827164173126
+      }
+     }
+    }
+   }
+  },
+  "3B-causal_champYb-gold5_wave1b": {
+   "run": "saes/quarto/analysis/3B-causal_champYb-gold5_wave1b.json",
+   "gate": {
+    "C1_das_concept_consistent": 4,
+    "C1_powered": 176,
+    "C1_fraction": 0.022727272727272728,
+    "passed": false,
+    "rule_version": "3B.C2",
+    "rule": "R7 concept-consistent or (on-only) for >= 50% of powered concepts (Wave 1b pre-registration S10, per gold set)"
+   },
+   "feasibility": {
+    "concepts": 176,
+    "powered_in_every_arm": 176,
+    "fraction": 1.0,
+    "powered_per_arm": {
+     "switch_on": 176,
+     "specificity": 176,
+     "switch_off": 176
+    },
+    "passed": true,
+    "rule": ">= 50% of concepts powered in every arm (n_min {'switch_on': 100, 'specificity': 100, 'switch_off': 50})"
+   },
+   "r7_verdicts": {
+    "install-only": 166,
+    "concept-consistent": 4,
+    "off-target": 4,
+    "inert": 2
+   },
+   "gate_passing_concepts": [
+    "col_2_completable_without_hole",
+    "row_2_completable_square",
+    "square_1_2_completable_square",
+    "tiger_line_col_1_winnable"
+   ],
+   "family_rollup": {
+    "hawk pinned": {
+     "n_concepts": 76,
+     "r7_verdicts": {
+      "install-only": 73,
+      "concept-consistent": 2,
+      "off-target": 1
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.41039101779460907,
+     "switch_on": {
+      "n_median": 1000.0,
+      "bh_significant": 75,
+      "flip_rate_median": 0.343500018119812,
+      "target_margin_median": 1.927449643611908,
+      "oracle_iia_star_median": 0.9923694526799229,
+      "iia_net_star_median": 0.9785856803935358,
+      "pairs_pooled": {
+       "pairs": 75510,
+       "informative_share": 0.3576612369222619,
+       "informative_reproduces_D(s)": 0.980412485651868,
+       "informative_leaves_D(b)": 0.9871514792461213,
+       "uninformative_keeps_D(b)": 0.9888872853225573
+      },
+      "ceiling": {
+       "network_own": 0.6600000262260437,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9773129718721221
+      }
+     },
+     "specificity": {
+      "n_median": 1000.0,
+      "bh_significant": 15,
+      "flip_rate_median": 0.15650000423192978,
+      "target_margin_median": 0.009179285727441311,
+      "oracle_iia_star_median": 0.12830714666818666,
+      "F_median": 0.15650000423192978,
+      "E_median": -0.01799999177455902,
+      "rho_median": -0.01910085535929818,
+      "pairs_pooled": {
+       "pairs": 76000,
+       "informative_share": 0.44892105263157894,
+       "informative_reproduces_D(s)": 0.09660589718037399,
+       "informative_leaves_D(b)": 0.25628700392754555,
+       "uninformative_keeps_D(b)": 0.8940117472900052
+      },
+      "ceiling": {
+       "network_own": 0.46550002694129944,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.0039964711008138205
+      }
+     },
+     "switch_off": {
+      "n_median": 213.0,
+      "bh_significant": 2,
+      "flip_rate_median": 0.01740920264273882,
+      "target_margin_median": -0.5668095648288727,
+      "oracle_iia_star_median": 0.01740920264273882,
+      "iia_net_star_median": 0.02668781850711454,
+      "pairs_pooled": {
+       "pairs": 17926,
+       "informative_share": 0.2476849269217896,
+       "informative_reproduces_D(s)": 0.14504504504504503,
+       "informative_leaves_D(b)": 0.2126126126126126,
+       "uninformative_keeps_D(b)": 0.9879875426368085
+      },
+      "ceiling": {
+       "network_own": 0.7818953096866608,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.21810467541217804
+      }
+     }
+    },
+    "hen pinned": {
+     "n_concepts": 76,
+     "r7_verdicts": {
+      "install-only": 73,
+      "off-target": 2,
+      "concept-consistent": 1
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.3595438450574875,
+     "switch_on": {
+      "n_median": 1000.0,
+      "bh_significant": 74,
+      "flip_rate_median": 0.4006236046552658,
+      "target_margin_median": 1.852791666984558,
+      "oracle_iia_star_median": 0.9915611394368775,
+      "iia_net_star_median": 0.9623560732949359,
+      "pairs_pooled": {
+       "pairs": 75007,
+       "informative_share": 0.385750663271428,
+       "informative_reproduces_D(s)": 0.974804728001659,
+       "informative_leaves_D(b)": 0.9882145572682657,
+       "uninformative_keeps_D(b)": 0.979792937295162
+      },
+      "ceiling": {
+       "network_own": 0.6088090240955353,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9589106768875384
+      }
+     },
+     "specificity": {
+      "n_median": 1000.0,
+      "bh_significant": 15,
+      "flip_rate_median": 0.1600000113248825,
+      "target_margin_median": 0.007691257866099477,
+      "oracle_iia_star_median": 0.13088843329050198,
+      "F_median": 0.1600000113248825,
+      "E_median": -0.01900000125169754,
+      "rho_median": -0.019685292574243483,
+      "pairs_pooled": {
+       "pairs": 76000,
+       "informative_share": 0.4450789473684211,
+       "informative_reproduces_D(s)": 0.10447584698161178,
+       "informative_leaves_D(b)": 0.27177319221900315,
+       "uninformative_keeps_D(b)": 0.8899558969981505
+      },
+      "ceiling": {
+       "network_own": 0.4570000320672989,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.004147709597415282
+      }
+     },
+     "switch_off": {
+      "n_median": 221.5,
+      "bh_significant": 1,
+      "flip_rate_median": 0.020500104874372482,
+      "target_margin_median": -0.5207644701004028,
+      "oracle_iia_star_median": 0.020500104874372482,
+      "iia_net_star_median": 0.04545445047503918,
+      "pairs_pooled": {
+       "pairs": 17599,
+       "informative_share": 0.275356554349679,
+       "informative_reproduces_D(s)": 0.140321914981428,
+       "informative_leaves_D(b)": 0.19603796945934793,
+       "uninformative_keeps_D(b)": 0.9875323453305105
+      },
+      "ceiling": {
+       "network_own": 0.7432128489017487,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.25678715109825134
+      }
+     }
+    },
+    "tiger offered_attr": {
+     "n_concepts": 4,
+     "r7_verdicts": {
+      "inert": 2,
+      "install-only": 2
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.20198121666908264,
+     "switch_on": {
+      "n_median": 1000.0,
+      "bh_significant": 4,
+      "flip_rate_median": 0.25300000607967377,
+      "target_margin_median": 0.3036185950040817,
+      "oracle_iia_star_median": 0.3083802062693871,
+      "iia_net_star_median": 0.20940883674389327,
+      "pairs_pooled": {
+       "pairs": 4000,
+       "informative_share": 0.36875,
+       "informative_reproduces_D(s)": 0.3694915254237288,
+       "informative_leaves_D(b)": 0.5579661016949152,
+       "uninformative_keeps_D(b)": 0.9227722772277228
+      },
+      "ceiling": {
+       "network_own": 0.6230000257492065,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9807980694893443
+      }
+     },
+     "specificity": {
+      "n_median": 1000.0,
+      "bh_significant": 0,
+      "flip_rate_median": 0.055000001564621925,
+      "target_margin_median": -0.001573213201481849,
+      "oracle_iia_star_median": 0.019450837181367604,
+      "F_median": 0.055000001564621925,
+      "E_median": -0.05400000512599945,
+      "rho_median": -0.20308437596552642,
+      "pairs_pooled": {
+       "pairs": 4000,
+       "informative_share": 0.2955,
+       "informative_reproduces_D(s)": 0.07614213197969544,
+       "informative_leaves_D(b)": 0.13705583756345177,
+       "uninformative_keeps_D(b)": 0.9677075940383251
+      },
+      "ceiling": {
+       "network_own": 0.3070000112056732,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.004228890583347151
+      }
+     },
+     "switch_off": {
+      "n_median": 1000.0,
+      "bh_significant": 1,
+      "flip_rate_median": 0.039500001817941666,
+      "target_margin_median": -0.15398330241441727,
+      "oracle_iia_star_median": 0.013500000350177288,
+      "iia_net_star_median": 0.03985504502550988,
+      "pairs_pooled": {
+       "pairs": 4000,
+       "informative_share": 0.2525,
+       "informative_reproduces_D(s)": 0.08811881188118811,
+       "informative_leaves_D(b)": 0.10891089108910891,
+       "uninformative_keeps_D(b)": 0.9822742474916388
+      },
+      "ceiling": {
+       "network_own": 0.741500049829483,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.21150001138448715
+      }
+     }
+    },
+    "tiger win_now": {
+     "n_concepts": 1,
+     "r7_verdicts": {
+      "off-target": 1
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.049778006970882416,
+     "switch_on": {
+      "n_median": 1000,
+      "bh_significant": 0,
+      "flip_rate_median": 0.17100000381469727,
+      "target_margin_median": 0.0845547541975975,
+      "oracle_iia_star_median": 0.1090425797525234,
+      "iia_net_star_median": 0.08313532365680348,
+      "pairs_pooled": {
+       "pairs": 1000,
+       "informative_share": 0.421,
+       "informative_reproduces_D(s)": 0.16152019002375298,
+       "informative_leaves_D(b)": 0.32779097387173395,
+       "uninformative_keeps_D(b)": 0.9430051813471503
+      },
+      "ceiling": {
+       "network_own": 0.5790000557899475,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9494682583855099
+      }
+     },
+     "specificity": {
+      "n_median": 1000,
+      "bh_significant": 0,
+      "flip_rate_median": 0.14300000667572021,
+      "target_margin_median": 0.01192318182438612,
+      "oracle_iia_star_median": 0.0062892280147864525,
+      "F_median": 0.14300000667572021,
+      "E_median": 0.028999999165534973,
+      "rho_median": 0.3488288478343071,
+      "pairs_pooled": {
+       "pairs": 1000,
+       "informative_share": 0.319,
+       "informative_reproduces_D(s)": 0.13793103448275862,
+       "informative_leaves_D(b)": 0.29153605015673983,
+       "uninformative_keeps_D(b)": 0.9265785609397944
+      },
+      "ceiling": {
+       "network_own": 0.3190000057220459,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": -0.0031446140073932262
+      }
+     },
+     "switch_off": {
+      "n_median": 1000,
+      "bh_significant": 0,
+      "flip_rate_median": 0.018000001087784767,
+      "target_margin_median": -0.05025305971503258,
+      "oracle_iia_star_median": 0.006000000052154064,
+      "iia_net_star_median": -0.011363718463717018,
+      "pairs_pooled": {
+       "pairs": 1000,
+       "informative_share": 0.264,
+       "informative_reproduces_D(s)": 0.022727272727272728,
+       "informative_leaves_D(b)": 0.03409090909090909,
+       "uninformative_keeps_D(b)": 0.9877717391304348
+      },
+      "ceiling": {
+       "network_own": 0.7360000610351562,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.2330000102519989
+      }
+     }
+    },
+    "tiger winnable": {
+     "n_concepts": 19,
+     "r7_verdicts": {
+      "install-only": 18,
+      "concept-consistent": 1
+     },
+     "rho_ge_threshold": 0,
+     "abs_cos_das_probe_median": 0.1997094601392746,
+     "switch_on": {
+      "n_median": 1000,
+      "bh_significant": 19,
+      "flip_rate_median": 0.28700000047683716,
+      "target_margin_median": 1.117618203163147,
+      "oracle_iia_star_median": 0.7884615715262477,
+      "iia_net_star_median": 0.7866667964723582,
+      "pairs_pooled": {
+       "pairs": 19000,
+       "informative_share": 0.3715263157894737,
+       "informative_reproduces_D(s)": 0.8155546111347216,
+       "informative_leaves_D(b)": 0.8253293667658309,
+       "uninformative_keeps_D(b)": 0.9855958462440332
+      },
+      "ceiling": {
+       "network_own": 0.6540000438690186,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.9569472482540562
+      }
+     },
+     "specificity": {
+      "n_median": 1000,
+      "bh_significant": 6,
+      "flip_rate_median": 0.16900001466274261,
+      "target_margin_median": 0.010891083627939224,
+      "oracle_iia_star_median": 0.14945654088493948,
+      "F_median": 0.16900001466274261,
+      "E_median": -0.02199999988079071,
+      "rho_median": -0.024906604140988477,
+      "pairs_pooled": {
+       "pairs": 19000,
+       "informative_share": 0.444,
+       "informative_reproduces_D(s)": 0.11036036036036036,
+       "informative_leaves_D(b)": 0.28105737316263635,
+       "uninformative_keeps_D(b)": 0.8842294585384324
+      },
+      "ceiling": {
+       "network_own": 0.4620000123977661,
+       "network_own_is": "F of the full swap",
+       "oracle_iia_star": 0.006451606824916488
+      }
+     },
+     "switch_off": {
+      "n_median": 1000,
+      "bh_significant": 7,
+      "flip_rate_median": 0.05000000074505806,
+      "target_margin_median": -0.45507898926734924,
+      "oracle_iia_star_median": 0.05000000074505806,
+      "iia_net_star_median": 0.09967851821698161,
+      "pairs_pooled": {
+       "pairs": 19000,
+       "informative_share": 0.2731578947368421,
+       "informative_reproduces_D(s)": 0.12774566473988438,
+       "informative_leaves_D(b)": 0.19865125240847784,
+       "uninformative_keeps_D(b)": 0.9910934105720492
+      },
+      "ceiling": {
+       "network_own": 0.7300000190734863,
+       "network_own_is": "A0 = P(D(b) = D(s))",
+       "oracle_iia_star": 0.27000001072883606
+      }
+     }
+    }
+   }
+  }
+ },
+ "concept_consistent_in_every_set": [
+  "col_2_completable_without_hole",
+  "row_2_completable_square",
+  "square_1_2_completable_square"
+ ],
+ "glossary": {
+  "D(x)": {
+   "range": "a cell",
+   "meaning": "the network's decision on input x: legal argmax of the place head"
+  },
+  "network_own_target": {
+   "range": "-",
+   "meaning": "D(s) for switch-on and switch-off, D(b) for specificity"
+  },
+  "IIA_net_star": {
+   "range": "(-inf, 1], ideal 1, 0 = no effect",
+   "meaning": "(A - A0) / (1 - A0), A = P(D_R = D(s)), A0 = P(D(b) = D(s)); stored as iia_star in C2 arms"
+  },
+  "F": {
+   "range": "[0, 1], ideal 0",
+   "meaning": "specificity flip rate P(D_R != D(b)) on pairs where C is false in both"
+  },
+  "E": {
+   "range": "[-1, 1], ideal <= 0",
+   "meaning": "excess leak: F minus the median F of the null"
+  },
+  "rho": {
+   "range": ">= 0, ideal 0",
+   "meaning": "relative leak E / IIA_net*(switch-on); undefined when that is <= 0; context-blind at >= 0.5"
+  },
+  "oracle_iia_star": {
+   "range": "(-inf, 1]",
+   "meaning": "Wave 1's primary score (target = the rational move), kept for continuity"
+  },
+  "ceiling": {
+   "range": "-",
+   "meaning": "the full-activation patch (z_s into the base), under both targets"
+  },
+  "verdict": {
+   "range": "see VERDICTS",
+   "meaning": "rule 3B.C2; Wave 1b pre-registration S9"
+  },
+  "informative": {
+   "range": "[0, 1]",
+   "meaning": "pairs where the network itself decides differently on source and base, D(s) != D(b)"
+  },
+  "reproduces_D(s)": {
+   "range": "[0, 1], ideal 1",
+   "meaning": "on informative pairs, the patched decision equals D(s)"
+  },
+  "leaves_D(b)": {
+   "range": "[0, 1], ideal 1",
+   "meaning": "on informative pairs, the patched decision differs from D(b)"
+  },
+  "keeps_D(b)": {
+   "range": "[0, 1], ideal 1",
+   "meaning": "on uninformative pairs (D(s) = D(b)), the patched decision stays D(b)"
+  }
+ }
+}
