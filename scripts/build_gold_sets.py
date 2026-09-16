@@ -1,12 +1,15 @@
-"""Build the Wave 1b gold position sets from their configs' recipes
-(3B-causal Wave 1b pre-registration, 2026-09-14, S4).
+"""Build gold position sets from their configs' recipes (3B-causal Wave 1b
+pre-registration 2026-09-14, S4; Wave 1c pre-registration 2026-09-15, S4).
 
 Per config: generate (gold<k> self-play, scripts/generate_positions.py) ->
-dedup within the set -> freshness filter against the pilot (S4.3) -> BSP labels
+dedup within the set -> freshness filter against earlier runs -> BSP labels
 on every basis the run uses -> orbit IDs. Generation runs in parallel across
 configs, the label and orbit jobs in parallel across (config, basis). A step
-whose output exists is skipped, so a rerun resumes. Every step is the repo's own
-CLI, so each file carries the same provenance as any other position set.
+whose output exists is skipped, so a rerun resumes -- but an existing raw or
+final positions file is reused only if its provenance matches the recipe
+(opponents, seed, games): two sets drawn with the same protocol share a raw
+file NAME, and reusing the other draw's data would be silent. Every step is the
+repo's own CLI, so each file carries the same provenance as any other set.
 
 Usage:
     build_gold_sets.py --config=<yaml>... [--dry-run]
@@ -50,8 +53,8 @@ def steps(cfg: dict) -> list[tuple[str, list[str], str]]:
                       "--num-games", str(r["games"]), "--seed", str(r["seed"]),
                       "--device", r["device"], "--output-dir", r["raw_dir"]], raw),
         ("dedup", ["scripts/deduplicate_positions.py", raw, "--output", dedup], dedup),
-        ("fresh", ["scripts/freshness_filter.py", dedup, f"--pilot-run={cfg['pilot_run']}",
-                   f"--output={pos}"], pos),
+        ("fresh", ["scripts/freshness_filter.py", dedup, f"--output={pos}",
+                   *(f"--pilot-run={run}" for run in pilot_runs(cfg))], pos),
     ]
     for basis in cfg["wave1"]["bases"]:
         n = sorted(ROOT.glob(f"data/quarto/bsp_schema-{basis}_*.json"))[0].stem.rsplit("_", 1)[-1]
@@ -63,18 +66,52 @@ def steps(cfg: dict) -> list[tuple[str, list[str], str]]:
     return out
 
 
+def pilot_runs(cfg: dict) -> list[str]:
+    """Earlier runs whose pair boards the set must exclude: ``pilot_runs`` (a
+    list, Wave 1c) or the single ``pilot_run`` of a Wave-1b config."""
+    runs = cfg.get("pilot_runs") or ([cfg["pilot_run"]] if cfg.get("pilot_run") else [])
+    if not runs:
+        raise SystemExit("a gold config needs pilot_runs (or pilot_run) for the freshness filter")
+    return list(runs)
+
+
+def recipe_provenance(path: Path) -> dict | None:
+    """(opponents, seed, num_games) recorded in a raw file, or in the raw source
+    of a deduplicated / filtered one."""
+    import torch
+
+    prov = torch.load(path, map_location="cpu", weights_only=False).get("provenance") or {}
+    src = (prov.get("source_provenances") or [prov])[0]
+    return {k: src.get(k) for k in ("opponents", "seed", "num_games")}
+
+
+def check_reuse(stage: str, out: str, cfg: dict) -> None:
+    """Refuse to reuse an existing raw / positions file drawn with another recipe."""
+    if stage not in ("generate", "fresh"):
+        return
+    r = cfg["positions_recipe"]
+    want = {"opponents": r["opponents"], "seed": r["seed"], "num_games": r["games"]}
+    got = recipe_provenance(ROOT / out)
+    if got != want:
+        raise SystemExit(f"[{stage}] {out} exists but was drawn with {got}, not the recipe's "
+                         f"{want}. Give this set its own raw_dir / positions name.")
+
+
 def main() -> int:
     from scripts.interchange_3b import load_config
 
     args = docopt(__doc__)
-    plans = {c: steps(load_config(c)) for c in args["--config"]}
+    cfgs = {c: load_config(c) for c in args["--config"]}
+    plans = {c: steps(cfg) for c, cfg in cfgs.items()}
     (ROOT / "logs").mkdir(exist_ok=True)
     for stage in STAGES:
         jobs = [(c, argv, out) for c, plan in plans.items() for st, argv, out in plan if st == stage]
         procs = []
         for c, argv, out in jobs:
             if (ROOT / out).exists():
-                print(f"[{stage}] exists, skipped: {out}", flush=True)
+                check_reuse(stage, out, cfgs[c])
+                checked = ", recipe matches" if stage in ("generate", "fresh") else ""
+                print(f"[{stage}] exists{checked}, skipped: {out}", flush=True)
                 continue
             print(f"[{stage}] python {' '.join(argv)}", flush=True)
             if args["--dry-run"]:

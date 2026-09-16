@@ -15,7 +15,7 @@ lib.sae.interchange.feasibility), so the counts are the ones a dry run on a set
 generated with that k would print.
 
 Usage:
-    gold_prefix_sweep.py --config=<yaml> [options]
+    gold_prefix_sweep.py --config=<yaml> [--pilot-run=<json>...] [options]
     gold_prefix_sweep.py (-h | --help)
 
 Options:
@@ -24,7 +24,7 @@ Options:
     --ks=<list>         Prefix lengths [default: 1,2,3,4,5,6,8]
     --games=<n>         Games per k [default: 2000]
     --seed-base=<n>     Game seed is seed-base + k [default: 4000]
-    --pilot-run=<json>  Pilot whose pair boards are excluded
+    --pilot-run=<json>  An earlier run whose pair boards are excluded; repeatable
                         [default: saes/quarto/analysis/3B-causal_champYb_wave1.json]
     --device=<d>        [default: cpu]
     --cap=<n>           Pairs per (concept, kind), as the run [default: 1000]
@@ -134,7 +134,8 @@ def main() -> int:
     ch = Champion(cfg, False, dev)
     gm = get_game_module(champ["game"])
     chosen = wave_concepts(cfg, load_schemas(cfg))
-    pilot_keys, pilot_info = pilot_board_keys(args["--pilot-run"])
+    runs = args["--pilot-run"]
+    pilot_keys, pilot_info = pilot_board_keys(runs[0] if len(runs) == 1 else runs)
     log(f"{ch.name}: {len(chosen)} concepts; pilot boards {pilot_info['pilot_board_orbits']:,} orbits")
 
     rows = []

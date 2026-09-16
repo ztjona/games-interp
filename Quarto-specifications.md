@@ -208,6 +208,10 @@ Position datasets are named after metals to indicate opponent strength progressi
   within the set; generate on **CPU** (near-tied Q-values break differently on
   CUDA, so the device is part of the recipe). Labels carry the set in the
   suffix: `bsp_labels-<basis><Champ>Gold<k>_<n>.pt`, e.g. `hawkYbGold3`.
+  A further independent draw of the same protocol adds `r<i>` (`gold3r2`,
+  `hawkYbGold3r2`) and needs its own raw directory: the raw file name
+  (`positions-gold<k>-<model>_raw.pt`) is shared, and `build_gold_sets.py`
+  refuses to reuse a file whose provenance names another seed.
 
 **BSPs (Animals theme):**
 BSP label sets are named after animals to indicate set size:

@@ -111,3 +111,130 @@ class TestAssignVerdicts:
         i3.assign_verdicts(res, "3B.C1")
         assert all(r["roles"]["R7"]["verdict"] == "context-blind" for r in res)
         assert "rho" not in res[0]["roles"]["R7"]
+
+
+class TestRuleC3Assignment:
+    """Wave 1c S9-S11: installs is the verdict, removal a label, and the removal
+    hypotheses count pinned concepts with a powered switch-off arm."""
+
+    @staticmethod
+    def _concept(bsp, kind, off_n, removes_by_role, e_leak=0.0):
+        def roles():
+            out = {}
+            for role, rem in removes_by_role.items():
+                out[role] = {
+                    "switch_on": {"n": 500, "iia_star": 0.8, "p": 0.001},
+                    "specificity": {"n": 500, "iia_star": None, "F": 0.2, "E": e_leak,
+                                    "p": 0.001 if e_leak else 0.9},
+                    "switch_off": {"n": off_n, "iia_star": 0.6 if rem else 0.0,
+                                   "p": 0.001 if rem else 0.9}}
+            return out
+        return {"bsp_id": bsp, "kind": kind, "n_pairs": {"switch_off": off_n}, "roles": roles()}
+
+    @staticmethod
+    def _roles(off_ok, k2=False, k4=True):
+        return {"R7": False, "R7off": off_ok, "R8k2": k2, "R8k4": k4, "R8k8": True, "R8k16": True}
+
+    def test_install_gate_removal_label_and_c2_continuity(self):
+        res = [self._concept(f"c{i}", "pinned", 80, {"R7": False}) for i in range(4)]
+        gate = i3.assign_verdicts(res, "3B.C3")
+        r7 = res[0]["roles"]["R7"]
+        assert r7["verdict"] == "installs" and r7["removal"] == "does not remove"
+        assert r7["verdict_3B.C2"] == "install-only"
+        assert gate["passed"] and gate["C1_das_concept_consistent"] == 4
+
+    def test_removal_hypotheses_count_pinned_concepts_with_powered_switch_off(self):
+        res = ([self._concept(f"p{i}", "pinned", 80, self._roles(i < 1)) for i in range(4)]
+               + [self._concept("under", "pinned", 10, self._roles(True)),       # switch-off underpowered
+                  self._concept("tig", "winnable", 80, self._roles(True))])      # not pinned
+        rm = i3.assign_verdicts(res, "3B.C3")["removal"]
+        assert rm["concepts"] == 4
+        assert rm["per_representation"]["R8k4"]["fraction"] == 1.0
+        assert rm["H-C6"]["outcome"] == "prediction holds" and rm["H-C6"]["k_star"] == 4
+        assert rm["per_representation"]["R7off"]["fraction"] == 0.25
+        assert rm["H-C7"]["outcome"] == "inconclusive"
+
+    def test_context_blind_subspaces_do_not_count_as_removing(self):
+        res = [self._concept(f"p{i}", "pinned", 80, self._roles(False, k2=True), e_leak=0.7)
+               for i in range(3)]
+        rm = i3.assign_verdicts(res, "3B.C3")["removal"]
+        assert all(rm["per_representation"][f"R8k{k}"]["fraction"] == 0.0 for k in (2, 4, 8, 16))
+        assert rm["H-C6"]["outcome"] == "falsified"
+
+
+class _FakeChampion:
+    """Closed-form champion on toy inputs: z = linear(board, piece)."""
+
+    def __init__(self, d=24, seed=0):
+        from lib.sae import interchange as ix
+        g = torch.Generator().manual_seed(seed)
+        self.Wb, self.Wp = torch.randn(256, d, generator=g) * 0.3, torch.randn(16, d, generator=g)
+        self.readout = ix.LinearReluReadout(torch.randn(16, d, generator=g), torch.zeros(16))
+
+    def hook_values(self, boards, pieces):
+        return boards.reshape(len(boards), -1) @ self.Wb + pieces @ self.Wp
+
+    def logits(self, zp, inputs):
+        ro = self.readout
+        return torch.relu(zp) @ ro.W.T + ro.b
+
+
+class _FakeDictionary:
+    def __init__(self, d=24, d_dict=32, seed=1):
+        g = torch.Generator().manual_seed(seed)
+        self.We = torch.randn(d, d_dict, generator=g)
+        self.W_dec = torch.nn.functional.normalize(torch.randn(d_dict, d, generator=g), dim=1)
+        self.freq = torch.rand(d_dict, generator=g) * 0.5 + 0.01
+
+    def encode(self, z):
+        return torch.relu(z @ self.We)
+
+
+def test_c3_concept_runs_every_registered_representation(monkeypatch):
+    """Wave 1c S7: R1-R7 as Wave 1b, plus R8-k for k in {2,4,8,16} and R7-off
+    where switch-off is powered; S9: every role gets a 3B.C3 verdict, a removal
+    label and the 3B.C2 verdict. The untrained-twin smoke cannot reach R7-off
+    (its switch-off filter keeps no pairs), so it is exercised here."""
+    from lib.sae import interchange as ix
+    from scripts.games import quarto_counterfactuals as qc
+    monkeypatch.setattr(i3, "DAS_STEPS", 25)
+    g = torch.Generator().manual_seed(3)
+    N = 400
+    boards = (torch.rand(N, 16, 4, 4, generator=g) < 0.05).float()
+    pieces = torch.nn.functional.one_hot(torch.randint(16, (N,), generator=g), 16).float()
+    ch, D = _FakeChampion(), _FakeDictionary()
+    Z_all = ch.hook_values(boards, pieces)
+    orbit = torch.randint(60, (N,), generator=g)
+
+    def pairset(kind, n):
+        base = torch.randint(N, (n,), generator=g)
+        legal = torch.rand(n, 16, generator=g) < 0.6
+        legal[:, 0] = True
+        target = torch.zeros(n, 16, dtype=torch.bool)
+        target[torch.arange(n), torch.randint(16, (n,), generator=g)] = True
+        return qc.PairSet(kind, base, torch.randint(16, (n,), generator=g), target, legal,
+                          target.clone(), torch.zeros(n, 8, dtype=torch.bool), torch.zeros(n, dtype=torch.bool))
+
+    pairs = {"switch_on": pairset("switch_on", 150), "specificity": pairset("specificity", 150),
+             "switch_off": pairset("switch_off", 80)}
+    spec = qc.ConceptSpec("row_0_completable_tall", "hawk", "pinned", group=0, pole=0)
+    sl = {"top": list(range(16)), "abs_mcc": torch.rand(32, generator=g)}
+    rec = i3.Records()
+    res = i3.run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, 3,
+                         torch.randn(24, generator=g), None, None, 20, 0, "cpu", rec, rule=ix.RULE_C3)
+    expected = {"R1", "R2", "R3", "R4", "R5", "R7", "R7off", "R8k2", "R8k4", "R8k8", "R8k16"}
+    assert expected <= {r for r, v in res["roles"].items() if isinstance(v, dict)}
+    gate = i3.assign_verdicts([res], ix.RULE_C3)
+    for role in expected:
+        rr = res["roles"][role]
+        assert rr["verdict"] in ix.VERDICTS and rr["removal"] in ("removes", "does not remove", "underpowered")
+        assert "verdict_3B.C2" in rr and rr["switch_off"]["n"] == 80
+    assert f"{spec.bsp_id}|R8k16|switch_off" in rec.rows and f"{spec.bsp_id}|R7off|switch_on" in rec.rows
+    assert gate["removal"]["concepts"] == 1
+
+
+def test_prereqs_list_every_excluded_run():
+    cfg = i3.load_config("configs/3B-causal/champYb-gold3r2.yaml")
+    cfg["pilot_runs"] = cfg["pilot_runs"] + ["saes/quarto/analysis/__nope__.json"]
+    missing = [m for m in i3.check_prereqs(cfg, "x") if m["item"].startswith("earlier run")]
+    assert [m["path"] for m in missing] == ["saes/quarto/analysis/__nope__.json"]

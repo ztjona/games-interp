@@ -1,12 +1,13 @@
 <#
 .SYNOPSIS
   Phase 3B-causal: interchange interventions on one champion -- Wave 1 on its
-  amalgam, or Wave 1b on fresh gold position sets.
+  amalgam, or a later wave (1b, 1c) on fresh gold position sets.
 
 .DESCRIPTION
   Portable by construction: -Champ selects configs/3B-causal/champ<Tag>.yaml,
-  -Set selects position-set configs champ<Tag>-<set>.yaml (Wave 1b), and
-  nothing else in the pipeline names a champion or a set. Per config:
+  -Set selects position-set configs champ<Tag>-<set>.yaml (their `rule:` picks
+  the wave: 3B.C2 = 1b, 3B.C3 = 1c), and nothing else in the pipeline names a
+  champion or a set. Per config:
 
     1. prerequisites  -- interchange_3b.py --prereqs. Inputs it can produce are
                          produced here (the lines it prints with "RUN: ": probe
@@ -20,13 +21,17 @@
     3. the run        -- only with every design file committed and unmodified
                          (--require-frozen). Wave 1b sets run IN PARALLEL, one
                          per GPU, each logging to logs/3B-causal-<set>.log.
-    4. stage plan     -- stage_3B-causal.md, the git-add list.
+    4. stage plan     -- emit_stage: stage_3B-causal.md only if an output needs git add -f.
 
   Design: Wave 1  docs/diary/2026-09-12_3B-causal-preregistration.md (+ amendments);
-          Wave 1b docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md.
-  Runtime: Wave 1 on champYb ~55 min on one GPU; each Wave-1b set about an hour.
+          Wave 1b docs/diary/2026-09-14_3B-causal-wave1b-preregistration.md;
+          Wave 1c docs/diary/2026-09-15_3B-causal-wave1c-preregistration.md.
+  Runtime: Wave 1 on champYb ~55 min on one GPU; a Wave-1b set ~1 h; a Wave-1c
+  set longer (DAS-k and R7-off), ~1.5-2 h -- sets run in parallel.
 
 .EXAMPLE
+  Wave 1c dry run:  pwsh -File runners\launch.ps1 3B-causal -Set gold3r2,gold5r2 -DryRun
+  Wave 1c run:      pwsh -File runners\launch.ps1 3B-causal -Set gold3r2,gold5r2
   Wave 1b dry run:  pwsh -File runners\launch.ps1 3B-causal -Set gold3,gold5 -DryRun
   Wave 1b smoke:    pwsh -File runners\3B-causal.ps1 -Set gold3 -Smoke
   Wave 1b run:      pwsh -File runners\launch.ps1 3B-causal -Set gold3,gold5
@@ -36,7 +41,7 @@
 #>
 param(
     [string]$Champ = 'Yb',
-    # Wave 1b position sets, comma-separated (gold3,gold5). Empty = Wave 1.
+    # Position sets, comma-separated (gold3,gold5 | gold3r2,gold5r2). Empty = Wave 1.
     [string]$Set = '',
     # Stop after the power table; no interchange score is computed.
     [switch]$DryRun,
@@ -65,7 +70,7 @@ try {
             throw "No config configs/3B-causal/$n.yaml. Copy champYb.yaml (or champYb-gold3.yaml) and change the names."
         }
     }
-    $wave = if ($sets.Count) { 'Wave 1b' } else { 'Wave 1' }
+    $wave = if ($sets.Count) { "sets $($sets -join ',')" } else { 'Wave 1' }
     Write-Host "== 3B-causal $wave on $($names -join ', ') =="
 
     # 1. prerequisites -- the check itself is Python (a tested entry point)
@@ -146,7 +151,7 @@ try {
     $files += @(Get-ChildItem "saes/quarto/analysis/*_topk-*.json" | Where-Object { $_.LastWriteTime -ge $runStart } |
             ForEach-Object { $_.FullName })
     python scripts/emit_stage.py --slug 3B-causal @files
-    Write-Host "`nDone. Results in saes/quarto/analysis/3B-causal_<name>_wave1*.json; commit plan in stage_3B-causal.md"
+    Write-Host "`nDone. Results in saes/quarto/analysis/3B-causal_<name>_wave1*.json; commit what git status lists"
 }
 finally {
     Stop-Transcript | Out-Null

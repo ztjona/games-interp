@@ -4,7 +4,7 @@
   champVe / champYb panel SAEs. CPU analysis on cached SAE codes, so it is
   sequential (no GPU fan-out needed). Verifies each run's inputs are present
   before invoking, writes one JSON per run plus a combined
-  3A_gate_summary.json, and emits stage_3A-dilution.md.
+  3A_gate_summary.json, and runs emit_stage.
 
   Nulls: every panel run is paired with a recipe-matched RANDOM-MODEL SAE
   control (trained by runners/3A-prep.ps1). If a control's _h cache is absent,
@@ -419,7 +419,7 @@ try {
     $files += "$ANALYSIS/3A_gate_summary.json"
     python scripts/emit_stage.py --slug 3A-dilution @files
 
-    Write-Host "`nDone. Per-run JSON in $ANALYSIS/; commit plan in stage_3A-dilution.md"
+    Write-Host "`nDone. Per-run JSON in $ANALYSIS/; commit what git status lists (stage_3A-dilution.md only if a file needs git add -f)"
 }
 finally {
     Stop-Transcript | Out-Null

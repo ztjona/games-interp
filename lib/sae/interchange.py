@@ -44,7 +44,10 @@ RULE_VERSION = "3B.C1"
 # network-own targets, the specificity flip rate F / excess E / relative leak rho,
 # and context-blind = installs AND E significant AND rho >= RHO_CONTEXT_BLIND.
 RULE_C2 = "3B.C2"
-RULES = (RULE_VERSION, RULE_C2)
+# Wave 1c (docs/diary/2026-09-15_3B-causal-wave1c-preregistration.md S9): the
+# 3B.C2 metrics, but the verdict is about INSTALLING; removal is a separate label.
+RULE_C3 = "3B.C3"
+RULES = (RULE_VERSION, RULE_C2, RULE_C3)
 RHO_CONTEXT_BLIND = 0.5
 
 # Pre-registered constants (pre-registration S8). Frozen: changing any of them
@@ -67,15 +70,16 @@ def underpowered_arms(power: dict) -> dict[str, list[str]]:
     return {c: [k for k, v in pw.items() if v["n"] < N_MIN[k]] for c, pw in power.items()}
 
 
-def feasibility(power: dict) -> dict:
-    """The Wave-1b feasibility rule on a design-stage power table."""
-    under = underpowered_arms(power)
-    n_ok = sum(1 for v in under.values() if not v)
+def feasibility(power: dict, arms: Sequence[str] = tuple(N_MIN)) -> dict:
+    """The feasibility rule on a design-stage power table: Wave 1b requires every
+    arm (the default); Wave 1c only the arms its verdict uses (switch-on and
+    specificity). ``powered_in_every_arm`` counts concepts powered in ``arms``."""
+    n_ok = sum(1 for pw in power.values() if all(pw[k]["n"] >= N_MIN[k] for k in arms))
     frac = n_ok / len(power) if power else 0.0
     per_arm = {k: sum(1 for pw in power.values() if pw[k]["n"] >= N_MIN[k]) for k in N_MIN}
-    return {"concepts": len(power), "powered_in_every_arm": n_ok, "fraction": frac,
-            "powered_per_arm": per_arm, "passed": frac >= FEASIBILITY_MIN,
-            "rule": f">= {FEASIBILITY_MIN:.0%} of concepts powered in every arm "
+    return {"concepts": len(power), "powered_in_every_arm": n_ok, "arms": list(arms),
+            "fraction": frac, "powered_per_arm": per_arm, "passed": frac >= FEASIBILITY_MIN,
+            "rule": f">= {FEASIBILITY_MIN:.0%} of concepts powered in {'/'.join(arms)} "
                     f"(n_min {N_MIN})"}
 
 # Machine-readable definitions travel with every report (reporting standard 6).
@@ -110,12 +114,25 @@ GLOSSARY_C2: dict[str, dict[str, str]] = {
     "verdict": {"range": "see VERDICTS", "meaning": f"rule {RULE_C2}; Wave 1b pre-registration S9"},
 }
 
+# Rule 3B.C3 (Wave 1c pre-registration S0, S7, S9). A C3 report carries all three.
+GLOSSARY_C3: dict[str, dict[str, str]] = {
+    "verdict": {"range": "underpowered | context-blind | installs | anti-consistent | off-target | inert",
+                "meaning": f"rule {RULE_C3}: about installing C; Wave 1c pre-registration S9"},
+    "installs": {"range": "verdict", "meaning": "switch-on IIA_net* >= 0.20, BH-significant, not context-blind"},
+    "removal": {"range": "removes | does not remove | underpowered",
+                "meaning": "switch-off IIA_net* >= 0.20 and BH-significant (n >= 50); reported beside the verdict, never changing it"},
+    "verdict_3B.C2": {"range": "see VERDICTS", "meaning": "the Wave-1b verdict of the same arms, for continuity"},
+    "R8k<k>": {"range": "k in {2, 4, 8, 16}", "meaning": "DAS-k: the best k-dimensional subspace, trained like R7"},
+    "R7off": {"range": "-", "meaning": "DAS-1 trained on switch-off pairs alone (the objective check, H-C7)"},
+}
+
 VERDICTS = (
     "concept-consistent",           # installs AND removes C, specifically
     "concept-consistent (on-only)",  # installs C specifically; removal underpowered
     "install-only",                  # installs C specifically; removal measured and fails
     "remove-only",                   # removal works; installation does not
     "context-blind",                 # installs C, but also where C is absent
+    "installs",                      # rule 3B.C3: installs C specifically (removal reported apart)
     "anti-consistent",               # pushes AWAY from the target
     "off-target",                    # changes decisions, not toward the target
     "inert",                         # none of the above
@@ -556,6 +573,100 @@ def train_das_direction_multi(batches: Sequence[DasBatch], readout: Readout,
         return (v / v.norm()).detach()
 
 
+def train_das_subspace_multi(batches: Sequence[DasBatch], readout: Readout, k: int,
+                             steps: int = 300, lr: float = 0.05, seed: int = 0) -> torch.Tensor:
+    """DAS-k (Wave 1c S7): a (d, k) orthonormal basis Q maximising, as
+    :func:`train_das_direction_multi` does, the probability that the patch
+    ``z_b + Q Q^T (z_s - z_b)`` lands the decision in each pair's target set --
+    each kind's loss averaged over its pairs, then the kinds averaged. Q is the
+    QR factor of a free (d, k) parameter, re-orthonormalised at every step."""
+    batches = [b for b in batches if b.z_b.shape[0] > 0]
+    if not batches:
+        raise ValueError("no training pairs")
+    z0 = batches[0].z_b
+    g = torch.Generator().manual_seed(seed)          # CPU generator: reproducible on any device
+    V = torch.randn(z0.shape[1], k, generator=g).to(device=z0.device, dtype=z0.dtype)
+    V = V.detach().requires_grad_(True)
+    opt = torch.optim.Adam([V], lr=lr)
+    neg = torch.finfo(z0.dtype).min / 4
+    for _ in range(steps):
+        Q, _ = torch.linalg.qr(V)
+        losses = []
+        for b in batches:
+            logits = readout(b.z_b + ((b.z_s - b.z_b) @ Q) @ Q.T, b.inputs)
+            legal_l = logits.masked_fill(~b.legal, neg)
+            tgt_l = logits.masked_fill(~(b.target & b.legal), neg)
+            losses.append((torch.logsumexp(legal_l, 1) - torch.logsumexp(tgt_l, 1)).mean())
+        loss = losses[0] if len(losses) == 1 else torch.stack(losses).mean()
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+    with torch.no_grad():
+        return torch.linalg.qr(V)[0].detach()
+
+
+def train_das_subspace_folds(batches: Sequence[DasBatch], folds: Sequence[torch.Tensor],
+                             n_folds: int, readout: Readout, k: int, seeds: Sequence[int],
+                             steps: int = 300, lr: float = 0.05) -> torch.Tensor:
+    """DAS-k for every cross-fitting fold at once: fold f trains on the rows whose
+    fold id is not f, exactly as :func:`train_das_subspace_multi` would on that
+    subset (same per-fold seed and init, same per-kind averaging). Adam is
+    elementwise, so one optimiser over the stacked (n_folds, d, k) parameter takes
+    the steps n_folds separate optimisers would; only the Python and kernel
+    overhead is shared. Returns (n_folds, d, k) orthonormal bases.
+
+    ``batches`` hold ALL of a concept's pairs of each kind; ``folds[i]`` gives
+    each pair's fold id for ``batches[i]``. Needs the closed-form readout (the
+    patched values of all folds go through it as one batch); any other readout
+    falls back to one :func:`train_das_subspace_multi` call per fold."""
+    if not isinstance(readout, LinearReluReadout):
+        out = []
+        for f in range(n_folds):
+            sub = [DasBatch(b.z_b[fo != f], b.z_s[fo != f], b.target[fo != f], b.legal[fo != f],
+                            None if b.inputs is None else tuple(x[fo != f] for x in b.inputs))
+                   for b, fo in zip(batches, folds)]
+            out.append(train_das_subspace_multi(sub, readout, k, steps=steps, lr=lr, seed=seeds[f]))
+        return torch.stack(out)
+    z0 = batches[0].z_b
+    V = torch.stack([torch.randn(z0.shape[1], k, generator=torch.Generator().manual_seed(s))
+                     for s in seeds]).to(device=z0.device, dtype=z0.dtype)
+    V = V.detach().requires_grad_(True)
+    opt = torch.optim.Adam([V], lr=lr)
+    neg = torch.finfo(z0.dtype).min / 4
+    fold_ids = torch.arange(n_folds, device=z0.device).unsqueeze(1)
+    prepared = []
+    for b, fo in zip(batches, folds):
+        train = fo.to(z0.device).unsqueeze(0) != fold_ids                   # (F, n)
+        prepared.append((b.z_b, b.z_s - b.z_b, b.legal, b.target & b.legal, train.to(z0.dtype),
+                         train.any(1)))
+    for _ in range(steps):
+        Q, _ = torch.linalg.qr(V)                                            # (F, d, k)
+        per_kind, has = [], []
+        for zb, dz, legal, tgt, w, any_rows in prepared:
+            zp = zb.unsqueeze(0) + torch.einsum("fnk,fdk->fnd", torch.einsum("nd,fdk->fnk", dz, Q), Q)
+            logits = readout(zp.reshape(-1, zp.shape[-1])).reshape(zp.shape[0], zp.shape[1], -1)
+            ce = (torch.logsumexp(logits.masked_fill(~legal, neg), -1)
+                  - torch.logsumexp(logits.masked_fill(~tgt, neg), -1))        # (F, n)
+            per_kind.append((ce * w).sum(1) / w.sum(1).clamp(min=1))
+            has.append(any_rows)
+        L, H = torch.stack(per_kind), torch.stack(has).to(z0.dtype)          # (kinds, F)
+        loss = ((L * H).sum(0) / H.sum(0).clamp(min=1)).sum()                 # sum of fold losses
+        opt.zero_grad()
+        loss.backward()
+        opt.step()
+    with torch.no_grad():
+        return torch.linalg.qr(V)[0].detach()
+
+
+def covariance_matched_subspaces(delta: torch.Tensor, n: int, k: int,
+                                 generator: torch.Generator) -> torch.Tensor:
+    """Null for DAS-k (Wave 1c S8): ``n`` random k-dimensional subspaces, each
+    spanned by k draws from N(0, Sigma_delta) (as :func:`covariance_matched_directions`)
+    and orthonormalised. Returns (n, d, k)."""
+    dirs = covariance_matched_directions(delta, n * k, generator)        # (n*k, d), unit rows
+    return torch.linalg.qr(dirs.reshape(n, k, -1).transpose(1, 2))[0]
+
+
 # ---------------------------------------------------------------------------
 # Verdict rule 3B.C1
 # ---------------------------------------------------------------------------
@@ -594,7 +705,11 @@ def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None,
     the specificity excess E BH-significant, and rho = E / IIA_net*(switch-on)
     >= 0.5 -- collateral at least half the intended effect. The caller passes
     network-own IIA_net* as ``iia_star`` and E as the specificity arm's
-    ``excess``."""
+    ``excess``.
+
+    3B.C3 (Wave 1c S9): the 3B.C2 arms, but the verdict is about installing --
+    underpowered -> context-blind -> installs -> anti-consistent -> off-target
+    -> inert. Removal never changes it; see :func:`removal_label`."""
     if rule not in RULES:
         raise ValueError(f"unknown rule {rule!r}")
     if on.n < N_MIN_SWITCH_ON or spec.n < N_MIN_SPECIFICITY:
@@ -604,18 +719,20 @@ def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None,
                 and on.significant)
     removes = (off_powered and off.iia_star is not None
                and off.iia_star >= IIA_STAR_FLOOR and off.significant)
-    if rule == RULE_C2:
+    if rule in (RULE_C2, RULE_C3):
         rho = relative_leak(spec, on)
         blind = spec.significant and rho is not None and rho >= RHO_CONTEXT_BLIND
     else:
         blind = spec.significant
     if installs and blind:
         return "context-blind"
+    if installs and rule == RULE_C3:
+        return "installs"                # removal is the separate removal_label
     if installs:
         if not off_powered:
             return "concept-consistent (on-only)"
         return "concept-consistent" if removes else "install-only"
-    if removes:
+    if removes and rule != RULE_C3:      # 3B.C3: removal is a label, never a verdict
         return "remove-only"
     if on.below_null_p5:
         return "anti-consistent"
@@ -626,3 +743,13 @@ def classify(on: ArmResult, spec: ArmResult, off: ArmResult | None,
     if on.flip_significant and not on.significant:
         return "off-target"
     return "inert"
+
+
+def removal_label(off: ArmResult | None) -> str:
+    """Rule 3B.C3's switch-off label, reported beside the verdict and never
+    changing it (Wave 1c S9)."""
+    if off is None or off.n < N_MIN_SWITCH_OFF:
+        return "underpowered"
+    if off.iia_star is not None and off.iia_star >= IIA_STAR_FLOOR and off.significant:
+        return "removes"
+    return "does not remove"

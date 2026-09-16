@@ -6,8 +6,9 @@ Status: OPEN. Founding design note (rationale, evidence, H10, gates):
 Parent: [`../../RESEARCH-STATUS.md`](../../RESEARCH-STATUS.md).
 Predecessor: [`phase-2B.md`](phase-2B.md) (closed 2026-06-09, ch. 5 —
 includes the executed-in-place "Phase 2C" concept-targeting arc).
-Sub-ledger: [`phase-3A.md`](phase-3A.md) — the dilution diagnostic, **CLOSED
-2026-08-25**. Split out when this file passed the ~400-line cap; every 3A
+Sub-ledgers: [`phase-3A.md`](phase-3A.md) — the dilution diagnostic, **CLOSED
+2026-08-25**; [`phase-3B-causal.md`](phase-3B-causal.md) — interchange
+interventions, split out 2026-09-15 at the same cap. Split out when this file passed the ~400-line cap; every 3A
 chapter moved there, so this file is the live ledger for 3B / 3B-causal / 3C /
 3D. Chapters below are the Phase-3-wide ones (champion results, metric policy).
 
@@ -38,7 +39,7 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 | Runs | Step | What | Gate | Status |
 |:---:|---|---|---|---|
 | — | 3A | Dilution diagnostic (co-firing communities, restricted-R², intrinsic dim) on champVe/champTa/**champYb** SAE caches | G-3A: diluted/tiled vs absent | ✅ **CLOSED 2026-08-25 — G-3A PASSES.** 114 cells, 12,151 concept-verdicts, 74.6% `spread`; the wall is a **disjunction** wall. Ledger: [`phase-3A.md`](phase-3A.md); report: [`2026-08-25_3A-final-report.md`](2026-08-25_3A-final-report.md) |
-| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). **Wave 1 RAN 2026-09-13 — gate FAILED as registered** (DAS-1 6%); R1–R6 sealed. A pilot: it exposed an unfloored specificity arm and a confounded switch-off target. **Wave 1b PRE-REGISTERED 2026-09-14** ([`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md)): gold3/gold5, network-own targets. **Built + dry runs feasible 2026-09-14** (gold3 73%, gold5 100% powered in every arm; [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md)); **Wave 1b RAN 2026-09-15: gate FAILED in both sets** (gold3 37%, gold5 2%): DAS-1 installs, does not remove; R1–R6 sealed ([`2026-09-15_3B-causal-wave1b-results.md`](2026-09-15_3B-causal-wave1b-results.md)). [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md) |
+| **1** | **3B-causal** | Gradient-alignment screen + clamp/steer on the **top-K candidate features per BSP** (rank by causal effect, not F1-argmax); LP vs anchored-SAE vs unsup-SAE causal effect (G11 insurance) | — (informs 3C budget) | **PRE-REGISTERED 2026-09-12** — full interchange; Wave 1 = offered-piece swap (pinned vs disjunctive on the same move). Gate: DAS-1. [`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md). **Wave 1 RAN 2026-09-13 — gate FAILED as registered** (DAS-1 6%); R1–R6 sealed. A pilot: it exposed an unfloored specificity arm and a confounded switch-off target. **Wave 1b PRE-REGISTERED 2026-09-14** ([`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md)): gold3/gold5, network-own targets. **Built + dry runs feasible 2026-09-14** (gold3 73%, gold5 100% powered in every arm; [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md)); **Wave 1b RAN 2026-09-15: gate FAILED in both sets** (gold3 37%, gold5 2%): DAS-1 installs, does not remove; R1–R6 sealed ([`2026-09-15_3B-causal-wave1b-results.md`](2026-09-15_3B-causal-wave1b-results.md)). **Wave 1c PRE-REGISTERED 2026-09-15** ([`2026-09-15_3B-causal-wave1c-preregistration.md`](2026-09-15_3B-causal-wave1c-preregistration.md)): install gate; removal as H-C6/H-C7. [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md) |
 | **2** | **3B** (alias `3B-geom`) | Ground-truth geometry: α/β allocation regime; κ_ms curvature; polytope + hierarchy-orthogonality; **H11 linearity-vs-decision-relevance** (LP-only) | — (always runs) | pending -- needs no new compute (alpha by construction, beta from the width sweep on disk) |
 | **3** | 3C | Geometry-aware SAE variants (brief sharpened by 3A — an **aggregating readout over existing sibling atoms**): γ pre-check, hierarchical anchoring, **SASA block decoders (LEAD ARM, adopted 2026-09-04)** vs Matryoshka / H-SAE / MP-SAE vs bilinear slots, **sign-aware arm (tiger)** | G-3C: beat I04 0.255 or ≥50% threat-gap closure, 3 seeds, +centered cross-seed stability | **UNBLOCKED** (G-3A passed) |
 | **4** | 3D | Causal subspace patching → move-change rate; pre-register add-vs-remove asymmetry | — | after 3C |
@@ -46,120 +47,8 @@ sibling runs first; entries dated before 2026-09-04 that say "3B" mean
 ## Chapters
 
 *(appended as results land; date-stamped. 3A's chapters live in
-[`phase-3A.md`](phase-3A.md).)*
-
-
-### 2026-09-15 -- 3B-causal Wave 1b: the gate fails in both sets
-
-Record: [`2026-09-15_3B-causal-wave1b-results.md`](2026-09-15_3B-causal-wave1b-results.md).
-
-- **As registered**: DAS-1 concept-consistent or on-only on gold3 65/176 (37 %),
-  gold5 4/176 (2 %) → gate FAILED in both; H-C0 falsified (the sets agree).
-  R1–R6 unread in both sets; H-C1 to H-C5 untested.
-- **Specificity fixed**: no concept reaches ρ ≥ 0.5; the pilot's
-  context-blindness does not recur.
-- **Removal fails**: DAS-1 installs (pinned IIA_net\* ≈ 0.97) but, on switch-off,
-  leaves the formerly winning cell on only 20–46 % of the pairs where the
-  network itself would. The full patch always does, so the information is in
-  the hook but not along that one direction: the add-vs-remove asymmetry.
-- Decision pending: a new wave with an install gate and a DAS-k removal curve,
-  or close and take removal to 3D.
-
-
-### 2026-09-14 -- 3B-causal Wave 1b built; both gold sets feasible
-
-Record: [`2026-09-14_3B-causal-wave1b-build.md`](2026-09-14_3B-causal-wave1b-build.md).
-Design stage only; no Wave-1b score exists.
-
-- **Gold sets**: gold3 225,197 positions, gold5 132,274 (30,000 games each, CPU;
-  558 / 0 dropped as pilot boards). Generator guard 0 mismatches on both.
-- **Feasible**: powered in every arm gold3 128/176 (73 %; the 48 short are
-  hawk/hen pinned, switch-off only), gold5 176/176. Both sets enter.
-- **Prefix sweep** (descriptive, cannot change *k*): switch-off is the binding
-  arm at every *k*; greedy play rarely hands over a winning piece.
-- **Rule 3B.C2 implemented**; the 3B.C1 path reproduces the pilot's code exactly
-  on the untrained twin.
-- **Correction**: the 3B.C1 code omitted "switch-on not significant" from
-  off-target. One pilot R7 verdict moves off-target → inert; the gate is
-  unaffected.
-
-
-### 2026-09-14 -- 3B-causal Wave 1b pre-registered
-
-Design (frozen on commit):
-[`2026-09-14_3B-causal-wave1b-preregistration.md`](2026-09-14_3B-causal-wave1b-preregistration.md).
-
-- **Fixes the pilot's three flaws**: the primary target is the network's own
-  counterfactual decision (classic interchange accuracy), not the rational move;
-  switch-off is scored against what the network does; specificity counts any
-  decision change where the concept is unchanged, and is context-blind only when
-  that collateral is at least half the intended effect (ρ ≥ 0.5).
-- **DAS-1 is trained toward the network's own counterfactuals** on all three
-  pair kinds; direction nulls are covariance-matched.
-- **Fresh data**: two champYb self-play sets, **gold3 / gold5** (3 or 5 random
-  placements, then best play for both sides; the random player hands over the
-  next piece, then leaves). Every board seen in a pilot pair is excluded. The
-  prefix length is fixed at 3 and 5; a descriptive sweep reports how the data
-  change with it but cannot choose it.
-- **A hypothesis is confirmed or falsified only if gold3 and gold5 agree.**
-- Disclosed: the relative-leak rule was chosen after seeing the pilot; that is
-  why only fresh boards are used. The pilot's R1–R6 stay sealed.
-
-
-### 2026-09-13 -- 3B-causal Wave 1 on champYb: gate fails as registered
-
-Full record: [`2026-09-13_3B-causal-wave1-results.md`](2026-09-13_3B-causal-wave1-results.md).
-
-- **Gate C1 FAILED**: DAS-1 concept-consistent on 11/176 (6%). As registered,
-  no R1–R6 verdict is read; SAE, probe and anchored results stay sealed.
-- **Not the failure the gate targeted.** DAS-1 installs pinned concepts almost
-  perfectly (IIA\* ≈ 1.00) but leaks toward the concept's cell where the concept
-  is false (median +0.061). The network itself does not (+0.006–0.009), so the
-  leak is real, but the verdict rule gives specificity no effect-size floor.
-- **Switch-off target confounded**: the network itself keeps playing *c* ~70%
-  of the time when the win disappears (ceiling 0.24–0.31; likely blocking, not
-  verified); DAS-1 over-drives against it.
-- Exploratory: with a 0.10 specificity floor, 66% would pass. Not adopted.
-- Next: a confirmatory **Wave 1b** on fresh data (pre-registered 2026-09-14,
-  below).
-
-
-### 2026-09-12 -- 3B-causal pre-registered; champYb's legality filter
-
-Full design (frozen on commit):
-[`2026-09-12_3B-causal-preregistration.md`](2026-09-12_3B-causal-preregistration.md).
-
-- **Interchange, not steering.** A dose α is a confound three ways (scale
-  across latents, off-distribution drift, and negative coordinates at a
-  post-ReLU hook). Interchange copies the value a representation takes on a
-  real input where the concept holds, so the dose comes from the data.
-- **Wave 1 = offered-piece swap on a fixed board.** It flips the 8 pinned
-  `*_completable` concepts and their OR (tiger `*_winnable`) together, with the
-  same target cell, so the pinned-vs-disjunctive contrast of 3A §5.1 is tested
-  causally with every nuisance fixed. H-C3 predicts the top-1 latent works
-  only for its own pole and the top-`knee_k` set recovers the variable.
-- **champYb has not learned legality**: raw place argmax on an occupied cell
-  67.2% (chance 34.2%, untrained 47.4%); the engine retries invalid moves
-  rather than penalising them. Decision: proceed. Counterfactuals keep the
-  legal set identical, and illegal logits are never scored.
-- Disclosed before any data: the `‖W d‖` screen and its r = −0.19 with MCC,
-  hence H-C4 is two-sided. That screen was also computed in the wrong space:
-  **every hook is pre-ReLU** (functional ReLU after the module), so SAE
-  directions live in `z` while the heads read `relu(z)`. Patches go back
-  through the network's own ReLU.
-- Training confirmed from source by the training project: every loss masks
-  illegal actions, no legality loss. A new champion is being trained in
-  parallel; 3B-causal is built to re-run on it unchanged.
-- **Amendment log of record** (the pre-registration itself is frozen, so its
-  own log stays empty):
-  1. [`2026-09-12_3B-causal-amendment-1.md`](2026-09-12_3B-causal-amendment-1.md)
-     — **pre-data**: pre-ReLU hook and the corrected Tier-A controls; training
-     facts and Test F; ordered verdict rule with `install-only` /
-     `remove-only`; portability contract.
-  2. [`2026-09-12_3B-causal-amendment-2.md`](2026-09-12_3B-causal-amendment-2.md)
-     — **pre-data**: Wave-1 implementation decisions (pair caps, set-valued
-     targets, R4/R7 cross-fitting, null construction, gate counting,
-     replicates) and freeze verification by SHA-256 stamps.
+[`phase-3A.md`](phase-3A.md); 3B-causal's, from 2026-09-12, in
+[`phase-3B-causal.md`](phase-3B-causal.md).)*
 
 
 ### 2026-09-04 -- 3A bookkeeping closed; plan reordered; SASA adopted

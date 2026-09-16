@@ -1,0 +1,28 @@
+# Phase 3B-causal WAVE 1c run config: champYb on gold3r2, the second draw of gold3.
+#
+# Design (frozen): docs/diary/2026-09-15_3B-causal-wave1c-preregistration.md,
+# verdict rule 3B.C3 (installation is the verdict; removal a label; DAS-k and
+# R7-off test removal). Everything not set here is inherited from champYb.yaml.
+# A hypothesis counts only if gold3r2 and gold5r2 agree (S11).
+
+extends: champYb.yaml
+rule: 3B.C3
+tag: champYb-gold3r2               # outputs: 3B-causal_champYb-gold3r2_wave1c*.json
+
+positions: data/quarto/positions-gold3r2_yb_unique.pt
+orbit_ids: data/quarto/orbit_ids-gold3r2_yb_unique.pt
+labels_suffix: YbGold3r2
+# bsp_suffix stays Yb (inherited): shortlists, 3A knee_k and probes are the amalgam's.
+
+# S4.2: every board of any pair of these runs is excluded (built, then re-checked).
+pilot_runs:
+  - saes/quarto/analysis/3B-causal_champYb_wave1.json
+  - saes/quarto/analysis/3B-causal_champYb-gold3_wave1b.json
+  - saes/quarto/analysis/3B-causal_champYb-gold5_wave1b.json
+
+positions_recipe:
+  opponents: gold3
+  games: 60000               # 2x Wave 1b: switch-off power for H-C6/H-C7 (S4.1)
+  seed: 3103
+  device: cpu                        # near-tied Q-values break differently on CUDA
+  raw_dir: data/quarto_Yb/gold3r2   # its own dir: the raw name is shared with gold3

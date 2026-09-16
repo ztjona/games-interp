@@ -13,7 +13,9 @@ Per set, per concept family:
     patch reproduces D(s) and how often it leaves D(b) at all; on the rest, how
     often it keeps D(b);
   * the full-activation ceiling (network-own and oracle).
-Across sets: concepts whose R7 verdict is concept-consistent in every set.
+Across sets: concepts whose R7 verdict is concept-consistent in every set, and
+a profile of each set's gate-passing concepts -- their verdicts in the other
+set, switch-off removal by pole and group type, removal by pieces on board.
 
 Usage:
     diagnose_3b_wave1b.py [--runs=<globs>] [--output=<json>]
@@ -29,6 +31,7 @@ Options:
 from __future__ import annotations
 
 import json
+import re
 import statistics
 import sys
 from collections import Counter, defaultdict
@@ -121,15 +124,83 @@ def diagnose(run_path: Path) -> dict:
             "gate_passing_concepts": cc, "family_rollup": out}
 
 
+def _pole_and_group(bsp_id: str):
+    m = re.match(r"((row|col|diag|square)_\w+?)_completable_(\w+)", bsp_id)
+    return (m.group(3), m.group(2)) if m else (None, None)
+
+
+def passing_profile(paths: list[Path]) -> dict:
+    """What the gate-passing concepts of each set have in common (added
+    2026-09-15 on request): their verdicts in the other sets, switch-off
+    removal by pole and by group type, and removal by pieces on the board."""
+    where = {p.stem: p for p in paths}
+    runs = {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in paths}
+    res = {r_: {x["bsp_id"]: x for x in run["results"]} for r_, run in runs.items()}
+    out = {}
+    for name, run in runs.items():
+        R = res[name]
+        others = [o for o in res if o != name]
+        passing = {v: sorted(b for b, x in R.items() if x["roles"]["R7"]["verdict"] == v)
+                   for v in ("concept-consistent (on-only)", "concept-consistent")}
+        prof = {}
+        for v, ids in passing.items():
+            prof[v] = {"n": len(ids),
+                       "switch_off_n_median": median([R[b]["n_pairs"]["switch_off"] for b in ids]),
+                       "verdict_in_other_sets": {o: dict(Counter(res[o][b]["roles"]["R7"]["verdict"] for b in ids))
+                                                 for o in others},
+                       "by_pole": dict(Counter(_pole_and_group(b)[0] for b in ids)),
+                       "by_group_type": dict(Counter(_pole_and_group(b)[1] for b in ids))}
+            if v == "concept-consistent":
+                prof[v]["switch_off_here_vs_other"] = {
+                    b: {"here": {k: R[b]["roles"]["R7"]["switch_off"][k] for k in ("iia_star", "ci95", "n")},
+                        **{o: {k: res[o][b]["roles"]["R7"]["switch_off"][k] for k in ("iia_star", "ci95", "n")}
+                           for o in others}} for b in ids}
+        by = {"pole": defaultdict(list), "group_type": defaultdict(list)}
+        for b, x in R.items():
+            a = x["roles"]["R7"].get("switch_off")
+            pole, gt = _pole_and_group(b)
+            if pole and isinstance(a, dict) and a["n"] >= ix.N_MIN_SWITCH_OFF:
+                by["pole"][pole].append(a["iia_star"])
+                by["group_type"][gt].append(a["iia_star"])
+        prof["switch_off_iia_net_star_median"] = {
+            k: {g: {"median": median(v), "concepts": len(v), "undefined": sum(z is None for z in v)}
+                for g, v in sorted(d.items())} for k, d in by.items()}
+        # removal by pieces on the board, pinned concepts, informative pairs
+        rec = torch.load(str(where[name]).replace(".json", "_pairs.pt"),
+                         map_location="cpu", weights_only=False)
+        cfg_pos = run["positions"]
+        npieces = torch.load(ROOT / cfg_pos, map_location="cpu", weights_only=False)["boards"].sum((1, 2, 3)).long()
+        curve = {}
+        for kind in ("switch_on", "switch_off"):
+            acc = defaultdict(lambda: [0, 0, 0])
+            for b, x in R.items():
+                if x["kind"] != "pinned" or f"{b}|R7|{kind}" not in rec:
+                    continue
+                y = rec[f"{b}|R7|{kind}"]
+                dp, db, ds = (y[k].long() for k in ("dec_patched", "dec_base", "dec_source"))
+                n, inf = npieces[y["base"].long()], ds != db
+                for p in n.unique().tolist():
+                    m = (n == p) & inf
+                    a = acc[p]
+                    a[0] += int(m.sum()); a[1] += int((dp == ds)[m].sum()); a[2] += int((dp != db)[m].sum())
+            curve[kind] = {str(p): {"informative": a[0], "reproduces_D(s)": a[1] / a[0], "leaves_D(b)": a[2] / a[0]}
+                           for p, a in sorted(acc.items()) if a[0]}
+        prof["pinned_by_pieces_on_board"] = curve
+        out[name] = prof
+    return out
+
+
 def main() -> int:
     args = docopt(__doc__)
-    sets = {Path(p).stem: diagnose(ROOT / p) for p in args["--runs"].split(",")}
+    paths = args["--runs"].split(",")
+    sets = {Path(p).stem: diagnose(ROOT / p) for p in paths}
     strict = [set(s["gate_passing_concepts"]) for s in sets.values()]
     out = {
         "status": ("POST-HOC DIAGNOSTICS OF FAILED GATES (Wave 1b pre-registration S10). "
                    "R7 and representation-free quantities only; R1-R6 SEALED in every set."),
         "sets": sets,
         "concept_consistent_in_every_set": sorted(set.intersection(*strict)) if strict else [],
+        "passing_profile": passing_profile([ROOT / p for p in paths]),
         "glossary": {**ix.GLOSSARY_C2,
                      "informative": {"range": "[0, 1]", "meaning": "pairs where the network itself decides differently on source and base, D(s) != D(b)"},
                      "reproduces_D(s)": {"range": "[0, 1], ideal 1", "meaning": "on informative pairs, the patched decision equals D(s)"},

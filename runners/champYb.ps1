@@ -200,7 +200,7 @@ try {
         saes/quarto/shipped_saes.jsonl
 
     Write-Host ''
-    Write-Host '=== champYb runner COMPLETE; commit plan in stage_champYb.md ==='
+    Write-Host '=== champYb runner COMPLETE; commit what git status lists (+ stage_champYb.md if a file needs git add -f) ==='
 }
 finally {
     Stop-Transcript | Out-Null

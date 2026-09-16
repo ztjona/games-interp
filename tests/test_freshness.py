@@ -91,3 +91,17 @@ def test_incomplete_pilot_records_abort(pilot):
     torch.save(rec, str(run).replace(".json", "_pairs.pt"))
     with pytest.raises(SystemExit, match="incomplete"):
         pilot_board_keys(run)
+
+
+def test_several_runs_are_excluded_together(pilot, tmp_path):
+    """Wave 1c S4.2: the pilot and both Wave-1b runs are excluded at once."""
+    run, boards, _ = pilot
+    other = tmp_path / "other.json"
+    other.write_text(json.dumps({"config": json.loads(run.read_text(encoding="utf-8"))["config"],
+                                 "power": {"c9": {"switch_on": {"n": 2}, "switch_off": {"n": 1},
+                                                  "specificity": {"n": 0}}}}), encoding="utf-8")
+    torch.save({"c9|R7|switch_on": {"base": torch.tensor([10, 11])},
+                "c9|R7|switch_off": {"base": torch.tensor([12])}}, tmp_path / "other_pairs.pt")
+    keys, info = pilot_board_keys([run, other])
+    assert len(info["runs"]) == 2 and info["pilot_pair_rows"] == 9
+    assert fresh_mask(boards, keys).tolist()[:14] == [False] * 6 + [True] * 4 + [False] * 3 + [True]

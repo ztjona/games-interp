@@ -788,3 +788,31 @@ rational move.
   ignored) is any pilot pair's board is removed at build time
   (`scripts/freshness_filter.py`, `compute_orbit_ids.board_keys`) and
   re-checked when the run starts.
+
+### 9.2 Rule `3B.C3` — Wave 1c (added 2026-09-15)
+
+Frozen in [`diary/2026-09-15_3B-causal-wave1c-preregistration.md`](diary/2026-09-15_3B-causal-wave1c-preregistration.md)
+§7–§11; a config selects it with `rule: 3B.C3`. The arms and metrics are
+3B.C2's (§9.1); what changes is the verdict and what is asked of removal.
+
+- **Verdict** (`interchange.classify(..., rule="3B.C3")`), ordered:
+  `underpowered` → `context-blind` (as 3B.C2) → **`installs`** (switch-on
+  IIA_net\* ≥ 0.20, BH-significant) → `anti-consistent` → `off-target` → `inert`.
+  There is no remove-only verdict.
+- **Removal label** (`interchange.removal_label`), beside the verdict, never
+  changing it: `removes` (switch-off n ≥ 50, IIA_net\* ≥ 0.20, BH-significant) /
+  `does not remove` / `underpowered`. **Removes specifically** = removes and not
+  context-blind. The 3B.C2 verdict is stored too (`verdict_3B.C2`).
+- **Removal representations**: **R8-k (DAS-k)**, k ∈ {2, 4, 8, 16} — the patch
+  `z_b + Q Qᵀ (z_s − z_b)`, Q a (d, k) orthonormal basis trained like R7 (all
+  three kinds, network-own targets, per-kind averaged loss;
+  `train_das_subspace_multi`), against 1,000 random covariance-matched
+  k-subspaces (`covariance_matched_subspaces`); **R7-off** — DAS-1 trained on
+  the switch-off pairs alone (run only where switch-off is powered).
+- **Removal hypotheses** (`interchange_3b.removal_hypotheses`), among pinned
+  concepts with a powered switch-off arm: H-C6 holds if some DAS-k removes
+  specifically for ≥ 50 % (k\* the smallest), is falsified below 20 % at every
+  k; H-C7 the same for R7-off. Per set; confirmed only when both sets agree.
+- **Gate**: R7 `installs` on ≥ 50 % of powered concepts. **Feasibility**: the
+  switch-on and specificity arms only (`feasibility(power, arms)`).
+- **Freshness** against several earlier runs at once (`pilot_runs:`).

@@ -429,3 +429,84 @@ class TestDasMulti:
         w = train_das_direction_multi([a, b], ro, steps=50, seed=4)
         assert torch.allclose(w, train_das_direction_multi([a, b10], ro, steps=50, seed=4), atol=1e-5)
         assert torch.equal(w, train_das_direction_multi([a, empty, b], ro, steps=50, seed=4))
+
+
+class TestRuleC3:
+    """Wave 1c S9: the verdict is about installing; removal is a separate label."""
+
+    @staticmethod
+    def _spec(excess=None, sig=False):
+        return _arm(s=None, sig=sig, excess=excess)
+
+    def test_installing_is_the_verdict_whatever_removal_does(self):
+        for off in (None, _arm(n=80, s=0.6), _arm(n=80, s=0.0, sig=False), _arm(n=10)):
+            assert classify(_arm(s=0.8), self._spec(), off, rule="3B.C3") == "installs"
+
+    def test_context_blind_as_c2_and_no_remove_only(self):
+        assert classify(_arm(s=0.8), self._spec(0.5, sig=True), None, rule="3B.C3") == "context-blind"
+        # removes but does not install: 3B.C2 says remove-only; 3B.C3 has no such verdict
+        on, off = _arm(s=0.05, sig=False), _arm(n=80, s=0.6)
+        assert classify(on, self._spec(), off, rule="3B.C2") == "remove-only"
+        assert classify(on, self._spec(), off, rule="3B.C3") == "inert"
+
+    def test_removal_label(self):
+        from lib.sae.interchange import removal_label
+        assert removal_label(None) == "underpowered"
+        assert removal_label(_arm(n=49, s=0.9)) == "underpowered"
+        assert removal_label(_arm(n=50, s=0.20)) == "removes"
+        assert removal_label(_arm(n=50, s=0.19)) == "does not remove"
+        assert removal_label(_arm(n=50, s=0.9, sig=False)) == "does not remove"
+
+    def test_feasibility_on_chosen_arms(self):
+        from lib.sae.interchange import feasibility
+        pw = {"a": {"switch_on": {"n": 500}, "specificity": {"n": 500}, "switch_off": {"n": 0}}}
+        assert not feasibility(pw)["passed"]
+        assert feasibility(pw, ("switch_on", "specificity"))["passed"]
+
+
+class TestDasSubspace:
+    def test_orthonormal_seeded_and_better_than_its_start(self):
+        from lib.sae.interchange import DasBatch, train_das_subspace_multi
+        ro, zb, zs, tgt, legal = TestDasMulti._setup(n=60, d=12)
+        b = [DasBatch(zb, zs, tgt, legal)]
+        Q = train_das_subspace_multi(b, ro, 3, steps=150, seed=5)
+        assert Q.shape == (12, 3)
+        assert torch.allclose(Q.T @ Q, torch.eye(3), atol=1e-5)
+        assert torch.equal(Q, train_das_subspace_multi(b, ro, 3, steps=150, seed=5))
+
+        def loss(Qm):
+            logits = ro(zb + ((zs - zb) @ Qm) @ Qm.T)
+            return float((torch.logsumexp(logits, 1) - logits[tgt]).mean())
+        Q0 = train_das_subspace_multi(b, ro, 3, steps=0, seed=5)
+        assert loss(Q) < loss(Q0)
+
+    def test_all_folds_at_once_equal_one_fold_at_a_time(self):
+        """Stacking the folds' parameters under one Adam changes the overhead,
+        not the optimisation: every fold's subspace matches a separate fit on
+        its training rows (same seed, same per-kind averaging)."""
+        from lib.sae.interchange import (DasBatch, train_das_subspace_folds,
+                                         train_das_subspace_multi)
+        ro, zb, zs, tgt, legal = TestDasMulti._setup(n=90, d=12)
+        g = torch.Generator().manual_seed(9)
+        batches = [DasBatch(zb[:60], zs[:60], tgt[:60], legal[:60]),
+                   DasBatch(zb[60:], zs[60:], tgt[60:], legal[60:])]
+        folds = [torch.randint(3, (60,), generator=g), torch.randint(3, (30,), generator=g)]
+        folds[1][folds[1] == 2] = 0                       # kind 2 has no rows in fold 2
+        seeds = [11, 12, 13]
+        Qs = train_das_subspace_folds(batches, folds, 3, ro, 2, seeds, steps=60)
+        for f in range(3):
+            sub = [DasBatch(b.z_b[fo != f], b.z_s[fo != f], b.target[fo != f], b.legal[fo != f])
+                   for b, fo in zip(batches, folds)]
+            Q1 = train_das_subspace_multi(sub, ro, 2, steps=60, seed=seeds[f])
+            assert torch.allclose(Qs[f] @ Qs[f].T, Q1 @ Q1.T, atol=1e-4)
+
+    def test_random_subspaces_live_in_the_span_of_real_differences(self):
+        from lib.sae.interchange import covariance_matched_subspaces
+        g = torch.Generator().manual_seed(0)
+        basis = torch.linalg.qr(torch.randn(32, 5, generator=g))[0]
+        delta = torch.randn(400, 5, generator=g) @ basis.T
+        Qs = covariance_matched_subspaces(delta, 50, 3, torch.Generator().manual_seed(1))
+        assert Qs.shape == (50, 32, 3)
+        eye = torch.eye(3).expand(50, 3, 3)
+        assert torch.allclose(Qs.transpose(1, 2) @ Qs, eye, atol=1e-5)
+        assert (Qs - basis @ (basis.T @ Qs)).abs().max() < 1e-4

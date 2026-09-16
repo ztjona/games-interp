@@ -7,6 +7,9 @@ The config's ``rule`` picks the design:
           network-own targets, specificity F / E / rho, B1' null, DAS-1 on all
           three kinds, on a gold position set (freshness re-checked, feasibility
           rule applied before any score).
+  3B.C3 -- Wave 1c: docs/diary/2026-09-15_3B-causal-wave1c-preregistration.md;
+          the 3B.C2 metrics with the verdict about INSTALLING, removal as a label,
+          and the removal representations R8-k (DAS-k) and R7-off (H-C6, H-C7).
 Game-agnostic machinery lives in lib/sae/interchange.py; Quarto pairs in
 scripts/games/quarto_counterfactuals.py; everything champion- or set-specific
 comes from ONE config file (configs/3B-causal/champ<Tag>[-<set>].yaml, which may
@@ -24,6 +27,7 @@ Stages (a --dry-run stops after 4 and computes no interchange score):
 Outputs (in --out-dir):
   3B-causal_<champ>_wave1[_pairs.pt|_dryrun].json      rule 3B.C1
   3B-causal_<tag>_wave1b[_pairs.pt|_dryrun].json       rule 3B.C2 (tag from the config)
+  3B-causal_<tag>_wave1c[_pairs.pt|_dryrun].json       rule 3B.C3
 
 Usage:
     interchange_3b.py --config=<yaml> [options]
@@ -85,9 +89,11 @@ DAS_STEPS, DAS_LR = 400, 0.05                     # amendment 2, B4
 ANALYSIS = ROOT / "saes/quarto/analysis"          # 3A reports and top-K exports live here
 PREREG_GLOB = "docs/diary/*_3B-causal-preregistration.md"
 AMEND_GLOB = "docs/diary/*_3B-causal-amendment-*.md"
-WAVE1B_GLOBS = ("docs/diary/*_3B-causal-wave1b-preregistration.md",
-                "docs/diary/*_3B-causal-wave1b-amendment-*.md")
-ROLES = ("R1", "R2", "R3", "R4", "R5", "R6", "R7")
+WAVE1B_GLOBS = ("docs/diary/*_3B-causal-wave1?-preregistration.md",   # wave1b, wave1c, ...
+                "docs/diary/*_3B-causal-wave1?-amendment-*.md")
+DAS_KS = (2, 4, 8, 16)                            # Wave 1c S7: DAS-k for the removal curve
+ROLES = ("R1", "R2", "R3", "R4", "R5", "R6", "R7", "R7off", *(f"R8k{k}" for k in DAS_KS))
+WAVE_OF_RULE = {"3B.C1": "1", "3B.C2": "1b", "3B.C3": "1c"}
 
 
 def log(msg: str) -> None:
@@ -152,8 +158,8 @@ def check_prereqs(cfg: dict, cfg_path: str | None = None) -> list[dict]:
 
     need("champion checkpoint", champ["path"], "train it (see configs/models/)")
     need("untrained twin", champ["random_path"], "save the E_0000 checkpoint")
-    if cfg.get("pilot_run"):
-        need("pilot run (freshness filter)", cfg["pilot_run"], "the Wave-1 pilot run")
+    for run in (cfg.get("pilot_runs") or ([cfg["pilot_run"]] if cfg.get("pilot_run") else [])):
+        need("earlier run (freshness filter)", run, "the run that produced it (see its config)")
     need("positions", cfg["positions"], build or "runners/champ<Tag>.ps1 (position generation)")
     need("activations", cfg["activations"], "runners/champ<Tag>.ps1 (activation collection)")
     need("orbit ids", cfg["orbit_ids"], build or "python scripts/compute_orbit_ids.py ...")
@@ -409,6 +415,20 @@ def null_directions(ch, d, dirs, chunk=64):
 
 
 @torch.no_grad()
+def null_subspaces(ch, d, Qs, chunk=32):
+    """Decisions under random k-subspace patches (Wave 1c S8); Qs is (draws, d, k)."""
+    delta = d["zs"] - d["zb"]
+    H, DEC = [], []
+    for s in range(0, len(Qs), chunk):
+        Q = Qs[s:s + chunk]
+        zp = d["zb"].unsqueeze(0) + torch.einsum("cnk,cdk->cnd", torch.einsum("nd,cdk->cnk", delta, Q), Q)
+        h, dec = _decide(ch.logits(zp, d["inp"]), d["legal"], d["target"])
+        H.append(h)
+        DEC.append(dec)
+    return torch.cat(H), torch.cat(DEC)
+
+
+@torch.no_grad()
 def null_latent_sets(ch, d, W_dec, sets, chunk=32):
     H, DEC = [], []
     for s in range(0, len(sets), chunk):
@@ -521,11 +541,12 @@ def _cat_arms(parts: list[dict]) -> dict:
 
 def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, anch,
                 anch_idx, n_draws, seed, dev, rec: Records, rule: str = ix.RULE_VERSION) -> dict:
-    c2 = rule == ix.RULE_C2
+    net = rule in (ix.RULE_C2, ix.RULE_C3)       # network-own metrics (3B.C2 and later)
+    c3 = rule == ix.RULE_C3
     rng = torch.Generator().manual_seed(qc._seed(spec.bsp_id, "null", seed))
     res = {"bsp_id": spec.bsp_id, "basis": spec.basis, "kind": spec.kind,
            "n_pairs": {k: v.n for k, v in pairs.items()}, "roles": {}}
-    if c2:
+    if net:
         res["ceiling"] = {}
     data = {}
     for kind, ps in pairs.items():
@@ -539,7 +560,7 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
         hb, db = _decide(lb, legal, target)
         d = dict(zb=zb, zs=zs, inp=inp, legal=legal, target=target, hb=hb, db=db,
                  dA=D.encode(zs) - D.encode(zb), grp=orbit[ps.base], ps=ps)
-        if c2:
+        if net:
             # D(s): the network's own decision on the source, natural forward
             src_inp = (boards[ps.base].to(dev), onehot(ps.src_piece).to(dev))
             hs, ds = _decide(ch.logits(zs, src_inp), legal, target)
@@ -567,7 +588,7 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
     dirs = ix.random_unit_directions(n_draws, Z_all.shape[1], rng).to(dev)
     b1 = {k: null_directions(ch, d, dirs) for k, d in data.items()}   # B1, isotropic
     b1c = None
-    if c2:   # B1': covariance of z_s - z_b over the concept's pairs of all kinds (S8)
+    if net:   # B1': covariance of z_s - z_b over the concept's pairs of all kinds (S8)
         delta = torch.cat([d["zs"] - d["zb"] for d in data.values()])
         dirs_c = ix.covariance_matched_directions(delta, n_draws, rng).to(dev)
         b1c = {k: null_directions(ch, d, dirs_c) for k, d in data.items()}
@@ -581,20 +602,20 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
         A = {"dp": dp, "hp": hp, "hb": g(d["hb"]), "db": g(d["db"]), "grp": gc(d["grp"]),
              "base": gc(d["ps"].base), "src": gc(d["ps"].src_piece), "nh": nh, "nd": nd,
              "nd_iso": nd_iso}
-        if c2:
+        if net:
             A["ds"] = g(d["ds"])
             A["margin"] = ix.target_margin(g(d["lb"]), lp_, g(d["tnet"]), g(d["legal"]))
         return A
 
     def score(kind, A) -> dict:
-        if c2:
+        if net:
             return summarize_c2(kind, A, seed)
         return summarize(A["hp"], A["hb"], A["dp"], A["db"], A["grp"], A["nh"], A["nd"], seed)
 
     def direction_nulls(k, te=None):
         """(nh, nd, nd_iso) for a direction role: B1' primary under 3B.C2."""
         cut = (lambda x: x) if te is None else (lambda x: x[:, te])
-        if c2:
+        if net:
             return cut(b1c[k][0]), cut(b1c[k][1]), cut(b1[k][1])
         return cut(b1[k][0]), cut(b1[k][1]), None
 
@@ -672,13 +693,13 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
                 tr = on["fold"] != f
                 best, best_s = top[0], -1e9
                 inp_tr = (on["inp"][0][tr], on["inp"][1][tr])
-                r0 = float((on["db"][tr] == on["ds"][tr]).float().mean()) if c2 \
+                r0 = float((on["db"][tr] == on["ds"][tr]).float().mean()) if net \
                     else float(on["hb"][tr].float().mean())
                 for j in top[:TOPK]:
                     jt = torch.tensor([j], device=dev)
                     hp, dp = _decide(ch.logits(patch_latents(on, jt, mask=tr), inp_tr),
                                      on["legal"][tr], on["target"][tr])
-                    a = float((dp == on["ds"][tr]).float().mean()) if c2 else float(hp.float().mean())
+                    a = float((dp == on["ds"][tr]).float().mean()) if net else float(hp.float().mean())
                     s = ix.chance_corrected(a, r0)
                     if s is not None and s > best_s:
                         best, best_s = j, s
@@ -733,7 +754,7 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
             target. 3B.C2 (S7): all three kinds toward the network-own targets,
             each kind's loss averaged separately, then the kinds averaged."""
             with torch.enable_grad():
-                if c2:
+                if net:
                     batches = []
                     for d in data.values():
                         tr = d["fold"] != f
@@ -758,6 +779,47 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
         crossfit_role("R7", pick_r7, r7_null)
         res["roles"]["R7"]["cos_with_lp_per_fold"] = cos
 
+    if c3 and "switch_on" in data:
+        # R8-k (DAS-k): k-dimensional subspaces trained exactly like R7 (Wave 1c S7),
+        # against random covariance-matched k-subspaces (S8)
+        delta = torch.cat([d["zs"] - d["zb"] for d in data.values()])
+        for kdim in DAS_KS:
+            Qs = ix.covariance_matched_subspaces(delta, n_draws, kdim, rng).to(dev)
+            sub_null = {kk: null_subspaces(ch, d, Qs) for kk, d in data.items()}
+
+            # every fold's subspace in one optimisation (train_das_subspace_folds:
+            # identical to one fit per fold, seeded per (concept, fold, k))
+            with torch.enable_grad():
+                fold_Q = ix.train_das_subspace_folds(
+                    [ix.DasBatch(d["zb"], d["zs"], d["tnet"], d["legal"], d["inp"]) for d in data.values()],
+                    [d["fold"] for d in data.values()], N_FOLDS, ch.readout, kdim,
+                    [qc._seed(spec.bsp_id, f"das{kdim}_{f}", seed) for f in range(N_FOLDS)],
+                    steps=DAS_STEPS, lr=DAS_LR)
+
+            def pick_r8(f, fold_Q=fold_Q):
+                Q = fold_Q[f]
+                return f"fold{f}", (lambda d, te: ix.patch_subspace(d["zb"][te], d["zs"][te], Q))
+
+            def r8_null(_, sub_null=sub_null):
+                return lambda sub, kk, te: (sub_null[kk][0][:, te], sub_null[kk][1][:, te], None)
+            crossfit_role(f"R8k{kdim}", pick_r8, r8_null)
+
+        # R7-off: DAS-1 trained on the switch-off pairs alone (S7, H-C7)
+        off = data.get("switch_off")
+        if off is None or off["ps"].n < ix.N_MIN_SWITCH_OFF or not all(
+                bool((off["fold"] != f).any()) for f in range(N_FOLDS)):
+            res["roles"]["R7off"] = "not-run: switch-off underpowered"
+        else:
+            def pick_r7off(f):
+                tr = off["fold"] != f
+                with torch.enable_grad():
+                    w = ix.train_das_direction(off["zb"][tr], off["zs"][tr], ch.readout, off["tnet"][tr],
+                                               off["legal"][tr], inputs=(off["inp"][0][tr], off["inp"][1][tr]),
+                                               steps=DAS_STEPS, lr=DAS_LR,
+                                               seed=qc._seed(spec.bsp_id, f"dasoff{f}", seed))
+                return f"fold{f}", (lambda d, te: ix.patch_direction(d["zb"][te], d["zs"][te], w))
+            crossfit_role("R7off", pick_r7off, lambda _: (lambda sub, kk, te: direction_nulls(kk, te)))
+
     # H-C3(b): winnable concepts, switch-on stratified by the single completing pole
     if spec.kind == "winnable" and "switch_on" in data and sl is not None:
         d = data["switch_on"]
@@ -770,7 +832,7 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
                 continue
             Jt = torch.tensor(J, dtype=torch.long, device=dev)
             hp, dp = _decide(ch.logits(patch_latents(d, Jt), d["inp"]), d["legal"], d["target"])
-            hit, base = ((dp == d["ds"]), (d["db"] == d["ds"])) if c2 else (hp, d["hb"])
+            hit, base = ((dp == d["ds"]), (d["db"] == d["ds"])) if net else (hp, d["hb"])
             per_pole = {}
             for kp, suffix in enumerate(qc.POLE_SUFFIXES):
                 m = single & sp[:, kp]
@@ -789,7 +851,8 @@ def run_concept(spec, pairs, ch, Z_all, boards, pieces, orbit, D, sl, knee, lp, 
 
 def assign_verdicts(results: list[dict], rule: str = ix.RULE_VERSION) -> dict:
     """BH within (representation, arm) across concepts, then the ordered rule."""
-    c2 = rule == ix.RULE_C2
+    net = rule in (ix.RULE_C2, ix.RULE_C3)       # network-own metrics (3B.C2 and later)
+    c3 = rule == ix.RULE_C3
     for role in ROLES:
         for kind in qc.PAIR_KINDS:
             rows = [r["roles"][role][kind] for r in results
@@ -808,7 +871,7 @@ def assign_verdicts(results: list[dict], rule: str = ix.RULE_VERSION) -> dict:
                 a = rr.get(k)
                 if not isinstance(a, dict):
                     return None
-                if c2:
+                if net:
                     return ix.ArmResult(n=a["n"], iia_star=a.get("iia_star"),
                                         significant=a.get("bh_significant", False),
                                         below_null_p5=a.get("below_null_p5", False),
@@ -821,18 +884,65 @@ def assign_verdicts(results: list[dict], rule: str = ix.RULE_VERSION) -> dict:
             on, sp, off = arm("switch_on"), arm("specificity"), arm("switch_off")
             rr["verdict"] = ("underpowered" if on is None or sp is None
                              else ix.classify(on, sp, off, rule=rule))
-            if c2 and on is not None and sp is not None:
+            if net and on is not None and sp is not None:
                 rr["rho"] = ix.relative_leak(sp, on)
+            if c3:   # Wave 1c S9: removal is a label beside the verdict; 3B.C2's for continuity
+                rr["removal"] = ix.removal_label(off)
+                rr["verdict_3B.C2"] = ("underpowered" if on is None or sp is None
+                                       else ix.classify(on, sp, off, rule=ix.RULE_C2))
     powered = [r for r in results if isinstance(r["roles"].get("R7"), dict)
                and r["roles"]["R7"].get("verdict", "underpowered") != "underpowered"]
-    cc = [r for r in powered if r["roles"]["R7"]["verdict"] in
-          ("concept-consistent", "concept-consistent (on-only)")]
+    passing = (("installs",) if c3 else ("concept-consistent", "concept-consistent (on-only)"))
+    cc = [r for r in powered if r["roles"]["R7"]["verdict"] in passing]
     frac = len(cc) / len(powered) if powered else 0.0
-    where = ("Wave 1b pre-registration S10, per gold set" if c2
-             else "pre-registration S7 C1; amendment 2 B6")
-    return {"C1_das_concept_consistent": len(cc), "C1_powered": len(powered),
-            "C1_fraction": frac, "passed": frac >= 0.5, "rule_version": rule,
-            "rule": f"R7 concept-consistent or (on-only) for >= 50% of powered concepts ({where})"}
+    where = {ix.RULE_C3: "R7 installs for >= 50% of powered concepts (Wave 1c pre-registration S10, per set)",
+             ix.RULE_C2: "R7 concept-consistent or (on-only) for >= 50% of powered concepts "
+                         "(Wave 1b pre-registration S10, per gold set)"}.get(
+        rule, "R7 concept-consistent or (on-only) for >= 50% of powered concepts "
+              "(pre-registration S7 C1; amendment 2 B6)")
+    gate = {"C1_das_concept_consistent": len(cc), "C1_powered": len(powered),
+            "C1_fraction": frac, "passed": frac >= 0.5, "rule_version": rule, "rule": where}
+    if c3:
+        gate["removal"] = removal_hypotheses(results)
+    return gate
+
+
+def removal_hypotheses(results: list[dict]) -> dict:
+    """H-C6 and H-C7 of the Wave 1c pre-registration (S11), per set: among pinned
+    concepts with a powered switch-off arm, the share each removal representation
+    REMOVES SPECIFICALLY -- removes, and its 3B.C3 verdict is not context-blind;
+    for R7-off, whose install arm is untrained, removal alone (S9)."""
+    base = [r for r in results if r["kind"] == "pinned"
+            and r["n_pairs"].get("switch_off", 0) >= ix.N_MIN_SWITCH_OFF]
+
+    def share(role):
+        n = 0
+        for r in base:
+            rr = r["roles"].get(role)
+            if isinstance(rr, dict) and rr.get("removal") == "removes" and (
+                    role == "R7off" or rr.get("verdict") != "context-blind"):
+                n += 1
+        return {"removes_specifically": n, "of": len(base), "fraction": n / len(base) if base else None}
+
+    def outcome(fracs):
+        fracs = [f for f in fracs if f is not None]
+        if not fracs:
+            return "untestable"
+        if max(fracs) >= 0.5:
+            return "prediction holds"
+        return "falsified" if max(fracs) < 0.2 else "inconclusive"
+
+    per_role = {role: share(role) for role in ("R7", "R7off", *(f"R8k{k}" for k in DAS_KS))}
+    ks = [k for k in DAS_KS if (per_role[f"R8k{k}"]["fraction"] or 0) >= 0.5]
+    return {
+        "concepts": len(base), "per_representation": per_role,
+        "H-C6": {"outcome": outcome([per_role[f"R8k{k}"]["fraction"] for k in DAS_KS]),
+                 "k_star": ks[0] if ks else None,
+                 "rule": ">= 50% at some k in {2,4,8,16}: prediction holds; < 20% at every k: falsified"},
+        "H-C7": {"outcome": outcome([per_role["R7off"]["fraction"]]),
+                 "rule": "R7-off >= 50%: prediction holds; < 20%: falsified"},
+        "note": "per set; a hypothesis is confirmed or falsified only if both sets agree (S11)",
+    }
 
 
 # ---------------------------------------------------------------------------
@@ -848,7 +958,8 @@ def main() -> int:
     rule = cfg.get("rule", ix.RULE_VERSION)
     if rule not in ix.RULES:
         raise SystemExit(f"unknown rule {rule!r} in {args['--config']}")
-    c2 = rule == ix.RULE_C2
+    net = rule in (ix.RULE_C2, ix.RULE_C3)       # network-own metrics (3B.C2 and later)
+    c3 = rule == ix.RULE_C3
     out_dir = ROOT / args["--out-dir"]
     out_dir.mkdir(parents=True, exist_ok=True)
     t_start = time.time()
@@ -889,9 +1000,10 @@ def main() -> int:
         raise SystemExit(f"orbit ids ({len(orbit)}) do not match positions ({T.n})")
 
     fresh = None
-    if c2:   # Wave 1b S4.3: the set must share no board with a pilot pair, up to symmetry
+    if net:   # Wave 1b S4.3: the set must share no board with a pilot pair, up to symmetry
         from scripts.freshness_filter import fresh_mask, pilot_board_keys
-        keys, info = pilot_board_keys(cfg["pilot_run"])
+        runs = cfg.get("pilot_runs") or [cfg["pilot_run"]]          # Wave 1c excludes several runs
+        keys, info = pilot_board_keys(runs[0] if len(runs) == 1 else runs)
         stale = int((~fresh_mask(boards, keys)).sum())
         if stale:
             raise SystemExit(f"FRESHNESS CHECK FAILED: {stale} positions share a board with a "
@@ -944,21 +1056,24 @@ def main() -> int:
 
     pairs, power = design_pairs(ch, specs, raw, boards, pieces, Z_all, cap, seed, dev)
     under = ix.underpowered_arms(power)
-    header = {"rule_version": rule, "wave": "1b" if c2 else 1, "champion": ch.name,
+    wave = WAVE_OF_RULE[rule]
+    header = {"rule_version": rule, "wave": wave if net else 1, "champion": ch.name,
               "untrained_twin": bool(args["--untrained"]), "config": args["--config"],
               "hook": cfg["hook"], "readout": tierA["readout"], "freeze": stamps,
               "tier_a": tierA, "cap": cap, "null_draws": n_draws, "seed": seed,
               "concept_filter": args["--concepts"], "n_concepts": len(specs),
               "power": power, "underpowered_arms": {b: v for b, v in under.items() if v},
-              "glossary": {**ix.GLOSSARY, **ix.GLOSSARY_C2} if c2 else ix.GLOSSARY}
-    if c2:
-        feas = ix.feasibility(power)
+              "glossary": ({**ix.GLOSSARY, **ix.GLOSSARY_C2, **(ix.GLOSSARY_C3 if c3 else {})}
+                           if net else ix.GLOSSARY)}
+    if net:
+        # Wave 1b: every arm; Wave 1c: the arms its verdict uses (S4.4)
+        feas = ix.feasibility(power, ("switch_on", "specificity") if c3 else tuple(ix.N_MIN))
         header.update({"position_set": cfg["tag"], "positions": cfg["positions"],
                        "n_positions": T.n, "freshness": fresh, "feasibility": feas})
         log(f"feasibility: {feas['powered_in_every_arm']}/{feas['concepts']} concepts powered in "
-            f"every arm ({feas['fraction']:.0%}; per arm {feas['powered_per_arm']}); "
+            f"{'/'.join(feas['arms'])} ({feas['fraction']:.0%}; per arm {feas['powered_per_arm']}); "
             f"passed={feas['passed']}")
-        tag = f"3B-causal_{cfg['tag']}{'-UNTRAINED' if args['--untrained'] else ''}_wave1b"
+        tag = f"3B-causal_{cfg['tag']}{'-UNTRAINED' if args['--untrained'] else ''}_wave{wave}"
     else:
         tag = f"3B-causal_{ch.name}_wave1"
     if args["--dry-run"]:
@@ -966,9 +1081,9 @@ def main() -> int:
         out.write_text(json.dumps(header, indent=1), encoding="utf-8")
         log(f"DRY RUN: no interchange score computed. Wrote {rel(out)}")
         return 0
-    if c2 and not header["feasibility"]["passed"] and not args["--concepts"]:
-        header["status"] = ("DROPPED: fewer than 50% of concepts powered in every arm "
-                            "(Wave 1b pre-registration S4.4). No score computed.")
+    if net and not header["feasibility"]["passed"] and not args["--concepts"]:
+        header["status"] = (f"DROPPED: fewer than 50% of concepts powered in {'/'.join(feas['arms'])} "
+                            f"(Wave {wave} pre-registration S4.4). No score computed.")
         out = out_dir / f"{tag}.json"
         out.write_text(json.dumps(header, indent=1), encoding="utf-8")
         log(f"SET DROPPED as infeasible (S4.4); no score computed. Wrote {rel(out)}")
@@ -1023,6 +1138,12 @@ def main() -> int:
                 r["roles"][role]["readable"] = gate["passed"]
     log(f"gate ({rule}): {gate['C1_das_concept_consistent']}/{gate['C1_powered']} "
         f"({gate['C1_fraction']:.2f}) passed={gate['passed']}")
+    if "removal" in gate:
+        rm = gate["removal"]
+        log(f"removal ({rm['concepts']} pinned concepts with powered switch-off): "
+            + ", ".join(f"{k} {v['fraction']:.0%}" for k, v in rm["per_representation"].items()
+                        if v["fraction"] is not None)
+            + f"; H-C6 {rm['H-C6']['outcome']} (k* {rm['H-C6']['k_star']}), H-C7 {rm['H-C7']['outcome']}")
 
     replicates = {}
     if not args["--no-replicates"]:
@@ -1051,7 +1172,7 @@ def main() -> int:
                     legal, target = ps.legal.to(dev), ps.target.to(dev)
                     hb, db = _decide(ch.logits(zb, inp), legal, target)
                     ds = None
-                    if c2:
+                    if net:
                         s_inp = (boards[ps.base].to(dev), onehot(ps.src_piece).to(dev))
                         ds = _decide(ch.logits(zs, s_inp), legal, target)[1]
                     roles = [("R1", sl["top"][:1]), ("R3", sl["top"][:TOPK])]
@@ -1062,7 +1183,7 @@ def main() -> int:
                         hp, dp = _decide(ch.logits(zb + dA[:, Jt] @ Dr.W_dec[Jt], inp), legal, target)
                         row.setdefault(name, {})[kind] = (
                             summarize_c2(kind, {"dp": dp, "hp": hp, "hb": hb, "db": db, "ds": ds,
-                                                "grp": orbit[ps.base]}, seed) if c2
+                                                "grp": orbit[ps.base]}, seed) if net
                             else summarize(hp, hb, dp, db, orbit[ps.base], seed=seed))
                 rows[s.bsp_id] = row
             replicates[rid] = rows

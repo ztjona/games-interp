@@ -1,8 +1,10 @@
-"""Freshness filter for 3B-causal Wave 1b (pre-registration 2026-09-14, S4.3).
+"""Freshness filter for 3B-causal position sets (Wave 1b pre-registration
+2026-09-14, S4.3; Wave 1c pre-registration 2026-09-15, S4.2).
 
 Drops every position whose BOARD, up to the 8 board symmetries (the piece in
-hand ignored), is the board of any pair a pilot run used -- any concept, any
-pair kind. Matching is the seed-0 board-only canonical hash of
+hand ignored), is the board of any pair an earlier run used -- any concept, any
+pair kind, any of the runs given (Wave 1c excludes the pilot and both Wave-1b
+runs). Matching is the seed-0 board-only canonical hash of
 ``scripts/compute_orbit_ids.py`` (``board_keys``).
 
 The pilot's boards come from its per-pair records, R7 keys only: every
@@ -15,14 +17,14 @@ to re-check a filtered set at run time, so the filter and the check share one
 implementation.
 
 Usage:
-    freshness_filter.py <positions_file> --pilot-run=<json> --output=<path>
+    freshness_filter.py <positions_file> --output=<path> --pilot-run=<json>...
     freshness_filter.py (-h | --help)
 
 Options:
     -h --help           Show this help message.
-    --pilot-run=<json>  Pilot run summary, e.g.
+    --pilot-run=<json>  An earlier run's summary, e.g.
                         saes/quarto/analysis/3B-causal_champYb_wave1.json
-                        (its _pairs.pt must sit next to it).
+                        (its _pairs.pt must sit next to it). Repeatable.
     --output=<path>     Filtered positions file; its provenance gains a
                         "freshness" block with the counts removed.
 """
@@ -44,13 +46,20 @@ sys.path.insert(0, str(ROOT))
 from scripts.compute_orbit_ids import board_keys  # noqa: E402
 
 
-def pilot_board_keys(run_json: str | Path) -> tuple[np.ndarray, dict]:
-    """Sorted unique board keys of every pair in a pilot run, and a provenance dict."""
+def pilot_board_keys(run_json: str | Path | list) -> tuple[np.ndarray, dict]:
+    """Sorted unique board keys of every pair in one or several earlier runs,
+    and a provenance dict (per run when several are given)."""
+    if isinstance(run_json, (list, tuple)):
+        parts = [pilot_board_keys(r) for r in run_json]
+        keys = np.unique(np.concatenate([k for k, _ in parts]))
+        return keys, {"runs": [i for _, i in parts], "pilot_board_orbits": int(keys.size),
+                      "pilot_pair_rows": sum(i["pilot_pair_rows"] for _, i in parts),
+                      "hash": parts[0][1]["hash"]}
     run_json = ROOT / run_json
     run = json.loads(run_json.read_text(encoding="utf-8"))
     rec = torch.load(str(run_json).replace(".json", "_pairs.pt"), map_location="cpu",
                      weights_only=False)
-    cfg = yaml.safe_load((ROOT / run["config"]).read_text(encoding="utf-8"))
+    cfg = _load_config(run["config"])
     boards = torch.load(ROOT / cfg["positions"], map_location="cpu", weights_only=False)["boards"]
     bases = []
     for bsp_id, per_kind in run["power"].items():
@@ -71,6 +80,16 @@ def pilot_board_keys(run_json: str | Path) -> tuple[np.ndarray, dict]:
             "pilot_board_orbits": int(keys.size),
             "hash": "scripts/compute_orbit_ids.py board_keys, seed 0"}
     return keys, info
+
+
+def _load_config(path: str) -> dict:
+    """The run's config, following ``extends:`` (a Wave-1b gold config extends
+    its champion's). Imported lazily: interchange_3b imports this module too."""
+    try:
+        from scripts.interchange_3b import load_config
+    except ImportError:          # pragma: no cover
+        return yaml.safe_load((ROOT / path).read_text(encoding="utf-8"))
+    return load_config(path)
 
 
 def fresh_mask(boards: torch.Tensor, pilot_keys: np.ndarray) -> torch.Tensor:
